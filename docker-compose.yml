@@ -1,4 +1,5 @@
-version: '3'
+version: '3.8'
+name: transcendence
 
 services:
   db:
@@ -14,44 +15,36 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       PG_DATA: /var/lib/postgresql/data
-    networks:
-      - ft_transcendance
     env_file:
       - .env
 
-  back:
-    build: "./back/"
+  backend:
+    build: "./backend/"
     container_name: backend
     restart: always
     ports:
       - "3000:3000"
-    command: sh -c "npm install; npm run build; npm run start:dev"
     environment:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
-      - ./back:/app
-    networks:
-      - ft_transcendance
+      - ./backend:/app
     depends_on:
       - "db"
-  front:
+  frontend:
     build:
-      context: "./front/"
+      context: "./frontend/"
       dockerfile: Dockerfile
     container_name: frontend
-     # dockerfile: Dockerfile
-    command: sh -c "npm install ; npm run build ; npm run dev"
     ports:
       - "8080:8080"
     volumes:
-      - ./front:/app
-
+      - ./frontend:/app
 
 volumes:
   db_data:
+
 networks:
-  ft_transcendance:
-    driver: bridge
-    #docker-compose -f docker-compose.yml --env-file .env up --build
+  default:
+    name: transcendence
