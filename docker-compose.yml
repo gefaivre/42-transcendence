@@ -1,12 +1,12 @@
 version: '3.8'
-name: transcendence
+# name: transcendence
 
 services:
   db:
     image: postgres:latest
     volumes:
       - db_data:/var/lib/postgresql/data
-    container_name: postgress
+    container_name: postgres
     restart: always
     expose: 
       - "5432"
