@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: frontend
+    container_name: frontend
+    hostname: frontend
+    ports:
+      - "4173:4173"
+    expose:
+      - "5173"
+    volumes:
+      - ./frontend:/usr/app
+  backend:
+    build:
+      context: backend
+    container_name: backend
+    hostname: backend
+    ports:
+      - "3000:3000"
+    expose:
+      - "5173"
+      - "5432"
+        #      - "5000"
+    volumes:
+      - ./backend:/usr/app
+  db:
+    image: postgres:15
+      container_name: postgresql
+      hostname: postgresql
+      expose:
+         - "5432"
+      environment:
+        POSTGRES_PASSWORD: example
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  volumes:
+    db:
+      name: db
