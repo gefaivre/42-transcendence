@@ -4,7 +4,7 @@
     let username: string;
 
     function getUser() {
-        axios.get(`http://localhost:3000/${username}`)
+        axios.get(`http://localhost:3000/user/${username}`)
             .then(res => {
                 console.log(res)
             })
