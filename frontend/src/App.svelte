@@ -3,6 +3,7 @@
 	import pingBackend from './ping.js';
     import SignUp from './user/SignUp.svelte';
     import GetUser from './user/GetUser.svelte'
+    import Chat from './chat/Chat.svelte'
 </script>
 
 <main>
@@ -11,6 +12,7 @@
 	<button on:click={pingBackend}>connexion au back</button>
     <SignUp></SignUp>
     <GetUser></GetUser>
+    <Chat></Chat>
 </main>
 
 
