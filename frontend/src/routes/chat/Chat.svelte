@@ -8,16 +8,17 @@
       username: string;
       text: string;
     }
+    
   let messages: Message[] = [];
   let textfield = '';
   let username = ''
 
   onMount(() => {
-        socket.emit('getMessages', {}, (res) => {
+        socket.emit('getMessages', {}, (res : Message[]) => {
           messages = [...res]
           })
     })
-  socket.on('recMessage', (message) => {
+  socket.on('recMessage', (message: Message) => {
       messages = [...messages, message]
     });
 
@@ -25,7 +26,7 @@
       const message = textfield.trim();
       if (!message)
         return;
-      let toSend = {username: username, text: textfield};
+      let toSend: Message = {username: username, text: textfield};
       console.log(toSend);
       socket.emit('sendMessage', toSend)
     }
