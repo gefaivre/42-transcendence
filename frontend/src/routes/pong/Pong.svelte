@@ -86,11 +86,11 @@
 
   function handleCollision() {
     if (checkCollision(rightPaddle)) {
-      ball.bouncePaddle()
+      ball.bouncePaddle(rightPaddle)
     }
 
     if (checkCollision(leftPaddle)) {
-      ball.bouncePaddle()
+      ball.bouncePaddle(leftPaddle)
     }
   }
 

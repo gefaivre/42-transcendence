@@ -57,9 +57,16 @@
         this.diry = -this.diry;
     }
 
-    bouncePaddle() {
-      this.dirx = -this.dirx;
-      this.speed = this.speed + BALL_SPEED / 8;
+    bouncePaddle(paddle: Paddle) {
+      let yPaddle: number = this.posy - (paddle.posy + (paddle.height / 2));
+
+      let newAngle: number = Math.asin(yPaddle / paddle.height);
+      this.diry = Math.sin(newAngle);
+      if (this.dirx < 0)
+        this.dirx = Math.cos(newAngle);
+      else
+        this.dirx = -Math.cos(newAngle);
+      this.speed = this.speed + BALL_SPEED / 10;
     }
   };
 
