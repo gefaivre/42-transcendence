@@ -35,12 +35,13 @@
       this.posx = this.frame.width / 2;
       this.posy = this.frame.height / 2;
       this.diry = 1;
+      this.dirx = 0;
       this.speed = BALL_SPEED
       this.initDir();
     }
 
     initDir() {
-      while (Math.abs(this.diry) >= .9) {
+      while (Math.abs(this.diry) >= 0.8 || Math.abs(this.dirx) <= 0.2) {
         let random: number = Math.random() * (Math.PI * 2);
         this.dirx = Math.cos(random);
         this.diry = Math.sin(random);
