@@ -7,7 +7,8 @@
     <p>Welcome to transcendance home page</p>
     <SignUp></SignUp>
     <GetUser></GetUser>
-    <a href="#/test">lien vers la page de test</a>
+    <a href="#/test">lien vers la page de test</a><br>
+    <a href="#/pong">lien vers le pong</a>
 </main>
 
 <style>
