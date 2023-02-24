@@ -1,10 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
-  import { tweened } from "svelte/motion";
 
-  import { Ball } from "./Objects.js"
-  import { Paddle } from "./Objects.js"
-  import { Frame } from "./Objects.ts"
+  import { Ball, Paddle, Frame } from "./Objects.js";
 
   let canvas, ctx;
   let animationId;
