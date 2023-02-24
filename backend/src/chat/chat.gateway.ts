@@ -5,11 +5,11 @@ import { ChatService } from './chat.service';
 import { Message } from './class/Message';
 
 @WebSocketGateway({
+    path: '/chat',
     cors: {
         origin: '*',
     },
 })
-
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private chatService: ChatService) {}

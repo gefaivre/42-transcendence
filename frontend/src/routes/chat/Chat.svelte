@@ -2,7 +2,7 @@
   import  ioClient  from 'socket.io-client';
   import { onMount } from "svelte";
 
-  const socket = ioClient('http://localhost:3000');
+  const socket = ioClient('http://localhost:3000', {path: '/chat'});
 
   class Message {
       username: string;
