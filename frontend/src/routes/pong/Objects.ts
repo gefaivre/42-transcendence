@@ -20,6 +20,7 @@
     diry: number;
     speed: number;
     radius: number;
+    lastCollision: number;
 
     constructor(frame: Frame) {
       this.frame = frame;
@@ -29,6 +30,7 @@
       this.diry = 1;
       this.initDir();
       this.radius = frame.width / 50;
+      this.lastCollision = Date.now();
     }
 
     reset() {
@@ -58,6 +60,9 @@
     }
 
     bouncePaddle(paddle: Paddle) {
+      if (Date.now() - this.lastCollision < 100)
+        return ;
+      this.lastCollision = Date.now();
       let yPaddle: number = this.posy - (paddle.posy + (paddle.height / 2));
 
       let newAngle: number = Math.asin(yPaddle / paddle.height);
