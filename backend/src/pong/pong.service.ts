@@ -46,4 +46,15 @@ export class PongService {
       return 'error';
   }
 
+  getRandomDir() {
+    let dirx: number = 0;
+    let diry: number = 1;
+
+    while (Math.abs(diry) >= 0.8 || Math.abs(dirx) <= 0.2) {
+      let random: number = Math.random() * (Math.PI * 2);
+      dirx = Math.cos(random);
+      diry = Math.sin(random);
+    }
+    return { dirx: dirx, diry: diry }; 
+  }
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte"
+  import  ioClient  from 'socket.io-client';
 
   import { Ball, Paddle, Frame } from "./Objects.js";
 
@@ -17,44 +18,75 @@
   let leftScore: number = 0;
   let rightScore: number = 0;
 
+  const socket = ioClient('http://localhost:3000', {path: '/pong'});
+
   onMount(() => {
     ctx = canvas.getContext("2d");
     draw();
+
+    socket.on('startMessage', () => {
+      stop = false;
+      socket.emit('initDir');
+    });
+
+    socket.on('disconnectMessage', (side: string) => {
+      console.log(side + " has disconnected");
+    });
+
+    socket.on('controlMessage', (control: {side: string, press: boolean, key: string}) => {
+      if (control.press === true) {
+        if (control.side === 'left')
+          startMove(leftPaddle, control.key);
+        else
+          startMove(rightPaddle, control.key);
+      } else {
+        if (control.side === 'left')
+          stopMove(leftPaddle, control.key);
+        else
+          stopMove(rightPaddle, control.key);
+      }
+    });
+
+    socket.on('dirMessage', (dir: { dirx: number, diry: number }) => {
+      ball.initDir(dir);
+    });
 
     game_loop();
     return () => {
       cancelAnimationFrame(animationId);
     };
   });
-
+  
   function start() {
-    stop = false;
+    socket.emit('start', {});
   }
 
-  function handleKeyup(e) {
+  function handleKeyup(e: KeyboardEvent) {
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
       e.preventDefault()
 
-    if (e.key === 'w' || e.key === 's')
-      leftPaddle.stop();
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
-      rightPaddle.stop();
+    socket.emit('control', { press: false, key: e.key });
   }
 
-  function handleKeydown(e) {
+  function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
       e.preventDefault()
 
-    if (e.key === 'w')
-      leftPaddle.moveUp();
-    if (e.key === 's')
-      leftPaddle.moveDown();
-    if (e.key === 'ArrowUp')
-      rightPaddle.moveUp();
-    if (e.key === 'ArrowDown')
-      rightPaddle.moveDown();
+    socket.emit('control', { press: true, key: e.key });
+  }
+  
+  function startMove(paddle: Paddle, key: string) {
+    if (key === 'w' || key === 'ArrowUp')
+      paddle.moveUp();
+    if (key === 's' || key === 'ArrowDown')
+      paddle.moveDown();
+  }
+
+  function stopMove(paddle: Paddle, key: string) {
+    if (key === 'w' || key === 's' || key === 'ArrowUp' || key === 'ArrowDown')
+      paddle.stop();
   }
 
   function game_loop() {
@@ -69,9 +101,13 @@
 
     if (ball.posx - ball.radius <= 0 
       || ball.posx + ball.radius >= frame.width) {
-      stop = true;
       updateScore();
       ball.reset();
+      stop = true;
+      socket.emit('initDir');
+      setTimeout(() => {
+        stop = false;
+      }, 3000);
       draw();
     }
   }

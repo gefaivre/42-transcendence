@@ -2,7 +2,13 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGat
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
 
-@WebSocketGateway()
+@WebSocketGateway({
+    path: '/pong',
+    cors: {
+        origin: '*',
+    },
+})
+
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly pongService: PongService) {}
   @WebSocketServer() server: Server;
@@ -21,6 +27,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.emit('controlMessage', { side: side, press: keyEvent.press, key: keyEvent.key });
   }
 
+  @SubscribeMessage('initDir')
+  initDir() {
+    const dir: { dirx: number; diry: number } = this.pongService.getRandomDir();
+    this.server.emit('dirMessage', dir);
+
+  }
 
   handleConnection(client: Socket) {
     this.pongService.addPlayer(client.id);
