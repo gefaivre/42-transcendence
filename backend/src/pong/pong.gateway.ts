@@ -1,7 +1,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGateway, SubscribeMessage } from '@nestjs/websockets';
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
-import { Message } from './class/Message';
 
 @WebSocketGateway()
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -10,23 +9,25 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('start')
   startGame(client: Socket) {
-    let start: boolean = this.pongService.startGame(client);
+    const start: boolean = this.pongService.startGame(client.id);
     if (start)
       this.server.emit('startMessage', {});
   }
 
   @SubscribeMessage('control')
-  handleControls(client: Socket, payload: Message) {
-    const message: Message = this.pongService.handleControls(payload);
-    this.server.emit('controlMessage', message);
+  handleControls(client: Socket, keyEvent: { press: boolean; key: string }) {
+    const side: string = this.pongService.handleControls(client.id, keyEvent.key);
+    if (side != 'error')
+      this.server.emit('controlMessage', { side: side, press: keyEvent.press, key: keyEvent.key });
   }
 
 
-  handleConnection(client: Socket, ...args: any[]) {
+  handleConnection(client: Socket) {
     this.pongService.addPlayer(client.id);
   }
 
-  handleDisconnect(client: Socket, ...args: any[]) {
-    this.pongService.removePlayer(client.id);
+  handleDisconnect(client: Socket) {
+    const side: string = this.pongService.removePlayer(client.id);
+      this.server.emit('disconnectMessage', side);
   }
 }
