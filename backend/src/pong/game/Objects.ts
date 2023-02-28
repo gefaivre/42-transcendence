@@ -1,5 +1,5 @@
-  const BALL_SPEED: number = 3.5;
-  const PADDLE_SPEED: number = 5;
+  const BALL_SPEED: number = 1.5;
+  const PADDLE_SPEED: number = 2.5;
 
   export class Frame {
     width: number;
@@ -27,24 +27,27 @@
       this.speed = BALL_SPEED;
       this.posx = frame.width / 2;
       this.posy = frame.height / 2 ;
-      this.diry = 0;
+      this.diry = 1;
       this.dirx = 0;
+      this.initDir();
       this.radius = frame.width / 50;
-      this.lastCollision = null;
     }
 
     reset() {
       this.posx = this.frame.width / 2;
       this.posy = this.frame.height / 2;
-      this.diry = 0;
+      this.diry = 1;
       this.dirx = 0;
+      this.initDir();
       this.speed = BALL_SPEED
-      this.lastCollision = null;
     }
 
-    initDir(dir: {dirx: number, diry: number}) {
-      this.dirx = dir.dirx; 
-      this.diry = dir.diry;
+    initDir() {
+      while (Math.abs(this.diry) >= 0.8 || Math.abs(this.dirx) <= 0.2) {
+        let random: number = Math.random() * (Math.PI * 2);
+        this.dirx = Math.cos(random);
+        this.diry = Math.sin(random);
+      }
     }
 
     updatePos() {

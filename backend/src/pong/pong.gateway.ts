@@ -16,22 +16,22 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('start')
   startGame(client: Socket) {
     const start: boolean = this.pongService.startGame(client.id);
-    if (start)
-      this.server.emit('startMessage', {});
+    if (start) {
+      this.server.emit('startMessage');
+      this.pongService.loopGame();
+    }
   }
 
   @SubscribeMessage('control')
   handleControls(client: Socket, keyEvent: { press: boolean; key: string }) {
-    const side: string = this.pongService.handleControls(client.id, keyEvent.key);
-    if (side != 'error')
-      this.server.emit('controlMessage', { side: side, press: keyEvent.press, key: keyEvent.key });
+    this.pongService.handleControls(client.id, keyEvent.press, keyEvent.key);
   }
 
-  @SubscribeMessage('initDir')
-  initDir() {
-    const dir: { dirx: number; diry: number } = this.pongService.getRandomDir();
-    this.server.emit('dirMessage', dir);
-
+  @SubscribeMessage('getState')
+  getGameState() {
+    this.pongService.loopGame();
+    const payload = this.pongService.getGameState();
+    this.server.emit('gameStateMessage', payload);
   }
 
   handleConnection(client: Socket) {
