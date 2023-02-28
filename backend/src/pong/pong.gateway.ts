@@ -1,7 +1,7 @@
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGateway, SubscribeMessage } from '@nestjs/websockets';
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
-import { Interval, Cron } from '@nestjs/schedule';
+import { Interval } from '@nestjs/schedule';
 
 @WebSocketGateway({
     path: '/pong',
