@@ -1,6 +1,7 @@
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGateway, SubscribeMessage } from '@nestjs/websockets';
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
+import { Interval, Cron } from '@nestjs/schedule';
 
 @WebSocketGateway({
     path: '/pong',
@@ -11,14 +12,17 @@ import { Socket, Server } from 'socket.io'
 
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly pongService: PongService) {}
+
   @WebSocketServer() server: Server;
+
+  start: boolean = false;
 
   @SubscribeMessage('start')
   startGame(client: Socket) {
     const start: boolean = this.pongService.startGame(client.id);
     if (start) {
       this.server.emit('startMessage');
-      this.pongService.loopGame();
+      this.start = true;
     }
   }
 
@@ -27,11 +31,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.pongService.handleControls(client.id, keyEvent.press, keyEvent.key);
   }
 
-  @SubscribeMessage('getState')
+  @Interval(1000 / 120)
   getGameState() {
-    this.pongService.loopGame();
-    const payload = this.pongService.getGameState();
-    this.server.emit('gameStateMessage', payload);
+    if (this.start) {
+      this.pongService.loopGame();
+      const payload = this.pongService.getGameState();
+      this.server.emit('gameStateMessage', payload);
+    }
   }
 
   handleConnection(client: Socket) {
@@ -40,6 +46,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     const side: string = this.pongService.removePlayer(client.id);
-      this.server.emit('disconnectMessage', side);
+    this.server.emit('disconnectMessage', side);
+    this.start = false;
   }
 }

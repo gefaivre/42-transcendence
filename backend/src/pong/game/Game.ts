@@ -21,15 +21,6 @@ export class Game {
     this.rightScore = 0;
   }
 
-  start() {
-    this.loop();
-    if (this.leftScore == 10)
-      return 'left';
-    else if (this.rightScore == 10)
-      return 'right'
-    else
-      return 'error';
-  }
   
   loop() {
       this.leftPaddle.updatePos();
@@ -85,19 +76,14 @@ export class Game {
       leftPaddle: {
         posx: this.leftPaddle.posx,
         posy: this.leftPaddle.posy,
-        width: this.leftPaddle.width,
-        height: this.leftPaddle.height,
       },
       rightPaddle: {
         posx: this.rightPaddle.posx,
         posy: this.rightPaddle.posy,
-        width: this.rightPaddle.width,
-        height: this.rightPaddle.height,
       },
       ball: {
         posx: this.ball.posx,
         posy: this.ball.posy,
-        radius: this.ball.radius,
       },
     };
   }

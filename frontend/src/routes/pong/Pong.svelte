@@ -3,8 +3,9 @@
   import  ioClient  from 'socket.io-client';
   import { Ball, Frame, Paddle } from './Objects'
 
-  let canvas, ctx;
-  let animationId;
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D;
+  let animationId: number;
 
   const frame: Frame =  new Frame(600, 400);
   const ball: Ball =  new Ball(frame); 
@@ -27,7 +28,6 @@
     
     socket.on('startMessage', () => {
       console.log("start Message received");
-      game_loop();
     });
 
     socket.on('gameStateMessage', (state) => {
@@ -38,24 +38,25 @@
 
       leftPaddle.posx = state.leftPaddle.posx;
       leftPaddle.posy = state.leftPaddle.posy;
-      leftPaddle.width = state.leftPaddle.width;
-      leftPaddle.height = state.leftPaddle.height;
 
       rightPaddle.posx = state.rightPaddle.posx;
       rightPaddle.posy = state.rightPaddle.posy;
-      rightPaddle.width = state.rightPaddle.width;
-      rightPaddle.height = state.rightPaddle.height;
 
       ball.posx = state.ball.posx;
       ball.posy = state.ball.posy;
-      ball.radius = state.ball.radius;
     });
-
+    
+    game_loop();
     return () => {
       cancelAnimationFrame(animationId);
     };
   });
   
+  function game_loop() {
+    requestAnimationFrame(game_loop);
+    draw();
+  }
+
   function startGame() {
     socket.emit('start', {});
   }
@@ -77,12 +78,6 @@
   }
   
 
-
-  function game_loop() {
-    animationId = requestAnimationFrame(game_loop);
-    socket.emit('getState');
-    draw();
-  }
   
   function drawPaddles() {
     ctx.fillStyle = "green";

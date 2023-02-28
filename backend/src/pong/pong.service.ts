@@ -3,7 +3,6 @@ import { Player } from './class/Player';
 import { Game } from './game/Game';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
-import { Interval } from '@nestjs/schedule';
 
 @Injectable()
 export class PongService {
@@ -49,9 +48,8 @@ export class PongService {
     return false;
   }
 
-  @Interval(1000 / 60)
   loopGame() {
-    this.game.start();
+    this.game.loop();
   }
 
   handleControls(clientId: string, pressed: boolean, key: string) {
