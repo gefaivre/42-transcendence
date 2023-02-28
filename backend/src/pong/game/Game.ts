@@ -30,7 +30,7 @@ export class Game {
     else
       return 'error';
   }
-
+  
   loop() {
       this.leftPaddle.updatePos();
       this.rightPaddle.updatePos();
@@ -42,13 +42,7 @@ export class Game {
       if (this.ball.posx - this.ball.radius <= 0 
         || this.ball.posx + this.ball.radius >= this.frame.width) {
         this.updateScore();
-        if (this.leftScore == 10 || this.rightScore == 10)
-          return ;
         this.ball.reset();
-        this.stop = true;
-        setTimeout(() => {
-          this.stop = false;
-        }, 3000);
       }
   }
 
@@ -83,7 +77,7 @@ export class Game {
 
   getState() {
     return {
-      start: !this.stop,
+      stop: this.stop,
       score: {
         leftScore: this.leftScore,
         rightScore: this.rightScore,

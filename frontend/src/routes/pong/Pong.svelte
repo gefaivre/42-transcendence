@@ -13,7 +13,7 @@
   
   let leftScore: number = 0;
   let rightScore: number = 0;
-  let start: boolean = false;
+  let stop: boolean = true;
 
   const socket = ioClient('http://localhost:3000', {path: '/pong'});
 
@@ -31,11 +31,10 @@
     });
 
     socket.on('gameStateMessage', (state) => {
-      start = state.start;
+      stop = state.stop;
 
       leftScore = state.score.leftScore;
       rightScore = state.score.rightScore;
-      console.log(leftScore," ", rightScore);
 
       leftPaddle.posx = state.leftPaddle.posx;
       leftPaddle.posy = state.leftPaddle.posy;
@@ -77,20 +76,9 @@
     socket.emit('control', { press: true, key: e.key });
   }
   
-  function startMove(paddle: Paddle, key: string) {
-    if (key === 'w' || key === 'ArrowUp')
-      paddle.moveUp();
-    if (key === 's' || key === 'ArrowDown')
-      paddle.moveDown();
-  }
 
-  function stopMove(paddle: Paddle, key: string) {
-    if (key === 'w' || key === 's' || key === 'ArrowUp' || key === 'ArrowDown')
-      paddle.stop();
-  }
 
   function game_loop() {
-    setTimeout(1 / 60);
     animationId = requestAnimationFrame(game_loop);
     socket.emit('getState');
     draw();

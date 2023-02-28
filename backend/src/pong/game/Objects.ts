@@ -20,7 +20,7 @@
     diry: number;
     speed: number;
     radius: number;
-    lastCollision: Paddle;
+    lastCollision: any;
 
     constructor(frame: Frame) {
       this.frame = frame;
@@ -31,6 +31,7 @@
       this.dirx = 0;
       this.initDir();
       this.radius = frame.width / 50;
+      this.lastCollision = null;
     }
 
     reset() {
@@ -39,6 +40,7 @@
       this.diry = 1;
       this.dirx = 0;
       this.initDir();
+      this.lastCollision = null;
       this.speed = BALL_SPEED
     }
 
@@ -60,7 +62,7 @@
     }
 
     bouncePaddle(paddle: Paddle) {
-      if (this.lastCollision && this.lastCollision === paddle)
+      if (this.lastCollision != null && this.lastCollision === paddle)
         return ;
       this.lastCollision = paddle;
 

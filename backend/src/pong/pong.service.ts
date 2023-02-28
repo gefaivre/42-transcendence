@@ -28,6 +28,7 @@ export class PongService {
     const left: boolean = this.players[toRemove].left;
     if (toRemove > -1) {
       this.players.splice(toRemove, 1);
+      this.game = new Game(600, 400);;
       console.log("Player removed, players = " + this.players);
       if (left)
         return 'left';
