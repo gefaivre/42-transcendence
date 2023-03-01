@@ -12,7 +12,7 @@ export class UsersController {
 
   // START CRUD
   
-  @Get(':leaderboard')
+  @Get(':leaderboard') // TODO: To put in other root
   topMmr() {
     return this.usersService.getTopMmr();
   }
