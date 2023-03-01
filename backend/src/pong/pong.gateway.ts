@@ -34,7 +34,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @Interval(1000 / 120)
   getGameState() {
     if (this.start) {
-      this.pongService.loopGame();
+      this.start = this.pongService.loopGame();
       const payload = this.pongService.getGameState();
       this.server.emit('gameStateMessage', payload);
     }

@@ -35,6 +35,14 @@ export class Game {
         this.updateScore();
         this.ball.reset();
       }
+      if (this.leftScore == 10 || this.rightScore == 10) {
+        return ({ 
+          leftScore: this.leftScore,
+          rightScore: this.rightScore
+        });
+      } else {
+          return ({});
+      }
   }
 
   updateScore() {

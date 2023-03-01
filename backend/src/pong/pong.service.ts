@@ -49,7 +49,12 @@ export class PongService {
   }
 
   loopGame() {
-    this.game.loop();
+    let result = this.game.loop();
+    if (JSON.stringify(result) !== '{}')
+      return false;
+    else
+      return true;
+
   }
 
   handleControls(clientId: string, pressed: boolean, key: string) {
