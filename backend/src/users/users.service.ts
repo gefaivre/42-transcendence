@@ -16,7 +16,7 @@ export class UsersService {
         username: createUserDto.username,
         password: createUserDto.password,
         games: 0,
-        mmr: 1000,
+        mmr: 100,
       },
     })
     let string: String
@@ -37,15 +37,6 @@ export class UsersService {
     })
     return user;
   }
-  
-  // async findSome(userWhereInput: Prisma.UserWhereInput) {
-    //   const user = await this.prisma.user.findMany({
-  //     where: {
-  //       data: userWhereInput,
-  //     }
-  //   })
-  //   return user;
-  // }
   
   async update(name: string, updateUserDto: UpdateUserDto) {
     console.log(updateUserDto);
