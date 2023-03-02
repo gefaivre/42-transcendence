@@ -33,5 +33,5 @@ export class CreateMatchDto {
   date: Date;
 
   @IsBoolean()
-  ranked: Boolean;
+  ranked: boolean;
 }

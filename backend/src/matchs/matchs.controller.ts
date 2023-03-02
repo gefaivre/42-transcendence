@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
 import { MatchsService } from './matchs.service';
 import { CreateMatchDto } from './dto/create-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
@@ -18,27 +18,27 @@ export class MatchsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.matchsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateMatchDto: UpdateMatchDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
     return this.matchsService.update(id, updateMatchDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.matchsService.remove(id);
   }
 
-  @Get(':userId')
-  findHistory(@Param('userId') userId: number) {
+  @Get('/history/:userId')
+  findHistory(@Param('userId', ParseIntPipe) userId: number) {
     return this.matchsService.findHistory(userId);
   }
 
-  @Delete(':userId')
-  removeHistory(@Param('userId') userId: number) {
+  @Delete('/history/:userId')
+  removeHistory(@Param('userId', ParseIntPipe) userId: number) {
     return this.matchsService.removeHistory(userId);
   }
   

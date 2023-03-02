@@ -33,5 +33,5 @@ export class UpdateMatchDto {
   date: Date;
 
   @IsBoolean()
-  ranked: Boolean;
+  ranked: boolean;
 }

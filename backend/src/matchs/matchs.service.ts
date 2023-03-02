@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Match } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
@@ -38,7 +37,14 @@ export class MatchsService {
   async update(id: number, updateMatchDto: UpdateMatchDto) {
     return this.prisma.match.update({
       where: { id: id },
-      data: updateMatchDto,
+      data: {
+        winnerId: updateMatchDto.winnerId,
+        winnerScore: updateMatchDto.winnerScore,
+        loserId: updateMatchDto.loserId,
+        loserScore: updateMatchDto.loserScore,
+        date: updateMatchDto.date,
+        ranked: updateMatchDto.ranked,
+      },
     });
   }
 
@@ -60,13 +66,13 @@ export class MatchsService {
   }
 
   async removeHistory(userId: number) {
-    return this.prisma.match.delete({
+    return this.prisma.match.deleteMany({
       where: {
         OR: [
           { winnerId: userId },
           { loserId: userId },
         ]
-      }
+      },
     });
   }
 
