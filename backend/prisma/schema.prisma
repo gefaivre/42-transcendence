@@ -15,6 +15,7 @@ model User {
   username  String        @unique
   password  String
   games     Int
+  mmr       Int
   wins      Match[]       @relation("winner")
   loses     Match[]       @relation("loser")
 }

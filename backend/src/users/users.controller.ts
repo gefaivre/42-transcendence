@@ -8,6 +8,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('leaderboard') // TODO: To put in other controller
+  topMmr() {
+    return this.usersService.getTopMmr();
+  }
+  
+  // START CRUD
+  
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -17,19 +24,23 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-
+  
   @Get(':name')
   findOne(@Param('name') name: string) {
     return this.usersService.findOne(name);
   }
-
+  
   @Patch(':name')
   update(@Param('name') name: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(name, updateUserDto);
   }
-
+  
   @Delete(':name')
   remove(@Param('name') name: string) {
     return this.usersService.remove(name);
   }
+  
+  // END CRUD
+  
+
 }
