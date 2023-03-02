@@ -11,6 +11,8 @@ export class UsersService {
   // START CRUD
   
   async create(createUserDto: CreateUserDto) {
+    if (await this.findOne(createUserDto.username) != null)
+      return "User " + createUserDto.username + " already exist";
     await this.prisma.user.create({
       data: {
         username: createUserDto.username,
