@@ -17,19 +17,37 @@ export class ChannelService {
     });
   }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
 
-  findAll() {
-    return `This action returns all channel`;
+  async findAll() {
+    return await this.prisma.channel.findMany({});
+    //return `This action returns all channel`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} channel`;
+  async findOne(id: number)  {
+    return this.prisma.channel.findUnique({
+      where: {
+        id: id,
+      }
+    });
+    //return `This action returns a #${id} channel`;
   }
 
-  update(id: number, updateChannelDto: UpdateChannelDto) {
-    return `This action updates a #${id} channel`;
+  async update(id: number, updateChannelDto: UpdateChannelDto) {
+    return await this.prisma.channel.update({
+      where: {id: id},
+      data: {
+        name: updateChannelDto.name,
+        ownerId: updateChannelDto.ownerId,
+      },
+    });
+    //return `This action updates a #${id} channel`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} channel`;
+  async remove(id: number) {
+    return await this.prisma.channel.delete({
+      where:
+    {
+      id: id
+    }});
+   // return `This action removes a #${id} channel`;
   }
 }
