@@ -6,7 +6,7 @@ import axios from 'axios'
 @Injectable()
 export class AuthService {
   constructor(
-      private usersService: UsersService,
+    private usersService: UsersService,
     private jwtService: JwtService
   ) {}
 
@@ -28,8 +28,9 @@ export class AuthService {
 
   // TODO error 500 if `code` isn't correct
   async getFortyTwoAccessToken(code: string) {
-    const res = await axios.post('https://api.intra.42.fr/oauth/token', null, { params: {
-      grant_type: 'authorization_code',
+    const res = await axios.post('https://api.intra.42.fr/oauth/token', null, {
+      params: {
+        grant_type: 'authorization_code',
         client_id: process.env.UID,
         client_secret: process.env.SECRET,
         code: code,
@@ -46,6 +47,7 @@ export class AuthService {
     return fortytwouser.data;
   }
 
+  // TODO explicit return statement
   async signin(username: string, password: string) {
     if (await this.usersService.findOne(username) == null) {
       this.usersService.create({ username: username, password: password })

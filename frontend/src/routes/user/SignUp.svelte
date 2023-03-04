@@ -1,33 +1,43 @@
 <script lang="ts">
 
-    import axios from 'axios'
-
     type User = {
-        username: string;
-        password: string;
-       };
-    
-    let user : User = {};
-
-
-    function signUp() {
-        console.log('user ' + user.username + ' sign up')
-        axios.post('http://localhost:3000/user', user)
-            .then((res) => {
-                console.log(res)
-            })
-            .catch((err) => {
-                console.log(err)
-            });
+        username: string
+        password: string
     };
 
-   </script>
+    async function signin(event: any) {
 
-<form on:submit|preventDefault={signUp}>
-    <input type="text" bind:value={user.username} placeholder="enter a username"><br>
-    <input type='password' bind:value={user.password} placeholder="enter password"><br>
+        //console.log(event);
+        //console.log(event.target);
+        //console.log(event.target.username.value);
+        //console.log(event.target.password.value);
 
-    <button type="submit">submit</button>
+        let user: User = {
+            username: event.target.username.value as string,
+            password: event.target.password.value as string
+        }
+
+        const response = await fetch('http://localhost:3000/auth/signin', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+
+        //console.log(response.status)
+        //console.log(response.body)
+
+    }
+
+</script>
+
+<!-- TODO (?) use bind:value -->
+<form on:submit|preventDefault={signin}>
+    <input required type="text" id="username" placeholder="username"/>
+    <input required type="password" id="password" placeholder="password"/>
+    <button type="submit">Create account</button>
 </form>
 
 <style>
@@ -36,5 +46,5 @@
 		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;
-        }
+    }
 </style>
