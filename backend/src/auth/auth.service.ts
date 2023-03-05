@@ -31,8 +31,8 @@ export class AuthService {
     const res = await axios.post('https://api.intra.42.fr/oauth/token', null, {
       params: {
         grant_type: 'authorization_code',
-        client_id: process.env.UID,
-        client_secret: process.env.SECRET,
+        client_id: process.env.FT_UID,
+        client_secret: process.env.FT_SECRET,
         code: code,
         redirect_uri: 'http://localhost:3000/auth/42'
       }
