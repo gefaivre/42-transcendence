@@ -1,27 +1,21 @@
 <script>
-    import SignUp from './user/SignUp.svelte';
-    import GetUser from './user/GetUser.svelte'
+
 </script>
 
 <main>
-    <p>Welcome to transcendance home page</p>
-    <SignUp></SignUp>
-    <GetUser></GetUser>
-    <a href="#/test">lien vers la page de test</a>
+    <h1>Welcome to transcendance home page</h1>
+    <a href="#/test">test</a>
+    <br>
+    <a href="#/usercrud">User CRUD</a>
+    <br>
+    <a href="#/leaderboard">Leaderboard</a>
 </main>
 
 <style>
-        main {
-                text-align: center;
-                padding: 1em;
-                max-width: 240px;
-                margin: 0 auto;
-        }
-
-        @media (min-width: 640px) {
-                main {
-                        max-width: none;
-                }
-        }
+	main {
+		text-align: center;
+		padding: 1em;
+		margin: 0 auto;
+	}
 </style>
 

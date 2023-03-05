@@ -1,0 +1,24 @@
+<script>
+    import AddUser from "./userCRUD/AddUser.svelte";
+    import DeleteAllUser from "./userCRUD/DeleteAllUser.svelte";
+    import DeleteUser from "./userCRUD/DeleteUser.svelte";
+    import GetAllUser from "./userCRUD/GetAllUser.svelte";
+    import GetUser from "./userCRUD/GetUser.svelte";
+    import UpdateUser from "./userCRUD/UpdateUser.svelte";
+
+</script>
+
+
+<h1>--UserCRUD--</h1>
+<AddUser></AddUser>
+<GetAllUser></GetAllUser>
+<GetUser></GetUser>
+<UpdateUser></UpdateUser>
+<DeleteUser></DeleteUser>
+<DeleteAllUser></DeleteAllUser>
+
+<style>
+    h1 {
+        text-align: center;
+    }
+</style>
