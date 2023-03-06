@@ -1,17 +1,12 @@
 <script lang="ts">
     import axios from "axios";
 
-    let username: string;
-
     function DeleteAllUser() {
         axios.delete(`http://localhost:3000/users`)
-            .then(res => {
-                console.log(res.data)
-            })
-            .catch(err => {
-                console.log(err)   
-            })
-        }
+        .then(res => { console.log(res.data) })
+        .catch(err => { console.log(err) })
+    }
+
 </script>
 
 <form on:submit|preventDefault={DeleteAllUser}>
@@ -23,9 +18,9 @@
 
 <style>
     legend {
-    background-color: #ff0000;
-    color: #ffffff;
-    padding: 3px 6px;
+        background-color: #ff0000;
+        color: #ffffff;
+        padding: 3px 6px;
     }
     fieldset {
         border-color: red;
