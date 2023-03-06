@@ -11,7 +11,7 @@
     <GetUser></GetUser>
     <a href="#/test">lien vers la page de test</a>
     <br>
-    <a href={link}>auth</a>
+    <a href={link}>signin with 42</a>
 </main>
 
 <style>
