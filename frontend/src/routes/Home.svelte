@@ -1,19 +1,4 @@
 <script>
-<<<<<<< HEAD
-    import SignUp from './user/SignUp.svelte';
-    import GetUser from './user/GetUser.svelte';
-
-    let link = FT_AUTHORIZE
-</script>
-
-<main>
-    <p>Welcome to transcendance home page</p>
-    <SignUp></SignUp>
-    <GetUser></GetUser>
-    <a href="#/test">lien vers la page de test</a>
-    <br>
-    <a href={link}>signin with 42</a>
-=======
 
 </script>
 
@@ -24,7 +9,8 @@
     <a href="#/usercrud">User CRUD</a>
     <br>
     <a href="#/leaderboard">Leaderboard</a>
->>>>>>> ecce671e252aef6813f4f39cbdbcaec737287ff9
+    <br>
+    <a href="#/signup">signup</a>
 </main>
 
 <style>

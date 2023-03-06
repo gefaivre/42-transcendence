@@ -33,16 +33,26 @@
 
 </script>
 
-<!-- TODO (?) use bind:value -->
-<form on:submit|preventDefault={signin}>
-    <input required type="text" id="username" placeholder="username"/>
-    <input required type="password" id="password" placeholder="password"/>
-    <button type="submit">Create account</button>
-</form>
+<main>
+
+  <!-- TODO (?) use bind:value -->
+  <form on:submit|preventDefault={signin}>
+      <input required type="text" id="username" placeholder="username"/>
+      <input required type="password" id="password" placeholder="password"/>
+      <button type="submit">Create account</button>
+  </form>
+
+  <br>
+  <br>
+
+  <a href={FT_AUTHORIZE}>Signup with 42</a>
+
+</main>
+
 
 <style>
     form {
-        text-align: center;
+      text-align: center;
 		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;
