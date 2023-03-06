@@ -47,12 +47,5 @@ export class AuthService {
     return fortytwouser.data;
   }
 
-  // TODO explicit return statement
-  async signin(username: string, password: string) {
-    if (await this.usersService.findOne(username) == null) {
-      this.usersService.create({ username: username, password: password })
-    }
-  }
-
 }
 

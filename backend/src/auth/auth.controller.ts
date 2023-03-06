@@ -1,30 +1,32 @@
-import { Controller, Get, Post, Request, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
 
-  constructor(private authService: AuthService) {}
-
-  // TODO distinguish whether request succeded or failed
-  @Post(':signin')
-  async signin(@Request() req: any) {
-    return this.authService.signin(req.body.username, req.body.password)
-  }
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService
+    ) {}
 
   @Get(':42')
   async auth42(@Query('code') code: string, @Res() res: Response) {
 
     const access_token = await this.authService.getFortyTwoAccessToken(code);
 
-    const fortytwouser = await this.authService.getFortyTwoUser(access_token);
+    const ft_user = await this.authService.getFortyTwoUser(access_token);
 
-    // add authenticated user to the database
-    this.authService.signin(fortytwouser.login, "password")
+    const user: CreateUserDto = {
+        username: ft_user.login,
+        password: ''
+    }
+    this.usersService.create(user)
 
     // send a jwt to the authenticated user
-    const jwt = await this.authService.login(fortytwouser.login)
+    const jwt = await this.authService.login(ft_user.login)
     console.log(jwt)
 
     // return jwt as a cookie to frontend
