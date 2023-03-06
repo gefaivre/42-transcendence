@@ -5,10 +5,12 @@
     type User = {
         username: string;
         password: string;
-       };
+    }
 
-    let user : User = {};
-
+    let user : User = {
+        username: '',
+        password: ''
+    }
 
     function signUp() {
         axios.post('http://localhost:3000/users', user)
@@ -19,7 +21,6 @@
 </script>
 
 <form on:submit|preventDefault={signUp}>
-
     <fieldset>
         <legend>AddUser</legend>
         <input type="text" bind:value={user.username} placeholder="enter a username"><br>
@@ -30,9 +31,9 @@
 
 <style>
     legend {
-    background-color: #000;
-    color: #fff;
-    padding: 3px 6px;
+        background-color: #000;
+        color: #fff;
+        padding: 3px 6px;
     }
     fieldset {
         text-align: center;

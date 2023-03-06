@@ -7,21 +7,22 @@
         password: string;
         mmr: number;
         games: number;
-       };
-    
-    let user : User = {};
+    }
 
-    let username: string;
+    let user: User = {
+        username: '',
+        password: '',
+        mmr: 0,
+        games: 0
+    }
+
+    let username: string
 
     function UpdateUser() {
         Object.keys(user).forEach((k) => user[k] == null && delete user[k]);
         axios.patch(`http://localhost:3000/users/${username}`, user)
-            .then((res) => {
-                console.log(res.data)
-            })
-            .catch((err) => {
-                console.log(err)
-            });
+        .then((res) => { console.log(res.data) })
+        .catch((err) => { console.log(err) });
     };
 
 </script>
@@ -41,9 +42,9 @@
 
 <style>
     legend {
-    background-color: #000;
-    color: #fff;
-    padding: 3px 6px;
+        background-color: #000;
+        color: #fff;
+        padding: 3px 6px;
     }
     fieldset {
         text-align: center;
