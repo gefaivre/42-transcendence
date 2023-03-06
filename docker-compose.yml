@@ -8,7 +8,7 @@ services:
       - db_data:/var/lib/postgresql/data
     container_name: postgres
     restart: always
-    expose: 
+    expose:
       - "5432"
     environment:
       POSTGRES_DB: "${POSTGRES_DB}"
@@ -29,6 +29,9 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       DATABASE_URL: "${DATABASE_URL}"
+      JWT_SECRET: "${JWT_SECRET}"
+      FT_UID: "${FT_UID}"
+      FT_SECRET: "${FT_SECRET}"
     volumes:
       - ./backend:/app
     depends_on:
@@ -40,6 +43,8 @@ services:
     container_name: frontend
     ports:
       - "8080:8080"
+    environment:
+      FT_AUTHORIZE: "${FT_AUTHORIZE}"
     volumes:
       - ./frontend:/app
 

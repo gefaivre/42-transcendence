@@ -9,6 +9,8 @@
     <a href="#/usercrud">User CRUD</a>
     <br>
     <a href="#/leaderboard">Leaderboard</a>
+    <br>
+    <a href="#/signup">signup</a>
 </main>
 
 <style>

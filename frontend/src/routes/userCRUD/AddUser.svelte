@@ -6,18 +6,14 @@
         username: string;
         password: string;
        };
-    
+
     let user : User = {};
 
 
     function signUp() {
         axios.post('http://localhost:3000/users', user)
-            .then((res) => {
-                console.log(res.data)
-            })
-            .catch((err) => {
-                console.log(err)
-            });
+        .then((res) => { console.log(res.data) })
+        .catch((err) => { console.log(err) });
     };
 
 </script>
