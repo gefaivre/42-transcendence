@@ -12,7 +12,7 @@ export class AuthController {
     private usersService: UsersService
     ) {}
 
-  @Get(':42')
+  @Get('42')
   async auth42(@Query('code') code: string, @Res() res: Response) {
 
     const access_token = await this.authService.getFortyTwoAccessToken(code);
