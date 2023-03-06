@@ -39,6 +39,10 @@ export class UsersController {
   remove(@Param('name') name: string) {
     return this.usersService.remove(name);
   }
+  @Delete()
+  removeAllUsers() {
+    return this.usersService.removeAllUsers();
+  }
   
   // END CRUD
   

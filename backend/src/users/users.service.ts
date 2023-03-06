@@ -18,7 +18,8 @@ export class UsersService {
         username: createUserDto.username,
         password: createUserDto.password,
         games: 0,
-        mmr: 100,
+        mmr: Math.floor(
+          Math.random() * (1500 - 0) + 0),
       },
     })
     let string: String
@@ -41,6 +42,7 @@ export class UsersService {
   }
   
   async update(name: string, updateUserDto: UpdateUserDto) {
+    console.log(name);
     console.log(updateUserDto);
     return this.prisma.user.update({
       where: { username: name },
@@ -52,13 +54,18 @@ export class UsersService {
     return this.prisma.user.delete({ where: { username: name } });
   }
 
+  async removeAllUsers() {
+    return this.prisma.user.deleteMany({});
+    
+  }
+
   // END CRUD
 
   async getTopMmr(){
     return await this.prisma.user.findMany({
       take: 10,
       orderBy: {
-          mmr: 'asc',
+          mmr: 'desc',
       }
     })
 
