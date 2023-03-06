@@ -38,7 +38,7 @@
         {#each tab as i}
         
         <tr>
-            <td class="username" ><a href="#/{i.username}">{i.username}</a></td>
+            <td class="username" >{i.username}</td>
             <td>{i.mmr}</td>
             <td>{i.games}</td>
         </tr>
