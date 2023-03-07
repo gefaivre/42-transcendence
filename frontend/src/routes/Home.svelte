@@ -13,6 +13,8 @@
     <a href="#/signup">signup</a>
     <br>
     <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
+    <br>
+    <a href="#/users">users</a>
 </main>
 
 <style>

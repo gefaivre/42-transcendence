@@ -17,9 +17,8 @@ export class UsersService {
       data: {
         username: createUserDto.username,
         password: createUserDto.password,
-        games: 0,
-        mmr: Math.floor(
-          Math.random() * (1500 - 0) + 0),
+        games:  Math.floor(Math.random() * (150 - 0) + 0),
+        mmr: Math.floor(Math.random() * (1500 - 0) + 0),
       },
     })
     return 'New user add! :  ' + createUserDto.username;
@@ -59,12 +58,6 @@ export class UsersService {
 
   // END CRUD
 
-  async getTopMmr(){
-    return await this.prisma.user.findMany({
-      take: 10,
-      orderBy: {
-          mmr: 'desc',
-      }
-    })
 
-}}
+
+}
