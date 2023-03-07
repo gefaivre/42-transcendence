@@ -15,23 +15,25 @@ export class AuthController {
   @Get('42')
   async auth42(@Query('code') code: string, @Res() res: Response) {
 
+    // exchange code for access token
     const access_token = await this.authService.getFortyTwoAccessToken(code);
 
+    // exchange access token for user data
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
-    const user: CreateUserDto = {
-        username: ft_user.login,
-        password: ''
-    }
+    // register user in database (if not already the case)
+    const user: CreateUserDto = { username: ft_user.login, password: '' }
     this.usersService.create(user)
 
-    // send a jwt to the authenticated user
-    const jwt = await this.authService.login(ft_user.login)
-    console.log(jwt)
+    // bind a jwt to the authenticated user
+    const jwt = await this.authService.loginFortyTwo(ft_user.login, ft_user.id)
 
-    // return jwt as a cookie to frontend
-    res.cookie("jwt", jwt.access_token)
+    // return the jwt as a cookie into frontend
+    res.cookie("jwt", jwt)
+
+    // redirect to frontend
     return res.redirect('http://localhost:8080')
+
   }
 
 }
