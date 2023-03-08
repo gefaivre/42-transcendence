@@ -21,12 +21,6 @@
 		padding: 0em;
         margin: 0%;
     }
-    
-    body {
-        display: flex;
-        flex-flow: column;
-        height: 100%;
-    }
 
 	main {
 		text-align: center;
