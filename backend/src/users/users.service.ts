@@ -35,6 +35,9 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({
       where: {
         username: name,
+      },
+      include: {
+        channels: true
       }
     })
     return user;

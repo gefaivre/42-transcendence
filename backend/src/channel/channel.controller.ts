@@ -12,6 +12,11 @@ export class ChannelController {
     return this.channelService.create(createChannelDto);
   }
 
+  @Post(':id/users/:userId')
+  addUserToChannel(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.channelService.addUserToChannel(+id, +userId);
+}
+
   @Get()
   findAll() {
     return this.channelService.findAll();
