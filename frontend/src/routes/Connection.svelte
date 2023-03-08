@@ -1,15 +1,16 @@
 <script lang="ts">
-
     import { getCookie, deleteCookie } from 'svelte-cookie';
     import { onMount } from "svelte";
     import axios from "axios";
 
-    let profile: string = ''
+    let profile = {
+        username: String,
+        userId: String
+    }
     let logged: boolean = false
     let jwt: string = getCookie('jwt')
 
     onMount(() => {
-
         axios.get('http://localhost:3000/profile', {
             headers : {
                 Authorization: 'Bearer ' + jwt
@@ -17,10 +18,9 @@
         })
         .then((res) => {
             logged = true
-            profile = JSON.stringify(res.data)
+            profile = res.data
         })
         .catch((err) => { console.log(err) })
-
     })
 
     function logout() {
@@ -32,18 +32,29 @@
 
 <main>
 
-    {#if logged}
-        You successfully authenticated as {profile}
-        <br>
-        Your jwt is {jwt}
-    {:else}
-        You not already authenticated...
-    {/if}
-
-    <br>
-
+    <a href={FT_AUTHORIZE}> <button>signin(42)</button> </a>
     <button on:click={logout}>logout</button>
+    <br>
+    {#if logged}
+        <p>You successfully authenticated as <b>{profile.username}</b></p>
+        <br>
+        <p>Your jwt is: </p>
+        <p class="break">{jwt}</p>
+    {:else}
+        <p>You not already authenticated...</p>
+    {/if}
 
 </main>
 
-<style></style>
+
+<style>
+    main {
+        text-align: center;
+		padding: 1em;
+		margin: 0 auto;
+    }
+    .break {
+        text-align: center;
+        word-break: break-all;
+    }
+</style>
