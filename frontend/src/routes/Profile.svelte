@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { getCookie } from 'svelte-cookie';
+    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { onMount } from "svelte";
     import axios from "axios";
 
@@ -23,6 +23,11 @@
 
     })
 
+    function logout() {
+        logged = false
+        deleteCookie('jwt')
+    }
+
 </script>
 
 <main>
@@ -34,6 +39,10 @@
     {:else}
         You not already authenticated...
     {/if}
+
+    <br>
+
+    <button on:click={logout}>logout</button>
 
 </main>
 

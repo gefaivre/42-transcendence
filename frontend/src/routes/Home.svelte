@@ -2,20 +2,18 @@
 
 </script>
 
-<body>
+<main>
+    <h1 class="zoom">Transcendence</h1>
+    <br>
+    <a href="#/usercrud">User CRUD</a>
+    <br>
+    <a href="#/leaderboard">Leaderboard</a>
+    <br>
+    <a href="#/signup">signup</a>
+    <br>
+    <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
+</main>
 
-    <main>
-        <h1 class="zoom">Transcendence</h1>
-        <a href="#/usercrud">User CRUD</a>
-        <br>
-        <a href="#/leaderboard">Leaderboard</a>
-        <br>
-        <a href="#/signup">signup</a>
-        <br>
-        <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
-    </main>
-    
-</body>
 <style>
 
 
