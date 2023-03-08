@@ -2,26 +2,32 @@
 
 </script>
 
-<main>
-    <h1 class="zoom">Transcendence</h1>
-    <a href="#/test">test</a>
-    <br>
-    <a href="#/usercrud">User CRUD</a>
-    <br>
-    <a href="#/leaderboard">Leaderboard</a>
-    <br>
-    <a href="#/signup">signup</a>
-    <br>
-    <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
-    <br>
-    <a href="#/users">users</a>
-</main>
+<body>
 
+    <main>
+        <h1 class="zoom">Transcendence</h1>
+        <a href="#/usercrud">User CRUD</a>
+        <br>
+        <a href="#/leaderboard">Leaderboard</a>
+        <br>
+        <a href="#/signup">signup</a>
+        <br>
+        <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
+    </main>
+    
+</body>
 <style>
+
 
     * {
 		padding: 0em;
         margin: 0%;
+    }
+    
+    body {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
     }
 
 	main {
@@ -30,6 +36,7 @@
         padding: 0px;
         color: #fff;
         background-color: black;
+
 	}
 
     @keyframes pulsate {
@@ -64,14 +71,18 @@
     }
 
     .zoom {
-        transition: transform .2s;
+        transition: transform .3s;
     }
 
     .zoom:hover {
         transform: scale(1.2);
     }
 
+
     h1 {
+        display: absolute;
+        margin-left: auto;
+        margin-right: auto;
         animation: pulsate 1s ease-in-out infinite alternate;
     }
 

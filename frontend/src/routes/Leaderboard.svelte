@@ -67,7 +67,7 @@
             {:else}
                 <td>{y+1}</td>
             {/if}
-            <td class="username" >{i.username}</td>
+            <td class="username" ><a href="#/users/{i.username}">{i.username}</a></td>
             <td>{i.mmr}</td>
             <td>{i.games}</td>
         </tr>
