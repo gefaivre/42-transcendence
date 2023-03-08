@@ -21,17 +21,15 @@ export class MatchsService {
   }
 
   async findAll() {
-    const matchs = await this.prisma.match.findMany({});
-    return matchs;
+    return await this.prisma.match.findMany();
   }
 
   async findOne(id: number) {
-    const match = await this.prisma.match.findUnique({
+    return await this.prisma.match.findUnique({
       where: {
         id: id,
       }
     });
-    return match;
   }
 
   async update(id: number, updateMatchDto: UpdateMatchDto) {
@@ -53,8 +51,8 @@ export class MatchsService {
   }
 
   async findHistory(userId: number) {
-    const history = await this.prisma.match.findMany({
-      where: { 
+    return await this.prisma.match.findMany({
+      where: {
         OR: [
           { winnerId: userId },
           { loserId: userId },
@@ -62,7 +60,6 @@ export class MatchsService {
       },
       orderBy: { date: 'desc' }
     })
-    return history;
   }
 
   async removeHistory(userId: number) {
