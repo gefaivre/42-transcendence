@@ -4,7 +4,6 @@
 
 <main>
     <h1 class="zoom">Transcendence</h1>
-    <a href="#/test">test</a>
     <br>
     <a href="#/usercrud">User CRUD</a>
     <br>
