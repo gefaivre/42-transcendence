@@ -6,16 +6,7 @@
 
     let tab = [];
 
-    onMount(async () => {
-        axios.get(`http://localhost:3000/leaderboard/mmr`)
-            .then(res => {
-                console.log(res.data)
-                tab = res.data;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        });
+    onMount(async () => {getMmr() });
 
     function getMmr() {
         axios.get(`http://localhost:3000/leaderboard/mmr`)
