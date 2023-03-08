@@ -31,7 +31,7 @@ export class AuthController {
     res.cookie("jwt", jwt)
 
     // redirect to frontend
-    return res.redirect('http://localhost:8080')
+    return res.redirect('http://localhost:8080/#/connection')
 
   }
 

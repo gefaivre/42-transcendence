@@ -5,12 +5,14 @@ import Leaderboard from './routes/Leaderboard.svelte'
 import SignUp from './routes/SignUp.svelte'
 import Profile from './routes/Profile.svelte'
 import Users from './routes/Users.svelte'
+import Connection from './routes/Connection.svelte'
 
 export default {
     '/': Home,
     '/UserCRUD': UserCRUD,
     '/leaderboard': Leaderboard,
     '/signup': SignUp,
+    '/connection': Connection, 
     '/profile': Profile,
     '/users/:name': Users,
     '*': NotFound

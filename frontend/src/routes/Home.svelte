@@ -9,9 +9,7 @@
     <br>
     <a href="#/leaderboard">Leaderboard</a>
     <br>
-    <a href="#/signup">signup</a>
-    <br>
-    <a href="#/profile">profile (/!\ with JWT Guard /!\)</a>
+    <a href="#/connection">Connection</a>
 </main>
 
 <style>
