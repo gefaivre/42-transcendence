@@ -25,17 +25,15 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany({
-    })
+    return await this.prisma.user.findMany()
   }
 
   async findOne(name: string) {
-    const user = await this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: {
         username: name,
       }
     })
-    return user;
   }
 
   async update(name: string, updateUserDto: UpdateUserDto) {
@@ -52,8 +50,7 @@ export class UsersService {
   }
 
   async removeAllUsers() {
-    return this.prisma.user.deleteMany({});
-
+    return this.prisma.user.deleteMany();
   }
 
   // END CRUD
@@ -65,5 +62,6 @@ export class UsersService {
           mmr: 'desc',
       }
     })
+  }
 
-}}
+}
