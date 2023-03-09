@@ -1,5 +1,5 @@
 compose_file				=	docker-compose.yml
-services					=	backend frontend db
+services					=	backend frontend db pgadmin
 
 all:						;	docker-compose --file $(compose_file) up --build --detach
 
