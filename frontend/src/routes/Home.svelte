@@ -1,15 +1,62 @@
-<script>
+<script lang="ts">
+
+    import axios from "axios";
+    import { onMount } from "svelte";
+    import { getCookie, deleteCookie } from 'svelte-cookie';
+    import { logged } from "../stores";
+
+    let jwt: string = getCookie('jwt')
+    let profile = { username: '', userId: '' }
+
+    onMount(() => {
+        if (jwt) {
+            logged.update(() => true)
+            getProfile()
+        } else {
+            logged.update(() => false)
+            resetProfile()
+        }
+    })
+
+    function getProfile() {
+        axios.get('http://localhost:3000/profile', {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
+        .then((res) => { profile = res.data })
+        .catch((err) => { console.log(err) })
+    }
+
+    function resetProfile() {
+        profile.username = ''
+        profile.userId = ''
+    }
+
+    function logout() {
+        logged.update(() => false)
+        deleteCookie('jwt')
+    }
 
 </script>
 
 <main>
-    <h1 class="zoom">Transcendence</h1>
-    <br>
-    <a href="#/usercrud">User CRUD</a>
-    <br>
-    <a href="#/leaderboard">Leaderboard</a>
-    <br>
-    <a href="#/connection">Connection</a>
+    {#if $logged}
+        <h1 class="zoom">Transcendence</h1>
+        <br>
+        <a href="#/usercrud">User CRUD</a>
+        <br>
+        <a href="#/leaderboard">Leaderboard</a>
+        <br>
+        <br>
+        <button on:click={logout}>logout</button>
+        <br>
+        <br>
+        <p>You successfully authenticated as <b>{profile.username}</b></p>
+        <br>
+        <p>Your jwt is:</p>
+        <p class="break">{jwt}</p>
+    {:else}
+        <a href={FT_AUTHORIZE} style="font-size: 30px;">Signup with 42</a>
+    {/if}
 </main>
 
 <style>

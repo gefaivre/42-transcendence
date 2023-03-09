@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { MatchsService } from './matchs.service';
 import { CreateMatchDto } from './dto/create-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('matchs')
 export class MatchsController {
   constructor(private readonly matchsService: MatchsService) {}
@@ -41,7 +43,7 @@ export class MatchsController {
   removeHistory(@Param('userId', ParseIntPipe) userId: number) {
     return this.matchsService.removeHistory(userId);
   }
-  
+
 
 
 }

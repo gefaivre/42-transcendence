@@ -1,8 +1,14 @@
 <script lang="ts">
+
     import axios from "axios";
+    import { getCookie } from "svelte-cookie"
+
+    let jwt: string = getCookie('jwt')
 
     function DeleteAllUser() {
-        axios.delete(`http://localhost:3000/users`)
+        axios.delete(`http://localhost:3000/users`, {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
         .then(res => { console.log(res.data) })
         .catch(err => { console.log(err) })
     }
