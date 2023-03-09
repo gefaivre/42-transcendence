@@ -17,6 +17,11 @@ export class ChannelController {
     return this.channelService.addUserToChannel(+id, +userId);
 }
 
+@Delete(':id/users/:userId')
+  removeUserFromChannel(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.channelService.removeUserFromChannel(+id, +userId);
+}
+
   @Get()
   findAll() {
     return this.channelService.findAll();
