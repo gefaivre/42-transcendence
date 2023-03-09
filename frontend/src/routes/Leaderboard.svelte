@@ -1,33 +1,40 @@
-<script>
+<script lang="ts">
+
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
+    import { getCookie } from 'svelte-cookie';
 
     let tab = [];
+    let jwt: string = getCookie('jwt')
 
     onMount(async () => {getMmr() });
 
     function getMmr() {
-        axios.get(`http://localhost:3000/leaderboard/mmr`)
+        axios.get(`http://localhost:3000/leaderboard/mmr`, {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
         .then(res => {
             console.log(res.data)
             tab = res.data;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        };
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    };
 
     function getGames() {
-        axios.get(`http://localhost:3000/leaderboard/games`)
-            .then(res => {
-                console.log(res.data)
-                tab = res.data;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        };
+        axios.get(`http://localhost:3000/leaderboard/games`, {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
+        .then(res => {
+            console.log(res.data)
+            tab = res.data;
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    };
 
 </script>
 

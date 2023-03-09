@@ -1,6 +1,7 @@
 <script lang="ts">
 
     import axios from 'axios'
+    import { getCookie } from "svelte-cookie"
 
     type User = {
         username: string;
@@ -17,10 +18,13 @@
     }
 
     let username: string
+    let jwt: string = getCookie('jwt')
 
     function UpdateUser() {
         Object.keys(user).forEach((k) => user[k] == null && delete user[k]);
-        axios.patch(`http://localhost:3000/users/${username}`, user)
+        axios.patch(`http://localhost:3000/users/${username}`, user, {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });
     };

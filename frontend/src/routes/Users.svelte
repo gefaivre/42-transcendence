@@ -1,22 +1,26 @@
 <script>
+
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
+    import { getCookie } from "svelte-cookie"
 
+    let jwt = getCookie('jwt')
     let tab = {};
     export let params = {}
 
     onMount(async () => {
-        axios.get(`http://localhost:3000/users/${params.name}`)
-            .then(res => {
-                console.log(res.data)
-                tab = res.data;
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        });
-
+        axios.get(`http://localhost:3000/users/${params.name}`, {
+            headers : { Authorization: 'Bearer ' + jwt }
+        })
+        .then(res => {
+            console.log(res.data)
+            tab = res.data;
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    });
 
 </script>
 
