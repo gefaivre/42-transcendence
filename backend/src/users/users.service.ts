@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,7 +8,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   // START CRUD
-  
+
   async create(createUserDto: CreateUserDto) {
     if (await this.findOne(createUserDto.username) != null)
       return "User " + createUserDto.username + " already exist";
@@ -17,22 +16,19 @@ export class UsersService {
       data: {
         username: createUserDto.username,
         password: createUserDto.password,
-        games: 0,
-        mmr: 100,
+        games:  Math.floor(Math.random() * (150 - 0) + 0),
+        mmr: Math.floor(Math.random() * (1500 - 0) + 0),
       },
     })
-    let string: String
-    string = 'New user add! :  ' + createUserDto.username;
-    return string;
+    return 'New user add! :  ' + createUserDto.username;
   }
 
   async findAll() {
-    return await this.prisma.user.findMany({
-    })
+    return await this.prisma.user.findMany()
   }
-  
+
   async findOne(name: string) {
-    const user = await this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: {
         username: name,
       },
@@ -40,19 +36,23 @@ export class UsersService {
         channels: true
       }
     })
-    return user;
   }
-  
+
   async update(name: string, updateUserDto: UpdateUserDto) {
+    console.log(name);
     console.log(updateUserDto);
     return this.prisma.user.update({
       where: { username: name },
       data: updateUserDto,
     });
   }
-  
+
   async remove(name: string) {
     return this.prisma.user.delete({ where: { username: name } });
+  }
+
+  async removeAllUsers() {
+    return this.prisma.user.deleteMany();
   }
 
   // END CRUD
@@ -61,8 +61,9 @@ export class UsersService {
     return await this.prisma.user.findMany({
       take: 10,
       orderBy: {
-          mmr: 'asc',
+          mmr: 'desc',
       }
     })
+  }
 
-}}
+}

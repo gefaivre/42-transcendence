@@ -5,10 +5,12 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { MatchsModule } from './matchs/matchs.module';
+import { AuthModule } from './auth/auth.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { ChannelModule } from './channel/channel.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, MatchsModule, ChannelModule],
+  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

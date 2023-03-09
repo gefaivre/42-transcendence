@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  constructor() {}
+
+  // This endpoint exist only to test its guard policy
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  testJwt(@Request() req: any) {
+    return req.user
   }
+
 }
+

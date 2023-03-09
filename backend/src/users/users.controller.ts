@@ -7,11 +7,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Get('leaderboard') // TODO: To put in other controller
-  topMmr() {
-    return this.usersService.getTopMmr();
-  }
   
   // START CRUD
   
@@ -38,6 +33,10 @@ export class UsersController {
   @Delete(':name')
   remove(@Param('name') name: string) {
     return this.usersService.remove(name);
+  }
+  @Delete()
+  removeAllUsers() {
+    return this.usersService.removeAllUsers();
   }
   
   // END CRUD
