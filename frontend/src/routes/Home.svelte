@@ -3,17 +3,17 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { getCookie, deleteCookie } from 'svelte-cookie';
+    import { logged } from "../stores";
 
-    let logged: boolean = false
     let jwt: string = getCookie('jwt')
     let profile = { username: '', userId: '' }
 
     onMount(() => {
         if (jwt) {
-            logged = true
+            logged.update(() => true)
             getProfile()
         } else {
-            logged = false
+            logged.update(() => false)
             resetProfile()
         }
     })
@@ -32,14 +32,14 @@
     }
 
     function logout() {
-        logged = false
+        logged.update(() => false)
         deleteCookie('jwt')
     }
 
 </script>
 
 <main>
-    {#if logged}
+    {#if $logged}
         <h1 class="zoom">Transcendence</h1>
         <br>
         <a href="#/usercrud">User CRUD</a>
