@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import AddUser from "./userCRUD/AddUser.svelte";
     import DeleteAllUser from "./userCRUD/DeleteAllUser.svelte";
     import DeleteUser from "./userCRUD/DeleteUser.svelte";
