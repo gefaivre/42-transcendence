@@ -4,13 +4,7 @@
     import { onMount } from "svelte";
     import { logged } from "../stores";
     import { getCookie } from "svelte-cookie"
-
-    type User = {
-        username: string
-        password: string
-        mmr: number
-        games: number
-    }
+    import type { User } from "../types";
 
     let user: User = {
         username: '',
