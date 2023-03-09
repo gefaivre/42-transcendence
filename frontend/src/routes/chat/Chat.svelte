@@ -1,8 +1,15 @@
 <script lang="ts">
   import  ioClient  from 'socket.io-client';
   import { onMount } from "svelte";
+  import { getCookie } from 'svelte-cookie'; 
 
-  const socket = ioClient('http://localhost:3000', {path: '/chat'});
+  let jwt = getCookie('jwt');
+  const socket = ioClient('http://localhost:3000', {
+    path: '/chat',
+    extraHeaders: {
+      Authorization: 'Bearer ' + jwt
+    }
+  });
 
   class Message {
       username: string;
@@ -21,6 +28,10 @@
   socket.on('recMessage', (message: Message) => {
       messages = [...messages, message]
     });
+
+  socket.on('Error', (res) => {
+    console.log(res);
+  });
 
   function sendMessage() {
       const message = textfield.trim();

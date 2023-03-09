@@ -22,7 +22,8 @@ export class AuthService {
         redirect_uri: 'http://localhost:3000/auth/42'
       }
     })
-    return res.data.access_token;
+    return res.data.access_token
+    ;
   }
 
   async getFortyTwoUser(access_token: string) {
@@ -32,5 +33,8 @@ export class AuthService {
     return fortytwouser.data;
   }
 
+  async validateSocket(clientToken: string) {
+    return this.jwtService.verify(clientToken);
+  }
 }
 

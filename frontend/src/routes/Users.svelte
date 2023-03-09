@@ -11,7 +11,7 @@
 
     onMount(async () => {
         axios.get(`http://localhost:3000/users/${params.name}`, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            headers : { 'Authorization': 'Bearer ' + jwt }
         })
         .then(res => {
             console.log(res.data)
