@@ -11,13 +11,27 @@ datasource db {
 }
 
 model User {
-  id        Int           @id @default(autoincrement())
-  username  String        @unique
-  password  String
-  games     Int
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
+  games          Int
   mmr       Int
-  wins      Match[]       @relation("winner")
-  loses     Match[]       @relation("loser")
+  wins           Match[]   @relation("winner")
+  loses          Match[]   @relation("loser")
+  channels       Channel[] @relation("channel_users")
+  ownedChannels  Channel[] @relation("channel_owner")
+  bannedChannels Channel[] @relation("channel_banned_users")
+  adminChannels  Channel[] @relation("channel_admins")
+}
+
+model Channel {
+  id          Int    @id @default(autoincrement())
+  name        String
+  ownerId     Int
+  owner       User   @relation("channel_owner", fields: [ownerId], references: [id])
+  bannedUsers User[] @relation("channel_banned_users")
+  admins      User[] @relation("channel_admins")
+  users       User[] @relation("channel_users")
 }
 
 model Match {
