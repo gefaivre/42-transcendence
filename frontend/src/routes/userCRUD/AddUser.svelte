@@ -3,14 +3,9 @@
     import axios from 'axios'
     import { getCookie } from "svelte-cookie"
 
-    type User = {
-        username: string;
-        password: string;
-    }
-
-    let user : User = {
+    let user = {
         username: '',
-        password: ''
+        password: '',
     }
 
     let jwt: string = getCookie('jwt')
