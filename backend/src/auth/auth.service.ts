@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios'
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -25,16 +26,13 @@ export class AuthService {
     return res.data.access_token
     ;
   }
-
-  async getFortyTwoUser(access_token: string) {
-    const fortytwouser = await axios.get('https://api.intra.42.fr/v2/me', {
-      headers : { Authorization: 'Bearer ' + access_token }
+async getFortyTwoUser(access_token: string) { const fortytwouser = await axios.get('https://api.intra.42.fr/v2/me', { headers : { Authorization: 'Bearer ' + access_token }
     })
     return fortytwouser.data;
   }
 
-  async validateSocket(clientToken: string) {
-    return this.jwtService.verify(clientToken);
+  async validateToken(token: string) {
+    return this.jwtService.verify(token, {secret:  jwtConstants.secret, ignoreExpiration: true });
   }
 }
 

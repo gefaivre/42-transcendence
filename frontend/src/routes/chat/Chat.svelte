@@ -11,22 +11,22 @@
     }
   });
 
-  class Message {
-      username: string;
-      text: string;
+  class Post {
+      content: string;
+      channelId: number;
     }
     
-  let messages: Message[] = [];
+  let posts: Post[] = [];
   let textfield = '';
-  let username = ''
+  let channelIdString = '';
 
   onMount(() => {
-        socket.emit('getMessages', {}, (res : Message[]) => {
-          messages = [...res]
+        socket.emit('getPosts', {}, (res : Post[]) => {
+          posts = [...res]
           })
     })
-  socket.on('recMessage', (message: Message) => {
-      messages = [...messages, message]
+  socket.on('recPost', (post: Post) => {
+      posts = [...posts, post]
     });
 
   socket.on('Error', (res) => {
@@ -34,25 +34,25 @@
   });
 
   function sendMessage() {
-      const message = textfield.trim();
-      if (!message)
+      const post = textfield.trim();
+      if (!post)
         return;
-      let toSend: Message = {username: username, text: textfield};
+      let toSend: Post = { content: textfield, channelId: parseInt(channelIdString)};
       console.log(toSend);
-      socket.emit('sendMessage', toSend)
+      socket.emit('sendPost', toSend)
     }
 </script>
 
 <h2>Test de chatRoom</h2>
 <p>liste des messages</p>
 <ul>
-{#each messages as message}
-<li>{message.username}: {message.text}</li>
+{#each posts as post}
+<li>{post.channelId.toString()}: {post.content}</li>
 {/each}
 </ul>
 
 <form on:submit|preventDefault={sendMessage}>
-  <input type="text" bind:value={username} placeholder="type your username">
+  <input type="text" bind:value={channelIdString} placeholder="channel id">
   <input type="text" bind:value={textfield} placeholder="type your message">
   <button type="submit">send</button>
 </form>

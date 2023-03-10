@@ -8,10 +8,12 @@ import { UsersModule } from './users/users.module';
 import { MatchsModule } from './matchs/matchs.module';
 import { AuthModule } from './auth/auth.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { ChannelModule } from './channel/channel.module';
+import { PostsModule } from './posts/posts.module';
 
 
 @Module({
-  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChatModule],
+  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule, ChatModule, PostsModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
