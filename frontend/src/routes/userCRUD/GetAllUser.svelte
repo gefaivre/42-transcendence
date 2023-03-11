@@ -3,7 +3,6 @@
     import axios from "axios";
     import { getCookie } from "svelte-cookie"
 
-    let username: string;
     let jwt: string = getCookie('jwt')
 
     function getAllUser() {
