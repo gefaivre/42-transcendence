@@ -2,6 +2,8 @@ import { ImATeapotException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+
 
 
 @Injectable()
@@ -193,5 +195,34 @@ export class ChannelService {
     //return user.username + "  has been disconect from " + channel.name;
     //return updatedChannel;
   }
+
+  async safeRemoveUserFromChannel(channelId: number, userId: number, requestingUserId: number): Promise<void> {
+    const channel = await this.prisma.channel.findUnique({
+      where: { id: channelId },
+      include: { users: true, admins: true},
+    });
+    if (!channel) {
+      throw new NotFoundException(`Channel with id ${channelId} not found`);
+    }
+  
+    // Vérifier que l'utilisateur qui demande la suppression est l'administrateur du canal
+    const isAdmin = channel.admins.some(admin => admin.id === requestingUserId);
+  
+    // Vérifier que l'utilisateur à retirer est soit l'utilisateur qui fait la demande,
+    // soit un administrateur du canal
+    const isSelfRemove = userId === requestingUserId;
+    const isChannelUser = channel.users.some(user => user.id === userId);
+    if (!isSelfRemove && !isAdmin) {
+      throw new UnauthorizedException('Only channel admins can remove users from the channel');
+    } else if (!isSelfRemove && !isChannelUser) {
+      throw new NotFoundException(`User with id ${userId} is not a member of channel with id ${channelId}`);
+    }
+  
+    await this.prisma.channel.update({
+      where: { id: channelId },
+      data: { users: { disconnect: { id: userId } } },
+    });
+  }
+  
   
 }
