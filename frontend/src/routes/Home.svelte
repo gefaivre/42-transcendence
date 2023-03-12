@@ -14,13 +14,13 @@
         })
         .then((res) => {
             user = res.data
-            logged.update(() => true)
+            logged.set('true')
         })
         .catch((err) => {
             console.log(err)
             user.username = ''
             user.userId = ''
-            logged.update(() => false)
+            logged.set('false')
         })
     }
 
@@ -28,14 +28,14 @@
         axios.get('http://localhost:3000/auth/logout', {
             withCredentials: true
         })
-        .then(() => logged.update(() => false))
+        .then(() => logged.set('false'))
         .catch((err) => console.log(err))
     }
 
 </script>
 
 <main>
-    {#if $logged}
+    {#if $logged === 'true'}
         <h1 class="zoom">Transcendence</h1>
         <br>
         <a href="#/usercrud">User CRUD</a>

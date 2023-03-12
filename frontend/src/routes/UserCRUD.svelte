@@ -9,7 +9,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>--UserCRUD--</h1>
     <AddUser></AddUser>
     <GetAllUser></GetAllUser>

@@ -29,7 +29,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>{user.username}</h1>
     <table>
         <tbody>

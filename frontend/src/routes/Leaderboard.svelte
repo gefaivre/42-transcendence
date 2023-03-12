@@ -36,7 +36,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>--LeaderBord--</h1>
 
     <table class="leaderboard">
