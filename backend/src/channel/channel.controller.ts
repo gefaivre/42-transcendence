@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { UsersService } from './../users/users.service';
+
 
 @Controller('channel')
 export class ChannelController {
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(private readonly channelService: ChannelService,
+              @Inject(UsersService)
+              private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createChannelDto: CreateChannelDto) {
@@ -51,4 +60,19 @@ export class ChannelController {
   remove(@Param('id') id: string) {
     return this.channelService.remove(+id);
   }
+
+  @Get('me/myself/andI')
+  @UseGuards(AuthGuard('jwt'))
+  myResource(@Req() request: Request & { user?: CreateUserDto }) {
+    // le middleware AuthGuard a vérifié le jeton JWT de la requête
+    // vous pouvez maintenant accéder à l'utilisateur en utilisant request.user
+    const whoami = request.user;
+    if (whoami) {
+     // return whoami.username;
+      return this.usersService.findOne(whoami?.username);
+   // const username = request.user?.username;
+    //return username
+  }
+}
+
 }
