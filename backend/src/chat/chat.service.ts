@@ -4,11 +4,12 @@ import { ChannelService } from 'src/channel/channel.service';
 import { PostsService } from 'src/posts/posts.service';
 import { UsersService } from 'src/users/users.service';
 import { PostDto } from './dto/post-dto';
+import { PostEmitDto } from './dto/post-emit.dto';
 
 @Injectable()
 export class ChatService {
   constructor(private authService: AuthService,
-              private userService: UsersService,
+              private usersService: UsersService,
               private channelService: ChannelService,
               private postsService: PostsService) {}
   users: {
@@ -17,20 +18,14 @@ export class ChatService {
     username: string;
   }[] = [];
 
-  handleConnection(clientId: string, authHeader: string | undefined) {
+  async handleConnection(authHeader: string | undefined): Promise<any> {
     if (authHeader) {
       const token = authHeader.split(' ')[1];
       if (token) {
-        this.authService.validateToken(token)
-        .then(data => {
-          this.addUser(data, clientId);
-          return true;
-        })
-        .catch(err => {
-          console.log(err);
-          return false;
-        });
+        return this.authService.validateToken(token)
       }
+    } else {
+      console.log('NoAuthHeader');
     }
     return false;
   }
@@ -40,31 +35,38 @@ export class ChatService {
     this.users.splice(index, 1);
   }
   
-  handlePost(clientId: string, payload: PostDto) {
+  handlePost(clientId: string, payload: PostDto): PostEmitDto | undefined {
     const user = this.users.find(user => user.clientId === clientId);
     if (user) {
-      this.channelService.findOne(payload.channelId)
+      this.channelService.findByName(payload.channelName)
       .then(channel => {
         if (!channel)
-          this.channelService.create({name: 'test' + payload.channelId.toString(), ownerId: user.id})
-        this.postsService.create({authorId: user.id, channelId: payload.channelId, content: payload.content});
+          this.channelService.create({name: payload.channelName, ownerId: user.id})
+        else
+        this.postsService.create({authorId: user.id, channelId: channel.id, content: payload.content});
       })
+      return { channelName: payload.channelName, author: user.username, content: payload.content }; 
     }
   }
 
-  getPosts() {
-      this.postsService.findAll();
+  async getAllChannels(user: any): Promise<any[]> {
+    return this.channelService.findByUser(user.id);
+  }
+  
+  async getChanPosts(channel: any): Promise<any[]> {
+    return this.postsService.findByChannel(channel.id);
   }
 
-  addUser(userToken: any, clientId: string) {
-    this.userService.findOne(userToken.username)
-    .then(user => {
-      if (user) {
-        this.users.push({id: user.id, clientId: clientId, username: user.username});
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  async getAuthor(post: any): Promise<any> {
+    return this.usersService.findById(post.authorId);
+  }
+
+  async getUser(userData: any) {
+    return this.usersService.findOne(userData.username);
+  }
+
+  async addUser(user: any, clientId: string): Promise<any> {
+    this.users.push({id: user.id, clientId: clientId, username: user.username})
+    return user;
   }
 }

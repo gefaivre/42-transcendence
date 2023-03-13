@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
+import { PostEmitDto } from './dto/post-emit.dto';
 
 @WebSocketGateway({
     path: '/chat',
@@ -21,28 +22,45 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     
   @SubscribeMessage('sendPost')
   handlePost(client: Socket, payload: PostDto): void {
-    console.log(payload);
-    this.chatService.handlePost(client.id, payload);
-    this.server.emit('recPost', payload);
-  }
-
-  @SubscribeMessage('getPosts')
-  getPosts() {
-    const posts = this.chatService.getPosts();
-    this.server.emit('recPost', posts);
+    const post = this.chatService.handlePost(client.id, payload);
+    console.log('emit = ' , payload);
+    this.server.emit('recPost', post);
   }
 
   afterInit() {
     this.logger.log('Init');
   }
 
-  handleConnection(client: Socket) {
-    if (this.chatService.handleConnection(client.id, client.handshake.headers.authorization)) {
+  async handleConnection(client: Socket) {
+    this.chatService.handleConnection(client.handshake.headers.authorization)
+    .then((userData) => {
+      console.log('valid token');
+      this.chatService.getUser(userData)
+      .then ((user) => {
+        console.log('user ', user?.username, ' added in chat');
+        this.chatService.addUser(user, client.id)
+        .then((user) => {
+          this.chatService.getAllChannels(user)
+          .then((channels) => {
+            channels.forEach((channel) => {
+              this.chatService.getChanPosts(channel)
+              .then((chanPosts) => {
+                chanPosts.forEach((chanPost) => {
+                  this.chatService.getAuthor(chanPost)
+                  .then((author) => {
+                      this.server.emit('recPost', {content: chanPost.content, author: author.username, channelName: channel.name});
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+    .catch(() => {
         this.logger.log(`Unauthorized Client: ${client.id}`);
         client.disconnect();
-    } else {
-        this.logger.log(`Client connected: ${client.id}`)
-    }
+    });
   }
 
   handleDisconnect(client: Socket) {

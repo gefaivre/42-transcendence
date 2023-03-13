@@ -27,7 +27,7 @@ model User {
 
 model Channel {
   id          Int    @id @default(autoincrement())
-  name        String
+  name        String @unique
   ownerId     Int
   owner       User   @relation("channel_owner", fields: [ownerId], references: [id])
   bannedUsers User[] @relation("channel_banned_users")
