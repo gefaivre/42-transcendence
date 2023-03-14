@@ -5,11 +5,12 @@
     import { onMount } from "svelte";
     import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
-    import groupe from "../../icons/groupe.png"
+    //import groupe from "../../icons/groupe.png"'
+    import logo from '../assets/groupe.png';
 
     const menuItems = [
       { label: 'Accueil', icon: 'home' },
-      { label: 'Profil', icon: groupe },
+      { label: 'Profil', icon: logo },
       { label: 'Messages', icon: 'message' },
       { label: 'Paramètres', icon: 'settings' }
     ];
@@ -19,6 +20,7 @@
       console.log(`Bouton ${index} sélectionné`);
       // ajouter le code pour gérer la sélection du bouton ici
     }
+    
   </script>
   
   <style>
@@ -49,20 +51,48 @@
       align-items: center;
       justify-content: center;
       background-color: #222222;
+      background-color: white;
     }
   
     /* style pour les icônes des boutons */
     .menu button i {
       margin-right: 5px;
     }
+    .menu button img {
+    margin-right: 5px;
+    height: 20px;
+    width: 20px;
+  }
+
+  .centered-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .centered-image img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
   </style>
-  
-  <div class="menu">
-    {#each menuItems as item, i}
-      <button on:click={() => selectMenuItem(i)}>
+
+
+<div class="menu">
+  {#each menuItems as item, i}
+    <button on:click={() => selectMenuItem(i)}>
+      {#if item.icon === 'Profil'}
+        <img src={item.icon} alt="Profil" />
+      {:else}
         <i class="material-icons">{item.icon}</i>
-        {item.label}
-      </button>
-    {/each}
-  </div>
-  
+      {/if}
+      {item.label}
+    </button>
+  {/each}
+</div>
+
+<div class="centered-image">
+  <img src={logo} alt="Logo de mon site web" />
+</div>
+
