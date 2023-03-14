@@ -1,9 +1,9 @@
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
-import { PostEmitDto } from './dto/post-emit.dto';
+import { ChannelDto } from './dto/channel-dto';
 
 @WebSocketGateway({
     path: '/chat',
@@ -19,12 +19,66 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
+
+  @SubscribeMessage('joinChannel')
+  handleJoinChannel(client: Socket, payload: ChannelDto) {
+    this.chatService.getChannel(payload.channelName)
+    .then((channel) => {
+      this.chatService.getUser(this.chatService.getChannelUser(client.id)?.username);
+      .then(user => {
+      this.chatService.getAllChannels(user!)
+      .then(channels => {
+        channels.forEach(channel => {
+          if (this.chatService.isInChannel(payload.channelName, channel))
+            return ;
+        })
+        this.chatService.joinChannel(client.id, payload.channelName, channel)
+        .then(() => {
+          client.join(payload.channelName);
+          this.server.to(payload.channelName).emit('recJoin', {channelName: payload.channelName, message: 'channel joined by ' + this.chatService.getChannelUser(client.id)?.username});
+          console.log(this.chatService.getChannelUser(client.id)?.username, ' has joined channel ', payload.channelName);
+          this.chatService.getChannel(payload.channelName)
+          .then((channel) => {
+            this.chatService.getChanPosts(channel!)
+            .then((chanPosts) => {
+              chanPosts.forEach(post => {
+              this.chatService.getAuthor(post)
+                .then((author) => {
+                this.server.to(client.id).emit('recPost', {content: post.content, author: author!.username, channelName: channel!.name});
+                })
+              })
+              })
+            })
+          })
+        })
+      })
+    })
+  }
+
+  @SubscribeMessage('leaveChannel')
+  handleLeaveChannel(client: Socket, payload: ChannelDto) {
+    this.chatService.getChannel(payload.channelName)
+    .then(channel => {
+      if (channel) {
+        this.chatService.handleLeaveChannel(client, channel)
+        .then(() => {
+          client.leave(payload.channelName);
+          this.server.to(payload.channelName).emit('recLeave', {channelName: payload.channelName, message: 'channel left by ' + this.chatService.getChannelUser(client.id)?.username});
+          console.log(this.chatService.getChannelUser(client.id)?.username, ' has left channel ', payload.channelName);
+        })
+      }
+    })
+  }
     
   @SubscribeMessage('sendPost')
   handlePost(client: Socket, payload: PostDto): void {
-    const post = this.chatService.handlePost(client.id, payload);
-    console.log('emit = ' , payload);
-    this.server.emit('recPost', post);
+    this.chatService.getChannel(payload.channelName)
+    .then((channel) => {
+      this.chatService.handlePost(client.id, channel, payload)
+      .then(() => {
+        this.server.to(payload.channelName).emit('recPost', { channelName: payload.channelName, content: payload.content, author: this.chatService.getChannelUser(client.id)?.username});
+      });
+    })
   }
 
   afterInit() {
@@ -48,7 +102,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 chanPosts.forEach((chanPost) => {
                   this.chatService.getAuthor(chanPost)
                   .then((author) => {
-                      this.server.emit('recPost', {content: chanPost.content, author: author.username, channelName: channel.name});
+                      this.server.to(client.id).emit('recPost', {content: chanPost.content, author: author!.username, channelName: channel.name});
                   })
                 })
               })

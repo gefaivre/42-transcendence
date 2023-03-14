@@ -100,6 +100,7 @@ export class ChannelService {
   
     return updatedChannel;
   }
+
   
   async remove(id: number) {
     return await this.prisma.channel.delete({
@@ -128,17 +129,17 @@ export class ChannelService {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    /*
+    
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
       data: {
         users: {
-          connect: { id: userId }
+          disconnect: { id: userId }
         }
       },
       include: { users: true }
     });
-    */
+    
     return user.username + "  has been disconect from " + channel.name;
     //return updatedChannel;
   }
