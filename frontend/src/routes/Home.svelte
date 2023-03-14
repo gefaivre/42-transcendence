@@ -46,6 +46,8 @@
         <br>
         <a href="#/leaderboard">Leaderboard</a>
         <br>
+        <a href="#/Menu">testfront</a>
+        <br>
         <br>
         <button on:click={logout}>logout</button>
         <br>
