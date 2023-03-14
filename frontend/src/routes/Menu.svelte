@@ -8,6 +8,8 @@
     //import groupe from "../../icons/groupe.png"'
     import logo from '../assets/groupe.png';
 
+    let groupeImage = "../assets/groupe.png"
+
     const menuItems = [
       { label: 'Accueil', icon: 'home' },
       { label: 'Profil', icon: logo },
@@ -20,6 +22,8 @@
       console.log(`Bouton ${index} sélectionné`);
       // ajouter le code pour gérer la sélection du bouton ici
     }
+    function handleClick() {
+    console.log("Le bouton a été cliqué !");}
     
   </script>
   
@@ -64,17 +68,28 @@
     width: 20px;
   }
 
-  .centered-image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  .menu button .menu-item-image {
+    margin-right: 5px;
+    height: 20px;
+    width: 20px;
   }
 
-  .centered-image img {
-    max-width: 100%;
-    max-height: 100%;
+  .button {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
   }
+  
+  .button img {
+    display: block;
+    height: 100px;
+    width: 100px;
+  }
+
 
   </style>
 
@@ -82,17 +97,19 @@
 <div class="menu">
   {#each menuItems as item, i}
     <button on:click={() => selectMenuItem(i)}>
-      {#if item.icon === 'Profil'}
-        <img src={item.icon} alt="Profil" />
-      {:else}
+      {#if typeof item.icon === 'string'}
         <i class="material-icons">{item.icon}</i>
+      {:else}
+        <img class="menu-item-image" src={item.icon} alt={item.label} />
       {/if}
       {item.label}
     </button>
   {/each}
 </div>
 
-<div class="centered-image">
-  <img src={logo} alt="Logo de mon site web" />
-</div>
+
+
+<button class="button" on:click={handleClick}>
+  <img src={logo} alt="Mon imaghgge" />
+</button>
 
