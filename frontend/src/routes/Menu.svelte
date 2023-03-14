@@ -97,11 +97,8 @@
 <div class="menu">
   {#each menuItems as item, i}
     <button on:click={() => selectMenuItem(i)}>
-      {#if typeof item.icon === 'string'}
-        <i class="material-icons">{item.icon}</i>
-      {:else}
+     
         <img class="menu-item-image" src={item.icon} alt={item.label} />
-      {/if}
       {item.label}
     </button>
   {/each}
