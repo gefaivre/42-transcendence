@@ -11,6 +11,7 @@
     import messageIcon  from '../assets/whiteChat.png'
     import gameIcon     from '../assets/whiteGame.png'
     import colorAvar    from '../assets/colorAvatar.png'
+    import logo         from '../assets/testPong.png'
 
 
     let groupeImage = "../assets/groupe.png"
@@ -76,28 +77,28 @@
     width: 55px;
   }
 
-  .button {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    background-color: #222222;
-  }
-  
-  .button img {
-    display: block;
-    height: 100px;
-    width: 100px;
-  }
   .testLink {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 1;
 }
+  .container {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .logo {
+    width: 500px;
+    height: 500px;
+    /*max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    */
+  }
  /* .profilLink
   {
     display: block;
@@ -124,6 +125,10 @@
         <img class="menu-item-image" src={item.icon} alt={item.label} />
     </a>
   {/each}
+</div>
+
+<div class="container">
+  <img class="logo" src={logo} alt="Logo" />
 </div>
 
 
