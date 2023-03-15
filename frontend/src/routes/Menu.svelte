@@ -6,15 +6,19 @@
     import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
     //import groupe from "../../icons/groupe.png"'
-    import logo from '../assets/groupe.png';
+    import channelIcon  from '../assets/whiteChannel.png';
+    import homeIcon     from '../assets/whiteHome.png'
+    import messageIcon  from '../assets/whiteChat.png'
+    import gameIcon     from '../assets/whiteGame.png'
+
 
     let groupeImage = "../assets/groupe.png"
 
     const menuItems = [
-      { label: 'Accueil', icon: 'home' },
-      { label: 'Profil', icon: logo },
-      { label: 'Messages', icon: 'message' },
-      { label: 'Paramètres', icon: 'settings' }
+      { label: 'Home', icon: homeIcon },
+      { label: 'Channel', icon: channelIcon },
+      { label: 'Messages', icon: messageIcon },
+      { label: 'Game', icon: gameIcon }
     ];
   
     // fonction pour gérer la sélection d'un bouton du menu
@@ -34,7 +38,7 @@
       top: 0;
       left: 0;
       height: 100%;
-      width: 14%;
+      width: 88px;
       background-color: #f2f2f2;
       display: flex;
       flex-direction: column;
@@ -55,7 +59,6 @@
       align-items: center;
       justify-content: center;
       background-color: #222222;
-      background-color: white;
     }
   
     /* style pour les icônes des boutons */
@@ -64,14 +67,14 @@
     }
     .menu button img {
     margin-right: 5px;
-    height: 20px;
-    width: 20px;
+    height: 55px;
+    width: 55px;
   }
 
   .menu button .menu-item-image {
     margin-right: 5px;
-    height: 20px;
-    width: 20px;
+    height: 55px;
+    width: 55px;
   }
 
   .button {
@@ -99,7 +102,6 @@
     <button on:click={() => selectMenuItem(i)}>
      
         <img class="menu-item-image" src={item.icon} alt={item.label} />
-      {item.label}
     </button>
   {/each}
 </div>
@@ -107,6 +109,6 @@
 
 
 <button class="button" on:click={handleClick}>
-  <img src={logo} alt="Mon imaghgge" />
+  <img src={channelIcon} alt="Mon imaghgge" />
 </button>
 
