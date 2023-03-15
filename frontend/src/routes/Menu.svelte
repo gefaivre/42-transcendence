@@ -22,18 +22,16 @@
       { label: 'Game', icon: gameIcon, link: '#/Game' }
     ];
   
-    // fonction pour gérer la sélection d'un bouton du menu
-    function selectMenuItem(index) {
-      console.log(`Bouton ${index} sélectionné`);
-      // ajouter le code pour gérer la sélection du bouton ici
-    }
-    function handleClick() {
-    console.log("Le bouton a été cliqué !");}
-    
   </script>
   
   <style>
     /* style pour le menu */
+    .profilLink {
+      display: block;
+      margin-right: 5px;
+      height: 55px;
+      width: 55px;
+   }
     .menu {
       position: fixed;
       top: 0;
@@ -49,7 +47,7 @@
     }
   
     /* style pour les boutons du menu */
-    .menu button {
+    .menu a {
       margin-bottom: 10px;
       border: none;
       padding: 10px;
@@ -94,20 +92,22 @@
     height: 100px;
     width: 100px;
   }
-
   .testLink {
-    position: fixed;
-    top: 30%;
-    left: 30%;
-  }
-  .profilLink
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+}
+ /* .profilLink
   {
     display: block;
     height: 100px;
     width: 100px; 
+    COMMENTAIRE BUG
+      mettre coloravatar en getAvatar() fonction qui va chercher l image de user
     
   }
-
+*/
 
   </style>
 
@@ -127,9 +127,5 @@
 </div>
 
 
-
-<button class="button" on:click={handleClick}>
-  <img src={channelIcon} alt="Mon imaghgge" />
-</button>
 
   
