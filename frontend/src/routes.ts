@@ -4,6 +4,7 @@ import UserCRUD from './routes/UserCRUD.svelte'
 import Leaderboard from './routes/Leaderboard.svelte'
 import Users from './routes/Users.svelte'
 import Menu from './routes/Menu.svelte'
+import Profil from './routes/Profil.svelte'
 
 export default {
     '/': Home,
@@ -11,5 +12,6 @@ export default {
     '/leaderboard': Leaderboard,
     '/users/:name': Users,
     '/Menu': Menu,
+    '/profil': Profil,
     '*': NotFound
 };

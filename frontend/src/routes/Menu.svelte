@@ -10,15 +10,16 @@
     import homeIcon     from '../assets/whiteHome.png'
     import messageIcon  from '../assets/whiteChat.png'
     import gameIcon     from '../assets/whiteGame.png'
+    import colorAvar    from '../assets/colorAvatar.png'
 
 
     let groupeImage = "../assets/groupe.png"
 
     const menuItems = [
-      { label: 'Home', icon: homeIcon },
-      { label: 'Channel', icon: channelIcon },
-      { label: 'Messages', icon: messageIcon },
-      { label: 'Game', icon: gameIcon }
+      { label: 'Home', icon: homeIcon, link: '#/Menu' },
+      { label: 'Channel', icon: channelIcon, link: '#/Channel' },
+      { label: 'Messages', icon: messageIcon, link: '#/Message' },
+      { label: 'Game', icon: gameIcon, link: '#/Game' }
     ];
   
     // fonction pour gérer la sélection d'un bouton du menu
@@ -62,16 +63,16 @@
     }
   
     /* style pour les icônes des boutons */
-    .menu button i {
+    .menu a  {
       margin-right: 5px;
     }
-    .menu button img {
+    .menu a img {
     margin-right: 5px;
     height: 55px;
     width: 55px;
   }
 
-  .menu button .menu-item-image {
+  .menu a .menu-item-image {
     margin-right: 5px;
     height: 55px;
     width: 55px;
@@ -85,6 +86,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    background-color: #222222;
   }
   
   .button img {
@@ -93,16 +95,34 @@
     width: 100px;
   }
 
+  .testLink {
+    position: fixed;
+    top: 30%;
+    left: 30%;
+  }
+  .profilLink
+  {
+    display: block;
+    height: 100px;
+    width: 100px; 
+    
+  }
+
 
   </style>
 
+<div class="testLink">
+   <a href = "#/profil">
+    <img class="profilLink" src={colorAvar} alt='profil'/>
+  </a>
+</div>
 
 <div class="menu">
   {#each menuItems as item, i}
-    <button on:click={() => selectMenuItem(i)}>
+    <a href={item.link}>
      
         <img class="menu-item-image" src={item.icon} alt={item.label} />
-    </button>
+    </a>
   {/each}
 </div>
 
@@ -112,3 +132,4 @@
   <img src={channelIcon} alt="Mon imaghgge" />
 </button>
 
+  
