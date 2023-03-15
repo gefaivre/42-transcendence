@@ -1,7 +1,6 @@
-
 <script>
-    export const title = 'Mon titre';
-    
+    // définir les boutons du menu
+
     import axios from "axios";
     import { onMount } from "svelte";
     import { getCookie, deleteCookie } from 'svelte-cookie';
@@ -13,18 +12,20 @@
     import gameIcon     from '../assets/whiteGame.png'
     import colorAvar    from '../assets/colorAvatar.png'
     import logo         from '../assets/testPong.png'
-    
-    
+
+
     let groupeImage = "../assets/groupe.png"
-    
+
     const menuItems = [
-        { label: 'Home', icon: homeIcon, link: '#/Menu' },
-        { label: 'Channel', icon: channelIcon, link: '#/Channel' },
-        { label: 'Messages', icon: messageIcon, link: '#/Message' },
-        { label: 'Game', icon: gameIcon, link: '#/Game' }
+      { label: 'Home', icon: homeIcon, link: '#/Menu' },
+      { label: 'Channel', icon: channelIcon, link: '#/Channel' },
+      { label: 'Messages', icon: messageIcon, link: '#/Message' },
+      { label: 'Game', icon: gameIcon, link: '#/Game' }
     ];
+  
   </script>
-   <style>
+  
+  <style>
     /* style pour le menu */
     .profilLink {
       display: block;
@@ -79,7 +80,7 @@
   .testLink {
   position: absolute;
   top: 10px;
-  left: 15px;
+  left: -4px;
   z-index: 1;
 }
   .container {
@@ -111,24 +112,22 @@
 
   </style>
 
-  <header>
-    <div class="testLink">
-      <a href = "#/profil">
-       <img class="profilLink" src={colorAvar} alt='profil'/>
-     </a>
-   </div>
-   
-   <div class="menu">
-     {#each menuItems as item, i}
-       <a href={item.link}>
-        
-           <img class="menu-item-image" src={item.icon} alt={item.label} />
-       </a>
-     {/each}
-   </div>
-  </header>
-  
-  <div class=container>
-    <slot></slot>
-  </div>
-  
+
+
+<div class="menu">
+    <a class= testLink href = "#/profil">
+     <img src={colorAvar} alt='profil'/>
+   </a>
+
+  {#each menuItems as item, i}
+    <a href={item.link}>
+     
+        <img class="menu-item-image" src={item.icon} alt={item.label} />
+    </a>
+  {/each}
+</div>
+
+<div class="container">
+  <img class="logo" src={logo} alt="Logo" />
+</div>
+

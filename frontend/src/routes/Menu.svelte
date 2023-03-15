@@ -80,7 +80,7 @@
   .testLink {
   position: absolute;
   top: 10px;
-  left: 10px;
+  left: 15px;
   z-index: 1;
 }
   .container {
