@@ -5,22 +5,23 @@
     import { onMount } from "svelte";
     import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
-    import logo         from '../assets/testPong.png'
     import Layout from "./Layout.svelte";
   
   </script>
   
   <style>
-  .logo {
-    width: 500px;
+  .toDo {
+    width: 400px;
     height: 500px;
-    /*max-width: 100%;
-    max-height: 100%;
-    margin: auto;
-    */
   }
  </style>
 
  <Layout>
-  <img class=logo src={logo} alt=pong>
+    <div class=toDo >
+        <ul>To do: <ul>
+            <li>sidebar avec toute les channels</li>
+            <li>conteneur qui met les posts</li>
+            <li>sidebar avec les users?</li>
+            <li>ou alors les friends ici</li>
+    </div>
  </Layout>

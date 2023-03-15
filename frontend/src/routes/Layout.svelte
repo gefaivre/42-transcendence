@@ -90,25 +90,6 @@
     height: 100vh;
   }
 
-  .logo {
-    width: 500px;
-    height: 500px;
-    /*max-width: 100%;
-    max-height: 100%;
-    margin: auto;
-    */
-  }
- /* .profilLink
-  {
-    display: block;
-    height: 100px;
-    width: 100px; 
-    COMMENTAIRE BUG
-      mettre coloravatar en getAvatar() fonction qui va chercher l image de user
-    
-  }
-*/
-
   </style>
 
   <header>
