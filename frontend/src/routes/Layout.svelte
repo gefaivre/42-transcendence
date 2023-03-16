@@ -1,10 +1,9 @@
 
 <script>
     export const title = 'Mon titre';
-    
+
     import axios from "axios";
     import { onMount } from "svelte";
-    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
     //import groupe from "../../icons/groupe.png"'
     import channelIcon  from '../assets/whiteChannel.png';
@@ -13,10 +12,10 @@
     import gameIcon     from '../assets/whiteGame.png'
     import colorAvar    from '../assets/colorAvatar.png'
     import logo         from '../assets/testPong.png'
-    
-    
+
+
     let groupeImage = "../assets/groupe.png"
-    
+
     const menuItems = [
         { label: 'Home', icon: homeIcon, link: '#/Menu' },
         { label: 'Channel', icon: channelIcon, link: '#/Channel' },
@@ -45,7 +44,7 @@
       justify-content: center;
       background-color: #222222;
     }
-  
+
     /* style pour les boutons du menu */
     .menu a {
       margin-bottom: 10px;
@@ -59,7 +58,7 @@
       justify-content: center;
       background-color: #222222;
     }
-  
+
     /* style pour les icônes des boutons */
     .menu a  {
       margin-right: 5px;
@@ -98,18 +97,17 @@
        <img class="profilLink" src={colorAvar} alt='profil'/>
      </a>
    </div>
-   
+
    <div class="menu">
      {#each menuItems as item, i}
        <a href={item.link}>
-        
+
            <img class="menu-item-image" src={item.icon} alt={item.label} />
        </a>
      {/each}
    </div>
   </header>
-  
+
   <div class=container>
     <slot></slot>
   </div>
-  
