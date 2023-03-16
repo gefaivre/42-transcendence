@@ -9,6 +9,9 @@ import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import replace from '@rollup/plugin-replace';
 import json from "@rollup/plugin-json";
+import image from '@rollup/plugin-image';
+import url from '@rollup/plugin-url';
+
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -43,6 +46,8 @@ export default {
 	},
 	plugins: [
         json(),
+		image(),
+		url(),
         replace({
             preventAssignment: true,
             FT_AUTHORIZE: JSON.stringify(process.env.FT_AUTHORIZE)
