@@ -2,14 +2,18 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
+import { Request } from "express";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: true, // TODO
+      ignoreExpiration: true,
       secretOrKey: jwtConstants.secret,
+      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+        const jwt = request?.cookies['jwt']
+        return jwt ? jwt : null
+      }])
     });
   }
 

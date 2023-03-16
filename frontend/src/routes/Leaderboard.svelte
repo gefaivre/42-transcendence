@@ -3,16 +3,14 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
-    import { getCookie } from 'svelte-cookie';
 
     let tab = [];
-    let jwt: string = getCookie('jwt')
 
     onMount(async () => {getMmr() });
 
     function getMmr() {
         axios.get(`http://localhost:3000/leaderboard/mmr`, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then(res => {
             console.log(res.data)
@@ -25,7 +23,7 @@
 
     function getGames() {
         axios.get(`http://localhost:3000/leaderboard/games`, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then(res => {
             console.log(res.data)
@@ -38,7 +36,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>--LeaderBord--</h1>
 
     <table class="leaderboard">
