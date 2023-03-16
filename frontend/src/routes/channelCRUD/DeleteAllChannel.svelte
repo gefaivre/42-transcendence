@@ -2,13 +2,10 @@
 <script lang="ts">
 
     import axios from "axios";
-    import { getCookie } from "svelte-cookie"
-
-    let jwt: string = getCookie('jwt')
 
     function DeleteAllChannel() {
         axios.delete(`http://localhost:3000/channel`, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then(res => { console.log(res.data) })
         .catch(err => { console.log(err) })

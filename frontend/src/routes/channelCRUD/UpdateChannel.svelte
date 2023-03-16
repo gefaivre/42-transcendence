@@ -2,7 +2,6 @@
 <script lang="ts">
 
     import axios from 'axios'
-    import { getCookie } from "svelte-cookie"
 
     type Channel = {
         id: number
@@ -15,8 +14,6 @@
         name: null,
         ownerId: null,
     }
-
-    let jwt: string = getCookie('jwt')
 
     function UpdateChannel() {
         alert('not implemented yet')

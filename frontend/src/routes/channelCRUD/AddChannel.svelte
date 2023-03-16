@@ -1,7 +1,6 @@
 <script lang="ts">
 
     import axios from 'axios'
-    import { getCookie } from "svelte-cookie"
 
     type Channel = {
         name: string
@@ -13,12 +12,10 @@
         ownerId: 1, // TODO
     }
 
-    let jwt = getCookie('jwt');
-
     async function addChannel() {
         console.log(channel)
         const response = await axios.post('http://localhost:3000/channel', channel, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         console.log(response)
     }
