@@ -3,7 +3,6 @@
     import axios from 'axios';
     import { logged } from "../stores";
     import { onMount } from "svelte";
-    import { getCookie } from 'svelte-cookie';
     import GetChannel from "./channelCRUD/GetChannel.svelte";
     import AddChannel from "./channelCRUD/AddChannel.svelte";
     import GetAllChannel from "./channelCRUD/GetAllChannel.svelte";
@@ -17,14 +16,13 @@
         ownerId: number
     }
 
-    let jwt = getCookie('jwt');
     let channels: Channel[] = []
 
     onMount(() => getAllChannel())
 
     async function getAllChannel() {
         const response = await axios.get('http://localhost:3000/channel', {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         channels = response.data
         console.log(response)

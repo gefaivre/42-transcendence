@@ -2,7 +2,6 @@
 <script lang="ts">
 
     import axios from "axios";
-    import { getCookie } from "svelte-cookie"
 
     type Channel = {
         id: string
@@ -12,11 +11,9 @@
 
     let channels: Channel[] = []
 
-    let jwt: string = getCookie('jwt')
-
     async function getAllChannel() {
         const response = await axios.get('http://localhost:3000/channel', {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         channels = response.data
         console.log(response)
