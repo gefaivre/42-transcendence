@@ -221,12 +221,12 @@ export class ChannelService {
     }
 
     // Vérifier que l'utilisateur qui demande la suppression est l'administrateur du canal
-    const isAdmin = channel.admins.some(admin => admin.id === requestingUserId);
+    const isAdmin = channel.admins.some((admin: any) => admin.id === requestingUserId);
 
     // Vérifier que l'utilisateur à retirer est soit l'utilisateur qui fait la demande,
     // soit un administrateur du canal
     const isSelfRemove = userId === requestingUserId;
-    const isChannelUser = channel.users.some(user => user.id === userId);
+    const isChannelUser = channel.users.some((user: any) => user.id === userId);
     if (!isSelfRemove && !isAdmin) {
       throw new UnauthorizedException('Only channel admins can remove users from the channel');
     } else if (!isSelfRemove && !isChannelUser) {
