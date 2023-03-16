@@ -3,13 +3,12 @@
 
     import axios from "axios";
     import { onMount } from "svelte";
-    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
     import logo         from '../assets/testPong.png'
     import Layout from "./Layout.svelte";
-  
+
   </script>
-  
+
   <style>
   .logo {
     width: 500px;

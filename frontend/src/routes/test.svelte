@@ -3,7 +3,6 @@
 
     import axios from "axios";
     import { onMount } from "svelte";
-    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
     //import groupe from "../../icons/groupe.png"'
     import channelIcon  from '../assets/whiteChannel.png';
@@ -22,9 +21,9 @@
       { label: 'Messages', icon: messageIcon, link: '#/Message' },
       { label: 'Game', icon: gameIcon, link: '#/Game' }
     ];
-  
+
   </script>
-  
+
   <style>
     /* style pour le menu */
     .profilLink {
@@ -46,7 +45,7 @@
       justify-content: center;
       background-color: #222222;
     }
-  
+
     /* style pour les boutons du menu */
     .menu a {
       margin-bottom: 10px;
@@ -60,7 +59,7 @@
       justify-content: center;
       background-color: #222222;
     }
-  
+
     /* style pour les icônes des boutons */
     .menu a  {
       margin-right: 5px;
@@ -103,10 +102,10 @@
   {
     display: block;
     height: 100px;
-    width: 100px; 
+    width: 100px;
     COMMENTAIRE BUG
       mettre coloravatar en getAvatar() fonction qui va chercher l image de user
-    
+
   }
 */
 
@@ -121,7 +120,7 @@
 
   {#each menuItems as item, i}
     <a href={item.link}>
-     
+
         <img class="menu-item-image" src={item.icon} alt={item.label} />
     </a>
   {/each}

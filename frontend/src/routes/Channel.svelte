@@ -3,12 +3,11 @@
 
     import axios from "axios";
     import { onMount } from "svelte";
-    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
-  
+
   </script>
-  
+
   <style>
   .toDo {
     width: 400px;
