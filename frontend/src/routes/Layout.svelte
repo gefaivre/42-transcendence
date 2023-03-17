@@ -24,13 +24,7 @@
     ];
   </script>
     <style>
-      /* style pour le menu */
-      .profilLink {
-        display: block;
-        margin-right: 5px;
-        height: 55px;
-        width: 55px;
-     }
+
       .menu {
         position: fixed;
         top: 0;
