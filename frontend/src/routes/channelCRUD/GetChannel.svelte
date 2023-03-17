@@ -7,6 +7,12 @@
     let channel: Channel = null
 
     async function getChannelById() {
+
+        if (!id) {
+            alert('Please provide a channel ID')
+            return
+        }
+
         const response = await axios.get(`http://localhost:3000/channel/${id}`, {
             withCredentials: true
         })

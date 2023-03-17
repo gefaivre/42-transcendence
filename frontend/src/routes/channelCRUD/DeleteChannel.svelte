@@ -3,14 +3,21 @@
 
     import axios from "axios";
 
-    let id: string = ''
+    let id: string = null
 
     function DeleteChannelbyId() {
+
+        if (!id) {
+            alert('Please provide an ID')
+            return
+        }
+
         axios.delete(`http://localhost:3000/channel/${id}`, {
             withCredentials: true
         })
         .then(res => { console.log(res.data) })
         .catch(err => { console.log(err) })
+        id = null
     }
 
 </script>

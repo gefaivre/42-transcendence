@@ -13,6 +13,12 @@
     }
 
     async function addChannel() {
+
+        if (!channel.name) {
+            alert('Please provide a channel name')
+            return
+        }
+
         console.log(channel)
         const response = await axios.post('http://localhost:3000/channel', channel, {
             withCredentials: true
