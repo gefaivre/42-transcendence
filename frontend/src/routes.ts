@@ -9,6 +9,7 @@ import Channel from './routes/Channel.svelte'
 import Message from './routes/Message.svelte'
 import Game from './routes/Game.svelte'
 import ChannelCRUD from './routes/ChannelCRUD.svelte'
+import Test from './routes/test.svelte'
 
 export default {
     '/': Home,
@@ -21,5 +22,6 @@ export default {
     '/channel': Channel,
     '/message': Message,
     '/game': Game,
+    '/test': Test,
     '*': NotFound
 };

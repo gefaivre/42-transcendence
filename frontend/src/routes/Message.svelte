@@ -12,6 +12,7 @@
   .toDo {
     width: 400px;
     height: 500px;
+    background-color: aliceblue;
   }
  </style>
 

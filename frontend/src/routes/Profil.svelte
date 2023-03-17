@@ -20,7 +20,9 @@
         <li>
 
             change avatar, username...
+
         </li>
+        <a href='#/test'>testDaisyUI</a>
 
     </p>
 </Layout>
