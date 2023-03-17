@@ -18,6 +18,7 @@
             withCredentials: true
         })
         console.log(response)
+        channel.name = null
     }
 
 </script>

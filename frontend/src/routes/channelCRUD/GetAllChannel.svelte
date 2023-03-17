@@ -2,12 +2,7 @@
 <script lang="ts">
 
     import axios from "axios";
-
-    type Channel = {
-        id: string
-        name: string
-        ownerId: number
-    }
+    import type { Channel } from "../../types";
 
     let channels: Channel[] = []
 

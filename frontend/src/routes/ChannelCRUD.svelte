@@ -9,12 +9,7 @@
     import DeleteChannel from "./channelCRUD/DeleteChannel.svelte";
     import DeleteAllChannel from './channelCRUD/DeleteAllChannel.svelte';
     import UpdateChannel from './channelCRUD/UpdateChannel.svelte';
-
-    type Channel = {
-        id: number
-        name: string
-        ownerId: number
-    }
+    import type { Channel } from "../types";
 
     let channels: Channel[] = []
 
@@ -25,7 +20,6 @@
             withCredentials: true
         })
         channels = response.data
-        console.log(response)
         console.log(channels)
     }
 
@@ -47,21 +41,18 @@
     <br>
     <br>
 
-    <!--
-        TODO
-        - add `owner` column
-        - add `number of participants` column
-    -->
-
     <table class="channels">
         <thead>
             <tr>
-                <th colspan="4">Channels</th>
+                <th colspan="6">Channels</th>
             </tr>
             <tr>
                 <td>ID</td>
                 <td>Name</td>
+                <td>Owner</td>
                 <td>Owner ID</td>
+                <td>Users</td>
+                <td>Admins</td>
             </tr>
         </thead>
         <tbody>
@@ -69,7 +60,10 @@
             <tr>
                 <td>{channel.id}</td>
                 <td>{channel.name}</td>
+                <td>{channel.owner.username}</td>
                 <td>{channel.ownerId}</td>
+                <td>{channel.users.length}</td>
+                <td>{channel.admins.length}</td>
             </tr>
             {/each}
         </tbody>

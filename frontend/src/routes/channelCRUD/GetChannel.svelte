@@ -1,15 +1,19 @@
 <script lang="ts">
 
     import axios from "axios";
+    import type { Channel } from "../../types";
 
-    let id: string;
+    let id: string = null
+    let channel: Channel = null
 
-    function getChannelById() {
-        axios.get(`http://localhost:3000/channel/${id}`, {
+    async function getChannelById() {
+        const response = await axios.get(`http://localhost:3000/channel/${id}`, {
             withCredentials: true
         })
-        .then(res => { console.log(res.data) })
-        .catch(err => { console.log(err) })
+        channel = response.data
+        console.log(channel)
+        id = null
+        channel = null
     }
 
 </script>
