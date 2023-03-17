@@ -4,6 +4,8 @@
     import axios from "axios";
 
     function DeleteAllChannel() {
+        if (!window.confirm("Are you sure ?"))
+            return;
         axios.delete(`http://localhost:3000/channel`, {
             withCredentials: true
         })
