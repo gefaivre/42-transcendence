@@ -60,7 +60,7 @@
             <tr>
                 <td>{channel.id}</td>
                 <td>{channel.name}</td>
-                <td>{channel.owner.username}</td>
+                <td><a href="#/users/{channel.owner.username}">{channel.owner.username}</a></td>
                 <td>{channel.ownerId}</td>
                 <td>{channel.users.length}</td>
                 <td>{channel.admins.length}</td>
