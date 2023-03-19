@@ -10,7 +10,7 @@
     import homeIcon     from '../assets/whiteHome.png'
     import messageIcon  from '../assets/whiteChat.png'
     import gameIcon     from '../assets/whiteGame.png'
-    import colorAvar    from '../assets/colorAvatar.png'
+    import colorAvar    from '../assets/payet.jpeg'
     import logo         from '../assets/testPong.png'
 
 
@@ -72,7 +72,7 @@
     .testLink {
     position: absolute;
     top: 10px;
-    left: -4px;
+    left: 10px;
     z-index: 1;
   }
     .container {
@@ -82,26 +82,16 @@
       align-items: center;
       height: 100vh;
     }
-  
-
-   /* .profilLink
-    {
-      display: block;
-      height: 100px;
-      width: 100px;
-      COMMENTAIRE BUG
-        mettre coloravatar en getAvatar() fonction qui va chercher l image de user
-  
-    }
-  */
-  
+    .menu a:hover {
+      background-color: #4D4D4D;}
+ 
     </style>
   
   
   
   <div class="menu">
       <a class= testLink href = "#/profil">
-       <img src={colorAvar} alt='profil'/>
+        <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
      </a>
   
     {#each menuItems as item, i}
