@@ -1,8 +1,9 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,7 @@ export class AuthController {
     ) {}
 
   @Get('42')
-  async auth42(@Query('code') code: string, @Res() res: Response) {
+  async auth42(@Query('code') code: string, @Res() response: Response) {
 
     // exchange code for access token
     const access_token = await this.authService.getFortyTwoAccessToken(code);
@@ -28,11 +29,23 @@ export class AuthController {
     const jwt = await this.authService.loginFortyTwo(ft_user.login, ft_user.id)
 
     // return the jwt as a cookie into frontend
-    res.cookie("jwt", jwt)
+    response.cookie('jwt', jwt, { httpOnly: true })
 
     // redirect to frontend
-    return res.redirect('http://localhost:8080/')
+    return response.redirect('http://localhost:8080')
+  }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Get('login')
+  login(@Request() request: any) {
+    return request.user
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('logout')
+  logout(@Res() response: Response) {
+    response.cookie('jwt', '', { expires: new Date(0) });
+    response.end()
   }
 
 }

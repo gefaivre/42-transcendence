@@ -1,18 +1,15 @@
 <script lang="ts">
 
     import axios from 'axios'
-    import { getCookie } from "svelte-cookie"
 
     let user = {
         username: '',
         password: '',
     }
 
-    let jwt: string = getCookie('jwt')
-
     function signUp() {
         axios.post('http://localhost:3000/users', user, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });

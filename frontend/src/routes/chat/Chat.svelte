@@ -35,8 +35,8 @@
 
   onMount(() => {
 
-    socket.on('recPost', (post: Post) => {
-      console.log('recPost', post);  
+    socket.on('post', (post: Post) => {
+      console.log('post', post);  
       posts = [...posts, post];
       channelsList = [...channelsList, post.channelName];
       channelsList = [...new Set(channelsList)];
@@ -52,16 +52,17 @@
       });
     });
 
-    socket.on('recLeave', (channel) => {
-      console.log('recLeave', channel);
+    socket.on('channelEvent', payload => {
+      console.log('channelEvent', payload);
     });
 
-    socket.on('recJoin', (channel) => {
-      console.log('recJoin', channel);
-      channels = [...channels, {name: channel.channelName, posts: []}];
-      console.log('channels are now ', channels);
+    socket.on('join', channelName => {
+      console.log('join', channelName);
+      channels = [...channels, { name: channelName.channelName, posts: [] }];
+      channels = [...channels].sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1: 0))
     });
-  })
+
+  });
 
   function leaveChannel(channelName: string) {
     socket.emit('leaveChannel', { channelName: channelName });

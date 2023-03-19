@@ -4,11 +4,12 @@ import { ChannelService } from 'src/channel/channel.service';
 import { PostsService } from 'src/posts/posts.service';
 import { UsersService } from 'src/users/users.service';
 import { PostDto } from './dto/post-dto';
-import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { ChatUser } from './class/ChatUser';
+import { ChatChannel } from './class/ChatChannel';
+import { PostEmitDto } from './dto/post-emit.dto';
 
 @Injectable()
 export class ChatService {
@@ -18,80 +19,108 @@ export class ChatService {
               private postsService: PostsService) {}
 
   users: ChatUser[] = [];
+  channels: ChatChannel[] = [];
 
-  async handleConnection(authHeader: string | undefined): Promise<any> {
-    if (authHeader) {
-      const token = authHeader.split(' ')[1];
-      if (token) {
-        return this.authService.validateToken(token)
+  async validateUser(authHeader: string) {
+    const token = authHeader.split(' ')[1];
+    return this.authService.validateToken(token)
+  }
+
+  async addUser(clientId: string, tokenData: any): Promise<string | undefined> {
+    const user: User | null = await this.usersService.findOne(tokenData.username);
+    if (user) {
+      this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
+      return user.username;
+    }
+  }
+
+  removeUser(username: string) {
+    const toRemove: number = this.users.findIndex(user => user.username === username);
+    this.users.splice(toRemove, 1);
+  }
+
+  async createChannel(username: string, channelName: string) {
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
+    if (user) {
+      await this.channelService.create({name: channelName, ownerId:user.id})
+      const newChan = await this.channelService.findByName(channelName);
+      this.channels.push({name: channelName, users: [user], id: newChan!.id});
+    }
+  }
+
+  joinChannel(username: string, channelName: string) {
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
+    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+
+    if (user && channel) {
+      channel.users.push(user);
+    }
+  }
+
+  async handleJoinChannel(username: string, channelName: string) {
+    const channel: Channel | null = await this.channelService.findByName('channelName');
+
+    if (channel)
+      this.joinChannel(username, channelName);
+    else
+      this.createChannel(username, channelName)
+  }
+
+  leaveChannel(channelName: string, username: string) {
+    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+
+    if (channel) {
+      const toRemove: number = channel.users.map(user => user.username).indexOf(username);
+      channel.users.splice(toRemove, 1);
+    }
+  }
+
+  async registerPost(username: string, payload: PostDto) {
+    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === payload.channelName);
+
+    if (channel) {
+      const author: ChatUser | undefined = channel.users.find(user => user.username === username);
+      if (author) 
+        this.postsService.create({content: payload.content, channelId: channel.id, authorId: author.id})
+    }
+  }
+  
+  isInChannel(username: string, channelName: string): boolean {
+    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+    
+    if (channel && channel.users.find(user => user.username === username))
+      return true;
+    return false;
+  }
+
+  getUserChannels(username: string): string[] {
+    const res: string[] = [];
+    this.channels.forEach(channel => {
+      if (this.isInChannel(username, channel.name))
+        res.push(channel.name);
+    });
+    return res;
+  }
+
+  async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
+    let ret: PostEmitDto[] = [];
+    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+
+    if (channel) {
+      const posts: Post[] = await this.postsService.findByChannel(channel.id);
+      for (const post of posts) {
+        const author: User | null = await this.usersService.findById(post.authorId);
+        if (author)
+          ret.push({content: post.content, author: author.username, channelName: channelName}); 
       }
-    } else {
-      console.log('NoAuthHeader');
     }
-  }
-
-  handleDisconnect(clientId: string) {
-    const index: number = this.users.findIndex(user => user.clientId === clientId);
-    this.users.splice(index, 1);
+    return ret;
   }
   
-  async handlePost(clientId: string, channel: Channel | null, payload: PostDto): Promise<any> {
+  getUsername(clientId: string): string | undefined {
     const user = this.users.find(user => user.clientId === clientId);
-    if (user) {
-      if (!channel)
-        return this.channelService.create({name: payload.channelName, ownerId: user.id})
-      else
-        return this.postsService.create({authorId: user.id, channelId: channel.id, content: payload.content});
-    }
+    if (user)
+      return user.username;
   }
 
-  async joinChannel(clientId: string, channelName: string, channel: Channel | null): Promise<any> {
-    const user = this.users.find(user => user.clientId === clientId);
-    if (user) {
-      if (!channel)
-        return this.channelService.create({name: channelName, ownerId: user.id});
-      else
-        return this.channelService.addUserToChannel(channel.id, user.id)
-    }
-  }
-
-  async handleLeaveChannel(client: Socket, channel: Channel): Promise<any> {
-    const user = this.users.find(user => user.clientId === client.id);
-    if (user) {
-      return this.channelService.removeUserFromChannel(channel.id, user.id);
-    }
-  }
-  
-  async getChannel(channelName: string): Promise<Channel | null> {
-    return this.channelService.findByName(channelName);
-  }
-
-  async getAllChannels(user: User): Promise<Channel[]> {
-      return this.channelService.findByUser(user.id);
-  }
-
-  isInChannel(channelName: string, channel: Channel): boolean {
-    return channelName === channel.name;
-  }
-  
-  async getChanPosts(channel: Channel): Promise<Post[]> {
-    return this.postsService.findByChannel(channel.id);
-  }
-
-  async getAuthor(post: Post): Promise<User | null> {
-    return this.usersService.findById(post.authorId);
-  }
-
-  async getUser(userData: any): Promise<User | null> {
-    return this.usersService.findOne(userData.username);
-  }
-
-  async addUser(user: any, clientId: string): Promise<User> {
-    this.users.push({id: user.id, clientId: clientId, username: user.username});
-    return user;
-  }
-
-  getChannelUser(clientId: String): ChatUser | undefined {
-    return this.users.find(user => user.clientId === clientId)
-  }
 }

@@ -1,9 +1,9 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
 import { ChannelDto } from './dto/channel-dto';
+import { PostEmitDto } from './dto/post-emit.dto';
 
 @WebSocketGateway({
     path: '/chat',
@@ -17,108 +17,102 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private chatService: ChatService,
   ) {}
 
-  @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('ChatGateway');
+  @WebSocketServer()
+  server: Server;
 
   @SubscribeMessage('joinChannel')
-  handleJoinChannel(client: Socket, payload: ChannelDto) {
-    this.chatService.getChannel(payload.channelName)
-    .then((channel) => {
-      this.chatService.getUser(this.chatService.getChannelUser(client.id)?.username);
-      .then(user => {
-      this.chatService.getAllChannels(user!)
-      .then(channels => {
-        channels.forEach(channel => {
-          if (this.chatService.isInChannel(payload.channelName, channel))
-            return ;
-        })
-        this.chatService.joinChannel(client.id, payload.channelName, channel)
-        .then(() => {
-          client.join(payload.channelName);
-          this.server.to(payload.channelName).emit('recJoin', {channelName: payload.channelName, message: 'channel joined by ' + this.chatService.getChannelUser(client.id)?.username});
-          console.log(this.chatService.getChannelUser(client.id)?.username, ' has joined channel ', payload.channelName);
-          this.chatService.getChannel(payload.channelName)
-          .then((channel) => {
-            this.chatService.getChanPosts(channel!)
-            .then((chanPosts) => {
-              chanPosts.forEach(post => {
-              this.chatService.getAuthor(post)
-                .then((author) => {
-                this.server.to(client.id).emit('recPost', {content: post.content, author: author!.username, channelName: channel!.name});
-                })
-              })
-              })
-            })
-          })
-        })
-      })
-    })
+  async handleJoinChannel(client: Socket, payload: ChannelDto) {
+    const username: string | undefined = this.chatService.getUsername(client.id)
+
+    if (!username) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      if (this.chatService.isInChannel(username, payload.channelName))
+        this.server.to(client.id).emit('error', { message: 'already in channel' });
+      else {
+        this.chatService.handleJoinChannel(username, payload.channelName);
+        client.join(payload.channelName);
+        this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'join' });
+        this.server.to(client.id).emit('join', { channelName: payload.channelName});
+        const channelPosts: PostEmitDto[] = await this.chatService.retrieveChannelPosts(payload.channelName)
+        for (const post of channelPosts)
+          this.server.to(client.id).emit('post', post);
+      }
+    }
   }
 
   @SubscribeMessage('leaveChannel')
-  handleLeaveChannel(client: Socket, payload: ChannelDto) {
-    this.chatService.getChannel(payload.channelName)
-    .then(channel => {
-      if (channel) {
-        this.chatService.handleLeaveChannel(client, channel)
-        .then(() => {
-          client.leave(payload.channelName);
-          this.server.to(payload.channelName).emit('recLeave', {channelName: payload.channelName, message: 'channel left by ' + this.chatService.getChannelUser(client.id)?.username});
-          console.log(this.chatService.getChannelUser(client.id)?.username, ' has left channel ', payload.channelName);
-        })
+  async handleLeaveChannel(client: Socket, payload: ChannelDto) {
+    const username: string | undefined = this.chatService.getUsername(client.id)
+
+    if (!username) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      if (!this.chatService.isInChannel(username, payload.channelName))
+        this.server.to(client.id).emit('error', { message: 'not in channel' });
+      else {
+        this.chatService.leaveChannel(username, payload.channelName);
+        client.leave(payload.channelName);
+        this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'leave' });
       }
-    })
+    }
   }
     
   @SubscribeMessage('sendPost')
   handlePost(client: Socket, payload: PostDto): void {
-    this.chatService.getChannel(payload.channelName)
-    .then((channel) => {
-      this.chatService.handlePost(client.id, channel, payload)
-      .then(() => {
-        this.server.to(payload.channelName).emit('recPost', { channelName: payload.channelName, content: payload.content, author: this.chatService.getChannelUser(client.id)?.username});
-      });
-    })
+    const username: string | undefined = this.chatService.getUsername(client.id)
+
+    if (!username) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      this.chatService.registerPost(username, payload);
+      const postEmit: PostEmitDto = { channelName: payload.channelName, content: payload.content, author: username }; 
+      this.server.to(payload.channelName).emit('post', postEmit);
+    }
   }
 
   afterInit() {
-    this.logger.log('Init');
+    console.log('chatWebsocket: init');
   }
 
   async handleConnection(client: Socket) {
-    this.chatService.handleConnection(client.handshake.headers.authorization)
-    .then((userData) => {
-      console.log('valid token');
-      this.chatService.getUser(userData)
-      .then ((user) => {
-        console.log('user ', user?.username, ' added in chat');
-        this.chatService.addUser(user, client.id)
-        .then((user) => {
-          this.chatService.getAllChannels(user)
-          .then((channels) => {
-            channels.forEach((channel) => {
-              this.chatService.getChanPosts(channel)
-              .then((chanPosts) => {
-                chanPosts.forEach((chanPost) => {
-                  this.chatService.getAuthor(chanPost)
-                  .then((author) => {
-                      this.server.to(client.id).emit('recPost', {content: chanPost.content, author: author!.username, channelName: channel.name});
-                  })
-                })
-              })
-            })
-          })
-        })
-      })
-    })
-    .catch(() => {
-        this.logger.log(`Unauthorized Client: ${client.id}`);
-        client.disconnect();
-    });
+    const authHeader = client.handshake.headers.authorization;
+
+    if (!authHeader) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      const tokenData = await this.chatService.validateUser(authHeader);
+      const username: string | undefined = await this.chatService.addUser(client.id, tokenData);
+
+      if (!username) {
+        this.server.to(client.id).emit('unauthorized', {user: client.id});
+        console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+      } else {
+        this.server.to(client.id).emit('welcome', {user: username});
+        console.log(`chatWebsocket: user ${username} connected`);
+      }
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.chatService.handleDisconnect(client.id);
-    this.logger.log(`Client disconnected: ${client.id}`)
+  async handleDisconnect(client: Socket) {
+    const username: string | undefined = this.chatService.getUsername(client.id)
+
+    if (!username) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      const channels: string[] = this.chatService.getUserChannels(username);
+
+      channels.forEach(channel => {
+        this.chatService.leaveChannel(username, channel);
+        this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' });
+      });
+      this.chatService.removeUser(username);
+    }
   }
+
 }
