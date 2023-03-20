@@ -11,8 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: true,
       secretOrKey: jwtConstants.secret,
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        const jwt = request?.cookies['jwt']
-        return jwt ? jwt : null
+        return request?.cookies?.jwt
       }])
     });
   }
