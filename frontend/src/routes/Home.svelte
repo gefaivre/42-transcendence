@@ -39,7 +39,7 @@
         <br>
         <a href="#/usercrud">User CRUD</a>
         <br>
-        <a href="#/channelcrud">Channel CRUD</a>
+        <a href="#/channels">Channels</a>
         <br>
         <a href="#/leaderboard">Leaderboard</a>
         <br>

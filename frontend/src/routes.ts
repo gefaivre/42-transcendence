@@ -9,13 +9,13 @@ import Profil from './routes/Profil.svelte'
 import Channel from './routes/Channel.svelte'
 import Message from './routes/Message.svelte'
 import Game from './routes/Game.svelte'
-import ChannelCRUD from './routes/ChannelCRUD.svelte'
+import Channels from './routes/Channels.svelte'
 
 export default {
     '/': Home,
     '/chat': Chat,
     '/UserCRUD': UserCRUD,
-    '/ChannelCRUD': ChannelCRUD,
+    '/Channels': Channels,
     '/leaderboard': Leaderboard,
     '/users/:name': Users,
     '/Menu': Menu,
