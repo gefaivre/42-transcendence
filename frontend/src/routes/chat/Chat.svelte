@@ -143,6 +143,3 @@
   </form>
 
 {/if}
-
-<style>
-</style>
