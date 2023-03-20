@@ -19,6 +19,10 @@ export class AuthController {
     // exchange code for access token
     const access_token = await this.authService.getFortyTwoAccessToken(code);
 
+    // code we sent could have been wrong
+    if (access_token == null)
+      return response.redirect('http://localhost:8080')
+
     // exchange access token for user data
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
