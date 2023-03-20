@@ -34,6 +34,7 @@
     "sirv-cli": "^2.0.0",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
+    "svelte-cookie": "^1.0.1",
     "svelte-spa-router": "^3.3.0",
     "url": "^0.11.0"
   }

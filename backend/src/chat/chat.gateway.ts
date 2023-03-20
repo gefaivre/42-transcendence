@@ -4,11 +4,13 @@ import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
 import { ChannelDto } from './dto/channel-dto';
 import { PostEmitDto } from './dto/post-emit.dto';
+import { ChannelEmitDto } from './dto/channel-emit-dto';
 
 @WebSocketGateway({
     path: '/chat',
     cors: {
-        origin: '*',
+        origin: 'http://localhost:8080',
+        credentials: true
     },
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -20,9 +22,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer()
   server: Server;
 
+  @SubscribeMessage('createChannel')
+  async handleCreateChannel(client: Socket, payload: ChannelDto) {
+    const username: string | undefined = this.chatService.getUsername(client.id);
+
+    if (!username) {
+      this.server.to(client.id).emit('unauthorized', {user: client.id});
+      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      if (this.chatService.isInChannel(username, payload.channelName))
+        this.server.to(client.id).emit('error', { message: 'already in channel' });
+      this.chatService.createChannel(username, payload.channelName);
+      client.join(payload.channelName);
+      this.server.to(client.id).emit('create', { channelName: payload.channelName});
+      this.server.emit('channel', { channelName: payload.channelName });
+    }
+  }
+
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(client: Socket, payload: ChannelDto) {
-    const username: string | undefined = this.chatService.getUsername(client.id)
+    const username: string | undefined = this.chatService.getUsername(client.id);
 
     if (!username) {
       this.server.to(client.id).emit('unauthorized', {user: client.id});
@@ -31,7 +50,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (this.chatService.isInChannel(username, payload.channelName))
         this.server.to(client.id).emit('error', { message: 'already in channel' });
       else {
-        this.chatService.handleJoinChannel(username, payload.channelName);
+        this.chatService.joinChannel(username, payload.channelName);
         client.join(payload.channelName);
         this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'join' });
         this.server.to(client.id).emit('join', { channelName: payload.channelName});
@@ -55,6 +74,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       else {
         this.chatService.leaveChannel(username, payload.channelName);
         client.leave(payload.channelName);
+        this.server.to(client.id).emit('leave', { channelName: payload.channelName });
         this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'leave' });
       }
     }
@@ -79,7 +99,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   async handleConnection(client: Socket) {
-    const authHeader = client.handshake.headers.authorization;
+    const authHeader = client.request.headers.cookie;
 
     if (!authHeader) {
       this.server.to(client.id).emit('unauthorized', {user: client.id});
@@ -93,6 +113,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log(`chatWebsocket: client ${client.id} is unauthorized`);
       } else {
         this.server.to(client.id).emit('welcome', {user: username});
+        const channels: ChannelEmitDto[] = await this.chatService.retrieveAllChannels();
+        for (const channel of channels)
+          this.server.to(client.id).emit('channel', channel);
         console.log(`chatWebsocket: user ${username} connected`);
       }
     }
@@ -112,6 +135,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' });
       });
       this.chatService.removeUser(username);
+      console.log(`chatWebsocket: client ${username} disconnected`);
     }
   }
 

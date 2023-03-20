@@ -10,6 +10,7 @@ import { Post } from '@prisma/client';
 import { ChatUser } from './class/ChatUser';
 import { ChatChannel } from './class/ChatChannel';
 import { PostEmitDto } from './dto/post-emit.dto';
+import { ChannelEmitDto } from './dto/channel-emit-dto';
 
 @Injectable()
 export class ChatService {
@@ -22,12 +23,13 @@ export class ChatService {
   channels: ChatChannel[] = [];
 
   async validateUser(authHeader: string) {
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split('=')[1];
     return this.authService.validateToken(token)
   }
 
   async addUser(clientId: string, tokenData: any): Promise<string | undefined> {
     const user: User | null = await this.usersService.findOne(tokenData.username);
+
     if (user) {
       this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
       return user.username;
@@ -48,22 +50,16 @@ export class ChatService {
     }
   }
 
-  joinChannel(username: string, channelName: string) {
+  async joinChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
 
     if (user && channel) {
       channel.users.push(user);
+    } else if (user) {
+      const newChan = await this.channelService.findByName(channelName);
+      this.channels.push({name: channelName, users: [user], id: newChan!.id});
     }
-  }
-
-  async handleJoinChannel(username: string, channelName: string) {
-    const channel: Channel | null = await this.channelService.findByName('channelName');
-
-    if (channel)
-      this.joinChannel(username, channelName);
-    else
-      this.createChannel(username, channelName)
   }
 
   leaveChannel(channelName: string, username: string) {
@@ -100,6 +96,16 @@ export class ChatService {
         res.push(channel.name);
     });
     return res;
+  }
+
+  async retrieveAllChannels(): Promise<ChannelEmitDto[]> {
+    let ret: ChannelEmitDto[] = [];
+
+    const channels: Channel[] = await this.channelService.findAll(); 
+    for (const channel of channels) {
+      ret.push({channelName: channel.name});
+    }
+    return ret;
   }
 
   async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
