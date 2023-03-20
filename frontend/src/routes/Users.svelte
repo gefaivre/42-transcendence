@@ -51,9 +51,3 @@
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
-
-<style>
-    table, td {
-        border: 1px solid #333;
-    }
-</style>

@@ -107,23 +107,3 @@
 {/if}
 
 </main>
-
-<style>
-
-    main {
-    	text-align: center;
-    }
-
-    table, td {
-        margin: auto;
-        min-width: 70px;
-        text-align: center;
-        border: 1px solid #333;
-    }
-
-    thead {
-        background-color: #333;
-        color: #fff;
-    }
-
-</style>
