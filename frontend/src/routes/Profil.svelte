@@ -4,7 +4,11 @@
     import { onMount } from "svelte";
     import greenWin from '../assets/greenWin.png'
     import redLose from "../assets/redLose.png"
+    import MatchHistory from '../assets/match_history.json';
+
+
     let user = null;
+    let game = [];
 
     onMount(async () => {
         try {
@@ -12,6 +16,8 @@
             withCredentials: true
         });
              user = response.data;
+             game = MatchHistory;
+             console.log(game);
   } catch (error) {
     console.error(error);
   }
@@ -73,8 +79,9 @@
     }
     .statistics{
         position: fixed;
-        display: flex;
+       /* display: flex;
         flex-direction: column; 
+        */
         bottom: 152px;
         right: 100px;
         width: 412px;
@@ -85,32 +92,59 @@
         z-index: 1;
     }
     .statistics h1{
-        margin-left: 5%;
-        margin-top: 20px;
-    }
-    .statistics h2{
         margin-left: 15%;
         margin-top: 20px;
     }
-    .statistics .flex {
-    width: 100%;
-    margin: 10px 0;
-    justify-content: center;
-    align-items: center;
-}
-.statistics .flex img {
-    width: 20px;
-    height: auto;
-}
-.statistics .flex h2 {
-    margin-left: 10px;
-}
+    .statistics .victory{
+        position: absolute;
+        top: 38%;
+        width: 100%;
+        height: 20%;
+    }
+    .statistics .loses{
+        position: absolute;
+        top: 58%;
+        width: 100%;
+        height: 20%;
+    }
+    .statistics .ratio{
+        position: absolute;
+        top: 78%;
+        width: 100%;
+        height: 22%;
+    }
+    .statistics img{
+        position: relative;
+        border: 2px solid purple; /**pour visualiser avent changement d'image*/
+        height: 30px;
+        width: 30px;
+        top: 30%;
+        left: 20%;
+    }
+    .statistics .text{
+        position: absolute;
+        left:37%;
+        top:0px;
+        z-index: 1;
+        height: 100%;
+        width: 35%;
+    }
+    .displaynb{
+        position: absolute;
+        left:80%;
+        top:0px;
+        z-index: 1;
+        height: 100%;
+        width: 20%;
+    }
 
 </style>
 
 <Layout>
     <div class="rectangle">
         <h1 class="text-5xl font-extrabold text-pink-500 text-center">Profil</h1>
+        <h1 class="text-5xl text-center font-inter"style="color: #9E27D9;">Profil</h1>
+
         <div class="ftbigAvatar">
             <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
         </div>
@@ -121,35 +155,51 @@
         {/if}
     </div>
     <div class="gameHistory">
-        <h1 class="text-4xl text-purple-800 font-inter">Game History</h1>
+        <h1 class="text-4xl font-inter" style="color: #9E27D9;">Game History</h1>
+        {#each game as match}
+        <div class="match">
+          <p>Winner: {match.winner.name} ({match.winnerScore})</p>
+          <p>Loser: {match.loser.name} ({match.loserScore})</p>
+        </div>
+          <hr>
+      {/each}
     </div>
     {#if user}
     <div class="statistics">
-        <div class="statistics">
-            <h1 class="text-4xl text-purple-800 font-inter">Statistics</h1>
-            <div class="flex mt-2 items-center">
-                <img src={greenWin} alt="Victory" class="h-6 mr-2 ml-2">
-                <h2 class="text-xl text-white font-inter">Victories:</h2>
-                <span class="text-white ml-2">{user.wins.length}</span>
+            <h1 class="text-4xl font-inter" style="color: #9E27D9;">Statistics</h1>
+            <div class="victory">
+                <img src={greenWin} alt="victory">
+                <div class="text">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Won games</span>
+                </div>
+                <div class="displaynb">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.wins.length}</span>
+                </div>
+
+            </div>
+            <div class="loses">
+                <img src={redLose} alt="loose">
+                <div class="text">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Lost games</span>
+                </div>
+                <div class="displaynb">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.loses.length}</span>
+
+                </div>
+
+            </div>
+            <div class="ratio">
+                <div class="text">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Ratio</span>
+                </div>
+                <div class="displaynb">
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.wins.length/user.loses.length}</span>
+                </div>
             </div>
             
-            <div class="flex items-center">
-                <img src={redLose} alt="Defeat" class="h-6 mr-2 ml-2">
-                <h2 class="text-xl text-white font-inter">Losses:</h2>
-                <span class="text-white ml-2">{user.loses.length}</span>
-            </div>
-            
-            <div class="flex items-center" style="width: 80px;">
-                <h2 class="text-2xl text-white font-inter">Ratio:</h2>
-                <span class="text-white ml-2">{user.wins.length / user.loses.length }</span>
-            </div>
-            
-            
-        </div>
         
     </div>
     {/if}
     
     
 </Layout>
-<h1 class="text-5xl text-purple-800 text-center font-inter">Profil</h1>
