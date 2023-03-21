@@ -1,5 +1,4 @@
 <script lang="ts">
-
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
@@ -43,6 +42,8 @@
         <a href="#/channels">Channels</a>
         <br>
         <a href="#/leaderboard">Leaderboard</a>
+        <br>
+        <a href="#/chat">chatroom</a>
         <br>
         <a href="#/Menu">testfront</a>
         <br>

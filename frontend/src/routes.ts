@@ -1,5 +1,6 @@
 import NotFound from './routes/NotFound.svelte'
 import Home from './routes/Home.svelte'
+import Chat from './routes/chat/Chat.svelte'
 import UserCRUD from './routes/UserCRUD.svelte'
 import Leaderboard from './routes/Leaderboard.svelte'
 import Users from './routes/Users.svelte'
@@ -12,6 +13,7 @@ import Channels from './routes/Channels.svelte'
 
 export default {
     '/': Home,
+    '/chat': Chat,
     '/UserCRUD': UserCRUD,
     '/Channels': Channels,
     '/leaderboard': Leaderboard,
