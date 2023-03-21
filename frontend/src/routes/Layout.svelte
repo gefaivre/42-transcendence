@@ -77,14 +77,21 @@
   }
     .container {
       background-color: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       height: 100vh;
+      max-width: 100%;
     }
     .menu a:hover {
       background-color: #4D4D4D;}
- 
+      @media (max-width: 768px) {
+  .menu {
+    width: 50px;
+  }
+  
+  .menu a img {
+    height: 30px;
+    width: 30px;
+  }
+}
     </style>
   
   
@@ -103,6 +110,6 @@
   </div>
   
 
-  <div class=container>
+  <div class="container m-0">
     <slot></slot>
   </div>

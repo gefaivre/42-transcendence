@@ -33,7 +33,9 @@ export class UsersService {
         username: name,
       },
       include: {
-        channels: true
+        channels: true,
+        wins: true,
+        loses: true
       }
     })
   }
