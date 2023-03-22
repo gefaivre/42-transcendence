@@ -50,7 +50,7 @@ export class ChatService {
 
   async joinChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    const channel: Channel = await this.channelService.findByName(channelName);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
     if (user && channel) 
       this.channelService.addUserToChannel(channel.id, user.id);
@@ -58,7 +58,7 @@ export class ChatService {
 
   async leaveChannel(channelName: string, username: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    const channel: Channel = await this.channelService.findByName(channelName);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
     if (channel && user) {
       this.channelService.removeUserFromChannel(channel.id, user.id);
@@ -66,7 +66,7 @@ export class ChatService {
   }
 
   async registerPost(username: string, payload: PostDto) {
-    const channel: Channel = await this.channelService.findByName(payload.channelName);
+    const channel: Channel | null = await this.channelService.findByName(payload.channelName);
     const author: ChatUser | undefined = this.users.find(user => user.username === username);
 
     if (channel && author) {
@@ -75,20 +75,22 @@ export class ChatService {
   }
   
   async isInChannel(username: string, channelName: string) {
-    const channel: Channel = await this.channelService.findByName(channelName);
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
 
-    if (channel) {
-      const user = await channel.users.findOne(username);
-      if (user)
-        return true;
+    if (user) {
+      const channels: Channel[] | null  = await this.channelService.findByUser(user.id);
+      for (const channel of channels) {
+        if (channel.name  === channelName)
+          return true
+      }
     }
     return false
   }
 
   async getUserChannels(username: string) {
-    const user: ChatUser  | undefined = this.users.find(user => user.username === username);
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
     if (user) {
-      const channels = await this.channelService.findByUser(user.id);
+      const channels: Channel[] | null = await this.channelService.findByUser(user.id);
       return channels;
     }
   }

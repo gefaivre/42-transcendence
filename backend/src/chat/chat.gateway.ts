@@ -22,24 +22,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer()
   server: Server;
 
-  @SubscribeMessage('createChannel')
-  async handleCreateChannel(client: Socket, payload: ChannelDto) {
-    const username: string | undefined = this.chatService.getUsername(client.id);
-
-    if (!username) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
-      if (isInChan)
-        this.server.to(client.id).emit('error', { message: 'already in channel' });
-      this.chatService.createChannel(username, payload.channelName);
-      client.join(payload.channelName);
-      this.server.to(client.id).emit('create', { channelName: payload.channelName});
-      this.server.emit('channel', { channelName: payload.channelName });
-    }
-  }
-
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(client: Socket, payload: ChannelDto) {
     const username: string | undefined = this.chatService.getUsername(client.id);
@@ -131,14 +113,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server.to(client.id).emit('unauthorized', {user: client.id});
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
-      const channels = this.chatService.getUserChannels(username);
-      for (const channel in channels) {
-        this.chatService.leaveChannel(username, channel);
-        this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' });
+      const channels = await this.chatService.getUserChannels(username);
+      if (channels) {
+        for (const channel of channels) {
+          this.chatService.leaveChannel(username, channel.name);
+          this.server.to(channel.name).emit('channelEvent', { user: username, event: 'leave' });
+        }
       }
       this.chatService.removeUser(username);
       console.log(`chatWebsocket: client ${username} disconnected`);
     }
   }
-
 }
