@@ -18,7 +18,7 @@ export class UsersService {
       return "User " + createUserDto.username + " already exist";
       // this.remove(createUserDto.username)
 
-    // this.images.downloadImage(new URL("https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg"),  '/app/images/' + createUserDto.username + '.jpg')
+    // this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
 
     await this.prisma.user.create({
       data: {
