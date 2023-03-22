@@ -8,9 +8,10 @@ import { MatchsModule } from './matchs/matchs.module';
 import { AuthModule } from './auth/auth.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { ChannelModule } from './channel/channel.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule],
+  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule, ImagesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

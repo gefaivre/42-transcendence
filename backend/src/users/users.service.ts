@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { ImagesService } from 'src/images/images.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private images: ImagesService) {}
 
   // START CRUD
 
   async create(createUserDto: CreateUserDto) {
     if (await this.findOne(createUserDto.username) != null)
-      return "User " + createUserDto.username + " already exist";
+      this.remove(createUserDto.username)
+      // return "User " + createUserDto.username + " already exist";
+
+    this.images.downloadImage(new URL("https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg"),  '/app/images/' + createUserDto.username + '.jpg')
+
     await this.prisma.user.create({
       data: {
         username: createUserDto.username,
