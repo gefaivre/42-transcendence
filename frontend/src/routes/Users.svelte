@@ -3,7 +3,6 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
-    import { getCookie } from "svelte-cookie"
     import type { User } from "../types";
 
     let user: User = {
@@ -13,12 +12,11 @@
         games: 0
     }
 
-    let jwt: string = getCookie('jwt')
     export let params: any = {}
 
     onMount(async () => {
         axios.get(`http://localhost:3000/users/${params.name}`, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then(res => {
             console.log(res.data)
@@ -31,7 +29,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>{user.username}</h1>
     <table>
         <tbody>
@@ -53,9 +51,3 @@
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
-
-<style>
-    table, td {
-        border: 1px solid #333;
-    }
-</style>

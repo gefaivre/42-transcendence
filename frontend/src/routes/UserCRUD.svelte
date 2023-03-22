@@ -9,7 +9,7 @@
 
 </script>
 
-{#if $logged}
+{#if $logged === 'true'}
     <h1>--UserCRUD--</h1>
     <AddUser></AddUser>
     <GetAllUser></GetAllUser>
@@ -20,9 +20,3 @@
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
-
-<style>
-    h1 {
-        text-align: center;
-    }
-</style>

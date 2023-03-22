@@ -61,6 +61,11 @@ export class ChannelController {
     return this.channelService.remove(+id);
   }
 
+  @Delete()
+  removeAll() {
+    return this.channelService.removeAll();
+  }
+
   @Get('me/myself/andI')
   @UseGuards(AuthGuard('jwt'))
   myResource(@Req() request: Request & { user?: CreateUserDto }) {

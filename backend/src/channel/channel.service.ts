@@ -11,37 +11,53 @@ export class ChannelService {
   constructor(private prisma: PrismaService){}
 
   async create(createChannelDto: CreateChannelDto) {
-    return this.prisma.channel.create({
-      data:{
+    if (await this.findByName(createChannelDto.name))
+      return "Channel " + createChannelDto.name + " already exist";
+    await this.prisma.channel.create({
+      data: {
         name: createChannelDto.name,
-        users: {
-          connect: [{ id: createChannelDto.ownerId }]
-        },
         ownerId: createChannelDto.ownerId,
-      },
-    });
+        admins: { connect: [{ id: createChannelDto.ownerId }] },
+        users: { connect: [{ id: createChannelDto.ownerId }] }
+      }
+    })
+    return 'New channel add! :  ' + createChannelDto.name;
   }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
 
   async findAll() {
     return await this.prisma.channel.findMany({
       include: {
+        owner: true,
         users: true,
         admins: true
       }
     });
-    //return `This action returns all channel`;
   }
 
   async findOne(id: number)  {
     return this.prisma.channel.findUnique({
       where: {
-        id: id,
+        id: id
       },
-      include: {  users: true,
+      include: {
+        owner: true,
+        users: true,
         admins: true
-}
+      }
     });
-    //return `This action returns a #${id} channel`;
+  }
+
+  async findByName(name: string) {
+    return this.prisma.channel.findFirst({
+      where: {
+        name: name
+      },
+      include: {
+        owner: true,
+        users: true,
+        admins: true
+      }
+    });
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {
@@ -59,21 +75,21 @@ export class ChannelService {
     const channel = await this.prisma.channel.findUnique({
       where: { id: channelId }
     }); //const channel = this.findOne(channelId)
-  
+
     if (!channel) {
       //throw new NotFoundException(`Channel with ID ${channelId} not found`);
       return "wrong channel";
     }
-  
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId }
     });
-  
+
     if (!user) {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
-  
+
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
       data: {
@@ -83,7 +99,7 @@ export class ChannelService {
       },
       include: { users: true }
     });
-  
+
     return updatedChannel;
   }
 
@@ -91,21 +107,21 @@ export class ChannelService {
     const channel = await this.prisma.channel.findUnique({
       where: { id: channelId }
     }); //const channel = this.findOne(channelId)
-  
+
     if (!channel) {
       //throw new NotFoundException(`Channel with ID ${channelId} not found`);
       return "wrong channel";
     }
-  
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId }
     });
-  
+
     if (!user) {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
-  
+
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
       data: {
@@ -117,7 +133,7 @@ export class ChannelService {
                   admins: true
       }
     });
-  
+
     return updatedChannel;
   }
 
@@ -125,21 +141,21 @@ export class ChannelService {
     const channel = await this.prisma.channel.findUnique({
       where: { id: channelId }
     }); //const channel = this.findOne(channelId)
-  
+
     if (!channel) {
       //throw new NotFoundException(`Channel with ID ${channelId} not found`);
       return "wrong channel";
     }
-  
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-  
+
     if (!user) {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
-  
+
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
       data: {
@@ -162,26 +178,31 @@ export class ChannelService {
     }});
    // return `This action removes a #${id} channel`;
   }
-  
+
+  async removeAll() {
+    return await this.prisma.channel.deleteMany();
+  }
+
   async removeUserFromChannel(channelId: number, userId: number) {//utiliser les anciennes plutot
     const channel = await this.prisma.channel.findUnique({
       where: { id: channelId }
     }); //const channel = this.findOne(channelId)
-    
+
     if (!channel) {
       //throw new NotFoundException(`Channel with ID ${channelId} not found`);
       return "wrong channel";
     }
-    
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId }
     });
-    
+
     if (!user) {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
     
+
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
       data: {
@@ -204,25 +225,25 @@ export class ChannelService {
     if (!channel) {
       throw new NotFoundException(`Channel with id ${channelId} not found`);
     }
-  
+
     // Vérifier que l'utilisateur qui demande la suppression est l'administrateur du canal
-    const isAdmin = channel.admins.some(admin => admin.id === requestingUserId);
-  
+    const isAdmin = channel.admins.some((admin: any) => admin.id === requestingUserId);
+
     // Vérifier que l'utilisateur à retirer est soit l'utilisateur qui fait la demande,
     // soit un administrateur du canal
     const isSelfRemove = userId === requestingUserId;
-    const isChannelUser = channel.users.some(user => user.id === userId);
+    const isChannelUser = channel.users.some((user: any) => user.id === userId);
     if (!isSelfRemove && !isAdmin) {
       throw new UnauthorizedException('Only channel admins can remove users from the channel');
     } else if (!isSelfRemove && !isChannelUser) {
       throw new NotFoundException(`User with id ${userId} is not a member of channel with id ${channelId}`);
     }
-  
+
     await this.prisma.channel.update({
       where: { id: channelId },
       data: { users: { disconnect: { id: userId } } },
     });
   }
-  
-  
+
+
 }

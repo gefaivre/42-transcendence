@@ -1,59 +1,57 @@
 <script lang="ts">
-
     import axios from "axios";
     import { onMount } from "svelte";
-    import { getCookie, deleteCookie } from 'svelte-cookie';
     import { logged } from "../stores";
 
-    let jwt: string = getCookie('jwt')
-    let profile = { username: '', userId: '' }
+    let user = { username: '', userId: '' }
 
-    onMount(() => {
-        if (jwt) {
-            logged.update(() => true)
-            getProfile()
-        } else {
-            logged.update(() => false)
-            resetProfile()
-        }
-    })
+    onMount(() => login())
 
-    function getProfile() {
-        axios.get('http://localhost:3000/profile', {
-            headers : { Authorization: 'Bearer ' + jwt }
+    function login() {
+        axios.get('http://localhost:3000/auth/login', {
+            withCredentials: true
         })
-        .then((res) => { profile = res.data })
-        .catch((err) => { console.log(err) })
-    }
-
-    function resetProfile() {
-        profile.username = ''
-        profile.userId = ''
+        .then((res) => {
+            user = res.data
+            logged.set('true')
+        })
+        .catch((err) => {
+            console.log(err)
+            user.username = ''
+            user.userId = ''
+            logged.set('false')
+        })
     }
 
     function logout() {
-        logged.update(() => false)
-        deleteCookie('jwt')
+        axios.get('http://localhost:3000/auth/logout', {
+            withCredentials: true
+        })
+        .then(() => logged.set('false'))
+        .catch((err) => console.log(err))
     }
 
 </script>
 
 <main>
-    {#if $logged}
+    {#if $logged === 'true'}
         <h1 class="zoom">Transcendence</h1>
         <br>
         <a href="#/usercrud">User CRUD</a>
         <br>
+        <a href="#/channels">Channels</a>
+        <br>
         <a href="#/leaderboard">Leaderboard</a>
+        <br>
+        <a href="#/chat">chatroom</a>
+        <br>
+        <a href="#/Menu">testfront</a>
         <br>
         <br>
         <button on:click={logout}>logout</button>
         <br>
         <br>
-        <p>You successfully authenticated as <b>{profile.username}</b></p>
-        <br>
-        <p>Your jwt is:</p>
-        <p class="break">{jwt}</p>
+        <p>You successfully authenticated as <b>{user.username}</b></p>
     {:else}
         <a href={FT_AUTHORIZE} style="font-size: 30px;">Signup with 42</a>
     {/if}

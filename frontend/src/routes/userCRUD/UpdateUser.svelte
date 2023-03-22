@@ -1,7 +1,6 @@
 <script lang="ts">
 
     import axios from 'axios'
-    import { getCookie } from "svelte-cookie"
     import type { User } from '../../types'
 
     let user: User = {
@@ -12,12 +11,11 @@
     }
 
     let username: string
-    let jwt: string = getCookie('jwt')
 
     function UpdateUser() {
         Object.keys(user).forEach((k) => user[k] == null && delete user[k]);
         axios.patch(`http://localhost:3000/users/${username}`, user, {
-            headers : { Authorization: 'Bearer ' + jwt }
+            withCredentials: true
         })
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });
@@ -37,17 +35,3 @@
         <button type="submit">submit</button>
     </fieldset>
 </form>
-
-<style>
-    legend {
-        background-color: #000;
-        color: #fff;
-        padding: 3px 6px;
-    }
-    fieldset {
-        text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-    }
-</style>
