@@ -60,6 +60,18 @@ export class ChannelService {
     });
   }
 
+  async findByUser(userId: number) {
+    return this.prisma.channel.findMany({
+      where: {
+        users: {
+          some: {
+            id: userId
+          }
+        }
+      }
+    })
+  }
+
   async update(id: number, updateChannelDto: UpdateChannelDto) {
     return await this.prisma.channel.update({
       where: {id: id},

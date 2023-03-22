@@ -30,7 +30,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server.to(client.id).emit('unauthorized', {user: client.id});
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
-      if (this.chatService.isInChannel(username, payload.channelName))
+      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
+      if (isInChan)
         this.server.to(client.id).emit('error', { message: 'already in channel' });
       this.chatService.createChannel(username, payload.channelName);
       client.join(payload.channelName);
@@ -47,7 +48,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server.to(client.id).emit('unauthorized', {user: client.id});
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
-      if (this.chatService.isInChannel(username, payload.channelName))
+      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
+      if (isInChan)
         this.server.to(client.id).emit('error', { message: 'already in channel' });
       else {
         this.chatService.joinChannel(username, payload.channelName);
@@ -69,7 +71,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server.to(client.id).emit('unauthorized', {user: client.id});
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
-      if (!this.chatService.isInChannel(username, payload.channelName))
+      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
+      if (!isInChan)
         this.server.to(client.id).emit('error', { message: 'not in channel' });
       else {
         this.chatService.leaveChannel(username, payload.channelName);
@@ -128,12 +131,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server.to(client.id).emit('unauthorized', {user: client.id});
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
-      const channels: string[] = this.chatService.getUserChannels(username);
-
-      channels.forEach(channel => {
+      const channels = this.chatService.getUserChannels(username);
+      for (const channel in channels) {
         this.chatService.leaveChannel(username, channel);
         this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' });
-      });
+      }
       this.chatService.removeUser(username);
       console.log(`chatWebsocket: client ${username} disconnected`);
     }
