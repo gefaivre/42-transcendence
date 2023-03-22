@@ -9,6 +9,15 @@
 
     let user = null;
     let game = [];
+    let toggleValue = 1;
+
+  function toggle() {
+    if (!toggleValue)
+        toggleValue == 1;
+    else
+        toggleValue ==0;
+    console.log(toggleValue);
+  }
 
     onMount(async () => {
         try {
@@ -165,7 +174,21 @@
         height: 100%;
         width: 100%;
     }
-    
+    .mmr{
+        position: absolute;
+        top : 30%;
+        right: 160px;
+        height: 100px;
+        width: 250px;
+    }
+    .rectangle .togleFa{
+        position: absolute;
+        bottom: 5%;
+        height: 60px;
+        width: 80%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
 
 </style>
@@ -181,6 +204,18 @@
         {#if user}
         <div class="username">
             <div class="text-4xl text-white text-center font-inter">{user.username}</div>
+        </div>
+        <div class="togleFa">
+            <label class="relative inline-flex mr-5 cursor-pointer">
+                <div class="relative inline-block w-11 h-6 dark:bg-gray-700">
+                    <input type="checkbox" class="peer hidden dark:checked:bg-purple-600" bind:checked={toggleValue} on:change={toggle}/>
+                    <div class="absolute inset-0 rounded-full bg-gray-200 peer-checked:bg-purple-600 peer-checked:peer-focus:ring-4 peer-checked:peer-focus:ring-purple-300 dark:peer-checked:peer-focus:ring-purple-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600">          
+                    </div>
+                </div>
+                  
+                
+                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300" style="color: #CDCDCD;">2FA (2 factor authentification)</span>
+              </label>
         </div>
         {/if}
     </div>
@@ -206,6 +241,9 @@
       {/each}   
     </div>
     {#if user}
+    <div class="mmr">
+        <span style="position: relative; color: #CDCDCD; font-size: 32px; font-family: Arial; top: 50%">Elo points : {user.mmr}</span>
+    </div>
     <div class="statistics">
             <h1 class="text-4xl font-inter" style="color: #9E27D9;">Statistics</h1>
             <div class="victory">
