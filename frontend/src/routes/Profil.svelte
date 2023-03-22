@@ -65,7 +65,6 @@
         left: 525px;
         width: 25%;
         height: 70%;
-        background-color: black;
         z-index: 1;
         border-right: 1px solid #707070;
         border-left: 1px solid #707070;
@@ -76,6 +75,7 @@
     .gameHistory h1{
         margin-left: 20px;
         margin-top: 20px;
+        margin-bottom: 30px;
     }
     .statistics{
         position: fixed;
@@ -137,6 +137,36 @@
         height: 100%;
         width: 20%;
     }
+    .gameHistory .match {
+         margin-bottom: 10px;
+         height: 35px;
+    }
+    .gameHistory .match img{
+        position: relative;
+        border: 2px solid purple; /**pour visualiser avent changement d'image*/
+        height: 100%;
+        width: 35px;
+        top: -35px;
+        left: 70%;
+
+     }
+     .gameHistory .match .lilavatar  {
+        position: relative;
+        width: 35px;
+        height: 35px;
+        float: left;
+        left:15%;
+        margin-right: 0px;
+    }
+    .gameHistory .match .lilavatar img{
+        position: relative;
+        top:0px;
+        left: 0%;
+        height: 100%;
+        width: 100%;
+    }
+    
+
 
 </style>
 
@@ -158,11 +188,22 @@
         <h1 class="text-4xl font-inter" style="color: #9E27D9;">Game History</h1>
         {#each game as match}
         <div class="match">
-          <p>Winner: {match.winner.name} ({match.winnerScore})</p>
-          <p>Loser: {match.loser.name} ({match.loserScore})</p>
+            {#if match.winner.id !== user.id}
+            <div class="lilavatar">
+                <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+            </div>
+            <p style="position: relative; top: 0px; color: red; left: 20%; font-size: 23px;">{match.winner.name}</p>
+            <img src={redLose} alt="victory">
+            {/if}
+            {#if match.loser.id !== user.id}
+            <div class="lilavatar">
+                <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+            </div>
+            <p style="position: relative; left: 20%; top: 0px;  color: green; font-size: 23px;">{match.loser.name}</p>
+            <img src={greenWin} alt="victory">
+             {/if}
         </div>
-          <hr>
-      {/each}
+      {/each}   
     </div>
     {#if user}
     <div class="statistics">
