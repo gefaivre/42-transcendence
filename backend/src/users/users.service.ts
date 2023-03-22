@@ -1,25 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { ImagesService } from 'src/images/images.service';
+import { Injectable , Inject} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService, private images: ImagesService) {}
+  constructor(private prisma: PrismaService,
+              private images: ImagesService) {}
+
 
   // START CRUD
 
   async create(createUserDto: CreateUserDto) {
+    console.log(createUserDto.username);
     if (await this.findOne(createUserDto.username) != null)
-      this.remove(createUserDto.username)
-      // return "User " + createUserDto.username + " already exist";
+      return "User " + createUserDto.username + " already exist";
+      // this.remove(createUserDto.username)
 
-    this.images.downloadImage(new URL("https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg"),  '/app/images/' + createUserDto.username + '.jpg')
+    // this.images.downloadImage(new URL("https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg"),  '/app/images/' + createUserDto.username + '.jpg')
 
     await this.prisma.user.create({
       data: {
-        username: createUserDto.username,
+        username: "test",
         password: createUserDto.password,
         games:  Math.floor(Math.random() * (150 - 0) + 0),
         mmr: Math.floor(Math.random() * (1500 - 0) + 0),

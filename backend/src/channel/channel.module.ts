@@ -4,10 +4,11 @@ import { ChannelController } from './channel.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
+import { ImagesService } from 'src/images/images.service';
 
 @Module({
   imports: [PrismaModule],
   controllers: [ChannelController],
-  providers: [ChannelService, PrismaService, UsersService]
+  providers: [ChannelService, PrismaService, UsersService, ImagesService]
 })
 export class ChannelModule {}
