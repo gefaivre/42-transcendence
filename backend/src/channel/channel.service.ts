@@ -16,10 +16,9 @@ export class ChannelService {
     await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
-        //users: {
-        //  connect: [{ id: createChannelDto.ownerId }]
-        //},
-        ownerId: createChannelDto.ownerId
+        ownerId: createChannelDto.ownerId,
+        admins: { connect: [{ id: createChannelDto.ownerId }] },
+        users: { connect: [{ id: createChannelDto.ownerId }] }
       }
     })
     return 'New channel add! :  ' + createChannelDto.name;
@@ -28,29 +27,35 @@ export class ChannelService {
   async findAll() {
     return await this.prisma.channel.findMany({
       include: {
+        owner: true,
         users: true,
         admins: true
       }
     });
-    //return `This action returns all channel`;
   }
 
   async findOne(id: number)  {
     return this.prisma.channel.findUnique({
       where: {
-        id: id,
+        id: id
       },
-      include: {  users: true,
+      include: {
+        owner: true,
+        users: true,
         admins: true
-}
+      }
     });
-    //return `This action returns a #${id} channel`;
   }
 
   async findByName(name: string) {
     return this.prisma.channel.findFirst({
       where: {
-        name: name,
+        name: name
+      },
+      include: {
+        owner: true,
+        users: true,
+        admins: true
       }
     });
   }
@@ -164,7 +169,7 @@ export class ChannelService {
     });
     return updatedChannel;
   }
-
+  
   async remove(id: number) {
     return await this.prisma.channel.delete({
       where:
@@ -196,6 +201,7 @@ export class ChannelService {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
+    
 
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },
