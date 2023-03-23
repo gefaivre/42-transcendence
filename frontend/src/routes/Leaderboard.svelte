@@ -86,31 +86,16 @@
         background-color: #8b6c42;
     }
 
-
-
     .clickable {
         color: white;
-    }
-    h1 {
-        text-align: center;
     }
 
     .leaderboard {
         margin: auto;
     }
+
     .username {
         text-align:left;
     }
 
-    table,
-    td {
-        border: 1px solid #333;
-        min-width: 70px;
-        text-align: center;
-    }
-
-    thead {
-        background-color: #333;
-        color: #fff;
-    }
 </style>

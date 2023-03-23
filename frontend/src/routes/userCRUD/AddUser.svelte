@@ -25,17 +25,3 @@
         <button type="submit">submit</button>
     </fieldset>
 </form>
-
-<style>
-    legend {
-        background-color: #000;
-        color: #fff;
-        padding: 3px 6px;
-    }
-    fieldset {
-        text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-    }
-</style>
