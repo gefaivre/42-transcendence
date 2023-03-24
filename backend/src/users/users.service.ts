@@ -35,6 +35,15 @@ export class UsersService {
     });
   }
 
+  findByFortyTwoLogin(login: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        ft_login: login
+      }
+    })
+
+  }
+
   async findOne(name: string) {
     return await this.prisma.user.findUnique({
       where: {

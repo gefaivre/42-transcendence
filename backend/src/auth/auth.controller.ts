@@ -27,7 +27,7 @@ export class AuthController {
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
     // register user in database (if not already the case)
-    this.usersService.create({ username: ft_user.login, password: '' } as CreateUserDto)
+    this.usersService.create({ username: ft_user.login, password: '', ft_login: ft_user.username } as CreateUserDto)
 
     // bind a jwt to the authenticated user
     const jwt = await this.authService.loginFortyTwo(ft_user.login, ft_user.id)

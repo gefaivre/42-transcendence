@@ -4,6 +4,7 @@ import {
   } from 'class-validator';
 
 export class CreateUserDto {
+    @IsString()
     @IsNotEmpty()
     username: string;
 
@@ -11,4 +12,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string;
 
+    @IsString()
+    @IsNotEmpty()
+    ft_login: string;
 }

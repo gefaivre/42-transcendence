@@ -3,6 +3,7 @@ export type User = {
     password: string
     mmr: number
     games: number
+    ft_login: string
 }
 
 export type Channel = {

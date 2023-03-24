@@ -9,7 +9,8 @@
         username: '',
         password: '',
         mmr: 0,
-        games: 0
+        games: 0,
+        ft_login: ''
     }
 
     export let params: any = {}
@@ -44,6 +45,9 @@
             </tr>
             <tr>
                 <td>Mmr:</td> <td>{user.mmr}</td>
+            </tr>
+            <tr>
+                <td>42 login:</td> <td>{user.ft_login}</td>
             </tr>
         </tbody>
     </table>
