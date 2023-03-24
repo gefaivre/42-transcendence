@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserameDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'))
@@ -29,6 +29,13 @@ export class UsersController {
   @Patch(':name')
   update(@Param('name') name: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(name, updateUserDto);
+  }
+
+  // TODO: try/catch to check if the new username is not already in use
+  @Patch('username/:name')
+  updateUsername(@Param('name') name: string, @Body() updateUsernameDto: UpdateUserameDto) {
+    console.log('UPDATE', 'current:', name, 'new:', updateUsernameDto.username)
+    return this.usersService.updateUsername(name, updateUsernameDto);
   }
 
   @Delete(':name')

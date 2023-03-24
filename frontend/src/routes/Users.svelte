@@ -13,20 +13,48 @@
         ft_login: ''
     }
 
-    export let params: any = {}
+    let username: string = null
 
-    onMount(async () => {
-        axios.get(`http://localhost:3000/users/${params.name}`, {
-            withCredentials: true
-        })
-        .then(res => {
-            console.log(res.data)
-            user = res.data;
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    });
+    export let params: any = { }
+
+    onMount(() => getUser())
+
+    async function getUser() {
+        const response = await
+        axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })
+        user = response.data
+    }
+
+    async function changeUsername() {
+
+      // guards
+      if (username == null) { return alert('empty username') }
+      if (username == user.username) { return alert('same username') }
+
+      try {
+
+        // proper dto (cf. /backend/src/users/dto/update-user.dto)
+        const updateUsernameDto = { username: username }
+
+        // patch username request
+        const response = await
+        axios.patch(`http://localhost:3000/users/username/${user.username}`, updateUsernameDto, { withCredentials: true })
+
+        // update component state
+        username = null
+        user.username = updateUsernameDto.username
+
+        // TODO: modify param to refresh with brand new route
+        // Or get user based on id (which doesnt't change) instead of username
+        params.username = user.username
+
+        // log
+        console.log(response.data)
+      } catch (error) {
+        console.log(error.data)
+      }
+
+    }
 
 </script>
 
@@ -51,6 +79,12 @@
             </tr>
         </tbody>
     </table>
+
+    <br>
+    <br>
+
+    <input type="text" placeholder="new username" bind:value={username}>
+    <button on:click={changeUsername}>Change</button>
 
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
