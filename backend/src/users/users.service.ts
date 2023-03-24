@@ -16,6 +16,7 @@ export class UsersService {
       data: {
         username: createUserDto.username,
         password: createUserDto.password,
+        ft_login: createUserDto.ft_login,
         games:  Math.floor(Math.random() * (150 - 0) + 0),
         mmr: Math.floor(Math.random() * (1500 - 0) + 0),
       },
