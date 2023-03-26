@@ -16,7 +16,7 @@ model User {
   password       String
   games          Int
   mmr            Int
-  ft_login       String    @unique @default("null")
+  ft_login       String?   @unique
   wins           Match[]   @relation("winner")
   loses          Match[]   @relation("loser")
   channels       Channel[] @relation("channel_users")

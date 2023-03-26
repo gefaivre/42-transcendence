@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUserameDto } from './dto/update-user.dto';
@@ -34,7 +34,6 @@ export class UsersController {
   // TODO: try/catch to check if the new username is not already in use
   @Patch('username/:name')
   updateUsername(@Param('name') name: string, @Body() updateUsernameDto: UpdateUserameDto) {
-    console.log('UPDATE', 'current:', name, 'new:', updateUsernameDto.username)
     return this.usersService.updateUsername(name, updateUsernameDto);
   }
 
@@ -42,6 +41,7 @@ export class UsersController {
   remove(@Param('name') name: string) {
     return this.usersService.remove(name);
   }
+
   @Delete()
   removeAllUsers() {
     return this.usersService.removeAllUsers();

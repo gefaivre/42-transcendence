@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios'
+import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private userService: UsersService
+  ) {}
 
-  async loginFortyTwo(ft_login: string, ft_id: string) {
-    const payload = { username: ft_login, sub: ft_id };
+  // TODO (?): remove async
+  async login(user: any) {
+    const payload = { sub: user.id };
     return this.jwtService.sign(payload)
   }
 
@@ -30,7 +35,9 @@ export class AuthService {
     }
   }
 
-async getFortyTwoUser(access_token: string) { const fortytwouser = await axios.get('https://api.intra.42.fr/v2/me', { headers : { Authorization: 'Bearer ' + access_token }
+  async getFortyTwoUser(access_token: string) {
+    const fortytwouser = await axios.get('https://api.intra.42.fr/v2/me', {
+      headers : { Authorization: 'Bearer ' + access_token }
     })
     return fortytwouser.data;
   }
@@ -38,5 +45,17 @@ async getFortyTwoUser(access_token: string) { const fortytwouser = await axios.g
   async validateToken(token: string) {
     return this.jwtService.verify(token, {secret:  jwtConstants.secret, ignoreExpiration: true });
   }
+
+  // TODO (?): Insert this function's body into LocalStrategy validate()
+  async validateLocalUser(username: string, password: string): Promise<any> {
+    const user = await this.userService.findOne(username);
+    if (user && user.password === password) {
+      // TODO (?): select only id field
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
 }
 

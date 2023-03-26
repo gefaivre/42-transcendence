@@ -1,6 +1,7 @@
-import { Controller, Get, Query, Res, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Res, Req, UseGuards, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
+import { Request} from 'express';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,8 +11,15 @@ export class AuthController {
 
   constructor(
     private authService: AuthService,
-    private usersService: UsersService
-    ) {}
+    private usersService: UsersService,
+  ) {}
+
+  // If you cycle through this loop, well, someone stole your login (Ò.Ó)
+  private async generateUsername(login: string) {
+    while (await this.usersService.findOne(login))
+      login = login + '_'
+    return login
+  }
 
   @Get('42')
   async auth42(@Query('code') code: string, @Res() response: Response) {
@@ -19,6 +27,7 @@ export class AuthController {
     // exchange code for access token
     const access_token = await this.authService.getFortyTwoAccessToken(code);
 
+    // TODO (?): throw http exception
     // code we sent could have been wrong
     if (access_token == null)
       return response.redirect('http://localhost:8080')
@@ -26,11 +35,27 @@ export class AuthController {
     // exchange access token for user data
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
-    // register user in database (if not already the case)
-    this.usersService.create({ username: ft_user.login, password: '', ft_login: ft_user.login } as CreateUserDto)
+    // see if this 42 user already in db
+    let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
+
+    // first conection: register in db
+    if (!user) {
+
+      let newUser: CreateUserDto = {
+        username: await this.generateUsername(ft_user.login),
+        password: '',
+        ft_login: ft_user.login
+      }
+
+      user = await this.usersService.create(newUser)
+
+      // TODO
+      if (user == null)
+        return
+    }
 
     // bind a jwt to the authenticated user
-    const jwt = await this.authService.loginFortyTwo(ft_user.login, ft_user.id)
+    const jwt = await this.authService.login(user)
 
     // return the jwt as a cookie into frontend
     response.cookie('jwt', jwt, { httpOnly: true })
@@ -39,17 +64,46 @@ export class AuthController {
     return response.redirect('http://localhost:8080')
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('login')
-  login(@Request() request: any) {
-    return request.user
+  @Post('signup')
+  async signup(@Body() body: CreateUserDto) {
+
+    // create user
+    const user = await this.usersService.create(body)
+    if (user == null)
+      throw new HttpException('This username already exists', HttpStatus.CONFLICT)
+
+    // remove passowrd field from user object
+    const { password, ...result } = user;
+
+    // frontend need to login after
+    return result;
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  async login(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
+
+    console.log('login')
+
+    // bind a jwt to the authenticated user
+    const jwt = await this.authService.login(req.user)
+
+    // return the jwt as a cookie into frontend
+    response.cookie('jwt', jwt, { httpOnly: true })
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('logout')
-  logout(@Res() response: Response) {
+  logout(@Res({ passthrough: true }) response: Response) {
     response.cookie('jwt', '', { expires: new Date(0) });
-    response.end()
+  }
+
+  // TODO (?): move into users controller (would be a conflict with other get routes though)
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  getProfile(@Req() request: any) {
+    console.log('profile', request.user)
+    return request.user
   }
 
 }

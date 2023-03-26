@@ -10,18 +10,20 @@ export class UsersService {
   // START CRUD
 
   async create(createUserDto: CreateUserDto) {
-    if (await this.findOne(createUserDto.username) != null)
-      return "User " + createUserDto.username + " already exist";
-    await this.prisma.user.create({
-      data: {
-        username: createUserDto.username,
-        password: createUserDto.password,
-        ft_login: createUserDto.ft_login,
-        games:  Math.floor(Math.random() * (150 - 0) + 0),
-        mmr: Math.floor(Math.random() * (1500 - 0) + 0),
-      },
-    })
-    return 'New user add! :  ' + createUserDto.username;
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          username: createUserDto.username,
+          password: createUserDto.password,
+          ft_login: createUserDto.ft_login,
+          games:  Math.floor(Math.random() * (150 - 0) + 0),
+          mmr: Math.floor(Math.random() * (1500 - 0) + 0),
+        },
+      })
+      return user
+    } catch (error) {
+      return null
+    }
   }
 
   async findAll() {
@@ -36,8 +38,8 @@ export class UsersService {
     });
   }
 
-  findByFortyTwoLogin(login: string) {
-    return this.prisma.user.findUnique({
+  async findByFortyTwoLogin(login: string) {
+    return await this.prisma.user.findUnique({
       where: {
         ft_login: login
       }

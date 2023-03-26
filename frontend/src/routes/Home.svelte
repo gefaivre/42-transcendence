@@ -3,32 +3,30 @@
     import { onMount } from "svelte";
     import { logged } from "../stores";
 
-    let user = { username: '', userId: '' }
+    // TODO: typedef
+    let user = { id: null }
 
-    onMount(() => login())
+    onMount(() => getProfile())
 
-    function login() {
-        axios.get('http://localhost:3000/auth/login', {
-            withCredentials: true
-        })
-        .then((res) => {
-            user = res.data
-            logged.set('true')
-        })
-        .catch((err) => {
-            console.log(err)
-            user.username = ''
-            user.userId = ''
-            logged.set('false')
-        })
+    async function getProfile() {
+      try {
+        const response = await
+        axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
+        user = response.data // TODO: typedef
+        logged.set('true')
+      } catch (error) {
+        user.id = null
+        logged.set('false')
+      }
     }
 
-    function logout() {
-        axios.get('http://localhost:3000/auth/logout', {
-            withCredentials: true
-        })
-        .then(() => logged.set('false'))
-        .catch((err) => console.log(err))
+    async function logout() {
+      try {
+        await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
+        logged.set('false')
+      } catch (error) {
+        console.log(error)
+      }
     }
 
 </script>
@@ -51,9 +49,15 @@
         <button on:click={logout}>logout</button>
         <br>
         <br>
-        <p>You successfully authenticated as <b>{user.username}</b></p>
+        <p>You successfully authenticated as user n.<b>{user.id}</b></p>
     {:else}
-        <a href={FT_AUTHORIZE} style="font-size: 30px;">Signup with 42</a>
+        <a href={FT_AUTHORIZE} style="font-size: 30px;">Signin with 42</a>
+        <br>
+        <br>
+        <a href="#/signup" style="font-size: 30px;">Signup with username</a>
+        <br>
+        <br>
+        <a href="#/login" style="font-size: 30px;">Login with username</a>
     {/if}
 </main>
 
