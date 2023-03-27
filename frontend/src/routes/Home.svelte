@@ -1,7 +1,7 @@
 <script lang="ts">
     import axios from "axios";
     import { onMount } from "svelte";
-    import { logged } from "../stores";
+    import { id, logged } from "../stores";
 
     // TODO: typedef
     let user = { id: null }
@@ -14,9 +14,11 @@
         axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
         user = response.data // TODO: typedef
         logged.set('true')
+        id.set(response.data.id.toString())
       } catch (error) {
         user.id = null
         logged.set('false')
+        id.set('0')
       }
     }
 
@@ -24,6 +26,7 @@
       try {
         await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
         logged.set('false')
+        id.set('0')
       } catch (error) {
         console.log(error)
       }

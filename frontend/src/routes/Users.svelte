@@ -2,27 +2,30 @@
 
     import axios from "axios";
     import { onMount } from "svelte";
-    import { logged } from "../stores";
+    import { logged, id } from "../stores";
+    import { replace } from "svelte-spa-router";
     import type { User } from "../types";
 
     let user: User = {
-        username: '',
-        password: '',
-        mmr: 0,
-        games: 0,
-        ft_login: ''
+        id: 0,
+        username: null,
+        password: null,
+        mmr: null,
+        games: null,
+        ft_login: null
     }
 
     let username: string = null
 
     export let params: any = { }
 
-    onMount(() => getUser())
+    onMount(async () => await getUser())
 
     async function getUser() {
         const response = await
         axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })
         user = response.data
+        console.log(params)
     }
 
     async function changeUsername() {
@@ -33,25 +36,26 @@
 
       try {
 
-        // proper dto (cf. /backend/src/users/dto/update-user.dto)
-        const updateUsernameDto = { username: username }
-
-        // patch username request
-        const response = await
-        axios.patch(`http://localhost:3000/users/username/${user.username}`, updateUsernameDto, { withCredentials: true })
+        // Yes, this body is dirty.
+        await axios.patch(`http://localhost:3000/users/username/${user.username}`, {
+          id: $id,
+          username: username
+        }, {
+          withCredentials: true
+        })
 
         // update component state
+        user.username = username
         username = null
-        user.username = updateUsernameDto.username
 
-        // TODO: modify param to refresh with brand new route
-        // Or get user based on id (which doesnt't change) instead of username
-        params.username = user.username
+        // redirect to your new user page
+        replace(`/users/${user.username}`)
 
-        // log
-        console.log(response.data)
       } catch (error) {
-        console.log(error.data)
+        if (error.response.status == 409)
+          alert('This username is already used.')
+        if (error.response.status == 401)
+          alert('Unauthorized to change other player username.')
       }
 
     }
@@ -63,19 +67,22 @@
     <table>
         <tbody>
             <tr>
-                <td>Username:</td> <td>{user.username}</td>
+                <td>id</td> <td>{user.id}</td>
             </tr>
             <tr>
-                <td>Password:</td> <td>{user.password}</td>
+                <td>Username</td> <td>{user.username}</td>
             </tr>
             <tr>
-                <td>Games played:</td> <td>{user.games}</td>
+                <td>Password</td> <td>{user.password}</td>
             </tr>
             <tr>
-                <td>Mmr:</td> <td>{user.mmr}</td>
+                <td>Games played</td> <td>{user.games}</td>
             </tr>
             <tr>
-                <td>42 login:</td> <td>{user.ft_login}</td>
+                <td>Mmr</td> <td>{user.mmr}</td>
+            </tr>
+            <tr>
+                <td>42 login</td> <td>{user.ft_login}</td>
             </tr>
         </tbody>
     </table>
@@ -83,8 +90,10 @@
     <br>
     <br>
 
-    <input type="text" placeholder="new username" bind:value={username}>
-    <button on:click={changeUsername}>Change</button>
+    {#if $id === user.id.toString()}
+      <input type="text" placeholder="new username" bind:value={username}>
+      <button on:click={changeUsername}>Change</button>
+    {/if}
 
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>

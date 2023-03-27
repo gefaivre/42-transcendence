@@ -57,5 +57,9 @@ export class AuthService {
     return null;
   }
 
+  decode(jwt: string) {
+    return this.jwtService.decode(jwt)
+  }
+
 }
 
