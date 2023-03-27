@@ -2,14 +2,25 @@
     import Layout from "./Layout.svelte";
     import axios from "axios";
     import { onMount } from "svelte";
-    import greenWin from '../assets/greenWin.png'
-    import redLose from "../assets/redLose.png"
+    import greenWin from '../assets/greenWin.png';
+    import redLose from "../assets/redLose.png";
     import MatchHistory from '../assets/match_history.json';
-
+    import uploadImg from '../assets/upload.png';
 
     let user = null;
     let game = [];
     let toggleValue = 1;
+    let avatar, fileinput;
+
+    avatar = "https://flowbite.com/docs/images/people/profile-picture-5.jpg";
+  const onFileSelected = (e) => {
+    let image = e.target.files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(image);
+    reader.onload = e => {
+      avatar = e.target.result;
+    };  
+  }
 
   function toggle() {
     if (!toggleValue)
@@ -48,7 +59,7 @@
     }
     .ftbigAvatar{
         position: absolute;
-        top: 50%;
+        top: 40%;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 200px;
@@ -189,6 +200,23 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
+    .rectangle .uploadAvatar{
+        position: absolute;
+        bottom: 40%;
+        height: 35px;
+        width: 50%;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        cursor: pointer;
+
+    }
+    .uploadAvatar img{
+        position: relative;
+        height: 40px;
+        width: 40px;
+        left: 50%;
+        transform: translate(-50%, 0%);
+    }
 
 
 </style>
@@ -199,7 +227,11 @@
         <h1 class="text-5xl text-center font-inter"style="color: #9E27D9;">Profil</h1>
 
         <div class="ftbigAvatar">
-            <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+            <img class="rounded-full" src={avatar} alt="Rounded avatar">
+        </div>
+        <div class="uploadAvatar">
+            <img src={uploadImg} alt="upload avatar" on:click={()=>{fileinput.click();}}>
+            <input style="display:none" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
         </div>
         {#if user}
         <div class="username">
