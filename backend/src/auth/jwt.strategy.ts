@@ -11,14 +11,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: true,
       secretOrKey: jwtConstants.secret,
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        const jwt = request?.cookies['jwt']
-        return jwt ? jwt : null
+        return request?.cookies?.jwt
       }])
     });
   }
 
+  // TODO (?): typedef the payload
   async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+    return { id: payload.sub };
   }
 }
 
