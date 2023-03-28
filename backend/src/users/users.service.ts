@@ -9,20 +9,20 @@ export class UsersService {
   constructor(private prisma: PrismaService,
               private images: ImagesService) {}
 
-
   // START CRUD
-
   async create(createUserDto: CreateUserDto) {
     console.log(createUserDto.username);
     if (await this.findOne(createUserDto.username) != null)
+    {
       return "User " + createUserDto.username + " already exist";
       // this.remove(createUserDto.username)
 
+    }
     // this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
 
     await this.prisma.user.create({
       data: {
-        username: "test",
+        username: createUserDto.username,
         password: createUserDto.password,
         games:  Math.floor(Math.random() * (150 - 0) + 0),
         mmr: Math.floor(Math.random() * (1500 - 0) + 0),
