@@ -30,8 +30,7 @@
       logged.set('true')
       push('/')
     } catch (error) {
-      console.log(error)
-      alert('Wrong credentials')
+      alert(error.response.data.message)
       createUserDto.username = null
       createUserDto.password = null
     }
