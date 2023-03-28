@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUsernameDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { Request} from 'express';
+import * as bcrypt from 'bcrypt';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -49,6 +50,31 @@ export class UsersController {
       await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
     } catch (error) {
       throw new ConflictException('This username is already used.')
+    }
+  }
+
+  // We might use guards someway to handle those verifications
+  @Patch('password/:name')
+  async updatePassword(@Param('name') name: string, @Body() body: any, @Req() req: Request) {
+
+    // check that user is changing its own password
+    if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
+      throw new UnauthorizedException('Unauthorized to change other player password.')
+
+    let hash
+
+    // hash password
+    try {
+      hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
+    } catch (error) {
+      throw new UnprocessableEntityException('Error about your password encryption')
+    }
+
+    // update password
+    try {
+      await this.usersService.updatePassword(name, { password: hash } as UpdatePasswordDto);
+    } catch (error) {
+      throw new ConflictException('Error while updating your password')
     }
   }
 
