@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import axios from 'axios'
 import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from './constants';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,8 @@ export class AuthService {
   // TODO (?): Insert this function's body into LocalStrategy validate()
   async validateLocalUser(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
-    if (user && user.password === password) {
+    // TODO (?): remove the `as string`
+    if (user && await bcrypt.compare(password, user.password as string)) {
       // TODO (?): select only id field
       const { password, ...result } = user;
       return result;
