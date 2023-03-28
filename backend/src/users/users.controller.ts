@@ -42,13 +42,13 @@ export class UsersController {
 
     // check that user is changing its own username
     if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('Unauthorized to change other player username.')
 
     // check that new username is not already used
     try {
       await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
     } catch (error) {
-      throw new ConflictException()
+      throw new ConflictException('This username is already used.')
     }
   }
 

@@ -52,10 +52,7 @@
         replace(`/users/${user.username}`)
 
       } catch (error) {
-        if (error.response.status == 409)
-          alert('This username is already used.')
-        if (error.response.status == 401)
-          alert('Unauthorized to change other player username.')
+        alert(error.response.data.message)
       }
 
     }
