@@ -23,10 +23,7 @@
     onMount(async () => await getUser())
 
     async function getUser() {
-        const response = await
-        axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })
-        user = response.data
-        console.log(params)
+        user = (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
     }
 
     async function updateUsername() {
