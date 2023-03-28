@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUserameDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUsernameDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { Request} from 'express';
@@ -46,7 +46,7 @@ export class UsersController {
 
     // check that new username is not already used
     try {
-      await this.usersService.updateUsername(name, { username: body.username } as UpdateUserameDto);
+      await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
     } catch (error) {
       throw new ConflictException()
     }
