@@ -45,6 +45,8 @@
           withCredentials: true
         })
 
+        alert('Username successfully updated!')
+
         // update component state
         user.username = username
         username = null
