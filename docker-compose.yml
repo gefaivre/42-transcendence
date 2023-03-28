@@ -21,6 +21,7 @@ services:
     container_name: backend
     ports:
       - "3000:3000"
+      - "5555:5555"
     environment:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
