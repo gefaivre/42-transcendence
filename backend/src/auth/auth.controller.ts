@@ -35,11 +35,6 @@ export class AuthController {
     // exchange access token for user data
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
-    console.log(ft_user.image.versions.small);
-
-    // register user in database (if not already the case)
-    this.usersService.create({ username: ft_user.login, password: '' , image: ft_user.image.versions.small} as CreateUserDto)
-    
     // see if this 42 user already in db
     let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
@@ -49,7 +44,8 @@ export class AuthController {
       let newUser: CreateUserDto = {
         username: await this.generateUsername(ft_user.login),
         password: '',
-        ft_login: ft_user.login
+        ft_login: ft_user.login,
+        image: new URL("")
       }
 
       user = await this.usersService.create(newUser)
