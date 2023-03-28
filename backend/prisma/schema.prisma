@@ -17,6 +17,7 @@ model User {
   games          Int
   mmr            Int
   images         String[]
+  ft_login       String?   @unique
   wins           Match[]   @relation("winner")
   loses          Match[]   @relation("loser")
   channels       Channel[] @relation("channel_users")

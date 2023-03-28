@@ -1,8 +1,8 @@
 import { Injectable , Inject} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
+import { UpdateUserDto, UpdateUserameDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -20,15 +20,20 @@ export class UsersService {
     }
     // this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
 
-    await this.prisma.user.create({
-      data: {
-        username: createUserDto.username,
-        password: createUserDto.password,
-        games:  Math.floor(Math.random() * (150 - 0) + 0),
-        mmr: Math.floor(Math.random() * (1500 - 0) + 0),
-      },
-    })
-    return 'New user add! :  ' + createUserDto.username;
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          username: createUserDto.username,
+          password: createUserDto.password,
+          ft_login: createUserDto.ft_login,
+          games:  Math.floor(Math.random() * (150 - 0) + 0),
+          mmr: Math.floor(Math.random() * (1500 - 0) + 0),
+        },
+      })
+      return user
+    } catch (error) {
+      return null
+    }
   }
 
   async findAll() {
@@ -41,6 +46,15 @@ export class UsersService {
         id: id,
       },
     });
+  }
+
+  async findByFortyTwoLogin(login: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        ft_login: login
+      }
+    })
+
   }
 
   async findOne(name: string) {
@@ -60,6 +74,13 @@ export class UsersService {
     return this.prisma.user.update({
       where: { username: name },
       data: updateUserDto,
+    });
+  }
+
+  updateUsername(name: string, updateUsernameDto: UpdateUserameDto) {
+    return this.prisma.user.update({
+      where: { username: name },
+      data: { username: updateUsernameDto.username }
     });
   }
 

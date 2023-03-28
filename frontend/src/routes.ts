@@ -10,9 +10,13 @@ import Channel from './routes/Channel.svelte'
 import Message from './routes/Message.svelte'
 import Game from './routes/Game.svelte'
 import Channels from './routes/Channels.svelte'
+import Signup from './routes/Signup.svelte'
+import Login from './routes/Login.svelte'
 
 export default {
     '/': Home,
+    '/signup': Signup,
+    '/login': Login,
     '/chat': Chat,
     '/UserCRUD': UserCRUD,
     '/Channels': Channels,
