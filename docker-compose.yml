@@ -21,10 +21,8 @@ services:
     container_name: backend
     ports:
       - "3000:3000"
+      - "5555:5555"
     environment:
-      POSTGRES_DB: $POSTGRES_DB
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       DATABASE_URL: $DATABASE_URL
       JWT_SECRET: $JWT_SECRET
       FT_UID: $FT_UID
@@ -44,18 +42,6 @@ services:
       FT_AUTHORIZE: $FT_AUTHORIZE
     volumes:
       - ./frontend:/app
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: $PGADMIN_DEFAULT_EMAIL
-      PGADMIN_DEFAULT_PASSWORD: $PGADMIN_DEFAULT_PASSWORD
-    depends_on:
-      - "db"
-    restart: always
 
 volumes:
   db_data:
