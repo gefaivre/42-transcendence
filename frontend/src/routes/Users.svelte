@@ -29,7 +29,7 @@
         console.log(params)
     }
 
-    async function changeUsername() {
+    async function updateUsername() {
 
       // guards
       if (username == null) { return alert('empty username') }
@@ -58,11 +58,11 @@
 
     }
 
-    // before change, password displayed in table is the hash
-    // after change, password displayed in table is in clear
+    // before update, password displayed in table is the hash
+    // after update, password displayed in table is in clear
     // you'll need to refresh the page to see the new password in its hashed version
     // this is not big deal since this table entry will be removed anyway
-    async function changePassword() {
+    async function updatePassword() {
 
       // guards
       if (password == null) { return alert('empty password') }
@@ -77,9 +77,9 @@
           withCredentials: true
         })
 
-        alert('Password successfully changed!')
+        alert('Password successfully updated!')
 
-        // change component state
+        // update component state
         user.password = password
         password = null
 
@@ -124,10 +124,10 @@
 
     {#if $id === user.id.toString()}
       <input type="text" placeholder="new username" bind:value={username}>
-      <button on:click={changeUsername}>Change</button>
+      <button on:click={updateUsername}>Update</button>
       <br>
       <input type="text" placeholder="new password" bind:value={password}>
-      <button on:click={changePassword}>Change</button>
+      <button on:click={updatePassword}>Update</button>
     {/if}
 
 {:else}
