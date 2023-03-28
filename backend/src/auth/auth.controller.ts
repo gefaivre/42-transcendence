@@ -103,7 +103,13 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() request: any) {
     console.log('profile', request.user)
-    return request.user
+    return request.user;
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('whoami')
+  getUser(@Req() request: any) {
+    const whoami = request.user;
+    return this.usersService.findById(whoami?.id);
   }
 
 }

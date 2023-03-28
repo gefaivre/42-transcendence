@@ -74,6 +74,7 @@ export class ChannelController {
     const whoami = request.user;
     if (whoami) {
      // return whoami.username;
+     console.log(whoami);
       return this.usersService.findOne(whoami?.username);
    // const username = request.user?.username;
     //return username

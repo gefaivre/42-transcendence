@@ -32,10 +32,11 @@
 
     onMount(async () => {
         try {
-          const response = await axios.get('http://localhost:3000/channel/me/myself/andI', {
+          const response = await axios.get('http://localhost:3000/auth/whoami', {
             withCredentials: true
         });
              user = response.data;
+             console.log(user);
              game = MatchHistory;
              console.log(game);
   } catch (error) {

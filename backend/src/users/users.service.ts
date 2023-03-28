@@ -35,6 +35,11 @@ export class UsersService {
       where: {
         id: id,
       },
+      include: {
+        channels: true,
+        wins: true,
+        loses: true
+      }
     });
   }
 
