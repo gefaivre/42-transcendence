@@ -158,11 +158,15 @@
         height: 100%;
         width: 20%;
     }
-    .gameHistory .match {
+    .scrolable{
+        position: relative;
+        height: 80%;
+    }
+    .gameHistory .scrolable .match {
          margin-bottom: 10px;
          height: 35px;
     }
-    .gameHistory .match img{
+    .gameHistory .scrolable .match img{
         position: relative;
         border: 2px solid purple; /**pour visualiser avent changement d'image*/
         height: 100%;
@@ -171,7 +175,7 @@
         left: 70%;
 
      }
-     .gameHistory .match .lilavatar  {
+     .gameHistory .scrolable .match .lilavatar  {
         position: relative;
         width: 35px;
         height: 35px;
@@ -179,7 +183,7 @@
         left:15%;
         margin-right: 0px;
     }
-    .gameHistory .match .lilavatar img{
+    .gameHistory .scrolable .match .lilavatar img{
         position: relative;
         top:0px;
         left: 0%;
@@ -254,24 +258,28 @@
     </div>
     <div class="gameHistory">
         <h1 class="text-4xl font-inter" style="color: #9E27D9;">Game History</h1>
-        {#each game as match}
-        <div class="match">
-            {#if match.winner.id !== user.id}
-            <div class="lilavatar">
-                <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+        <div class=scrolable style="overflow-y: scroll;">
+            {#each game as match}
+            <div class="match">
+                {#if match.winner.name !== user.username}
+                <div class="lilavatar">
+                    <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+                </div>
+                <p style="position: relative; top: 0px; color: red; left: 20%; font-size: 23px;">{match.winner.name}</p>
+                <img src={redLose} alt="victory">
+                {/if}
+                {#if match.loser.name !== user.username}
+                <div class="lilavatar">
+                    <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
+                </div>
+                <p style="position: relative; left: 20%; top: 0px;  color: green; font-size: 23px;">{match.loser.name}</p>
+                <img src={greenWin} alt="victory">
+                {/if}
             </div>
-            <p style="position: relative; top: 0px; color: red; left: 20%; font-size: 23px;">{match.winner.name}</p>
-            <img src={redLose} alt="victory">
-            {/if}
-            {#if match.loser.id !== user.id}
-            <div class="lilavatar">
-                <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
-            </div>
-            <p style="position: relative; left: 20%; top: 0px;  color: green; font-size: 23px;">{match.loser.name}</p>
-            <img src={greenWin} alt="victory">
-             {/if}
+            {/each}
+
         </div>
-      {/each}   
+        
     </div>
     {#if user}
     <div class="mmr">
