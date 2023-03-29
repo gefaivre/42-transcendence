@@ -13,6 +13,7 @@ import Test from './routes/test.svelte'
 import Channels from './routes/Channels.svelte'
 import Signup from './routes/Signup.svelte'
 import Login from './routes/Login.svelte'
+import UserProfile from './routes/UserProfile.svelte';
 
 export default {
     '/': Home,
@@ -29,5 +30,6 @@ export default {
     '/message': Message,
     '/game': Game,
     '/test': Test,
+    '/:username': UserProfile,
     '*': NotFound
 };
