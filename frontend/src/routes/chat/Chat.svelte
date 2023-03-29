@@ -24,11 +24,12 @@
   let channels: Channel[] = [];
 
   onMount(() => {
-    axios.get('http://localhost:3000/channels', { withCredentials: true })
-    .then(channels => {
-      channels.foreach(channel => {
-        channels.push({name: channel.name, post: [], joined: false});
-      });
+    axios.get('http://localhost:3000/channel', { withCredentials: true })
+    .then(channelList => {
+      console.log('channel list', channelList);
+      for (const channel of channelList.data)
+        channels.push({name: channel.name, posts: [], joined: false});
+      channels = channels;
     });
 
     socket.on('post', (post: Post) => {
@@ -77,6 +78,9 @@
     for (let field of formData) {
       const [key, value] = field;
       if (key === 'channelName') {
+        console.log(value);
+        axios.post('http://localhost:3000/chat', { channelName: value }, { withCredentials: true });
+      }
     }
   }
 

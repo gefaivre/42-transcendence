@@ -20,7 +20,6 @@ export class ChatService {
               private postsService: PostsService) {}
 
   users: ChatUser[] = [];
-  channels: ChatChannel[] = [];
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];
@@ -28,7 +27,7 @@ export class ChatService {
   }
 
   async addUser(clientId: string, tokenData: any): Promise<string | undefined> {
-    const user: User | null = await this.usersService.findOne(tokenData.username);
+    const user: User | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
@@ -43,6 +42,7 @@ export class ChatService {
 
   async createChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
+
     if (user) {
       await this.channelService.create({name: channelName, ownerId:user.id})
     }
@@ -79,9 +79,11 @@ export class ChatService {
 
     if (user) {
       const channels: Channel[] | null  = await this.channelService.findByUser(user.id);
-      for (const channel of channels) {
-        if (channel.name  === channelName)
-          return true
+      if (channels) {
+        for (const channel of channels) {
+          if (channel.name  === channelName)
+            return true
+        }
       }
     }
     return false
@@ -107,7 +109,7 @@ export class ChatService {
 
   async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
     let ret: PostEmitDto[] = [];
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
     if (channel) {
       const posts: Post[] = await this.postsService.findByChannel(channel.id);

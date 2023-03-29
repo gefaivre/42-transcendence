@@ -18,7 +18,7 @@ export class ChannelService {
         name: createChannelDto.name,
         ownerId: createChannelDto.ownerId,
         admins: { connect: [{ id: createChannelDto.ownerId }] },
-        users: { connect: [{ id: createChannelDto.ownerId }] }
+        //users: { connect: [{ id: createChannelDto.ownerId }] }
       }
     })
     return 'New channel add! :  ' + createChannelDto.name;
