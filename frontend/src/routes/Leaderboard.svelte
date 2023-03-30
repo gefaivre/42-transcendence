@@ -48,20 +48,12 @@
             </tr>
         </thead>
         <tbody>
-            {#each users as i, y}
+            {#each users as user, i}
             <tr>
-                {#if y == 0}
-                    <td class="first">{y+1}</td>
-                {:else if y == 1}
-                    <td class="second">{y+1}</td>
-                {:else if y == 2}
-                    <td class="third">{y+1}</td>
-                {:else}
-                    <td>{y+1}</td>
-                {/if}
-                <td class="username" ><a href="#/users/{i.username}">{i.username}</a></td>
-                <td>{i.mmr}</td>
-                <td>{i.games}</td>
+                <td>{i + 1}</td>
+                <td class="username" ><a href="#/users/{user.username}">{user.username}</a></td>
+                <td>{user.mmr}</td>
+                <td>{user.games}</td>
             </tr>
             {/each}
         </tbody>
@@ -71,15 +63,17 @@
 {/if}
 
 <style>
-    .first {
+
+    tbody tr:nth-child(1) > td:nth-child(1) {
         background-color: gold;
     }
-    .second {
+
+    tbody tr:nth-child(2) td:nth-child(1) {
         background-color: silver;
     }
 
-    .third {
-        background-color: #8b6c42;
+    tbody tr:nth-child(3) td:nth-child(1) {
+        background-color: sienna;
     }
 
     .clickable {
