@@ -18,7 +18,7 @@ export class ChannelService {
         name: createChannelDto.name,
         ownerId: createChannelDto.ownerId,
         admins: { connect: [{ id: createChannelDto.ownerId }] },
-        users: { connect: [{ id: createChannelDto.ownerId }] }
+        //users: { connect: [{ id: createChannelDto.ownerId }] }
       }
     })
     return 'New channel add! :  ' + createChannelDto.name;
@@ -58,6 +58,18 @@ export class ChannelService {
         admins: true
       }
     });
+  }
+
+  async findByUser(userId: number) {
+    return this.prisma.channel.findMany({
+      where: {
+        users: {
+          some: {
+            id: userId
+          }
+        }
+      }
+    })
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

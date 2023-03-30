@@ -1,4 +1,5 @@
 <script lang="ts">
+  import axios from 'axios'
   import  ioClient  from 'socket.io-client';
   import { onMount } from "svelte";
   import { logged } from '../../stores';
@@ -23,12 +24,12 @@
   let channels: Channel[] = [];
 
   onMount(() => {
-    socket.on('channel', payload => {
-      console.log('channel', payload);
-      if (!channels.find(channel => channel.name === payload.channelName)) {
-        channels = [...channels, { name: payload.channelName, posts: [], joined: false}];
-        channels = [...channels].sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1: 0))
-      }
+    axios.get('http://localhost:3000/channel', { withCredentials: true })
+    .then(channelList => {
+      console.log('channel list', channelList);
+      for (const channel of channelList.data)
+        channels.push({name: channel.name, posts: [], joined: false});
+      channels = channels;
     });
 
     socket.on('post', (post: Post) => {
@@ -57,23 +58,6 @@
       }
     });
 
-    socket.on('create', payload => {
-      console.log('create', payload);
-      const chan = channels.find(channel => channel.name === payload.channelName);
-      if (chan) {
-        chan.joined = true;
-        channels = channels;
-      }
-      else {
-        channels = [...channels, { name: payload.channelName, posts: [], joined: true}];
-        channels = [...channels].sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1: 0))
-      }
-    });
-
-    socket.on('channelEvent', payload => {
-      console.log('channelEvent', payload);
-    });
-
     socket.on('error', payload => {
       console.log(payload);
     });
@@ -93,8 +77,10 @@
 
     for (let field of formData) {
       const [key, value] = field;
-      if (key === 'channelName')
-        socket.emit('createChannel', { channelName: value });
+      if (key === 'channelName') {
+        console.log(value);
+        axios.post('http://localhost:3000/chat', { channelName: value }, { withCredentials: true });
+      }
     }
   }
 
