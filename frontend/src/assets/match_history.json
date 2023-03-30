@@ -3,7 +3,7 @@
       "id": 1,
       "winner": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "winnerId": 1,
       "winnerScore": 3,
@@ -20,7 +20,7 @@
       "id": 2,
       "winner": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "winnerId": 1,
       "winnerScore": 2,
@@ -43,7 +43,7 @@
       "winnerScore": 3,
       "loser": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "loserId": 1,
       "loserScore": 2,
@@ -54,7 +54,7 @@
       "id": 4,
       "winner": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "winnerId": 1,
       "winnerScore": 2,
@@ -71,7 +71,7 @@
       "id": 5,
       "winner": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "winnerId": 1,
       "winnerScore": 3,
@@ -88,7 +88,7 @@
       "id": 6,
       "winner": {
         "id": 1,
-        "name": "hskikdi"
+        "name": "username"
       },
       "winnerId": 1,
       "winnerScore": 2,
@@ -111,7 +111,7 @@
         "winnerScore": 3,
         "loser": {
             "id": 1,
-            "name": "hskikdi"
+            "name": "username"
         },
         "loserId": 1,
         "loserScore": 1,
@@ -128,7 +128,7 @@
         "winnerScore": 2,
         "loser": {
             "id": 1,
-            "name": "hskikdi"
+            "name": "username"
         },
         "loserId": 1,
         "loserScore": 1,
@@ -139,7 +139,7 @@
         "id": 3,
         "winner": {
             "id": 1,
-            "name": "hskikdi"
+            "name": "username"
         },
         "winnerId": 1,
         "winnerScore": 3,
@@ -156,7 +156,7 @@
         "id": 4,
         "winner": {
             "id": 1,
-            "name": "hskikdi"
+            "name": "username"
         },
         "winnerId": 1,
         "winnerScore": 2,

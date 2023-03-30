@@ -50,7 +50,7 @@
   position: fixed;
   top: 0;
   left: 88px;
-  width: 25%;
+  width: 360px;
   height: 100%;
   background-color: black;
   z-index: 1;
@@ -261,14 +261,14 @@
         <div class=scrolable style="overflow-y: scroll;">
             {#each game as match}
             <div class="match">
-                {#if match.winner.name !== user.username}
+                {#if match.winner.name !== "username"}
                 <div class="lilavatar">
                     <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
                 </div>
                 <p style="position: relative; top: 0px; color: red; left: 20%; font-size: 23px;">{match.winner.name}</p>
                 <img src={redLose} alt="victory">
                 {/if}
-                {#if match.loser.name !== user.username}
+                {#if match.loser.name !== "username"}
                 <div class="lilavatar">
                     <img class="rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Rounded avatar">
                 </div>
