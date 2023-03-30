@@ -1,5 +1,5 @@
 compose_file				=	docker-compose.yml
-services					=	backend frontend db pgadmin
+services					=	backend frontend db
 
 all:						;	docker-compose --file $(compose_file) up --build --detach
 
@@ -14,6 +14,8 @@ all:						;	docker-compose --file $(compose_file) up --build --detach
 %_clean:	%_stop			;	docker-compose --file $(compose_file) rm $* --force
 
 %_re:		%_clean %_up	;
+
+studio:		backend_up 		;	docker-compose --file $(compose_file) exec -d backend npx prisma studio
 
 stop:							$(foreach service, $(services), $(service)_stop)
 clean:							$(foreach service, $(services), $(service)_clean)

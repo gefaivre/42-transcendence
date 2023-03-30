@@ -1,10 +1,11 @@
-import { Controller, Get, Query, Res, Req, UseGuards, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request} from 'express';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
@@ -67,12 +68,22 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() body: CreateUserDto) {
 
+    let hash
+
+    // hash password
+    try {
+      hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
+    } catch (error) {
+      throw new UnprocessableEntityException('Error about your password encryption')
+    }
+
     // create user
+    body.password = hash
     const user = await this.usersService.create(body)
     if (user == null)
-      throw new HttpException('This username already exists', HttpStatus.CONFLICT)
+      throw new ConflictException('This username already exists')
 
-    // remove passowrd field from user object
+    // remove password field from user object
     const { password, ...result } = user;
 
     // frontend need to login after

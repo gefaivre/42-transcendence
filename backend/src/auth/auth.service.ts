@@ -46,17 +46,6 @@ export class AuthService {
     return this.jwtService.verify(token, {secret:  jwtConstants.secret, ignoreExpiration: true });
   }
 
-  // TODO (?): Insert this function's body into LocalStrategy validate()
-  async validateLocalUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.findOne(username);
-    if (user && user.password === password) {
-      // TODO (?): select only id field
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
   decode(jwt: string) {
     return this.jwtService.decode(jwt)
   }
