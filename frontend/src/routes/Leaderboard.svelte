@@ -8,24 +8,26 @@
     // TODO: get rid of unused `User` fields (i.e. `id`, `password` and `ft_login`)
     let users: User[] = [];
 
-    onMount(() => getMmr());
+    onMount(() => getUsers());
 
-    async function getMmr() {
+    async function getUsers () {
       try {
-        users = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
+        users = (await axios.get(`http://localhost:3000/users`, { withCredentials: true })).data
         console.log(users)
+        sortByMMR()
       } catch (error) {
-        console.log(error)
+        console.log(error.response.data.messsage)
       }
-    };
+    }
 
-    async function getGames() {
-      try {
-        users = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
-        console.log(users)
-      } catch (error) {
-        console.log(error)
-      }
+    function sortByMMR () {
+      users.sort((a,b) => b.mmr - a.mmr)
+      users = users // svelte reload
+    }
+
+    function sortByGames () {
+      users.sort((a,b) => b.games - a.games)
+      users = users // svelte relaod
     }
 
 </script>
@@ -41,8 +43,8 @@
             <tr>
                 <td>Rank</td>
                 <td>Username</td>
-                <td><a class="clickable" href="/#/leaderboard" on:click={() => getMmr()}>Mmr</a></td>
-                <td><a class="clickable" href="/#/leaderboard" on:click={() => getGames()}>Games</a></td>
+                <td><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></td>
+                <td><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></td>
             </tr>
         </thead>
         <tbody>
