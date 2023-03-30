@@ -3,15 +3,17 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { logged } from "../stores";
+    import type { User } from "../types";
 
-    let tab = [];
+    // TODO: get rid of unused `User` fields (i.e. `id`, `password` and `ft_login`)
+    let users: User[] = [];
 
     onMount(() => getMmr());
 
     async function getMmr() {
       try {
-        tab = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
-        console.log(tab)
+        users = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
+        console.log(users)
       } catch (error) {
         console.log(error)
       }
@@ -19,8 +21,8 @@
 
     async function getGames() {
       try {
-        tab = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
-        console.log(tab)
+        users = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
+        console.log(users)
       } catch (error) {
         console.log(error)
       }
@@ -44,7 +46,7 @@
             </tr>
         </thead>
         <tbody>
-            {#each tab as i, y}
+            {#each users as i, y}
             <tr>
                 {#if y == 0}
                     <td class="first">{y+1}</td>
