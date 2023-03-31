@@ -40,14 +40,6 @@ export class ChatService {
     this.users.splice(toRemove, 1);
   }
 
-  async createChannel(username: string, channelName: string) {
-    const user: ChatUser | undefined = this.users.find(user => user.username === username);
-
-    if (user) {
-      await this.channelService.create({name: channelName, ownerId:user.id})
-    }
-  }
-
   async joinChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     const channel: Channel | null = await this.channelService.findByName(channelName);

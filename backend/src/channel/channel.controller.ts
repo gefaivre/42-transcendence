@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
+import { CreateChannelDto } from 'src/chat/dto/channel-dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -8,6 +8,8 @@ import { UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { UsersService } from './../users/users.service';
+import { ChannelDto } from 'src/chat/dto/channel-dto';
+import { User } from '@prisma/client';
 
 
 @Controller('channel')
@@ -17,8 +19,21 @@ export class ChannelController {
               private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createChannelDto: CreateChannelDto) {
-    return this.channelService.create(createChannelDto);
+  @UseGuards(AuthGuard('jwt'))
+  async createChannel(@Req() request: any, @Body(new ValidationPipe({ transform: true })) channelDto: ChannelDto) {
+    const whoAmI = request.user;
+    if (whoAmI) {
+      const user: User | null = await this.usersService.findById(whoAmI?.id);
+      if (user) {
+        const channel: CreateChannelDto = {
+          channelName: channelDto.channelName,
+          ownerId: user.id,
+          status: channelDto.status
+        }
+        if (await this.channelService.create(channel) == null)
+          throw new ConflictException('This channel already exists.')
+      }
+    }
   }
 
   @Post(':id/users/:userId')
@@ -56,9 +71,15 @@ export class ChannelController {
     return this.channelService.update(+id, updateChannelDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.channelService.remove(+id);
+  @Delete(':name')
+  async delete(@Param('name') name: string) {
+    try {
+      const channel = await this.channelService.findByName(name)
+      if (channel)
+        return this.channelService.remove(channel.id);
+    } catch (error) {
+      throw new NotFoundException(`Channel ${name} doesn't exist`)
+    }
   }
 
   @Delete()

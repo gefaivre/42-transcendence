@@ -7,6 +7,12 @@ export type User = {
     ft_login: string
 }
 
+export enum ChannelStatus {
+    Public = "Public",
+    Private = "Private",
+    Protected = "Protected",
+}
+
 export type Channel = {
     id: number
     name: string
@@ -14,4 +20,10 @@ export type Channel = {
     owner: User
     users: []
     admins: []
+    status: ChannelStatus
+}
+
+export type ChannelDto = {
+    channelName: string
+    status: ChannelStatus
 }

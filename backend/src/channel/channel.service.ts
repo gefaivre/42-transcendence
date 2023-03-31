@@ -1,6 +1,6 @@
 import { ImATeapotException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
+import { CreateChannelDto } from 'src/chat/dto/channel-dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
@@ -11,17 +11,19 @@ export class ChannelService {
   constructor(private prisma: PrismaService){}
 
   async create(createChannelDto: CreateChannelDto) {
-    if (await this.findByName(createChannelDto.name))
-      return "Channel " + createChannelDto.name + " already exist";
-    await this.prisma.channel.create({
-      data: {
-        name: createChannelDto.name,
-        ownerId: createChannelDto.ownerId,
-        admins: { connect: [{ id: createChannelDto.ownerId }] },
-        //users: { connect: [{ id: createChannelDto.ownerId }] }
-      }
-    })
-    return 'New channel add! :  ' + createChannelDto.name;
+    try {
+      const channel = await this.prisma.channel.create({
+        data: {
+          name: createChannelDto.channelName,
+          ownerId: createChannelDto.ownerId,
+          admins: { connect: [{ id: createChannelDto.ownerId }] },
+          status: createChannelDto.status
+        }
+      })
+      return channel
+    } catch (error) {
+      return null
+    }
   }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
 
   async findAll() {
@@ -47,7 +49,7 @@ export class ChannelService {
     });
   }
 
-  async findByName(name: string) {
+  findByName(name: string) {
     return this.prisma.channel.findFirst({
       where: {
         name: name
@@ -76,7 +78,7 @@ export class ChannelService {
     return await this.prisma.channel.update({
       where: {id: id},
       data: {
-        name: updateChannelDto.name,
+        name: updateChannelDto.channelName,
         ownerId: updateChannelDto.ownerId,
       },
     });

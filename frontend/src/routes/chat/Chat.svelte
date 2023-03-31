@@ -3,6 +3,8 @@
   import  ioClient  from 'socket.io-client';
   import { onMount } from "svelte";
   import { logged } from '../../stores';
+  import { ChannelStatus } from '../../types';
+  import type { ChannelDto } from '../../types';
 
   const socket = ioClient('http://localhost:3000', {
     path: '/chat',
@@ -79,7 +81,7 @@
       const [key, value] = field;
       if (key === 'channelName') {
         console.log(value);
-        axios.post('http://localhost:3000/chat', { channelName: value }, { withCredentials: true });
+        axios.post('http://localhost:3000/channel', { channelName: value, status: ChannelStatus.Public } as ChannelDto, { withCredentials: true });
       }
     }
   }
