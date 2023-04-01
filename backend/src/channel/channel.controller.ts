@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException, UnprocessableEntityException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from 'src/chat/dto/channel-dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { UsersService } from './../users/users.service';
 import { ChannelDto } from 'src/chat/dto/channel-dto';
 import { User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 
 @Controller('channel')
@@ -24,12 +25,18 @@ export class ChannelController {
     const whoAmI = request.user;
     if (whoAmI) {
       const user: User | null = await this.usersService.findById(whoAmI?.id);
+      let hash: string
+      try {
+        hash = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
+      } catch (error) {
+        throw new UnprocessableEntityException('Error about the channel password encryption')
+      }
       if (user) {
         const channel: CreateChannelDto = {
           channelName: channelDto.channelName,
           ownerId: user.id,
           status: channelDto.status,
-          password: channelDto.password
+          password: hash
         }
         if (await this.channelService.create(channel) == null)
           throw new ConflictException('This channel already exists.')
