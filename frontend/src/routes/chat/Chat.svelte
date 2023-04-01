@@ -96,18 +96,15 @@
       password: pass
     }
 
+    console.log(channel)
     axios.post('http://localhost:3000/channel', channel, { withCredentials: true });
   }
 
   function sendMessage(channelName: string, event) {
     const formData = new FormData(event.target);
-
-    for (let field of formData) {
-      const [key, value] = field;
-      if (key === 'textfield') {
-        socket.emit('sendPost', { content: value, channelName: channelName });
-      }
-    }
+    const content: string = formData.get('textfield') as string
+    if (content)
+      socket.emit('sendPost', { content: content, channelName: channelName });
   }
 
 </script>
