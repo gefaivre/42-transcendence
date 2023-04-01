@@ -63,7 +63,7 @@
     }
     channel.channelName = null
     channel.status = null
-    channel.password = null
+    channel.password = ''
   }
 
 </script>
