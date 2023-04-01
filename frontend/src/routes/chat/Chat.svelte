@@ -3,8 +3,7 @@
   import  ioClient  from 'socket.io-client';
   import { onMount } from "svelte";
   import { logged } from '../../stores';
-  import { ChannelStatus } from '../../types';
-  import type { ChannelDto } from '../../types';
+  import type { ChannelStatus, ChannelDto } from '../../types';
 
   const socket = ioClient('http://localhost:3000', {
     path: '/chat',
@@ -77,13 +76,18 @@
   function createChannel(event) {
     const formData = new FormData(event.target);
 
-    for (let field of formData) {
-      const [key, value] = field;
-      if (key === 'channelName') {
-        console.log(value);
-        axios.post('http://localhost:3000/channel', { channelName: value, status: ChannelStatus.Public } as ChannelDto, { withCredentials: true });
-      }
+    if (formData.get('channelName') === '')
+      return alert('Empty name')
+
+    if (formData.has('channelStatus') === false)
+      return alert('Empty status')
+
+    let channel: ChannelDto = {
+      channelName: formData.get('channelName') as string,
+      status: formData.get('channelStatus') as ChannelStatus,
     }
+
+    axios.post('http://localhost:3000/channel', channel, { withCredentials: true });
   }
 
   function sendMessage(channelName: string, event) {
@@ -125,7 +129,13 @@
 
 {/each}
 
+  <br>
+  <hr class="solid">
+  <br>
   <form on:submit|preventDefault={createChannel}>
+    <input id="channelStatus" name="channelStatus" type="radio" value="Public">Public &#9989<br>
+    <input id="channelStatus" name="channelStatus" type="radio" value="Private">Private &#9940<br>
+    <input id="channelStatus" name="channelStatus" type="radio" value="Protected">Protected &#128273<br>
     <input id="channelName" name="channelName" type="text" placeholder="channelName">
     <button type="submit">createChannel</button>
   </form>
