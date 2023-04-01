@@ -82,9 +82,17 @@
     if (formData.has('channelStatus') === false)
       return alert('Empty status')
 
+    if (formData.get('channelStatus') === 'Protected') {
+      var pass: string = window.prompt('Enter password');
+      if (!pass) return alert('Empty password')
+    } else {
+      pass = null
+    }
+
     let channel: ChannelDto = {
       channelName: formData.get('channelName') as string,
       status: formData.get('channelStatus') as ChannelStatus,
+      password: pass
     }
 
     axios.post('http://localhost:3000/channel', channel, { withCredentials: true });

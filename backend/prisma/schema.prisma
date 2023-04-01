@@ -42,6 +42,7 @@ model Channel {
   users       User[] @relation("channel_users")
   posts       Post[]
   status      ChannelStatus
+  password    String
 }
 
 model Match {

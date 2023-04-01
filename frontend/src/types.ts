@@ -26,4 +26,5 @@ export type Channel = {
 export type ChannelDto = {
     channelName: string
     status: ChannelStatus
+    password: string
 }

@@ -28,7 +28,8 @@ export class ChannelController {
         const channel: CreateChannelDto = {
           channelName: channelDto.channelName,
           ownerId: user.id,
-          status: channelDto.status
+          status: channelDto.status,
+          password: channelDto.password
         }
         if (await this.channelService.create(channel) == null)
           throw new ConflictException('This channel already exists.')

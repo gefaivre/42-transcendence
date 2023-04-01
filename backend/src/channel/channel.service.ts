@@ -17,7 +17,8 @@ export class ChannelService {
           name: createChannelDto.channelName,
           ownerId: createChannelDto.ownerId,
           admins: { connect: [{ id: createChannelDto.ownerId }] },
-          status: createChannelDto.status
+          status: createChannelDto.status,
+          password: createChannelDto.password
         }
       })
       return channel
@@ -183,7 +184,7 @@ export class ChannelService {
     });
     return updatedChannel;
   }
-  
+
   async remove(id: number) {
     return await this.prisma.channel.delete({
       where:
@@ -215,7 +216,7 @@ export class ChannelService {
       return "wrong user";
       //throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    
+
 
     const updatedChannel = await this.prisma.channel.update({
       where: { id: channelId },

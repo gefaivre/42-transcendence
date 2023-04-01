@@ -11,7 +11,8 @@
 
   let channel: ChannelDto = {
     channelName: null,
-    status: null
+    status: null,
+    password: null
   }
 
   onMount(() => getAll())
@@ -52,6 +53,8 @@
       return alert('Empty channel name')
     if (!channel.status)
       return alert('Please select a status')
+    if (channel.status === ChannelStatus.Protected && channel.password === '')
+      return alert('Empty channel password')
     try {
       await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
       getAll()
@@ -60,6 +63,7 @@
     }
     channel.channelName = null
     channel.status = null
+    channel.password = null
   }
 
 </script>
@@ -113,6 +117,9 @@
     <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected<br>
     <input type="text" bind:value={channel.channelName} placeholder="channel name">
     <button on:click={create}>Add</button>
+    {#if channel.status == ChannelStatus.Protected}
+      <input type="text" bind:value={channel.password} placeholder="password">
+    {/if}
   </fieldset>
 
   <br>

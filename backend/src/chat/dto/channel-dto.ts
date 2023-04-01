@@ -8,6 +8,9 @@ export class ChannelDto {
 
   @IsEnum(ChannelStatus)
   status: ChannelStatus
+
+  @IsString()
+  password: string
 }
 
 export class CreateChannelDto extends ChannelDto {
