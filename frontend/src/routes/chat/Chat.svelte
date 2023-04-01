@@ -86,7 +86,7 @@
       var pass: string = window.prompt('Enter password');
       if (!pass) return alert('Empty password')
     } else {
-      pass = null
+      pass = ''
     }
 
     let channel: ChannelDto = {

@@ -12,7 +12,7 @@
   let channel: ChannelDto = {
     channelName: null,
     status: null,
-    password: null
+    password: ''
   }
 
   onMount(() => getAll())
