@@ -33,37 +33,36 @@
         channels.push({name: channel.name, posts: [], joined: false, status: channel.status});
       channels = channels;
     });
+  });
 
-    socket.on('post', (post: Post) => {
-      console.log('post', post);  
-      const channel = channels.find(channel => channel.name === post.channelName);
-      if (channel)
-        channel.posts.push(post);
+  socket.on('post', (post: Post) => {
+    console.log('post', post);
+    const channel = channels.find(channel => channel.name === post.channelName);
+    if (channel)
+      channel.posts.push(post);
+    channels = channels;
+  });
+
+  socket.on('join', payload => {
+    console.log('join', payload);
+    const chan = channels.find(channel => channel.name === payload.channelName);
+    if (chan) {
+      chan.joined = true;
       channels = channels;
-    });
+    }
+  });
 
-    socket.on('join', payload => {
-      console.log('join', payload);
-      const chan = channels.find(channel => channel.name === payload.channelName);
-      if (chan) {
-        chan.joined = true;
-        channels = channels;
-      }
-    });
+  socket.on('leave', payload => {
+    console.log('leave', payload);
+    const chan = channels.find(channel => channel.name === payload.channelName);
+    if (chan) {
+      chan.joined = false;
+      channels = channels;
+    }
+  });
 
-    socket.on('leave', payload => {
-      console.log('leave', payload);
-      const chan = channels.find(channel => channel.name === payload.channelName);
-      if (chan) {
-        chan.joined = false;
-        channels = channels;
-      }
-    });
-
-    socket.on('error', payload => {
-      console.log(payload);
-    });
-
+  socket.on('error', payload => {
+    console.log(payload);
   });
 
   function leaveChannel(channelName: string) {
