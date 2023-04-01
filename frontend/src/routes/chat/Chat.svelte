@@ -20,8 +20,9 @@
     name: string;
     posts: Post[];
     joined: boolean;
+    status: string;
   }
-    
+
   let channels: Channel[] = [];
 
   onMount(() => {
@@ -29,7 +30,7 @@
     .then(channelList => {
       console.log('channel list', channelList);
       for (const channel of channelList.data)
-        channels.push({name: channel.name, posts: [], joined: false});
+        channels.push({name: channel.name, posts: [], joined: false, status: channel.status});
       channels = channels;
     });
 
@@ -118,7 +119,7 @@
 
 {#each channels as channel}
 
-  <h3>{channel.name}</h3>
+  <h3>{channel.name} ({channel.status})</h3>
 
 {#if channel.joined}
   <button on:click={() => leaveChannel(channel.name)}>leave this channel</button>
