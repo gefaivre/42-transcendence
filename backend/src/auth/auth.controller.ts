@@ -46,7 +46,7 @@ export class AuthController {
         username: await this.generateUsername(ft_user.login),
         password: '',
         ft_login: ft_user.login,
-        image: new URL("")
+        image: new URL(ft_user.image.versions.small)
       }
 
       user = await this.usersService.create(newUser)
@@ -73,7 +73,7 @@ export class AuthController {
     let user = await this.usersService.create(body)
 
     // remove passowrd field from user object
-    // const { password , ...result } = user;
+    const { password, ...result } = user;
 
     // frontend need to login after
     return user;

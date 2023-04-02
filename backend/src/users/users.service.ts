@@ -14,25 +14,22 @@ export class UsersService {
     if (await this.findOne(createUserDto.username) != null)
     {
       throw new HttpException('This username already exists', HttpStatus.CONFLICT)
-      // this.remove(createUserDto.username)
     }
+    console.log(createUserDto.image);
 
-    // this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
+    this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
 
-    try {
-      const user = await this.prisma.user.create({
-        data: {
-          username: createUserDto.username,
-          password: createUserDto.password,
-          ft_login: createUserDto.ft_login,
-          games:  Math.floor(Math.random() * (150 - 0) + 0),
-          mmr: Math.floor(Math.random() * (1500 - 0) + 0),
-        },
-      })
-      return user
-    } catch (error) {
-      return null
-    }
+    const user = await this.prisma.user.create({
+      data: {
+        username: createUserDto.username,
+        password: createUserDto.password,
+        ft_login: createUserDto.ft_login,
+        games:  Math.floor(Math.random() * (150 - 0) + 0),
+        mmr: Math.floor(Math.random() * (1500 - 0) + 0),
+      },
+    })
+    return user
+
   }
 
   async findAll() {
@@ -59,11 +56,11 @@ export class UsersService {
   async findOne(name: string) {
     return await this.prisma.user.findUnique({
       where: {
-        username: name,
-      },
-      include: {
-        channels: true
+        username: name
       }
+      // include: {
+      //   channels: true
+      // }
     })
   }
 
