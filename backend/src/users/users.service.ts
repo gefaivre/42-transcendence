@@ -1,4 +1,4 @@
-import { Injectable , Inject} from '@nestjs/common';
+import { Injectable , Inject, HttpException, HttpStatus} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ImagesService } from 'src/images/images.service';
@@ -11,13 +11,12 @@ export class UsersService {
 
   // START CRUD
   async create(createUserDto: CreateUserDto) {
-    console.log(createUserDto.username);
     if (await this.findOne(createUserDto.username) != null)
     {
-      return "User " + createUserDto.username + " already exist";
+      throw new HttpException('This username already exists', HttpStatus.CONFLICT)
       // this.remove(createUserDto.username)
-
     }
+
     // this.images.downloadImage(new URL(createUserDto.image),  '/app/images/' + createUserDto.username + '.jpg')
 
     try {

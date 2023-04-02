@@ -36,7 +36,8 @@ export class AuthController {
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
     // see if this 42 user already in db
-    let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
+    let user
+    user = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
     if (!user) {
@@ -69,15 +70,13 @@ export class AuthController {
   async signup(@Body() body: CreateUserDto) {
 
     // create user
-    const user = await this.usersService.create(body)
-    if (user == null)
-      throw new HttpException('This username already exists', HttpStatus.CONFLICT)
+    let user = await this.usersService.create(body)
 
     // remove passowrd field from user object
-    const { password, ...result } = user;
+    // const { password , ...result } = user;
 
     // frontend need to login after
-    return result;
+    return user;
   }
 
   @UseGuards(AuthGuard('local'))
