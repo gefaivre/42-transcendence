@@ -5,12 +5,15 @@ import { UsersService } from 'src/users/users.service';
 import { PathLike, promises as fs } from "fs";
 import { createReadStream } from 'fs';
 import { join } from 'path';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { take } from 'rxjs';
 
 
 @Injectable()
 export class ImagesService {
   constructor(@Inject(forwardRef(() => UsersService))
-    private usersService: UsersService) {}
+    private usersService: UsersService,
+    private PrismaService: PrismaService) {}
 
   create(createImageDto: CreateImageDto) {
     return 'This action adds a new image';
@@ -21,13 +24,23 @@ export class ImagesService {
   }
 
   async findUserlast(UserId: string) {
-    let link;
+    let image;
     let user = await this.usersService.findById(+UserId)
     if (user == null)
       return null;
-    link = user.images[0]
+    image = await this.PrismaService.image.findMany({
+      take: 1,
+      where: {
+        User: {
+          id: +UserId
+        },
+      },
+      orderBy: {
+        lastuse: 'desc',
+    }
+    })
 
-    const file = createReadStream(link);
+    const file = createReadStream(image[0].link);
     return new StreamableFile(file);
   }
 
@@ -35,7 +48,10 @@ export class ImagesService {
 
     const file = createReadStream(join(process.cwd(), 'package.json'));
     return new StreamableFile(file)
-    return `This action returns a #${userId} image`;
+  }
+
+  AddOne(UserId: number, updateImageDto: UpdateImageDto) {
+    return `This action updates a #${UserId} image`;
   }
 
   update(id: number, updateImageDto: UpdateImageDto) {
@@ -56,4 +72,5 @@ export class ImagesService {
     await fs.writeFile(path, buffer, {flag: 'wx'});
     return path;
   }
+
 }

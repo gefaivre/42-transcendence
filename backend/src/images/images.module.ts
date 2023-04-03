@@ -2,12 +2,12 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { ImagesController } from './images.controller';
 import { UsersModule } from 'src/users/users.module';
-import { UsersService } from 'src/users/users.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   imports: [forwardRef(() => UsersModule)],
   controllers: [ImagesController],
-  providers: [ImagesService],
+  providers: [ImagesService, PrismaService],
   exports: [ImagesService]
 })
 export class ImagesModule {}

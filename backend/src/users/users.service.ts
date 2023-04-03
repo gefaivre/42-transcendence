@@ -23,8 +23,14 @@ export class UsersService {
           ft_login: createUserDto.ft_login,
           games:  Math.floor(Math.random() * (150 - 0) + 0),
           mmr: Math.floor(Math.random() * (1500 - 0) + 0),
-        },
-      })
+          images: {
+            create: {
+              name: "default",
+              link: "/app/images/basic_pp.jpg",
+            }
+          },
+        }
+  })
     // Add image to user
     // create directory
     var fs = require('fs');
@@ -44,7 +50,7 @@ export class UsersService {
     else
       internlink = "/app/images/basic_pp.jpg"
 
-    console.log("link inage = ", internlink)
+    console.log("link image = ", internlink)
 
     return user
   }
