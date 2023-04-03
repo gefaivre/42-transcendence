@@ -15,18 +15,23 @@ export class ImagesController {
     return this.imagesService.create(createImageDto);
   }
 
-  @Get()
-  findAll() {
+  @Get(':userId')
+  findUserlast(@Param('userId') userId: string) {
+    return this.imagesService.findUserlast(userId);
+  }
+
+  @Get(':userId/all')
+  findUserAll(@Param('userId') userId: string) {
     return this.imagesService.findAll();
   }
 
   @Get(':userId/:Id')
-  findOne(@Param('userId') userId: string, @Param('Id') Id: string) {
+  findUserOne(@Param('userId') userId: string, @Param('Id') Id: string) {
     return this.imagesService.findOne(+userId, +Id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  removeOne(@Param('id') id: string) {
     return this.imagesService.remove(+id);
   }
 }

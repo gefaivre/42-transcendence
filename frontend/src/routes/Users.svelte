@@ -63,6 +63,8 @@
 </script>
 
 {#if $logged === 'true'}
+    <img src="http://localhost:3000/images/{user.id}" alt="profil">
+
     <h1>{user.username}</h1>
     <table>
         <tbody>

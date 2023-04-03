@@ -12,9 +12,11 @@ import { PostsService } from 'src/posts/posts.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ImagesService } from 'src/images/images.service';
+import { ImagesModule } from 'src/images/images.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, ChannelModule, PostsModule],
-  providers: [ChatGateway, ChatService, AuthService, UsersService, ChannelService, PostsService, JwtService, PrismaService, ImagesService],
+  imports: [AuthModule, UsersModule, ChannelModule, PostsModule, ImagesModule],
+  providers: [ChatGateway, ChatService, JwtService, PrismaService],
+  exports: [ChatService]
 })
 export class ChatModule {}
