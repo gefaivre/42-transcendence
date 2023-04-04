@@ -60,10 +60,34 @@
 
     }
 
+    let fileInput
+    const handleSubmit = async () => {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('http://localhost:3000/images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      });
+
+      console.log(response.data); // do something with the response from the backend
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 </script>
 
 {#if $logged === 'true'}
     <img src="http://localhost:3000/images/{user.id}" alt="profil">
+    <form on:submit|preventDefault={handleSubmit}>
+      <input type="file" bind:this={fileInput} accept="image/*">
+      <button type="submit">Upload</button>
+    </form>
 
     <h1>{user.username}</h1>
     <table>
@@ -100,3 +124,9 @@
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
+
+<style>
+img {
+    max-width:250px;
+}
+</style>

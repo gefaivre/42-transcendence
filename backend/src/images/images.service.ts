@@ -16,11 +16,21 @@ export class ImagesService {
     private PrismaService: PrismaService) {}
 
 
-  AddImage(userId: number, createImageDto: CreateImageDto)
+  async AddImage(userId: number, file: Express.Multer.File)
   {
-    
-  }
+    console.log("file in add Image = ", file)
+    console.log("userId in add image = ", userId)
+    let image = await this.PrismaService.image.create({
+      data: {
+        name: file.filename,
+        link: `${file.destination}/${file.filename}`,
+        userId: userId
+      }
 
+    })
+    console.log("image in add image = ", image)
+    return "Image created"
+  }
   create(createImageDto: CreateImageDto) {
     return 'This action adds a new image';
   }
@@ -35,7 +45,7 @@ export class ImagesService {
     if (user == null)
       return null;
     image = await this.PrismaService.image.findMany({
-      take: 1,
+      // take: 1,
       where: {
         User: {
           id: +UserId
@@ -45,6 +55,7 @@ export class ImagesService {
         lastuse: 'desc',
     }
     })
+    console.log(image);
 
     const file = createReadStream(image[0].link);
     return new StreamableFile(file);
