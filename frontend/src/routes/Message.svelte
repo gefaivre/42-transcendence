@@ -5,6 +5,7 @@
     import { onMount } from "svelte";
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
+    import ChanMenu from "./chanLayouts.svelte";
 
   </script>
 
@@ -21,6 +22,8 @@
  </style>
 
  <Layout>
+    <ChanMenu>
+    </ChanMenu>
     <div class=toDo >
         <ul>To do: <ul>
             <li>messagerie</li>

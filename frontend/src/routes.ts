@@ -14,6 +14,7 @@ import Channels from './routes/Channels.svelte'
 import Signup from './routes/Signup.svelte'
 import Login from './routes/Login.svelte'
 import UserProfile from './routes/UserProfile.svelte';
+import CreateChannel from './routes/CreateChannel.svelte';
 
 export default {
     '/': Home,
@@ -31,5 +32,6 @@ export default {
     '/game': Game,
     '/test': Test,
     '/:username': UserProfile,
+    '/message/create': CreateChannel,
     '*': NotFound
 };
