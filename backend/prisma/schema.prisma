@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
+  games          Int
+  mmr            Int
+  ft_login       String?   @unique
+  wins           Match[]   @relation("winner")
+  loses          Match[]   @relation("loser")
+  channels       Channel[] @relation("channel_users")
+  ownedChannels  Channel[] @relation("channel_owner")
+  bannedChannels Channel[] @relation("channel_banned_users")
+  adminChannels  Channel[] @relation("channel_admins")
+  posts          Post[]
+}
+
+model Channel {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  ownerId     Int
+  owner       User   @relation("channel_owner", fields: [ownerId], references: [id])
+  bannedUsers User[] @relation("channel_banned_users")
+  admins      User[] @relation("channel_admins")
+  users       User[] @relation("channel_users")
+  posts       Post[]
+}
+
+model Match {
+  id          Int       @id @default(autoincrement())
+  winner      User      @relation(name: "winner", fields: [winnerId], references: [id])
+  winnerId    Int
+  winnerScore Int
+  loser       User      @relation(name: "loser", fields: [loserId], references: [id])
+  loserId     Int
+  loserScore  Int
+  date        DateTime
+  ranked      Boolean
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  content   String
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  channelId Int
+}

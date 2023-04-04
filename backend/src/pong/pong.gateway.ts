@@ -2,11 +2,13 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGat
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
 import { Interval } from '@nestjs/schedule';
+import { KeyEventDto } from './dto/key-event-dto';
 
 @WebSocketGateway({
     path: '/pong',
     cors: {
-        origin: '*',
+        origin: 'http://localhost:8080',
+        credentials: true
     },
 })
 
@@ -15,38 +17,60 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server: Server;
 
-  start: boolean = false;
+
+  @SubscribeMessage('requestGame')
+  handleRequestGame(client: Socket) {
+    const response: responseDto = this.pongService.handleRequestGame(client.id);
+    this.server.to(response.room).emit('requestGame', response.payload);
+  }
 
   @SubscribeMessage('start')
-  startGame(client: Socket) {
-    const start: boolean = this.pongService.startGame(client.id);
-    if (start) {
-      this.server.emit('startMessage');
-      this.start = true;
-    }
+  handleStartGame(client: Socket) {
+    const response: responseDto = this.pongService.handleStartGame(client.id);
+    this.server.to(response.room).emit('startGame', response.payload);
   }
 
   @SubscribeMessage('control')
-  handleControls(client: Socket, keyEvent: { press: boolean; key: string }) {
-    this.pongService.handleControls(client.id, keyEvent.press, keyEvent.key);
+  handleControls(client: Socket, keyEventDto: KeyEventDto) {
+    this.pongService.handleControls(client.id, keyEventDto.press, keyEventDto.key);
+  }
+
+  @SubscribeMessage('watchGame')
+  handleWatchGame(client: Socket, game: gameDto) {
+    this.pongService.handleWatchGame(client.id, game);
+    this.server.to(client.id).emit('watchGame', { response: true });
   }
 
   @Interval(1000 / 120)
-  getGameState() {
-    if (this.start) {
-      this.start = this.pongService.loopGame();
-      const payload = this.pongService.getGameState();
-      this.server.emit('gameStateMessage', payload);
-    }
+  sendGameState() {
+    const gamesState: GameStateDto[] = this.pongService.getGamesState();
+    gamesState.forEach(game => {
+      this.server.to(game.id).emit(game.state);
+    });
   }
 
   handleConnection(client: Socket) {
-    this.pongService.addPlayer(client.id);
+    const authHeader = client.request.headers.cookie;
+
+    if (!authHeader) {
+      this.server.to(client.id).emit('unauthorized', { user: client.id });
+      console.log(`pongWebsocket: client ${client.id} is unauthorized`);
+    } else {
+      const tokenData = await this.pongService.validateUser(authHeader);
+      const username: string | undefined = await this.pongService.addUser(client.id, tokenData);
+      
+      if (!username) {
+        this.server.to(client.id).emit('unauthorized', { user: client.id });
+        console.log(`pongWebsocket: client ${client.id} is unauthorized`);
+      } else {
+        this.server.to(client.id).emit('welcome', { user: client.id });
+        console.log(`pongWebsocket: user ${username} connected`);
+      }
+    }
   }
 
   handleDisconnect(client: Socket) {
-    const side: string = this.pongService.removePlayer(client.id);
-    this.server.emit('disconnectMessage', side);
-    this.start = false;
+    const response: responseDto = this.pongService.removePlayer(client.id);
+    this.server.to(response.room).emit('disconnect', response.payload);
   }
 }
