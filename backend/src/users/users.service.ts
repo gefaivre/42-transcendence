@@ -15,7 +15,7 @@ export class UsersService {
     if (await this.findOne(createUserDto.username) != null)
       throw new HttpException('This username already exists', HttpStatus.CONFLICT)
 
-      //Create User
+      // Create User
       const user = await this.prisma.user.create({
         data: {
           username: createUserDto.username,
@@ -30,28 +30,26 @@ export class UsersService {
             }
           },
         }
-  })
+      })
+
     // Add image to user
-    // create directory
-    var fs = require('fs');
-    var dir = `/images/${user.id}`;
-
-    if (!fs.existsSync(dir)){
-      fs.mkdirSync(dir, { recursive: true })}
-
-    // Add image link to the user
-    let internlink;
     if (createUserDto.image != null)
     {
-      //app/images/userId/image_name
-      internlink = `/app/images/${user.id}` + createUserDto.username + "_default" + '.jpg'
+      let internlink;
+      //create dir app/images/userId/image_name
+      var fs = require('fs');
+      var dir = `/app/images/${user.id}`
+      if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
+      internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
       this.images.downloadImage(new URL(createUserDto.image),  internlink)
+      await this.prisma.image.create({
+        data: {
+          name: "default42",
+          link: internlink,
+          userId: user.id,
+        }
+      })
     }
-    else
-      internlink = "/app/images/basic_pp.jpg"
-
-    console.log("link image = ", internlink)
-
     return user
   }
 

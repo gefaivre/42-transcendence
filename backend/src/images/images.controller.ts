@@ -10,14 +10,14 @@ import { UpdateImageDto } from './dto/update-image.dto';
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
-  @Post()
-  create(@Body() createImageDto: CreateImageDto) {
-    return this.imagesService.create(createImageDto);
+  @Post(':userId')
+  AddImage(@Param('userId') userId: number ,@Body() createImageDto: CreateImageDto) {
+    return this.imagesService.AddImage(userId, createImageDto);
   }
 
   @Get(':userId')
-  findUserlast(@Param('userId') userId: string) {
-    return this.imagesService.findUserlast(userId);
+  getImage(@Param('userId') userId: string) {
+    return this.imagesService.getImage(userId);
   }
 
   @Get(':userId/all')

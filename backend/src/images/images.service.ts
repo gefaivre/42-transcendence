@@ -15,6 +15,12 @@ export class ImagesService {
     private usersService: UsersService,
     private PrismaService: PrismaService) {}
 
+
+  AddImage(userId: number, createImageDto: CreateImageDto)
+  {
+    
+  }
+
   create(createImageDto: CreateImageDto) {
     return 'This action adds a new image';
   }
@@ -23,7 +29,7 @@ export class ImagesService {
     return `This action returns all images`;
   }
 
-  async findUserlast(UserId: string) {
+  async getImage(UserId: string) {
     let image;
     let user = await this.usersService.findById(+UserId)
     if (user == null)
