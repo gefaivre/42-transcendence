@@ -70,7 +70,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    const response: responseDto = this.pongService.removePlayer(client.id);
+    const response: responseDto = this.pongService.removeUser(client.id);
     this.server.to(response.room).emit('disconnect', response.payload);
   }
 }

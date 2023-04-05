@@ -1,41 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { Player } from './class/Player';
 import { Game } from './game/Game';
+import { User } from '@prisma/client';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
+import { Room } from './class/Room';
+import { PongUser } from './class/PongUser';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PongService {
 
+  constructor(private readonly authService: AuthService,
+              private readonly usersService: UsersService) {}
+
   @WebSocketServer() server: Server;
 
-  players: Player[] = [];
-  game: Game = new Game(600, 400);
+  rooms: Room[] = [];
+  users: PongUser[] = [];
 
-  addPlayer(clientId: string) {
-    if (this.players.map(player => player.id).find(id => id === clientId))
-      return ;
-    if (this.players.length === 0)
-      this.players.push({ id: clientId, left: true, start: false });
-    else
-      this.players.push({id: clientId, left: false, start: false });
-    console.log("New player, players = " + this.players);
+
+  async validateUser(authHeader: string) {
+    const token = authHeader.split('=')[1];
+    return this.authService.validateToken(token)
   }
 
-  removePlayer(clientId: string) {
-    const toRemove: number = this.players.map(player => player.id).indexOf(clientId);
-    const left: boolean = this.players[toRemove].left;
-    if (toRemove > -1) {
-      this.players.splice(toRemove, 1);
-      this.game = new Game(600, 400);;
-      console.log("Player removed, players = " + this.players);
-      if (left)
-        return 'left';
-      else
-        return 'right';
+  async addUser(clientId: string, tokenData: any) {
+    const user: User | null = await this.usersService.findById(tokenData.sub);
+
+    if (user) {
+      this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
+      return user.username;
     }
-    else
-      return 'error';
+  }
+
+  async removeUser(clientId: string) {
   }
 
   startGame(clientId: string) {
