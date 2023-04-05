@@ -12,7 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
-  @Post()
+  @Post('/add')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
@@ -27,27 +27,32 @@ export class ImagesController {
     return this.imagesService.AddImage(request.user.id, file);
   }
 
-  // @Post(':userId')
-  // AddImage(@Param('userId') userId: number ,@Body() createImageDto: CreateImageDto) {
-  //   return this.imagesService.AddImage(userId, createImageDto);
-  // }
+  @Get('/set/:Id')
+  @UseGuards(AuthGuard('jwt'))
+  setImage(@Req() request: any, @Param('Id') ImageId: number) {
+    return this.imagesService.setImage(request.user.id, ImageId);
+  }
 
-  @Get(':userId')
+  @Get('/actual/:userId')
+  @UseGuards(AuthGuard('jwt'))
   getImage(@Param('userId') userId: string) {
     return this.imagesService.getImage(userId);
   }
 
-  @Get(':userId/all')
-  findUserAll(@Param('userId') userId: string) {
-    return this.imagesService.findAll();
+  @Get('/all')
+  @UseGuards(AuthGuard('jwt'))
+  findUserAll(@Req() request: any) {
+    return this.imagesService.findAll(request.user.id);
   }
 
-  @Get(':userId/:Id')
-  findUserOne(@Param('userId') userId: string, @Param('Id') Id: string) {
-    return this.imagesService.findOne(+userId, +Id);
+  @Get(':Id')
+  @UseGuards(AuthGuard('jwt'))
+  findUserOne(@Req() request: any, @Param('Id') Id: string) {
+    return this.imagesService.findOne(request.user.id, +Id);
   }
 
-  @Delete(':id')
+  @Delete('/delete/:id')
+  @UseGuards(AuthGuard('jwt'))
   removeOne(@Param('id') id: string) {
     return this.imagesService.remove(+id);
   }

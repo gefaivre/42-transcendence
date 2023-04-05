@@ -7,6 +7,8 @@ import { createReadStream } from 'fs';
 import { join } from 'path';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { take } from 'rxjs';
+import { User } from 'src/users/entities/user.entity';
+import { log } from 'console';
 
 
 @Injectable()
@@ -31,24 +33,41 @@ export class ImagesService {
     console.log("image in add image = ", image)
     return "Image created"
   }
-  create(createImageDto: CreateImageDto) {
-    return 'This action adds a new image';
+
+  async setImage(UserId: number, imageId:number) {
+    console.log("in setImage")
+    let result = await this.PrismaService.image.update({
+      where: { id: +imageId },
+      data: {lastuse: new Date()}
+    })
+    console.log("result = ", result);
+    return "update OK";
   }
 
-  findAll() {
-    return `This action returns all images`;
+  async findAll(userId: number) {
+    let images = await this.PrismaService.image.findMany({
+      where: {
+        User: {
+          id: userId
+        }
+      },
+      orderBy: {
+        lastuse: 'desc',
+      }
+    })
+    return images;
   }
 
-  async getImage(UserId: string) {
+  async getImage(userId: string) {
     let image;
-    let user = await this.usersService.findById(+UserId)
+    let user = await this.usersService.findById(+userId)
     if (user == null)
       return null;
     image = await this.PrismaService.image.findMany({
       // take: 1,
       where: {
         User: {
-          id: +UserId
+          id: +userId
         },
       },
       orderBy: {
@@ -61,10 +80,20 @@ export class ImagesService {
     return new StreamableFile(file);
   }
 
-  findOne(userId: number, Id: number) {
-
-    const file = createReadStream(join(process.cwd(), 'package.json'));
-    return new StreamableFile(file)
+  async findOne(userId: number, Id: number) {
+    let image
+    image = await this.PrismaService.image.findUnique({
+      where: {
+        id: Id
+      }
+    })
+    if (image == null)
+      return null;
+    else
+    {
+      const file = createReadStream(image.link);
+      return new StreamableFile(file)
+    }
   }
 
   AddOne(UserId: number, updateImageDto: UpdateImageDto) {

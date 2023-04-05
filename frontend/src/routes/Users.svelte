@@ -1,10 +1,11 @@
 <script lang="ts">
 
-    import axios from "axios";
-    import { onMount } from "svelte";
-    import { logged, id } from "../stores";
-    import { replace } from "svelte-spa-router";
-    import type { User } from "../types";
+  import axios from "axios";
+  import { onMount } from "svelte";
+  import { logged, id } from "../stores";
+  import { replace } from "svelte-spa-router";
+  import type { User } from "../types";
+  import ChangePp from "./userImages/ChangePp.svelte";
 
     let user: User = {
         id: 0,
@@ -16,6 +17,10 @@
     }
 
     let username: string = null
+
+
+
+    let reloadImage: number = 0
 
     export let params: any = { }
 
@@ -60,34 +65,17 @@
 
     }
 
-    let fileInput
-    const handleSubmit = async () => {
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
 
-    try {
-      const response = await axios.post('http://localhost:3000/images', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        withCredentials: true
-      });
 
-      console.log(response.data); // do something with the response from the backend
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
 
 </script>
 
 {#if $logged === 'true'}
-    <img src="http://localhost:3000/images/{user.id}" alt="profil">
-    <form on:submit|preventDefault={handleSubmit}>
-      <input type="file" bind:this={fileInput} accept="image/*">
-      <button type="submit">Upload</button>
-    </form>
+    <img class="imagePP" src="http://localhost:3000/images/actual/{user.id}?$reload=${reloadImage}" alt="profil">
+    {#if $id === user.id.toString() }
+      <ChangePp bind:reloadImage={reloadImage} />
+    {/if}
 
     <h1>{user.username}</h1>
     <table>
@@ -125,8 +113,14 @@
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
 
+
 <style>
-img {
-    max-width:250px;
+
+.imagePP {
+  border: 5px solid rgb(78, 78, 78);
+  border-radius: 50%;
+  height: 200px;
+  width: 200px;
 }
+
 </style>
