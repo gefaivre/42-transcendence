@@ -1,8 +1,6 @@
 
 <script lang="ts">
     import axios from 'axios';
-    import plus from '../../assets/plus.png';
-    import UpdateUser from '../userCRUD/UpdateUser.svelte';
 
     let fileInput: any = null
 
@@ -14,8 +12,10 @@
 
 
     async function submitImage() {
+        console.log(fileInput.files[0])
 
-        if (fileInput == null) { return alert('empty file') }
+        if (fileInput.files[0] == null) { return alert('empty file') }
+
 
         const file = fileInput.files[0]
         const formData = new FormData()
@@ -32,6 +32,7 @@
         } catch (error) {
         console.error(error)
         }
+        fileInput == null;
     };
 
     async function toggleImageParameter() {
@@ -67,11 +68,10 @@
     {#if ImageParameter}
     <div class="image-list">
         {#each imagesTab as i}
-        <button class="button-style"  on:click={() => { UpdatePP(i.id) }}>
+        <button class="hidden-button"  on:click={() => { UpdatePP(i.id) }}>
             <img class="pp" src="http://localhost:3000/images/{i.id}" alt="{i.name}">
         </button>
         {/each}
-        <img class="addImage" src={plus} alt="add one">
     </div>
     <form on:submit|preventDefault={submitImage}>
         <input type="file" bind:this={fileInput} accept="image/*">
@@ -89,7 +89,7 @@
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    justify-content: space-between;
+    justify-content:space-between;
     margin: auto;
     width: 100%;
     max-width: 50vw;
@@ -101,7 +101,7 @@
     width: 100px;
     height: 100px;
     object-fit: cover;
-    margin: 10px;
+    margin: auto;
     cursor: pointer;
 }
 
@@ -112,23 +112,7 @@
     border: 2px solid #333;
 }
 
-.image-list .addImage {
-    width: 50px;
-    height: 50px;
-    margin: auto;
-    transition: 500ms;
-
-}
-.image-list .addImage:hover{
-
-    width: 75px;
-    height: 75px;
-    cursor: pointer;
-
-
-}
-
-.button-style {
+.hidden-button {
   border: none;
   background-color: transparent;
   outline: none;

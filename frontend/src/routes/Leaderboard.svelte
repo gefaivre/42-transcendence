@@ -63,7 +63,14 @@
                 {:else}
                     <td>{y+1}</td>
                 {/if}
-                <td class="username" ><a href="#/users/{i.username}">{i.username}</a></td>
+                <td >
+                    <a href="#/users/{i.username}">
+                        <span class="user">
+                            <img class="pp" src="http://localhost:3000/images/actual/{i.id}" alt="pp"/>
+                            <p class="username">{i.username}</p>
+                        </span>
+                    </a>
+                </td>
                 <td>{i.mmr}</td>
                 <td>{i.games}</td>
             </tr>
@@ -94,8 +101,23 @@
         margin: auto;
     }
 
+    .user{
+        display: flex;
+        display: flex;
+        align-items:center;
+    }
+
     .username {
-        text-align:left;
+        font-size: large;
+        text-align: left;
+        margin-left: 5px;
+        margin-right: 2px;
+    }
+    .pp {
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgb(78, 78, 78);
+        border-radius: 50%;
     }
 
 </style>
