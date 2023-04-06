@@ -6,33 +6,25 @@
 
     let tab = [];
 
-    onMount(async () => {getMmr() });
+    onMount(() => getMmr());
 
-    function getMmr() {
-        axios.get(`http://localhost:3000/leaderboard/mmr`, {
-            withCredentials: true
-        })
-        .then(res => {
-            console.log(res.data)
-            tab = res.data;
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    async function getMmr() {
+      try {
+        tab = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
+        console.log(tab)
+      } catch (error) {
+        console.log(error)
+      }
     };
 
-    function getGames() {
-        axios.get(`http://localhost:3000/leaderboard/games`, {
-            withCredentials: true
-        })
-        .then(res => {
-            console.log(res.data)
-            tab = res.data;
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    };
+    async function getGames() {
+      try {
+        tab = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
+        console.log(tab)
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
 </script>
 

@@ -20,7 +20,6 @@ export class ChatService {
               private postsService: PostsService) {}
 
   users: ChatUser[] = [];
-  channels: ChatChannel[] = [];
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];
@@ -28,7 +27,7 @@ export class ChatService {
   }
 
   async addUser(clientId: string, tokenData: any): Promise<string | undefined> {
-    const user: User | null = await this.usersService.findOne(tokenData.username);
+    const user: User | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
@@ -43,59 +42,59 @@ export class ChatService {
 
   async createChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
+
     if (user) {
       await this.channelService.create({name: channelName, ownerId:user.id})
-      const newChan = await this.channelService.findByName(channelName);
-      this.channels.push({name: channelName, users: [user], id: newChan!.id});
     }
   }
 
   async joinChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
-    if (user && channel) {
-      channel.users.push(user);
-    } else if (user) {
-      const newChan = await this.channelService.findByName(channelName);
-      this.channels.push({name: channelName, users: [user], id: newChan!.id});
-    }
+    if (user && channel) 
+      this.channelService.addUserToChannel(channel.id, user.id);
   }
 
-  leaveChannel(channelName: string, username: string) {
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+  async leaveChannel(channelName: string, username: string) {
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
-    if (channel) {
-      const toRemove: number = channel.users.map(user => user.username).indexOf(username);
-      channel.users.splice(toRemove, 1);
+    if (channel && user) {
+      this.channelService.removeUserFromChannel(channel.id, user.id);
     }
   }
 
   async registerPost(username: string, payload: PostDto) {
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === payload.channelName);
+    const channel: Channel | null = await this.channelService.findByName(payload.channelName);
+    const author: ChatUser | undefined = this.users.find(user => user.username === username);
 
-    if (channel) {
-      const author: ChatUser | undefined = channel.users.find(user => user.username === username);
-      if (author) 
+    if (channel && author) {
         this.postsService.create({content: payload.content, channelId: channel.id, authorId: author.id})
     }
   }
   
-  isInChannel(username: string, channelName: string): boolean {
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
-    
-    if (channel && channel.users.find(user => user.username === username))
-      return true;
-    return false;
+  async isInChannel(username: string, channelName: string) {
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
+
+    if (user) {
+      const channels: Channel[] | null  = await this.channelService.findByUser(user.id);
+      if (channels) {
+        for (const channel of channels) {
+          if (channel.name  === channelName)
+            return true
+        }
+      }
+    }
+    return false
   }
 
-  getUserChannels(username: string): string[] {
-    const res: string[] = [];
-    this.channels.forEach(channel => {
-      if (this.isInChannel(username, channel.name))
-        res.push(channel.name);
-    });
-    return res;
+  async getUserChannels(username: string) {
+    const user: ChatUser | undefined = this.users.find(user => user.username === username);
+    if (user) {
+      const channels: Channel[] | null = await this.channelService.findByUser(user.id);
+      return channels;
+    }
   }
 
   async retrieveAllChannels(): Promise<ChannelEmitDto[]> {
@@ -110,7 +109,7 @@ export class ChatService {
 
   async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
     let ret: PostEmitDto[] = [];
-    const channel: ChatChannel | undefined = this.channels.find(channel => channel.name === channelName);
+    const channel: Channel | null = await this.channelService.findByName(channelName);
 
     if (channel) {
       const posts: Post[] = await this.postsService.findByChannel(channel.id);

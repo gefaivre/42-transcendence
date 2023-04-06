@@ -1,23 +1,31 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable, ForbiddenException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Injectable, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(private userService: UsersService) {
     super();
   }
 
-  // TODO: create typedef like UserLoginDto
-  // TODO: encrypt password
-  // TODO (?): distinguish user doesn't exist and wrong password
-  async validate(username: string, password: string): Promise<any> {
-    const user = await this.authService.validateLocalUser(username, password);
-    if (!user) {
-      throw new ForbiddenException();
-      //throw new HttpException('Wrong username or password', HttpStatus.FORBIDDEN)
-    }
-    return user;
+  // TODO: typedef arguments with proper dto
+  async validate(username: string, _password: string): Promise<any> {
+
+    const user = await this.userService.findOne(username);
+
+    if (!user)
+      throw new BadRequestException("Username doesn't exist")
+
+    // TODO: remove `as string`
+    if (!await bcrypt.compare(_password, user.password as string))
+      throw new ForbiddenException('Wrong password')
+
+    // TODO: select only id field
+    const { password, ...result } = user;
+    return result;
+
   }
+
 }

@@ -1,8 +1,8 @@
 import { Injectable , Inject, HttpException, HttpStatus, forwardRef} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
-import { UpdateUserDto, UpdateUserameDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -102,10 +102,17 @@ export class UsersService {
     });
   }
 
-  updateUsername(name: string, updateUsernameDto: UpdateUserameDto) {
+  updateUsername(name: string, updateUsernameDto: UpdateUsernameDto) {
     return this.prisma.user.update({
       where: { username: name },
       data: { username: updateUsernameDto.username }
+    });
+  }
+
+  updatePassword(name: string, updatePasswordDto: UpdatePasswordDto) {
+    return this.prisma.user.update({
+      where: { username: name },
+      data: { password: updatePasswordDto.password }
     });
   }
 
