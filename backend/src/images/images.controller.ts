@@ -16,8 +16,13 @@ export class ImagesController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: '/app/images',
-      filename: (req, file, cb) => {
+      destination: (request, file, cb) => {
+        if (request.user == undefined)
+          return "You shall not pass";
+        const directory = `/app/images/${request.user}`
+        cb(null, directory);
+      },
+      filename: (request, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop());
       }
