@@ -18,6 +18,15 @@ export class ChannelController {
 
   @Post()
   create(@Body() createChannelDto: CreateChannelDto) {
+    console.log(createChannelDto);
+    return this.channelService.create(createChannelDto);
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('newChan')
+  createChan(@Body() createChannelDto: CreateChannelDto, @Req() request: any) {
+    const whoami = request.user;
+    console.log("ça apsse bien par newChan");
+    createChannelDto.ownerId = whoami.id;
     return this.channelService.create(createChannelDto);
   }
 

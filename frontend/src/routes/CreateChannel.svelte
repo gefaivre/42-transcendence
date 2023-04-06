@@ -10,6 +10,15 @@
     let visibility = 'public';
     let password = '';
     
+    async function createChan(channelData){
+        let channel = { name: null, ownerId: 1 };
+        console.log(channelData);
+        channel.name = channelData.name;
+        const response = await
+        axios.post('http://localhost:3000/channel/newChan', channel, { withCredentials: true });
+        console.log(response);
+
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
         const channelData = {
@@ -17,7 +26,8 @@
         visibility: visibility,
         password: password
         };
-        console.log(channelData); // envoyer les données au backend
+        createChan(channelData);
+        window.location.href = '/#/message'; // envoyer les données au backend
   };
 
   </script>
