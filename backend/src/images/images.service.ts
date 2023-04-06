@@ -1,14 +1,9 @@
 import { Inject, Injectable, StreamableFile, forwardRef } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { UsersService } from 'src/users/users.service';
 import { PathLike, promises as fs } from "fs";
 import { createReadStream } from 'fs';
-import { join } from 'path';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { take } from 'rxjs';
-import { User } from 'src/users/entities/user.entity';
-import { log } from 'console';
 
 
 @Injectable()
@@ -64,7 +59,7 @@ export class ImagesService {
     if (user == null)
       return null;
     image = await this.PrismaService.image.findMany({
-      // take: 1,
+      take: 1,
       where: {
         User: {
           id: +userId

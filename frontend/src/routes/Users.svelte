@@ -18,8 +18,6 @@
 
     let username: string = null
 
-
-
     let reloadImage: number = 0
 
     export let params: any = { }
@@ -62,12 +60,7 @@
         if (error.response.status == 401)
           alert('Unauthorized to change other player username.')
       }
-
     }
-
-
-
-
 
 </script>
 

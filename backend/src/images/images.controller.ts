@@ -5,6 +5,7 @@ import { UpdateImageDto } from './dto/update-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
 
 
 // https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg
@@ -19,12 +20,15 @@ export class ImagesController {
       destination: (request, file, cb) => {
         if (request.user == undefined)
           return "You shall not pass";
-        const directory = `/app/images/${request.user}`
+        var fs = require('fs');
+        const directory  = `/app/images/${request.user.id}`
+        if (!fs.existsSync(directory)){
+            fs.mkdirSync(directory);
+        }
         cb(null, directory);
       },
       filename: (request, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop());
+        cb(null, Date.now() + '-' + file.originalname);
       }
     })
   }))
