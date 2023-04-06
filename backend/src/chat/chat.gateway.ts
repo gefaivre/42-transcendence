@@ -64,7 +64,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
     }
   }
-    
+
   @SubscribeMessage('sendPost')
   handlePost(client: Socket, payload: PostDto): void {
     const username: string | undefined = this.chatService.getUsername(client.id)
@@ -74,7 +74,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       console.log(`chatWebsocket: client ${client.id} is unauthorized`);
     } else {
       this.chatService.registerPost(username, payload);
-      const postEmit: PostEmitDto = { channelName: payload.channelName, content: payload.content, author: username }; 
+      const postEmit: PostEmitDto = { channelName: payload.channelName, content: payload.content, author: username };
       this.server.to(payload.channelName).emit('post', postEmit);
     }
   }

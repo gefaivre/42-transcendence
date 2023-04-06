@@ -15,8 +15,6 @@ export class ImagesService {
 
   async AddImage(userId: number, file: Express.Multer.File)
   {
-    console.log("file in add Image = ", file)
-    console.log("userId in add image = ", userId)
     let image = await this.PrismaService.image.create({
       data: {
         name: file.filename,
@@ -25,17 +23,14 @@ export class ImagesService {
       }
 
     })
-    console.log("image in add image = ", image)
     return "Image created"
   }
 
   async setImage(UserId: number, imageId:number) {
-    console.log("in setImage")
     let result = await this.PrismaService.image.update({
       where: { id: +imageId },
       data: {lastuse: new Date()}
     })
-    console.log("result = ", result);
     return "update OK";
   }
 
@@ -69,8 +64,6 @@ export class ImagesService {
         lastuse: 'desc',
     }
     })
-    console.log(image);
-
     const file = createReadStream(image[0].link);
     return new StreamableFile(file);
   }

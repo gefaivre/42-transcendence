@@ -96,8 +96,6 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
 
-    console.log('login')
-
     // bind a jwt to the authenticated user
     const jwt = await this.authService.login(req.user)
 
@@ -115,7 +113,6 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   getProfile(@Req() request: any) {
-    console.log('profile', request.user)
     return request.user
   }
 
