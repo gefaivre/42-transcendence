@@ -24,11 +24,4 @@
  <Layout>
     <ChanMenu>
     </ChanMenu>
-    <div class=toDo >
-        <ul>To do: <ul>
-            <li>messagerie</li>
-            <li>peut etre les channels au final a voir </li>
-            <li>dqns ce cqs quid des messqges?</li>
-            <div class="bg-red-500">Hello World</div>
-    </div>
  </Layout>

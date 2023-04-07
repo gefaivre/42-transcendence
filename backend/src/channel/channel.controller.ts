@@ -54,7 +54,10 @@ export class ChannelController {
   findAll() {
     return this.channelService.findAll();
   }
-
+  @Get(':name')
+  findOneName(@Param('name') name: string) {
+    return this.channelService.findByName(name);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.channelService.findOne(+id);
