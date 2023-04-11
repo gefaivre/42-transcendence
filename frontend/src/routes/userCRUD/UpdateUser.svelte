@@ -8,7 +8,8 @@
         password: '',
         mmr: 0,
         games: 0,
-        ft_login: ''
+        ft_login: '',
+        id : 0
     }
 
     let username: string

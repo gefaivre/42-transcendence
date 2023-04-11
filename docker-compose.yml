@@ -31,6 +31,7 @@ services:
       - "db"
     volumes:
       - ./backend:/app
+      - images:/app/images
     restart: always
 
   frontend:
@@ -45,6 +46,7 @@ services:
 
 volumes:
   db_data:
+  images:
 
 networks:
   default:
