@@ -1,41 +1,32 @@
 <script lang="ts">
   import axios from 'axios'
-  import  ioClient  from 'socket.io-client';
+  import ioClient from 'socket.io-client';
   import { onMount } from "svelte";
-  import { logged } from '../../stores';
-  import type { ChannelStatus, ChannelDto } from '../../types';
+  import { logged, id } from '../../stores';
+  import type { ChannelStatus, ChannelDto, PostEmitDto, ChannelBis, WsException } from '../../types';
 
   const socket = ioClient('http://localhost:3000', {
     path: '/chat',
     withCredentials: true
   });
 
-  class Post {
-      author: string;
-      content: string;
-      channelName: string;
-    }
+  let channels: ChannelBis[] = [];
 
-  class Channel {
-    name: string;
-    posts: Post[];
-    joined: boolean;
-    status: string;
+  onMount(() => getAll())
+
+  // TODO: what if we manually change `id` store value ?
+  async function getAll() {
+    channels = (await axios.get('http://localhost:3000/channel', { withCredentials: true })).data
+    for (const channel of channels) {
+      channel.posts = [];
+      if (channel.users.find((user: any) => user.id.toString() === $id))
+        joinRoom(channel.name)
+    }
+    channels = channels;
+    console.log('channel', channels)
   }
 
-  let channels: Channel[] = [];
-
-  onMount(() => {
-    axios.get('http://localhost:3000/channel', { withCredentials: true })
-    .then(channelList => {
-      console.log('channel list', channelList);
-      for (const channel of channelList.data)
-        channels.push({name: channel.name, posts: [], joined: false, status: channel.status});
-      channels = channels;
-    });
-  });
-
-  socket.on('post', (post: Post) => {
+  socket.on('post', (post: PostEmitDto) => {
     console.log('post', post);
     const channel = channels.find(channel => channel.name === post.channelName);
     if (channel)
@@ -43,37 +34,57 @@
     channels = channels;
   });
 
-  socket.on('join', payload => {
-    console.log('join', payload);
-    const chan = channels.find(channel => channel.name === payload.channelName);
-    if (chan) {
-      chan.joined = true;
-      channels = channels;
-    }
-  });
+  socket.on('exception', (e: WsException) => console.error(e))
 
-  socket.on('leave', payload => {
-    console.log('leave', payload);
-    const chan = channels.find(channel => channel.name === payload.channelName);
-    if (chan) {
-      chan.joined = false;
-      channels = channels;
-    }
-  });
+  function joinChannel(channel: ChannelBis) {
+      socket.emit('joinChannel', {
+        channelName: channel.name,
+        status: channel.status,
+        password: ''
+      } as ChannelDto, (response: any) => {
+        console.log(response)
+        joinRoom(channel.name)
+      })
+  }
 
-  socket.on('error', payload => {
-    console.log(payload);
-  });
+  function joinRoom(channelName: string) {
+    socket.emit('joinRoom', channelName, (response: any) => {
+      console.log(response)
+      const chan = channels.find(channel => channel.name === channelName);
+      if (chan) {
+        chan.joined = true;
+        channels = channels;
+      }
+    })
+  }
 
   function leaveChannel(channelName: string) {
-    socket.emit('leaveChannel', { channelName: channelName });
+    socket.emit('leaveChannel', channelName, (response: any) => {
+      console.log('leave channel', channelName, response)
+      const chan = channels.find(channel => channel.name === channelName);
+      if (chan) {
+        chan.posts = []
+        chan.joined = false;
+        channels = channels;
+      }
+    })
   }
 
-  function joinChannel(channelName: string) {
-    socket.emit('joinChannel', { channelName: channelName });
+  function sendMessage(channelName: string, event: any) {
+    const formData = new FormData(event.target);
+    const content: string = formData.get('textfield') as string
+    if (content)
+      socket.emit('sendPost', {
+        content: content,
+        channelName: channelName
+      }, (response: any) => {
+        console.log(response)
+        formData.set(content, null)
+      })
   }
 
-  function createChannel(event) {
+  async function createChannel(event: any) {
+
     const formData = new FormData(event.target);
 
     if (formData.get('channelName') === '')
@@ -84,7 +95,10 @@
 
     if (formData.get('channelStatus') === 'Protected') {
       var pass: string = window.prompt('Enter password');
-      if (!pass) return alert('Empty password')
+      if (pass === '')
+        return alert('Empty password')
+      if (!pass)
+        return
     } else {
       pass = ''
     }
@@ -95,15 +109,13 @@
       password: pass
     }
 
-    console.log(channel)
-    axios.post('http://localhost:3000/channel', channel, { withCredentials: true });
-  }
-
-  function sendMessage(channelName: string, event) {
-    const formData = new FormData(event.target);
-    const content: string = formData.get('textfield') as string
-    if (content)
-      socket.emit('sendPost', { content: content, channelName: channelName });
+    try {
+      await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
+      console.log(`Channel ${channel.channelName} successfully created.`)
+      getAll()
+    } catch (error) {
+      console.log(error.response.data.message)
+    }
   }
 
 </script>
@@ -129,14 +141,12 @@
     <button type="submit">send post</button>
   </form>
 {:else}
-  <button on:click={() => joinChannel(channel.name)}>join this channel</button>
+  <button on:click={() => joinChannel(channel)}>join this channel</button>
 {/if}
-
-{/each}
-
   <br>
   <hr class="solid">
   <br>
+{/each}
   <form on:submit|preventDefault={createChannel}>
     <input id="channelStatus" name="channelStatus" type="radio" value="Public">Public &#9989<br>
     <input id="channelStatus" name="channelStatus" type="radio" value="Private">Private &#9940<br>
@@ -144,5 +154,5 @@
     <input id="channelName" name="channelName" type="text" placeholder="channelName">
     <button type="submit">createChannel</button>
   </form>
-
+  <br>
 {/if}

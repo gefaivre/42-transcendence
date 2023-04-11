@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException, UnprocessableEntityException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException, UnprocessableEntityException, ConsoleLogger, ParseIntPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from 'src/chat/dto/channel-dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -21,57 +21,64 @@ export class ChannelController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  async createChannel(@Req() request: any, @Body(new ValidationPipe({ transform: true })) channelDto: ChannelDto) {
-    const whoAmI = request.user;
-    if (whoAmI) {
-      const user: User | null = await this.usersService.findById(whoAmI?.id);
-      let hash: string
+  async create(@Req() request: any, @Body(new ValidationPipe({ transform: true })) channelDto: ChannelDto) {
+
+    const user: User | null = await this.usersService.findById(request.user.id);
+
+    // is it really possible ??
+    if (user == null)
+      throw new BadRequestException("User cannot create a channel because he doesn't exist !...")
+
+    // we could also hash into the channel service
+    if (channelDto.status === 'Protected') {
       try {
-        hash = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
+        channelDto.password = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
       } catch (error) {
-        throw new UnprocessableEntityException('Error about the channel password encryption')
-      }
-      if (user) {
-        const channel: CreateChannelDto = {
-          channelName: channelDto.channelName,
-          ownerId: user.id,
-          status: channelDto.status,
-          password: hash
-        }
-        if (await this.channelService.create(channel) == null)
-          throw new ConflictException('This channel already exists.')
+        throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
+
+    const channel: CreateChannelDto = {
+      channelName: channelDto.channelName,
+      ownerId: user.id,
+      status: channelDto.status,
+      password: channelDto.password
+    }
+
+    if (await this.channelService.create(channel) === null)
+      throw new ConflictException('This channel already exists.')
   }
 
-  @Post(':id/users/:userId')
-  addUserToChannel(@Param('id') id: string, @Param('userId') userId: string) {
-    return this.channelService.addUserToChannel(+id, +userId);
-}
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/users/:id')
+  addUser(@Req() request: any, @Param('id', new ParseIntPipe) id: number) {
+    return this.channelService.addUserToChannel(id, request.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/users/:id')
+  removeUser(@Req() request: any, @Param('id', new ParseIntPipe) id: number) {
+    return this.channelService.removeUserFromChannel(id, request.user.id);
+  }
 
   @Post(':id/admin/:userId')
   addAdminToChannel(@Param('id') id: string, @Param('userId') userId: string) {
     return this.channelService.addAdminToChannel(+id, +userId);
-}
-
-  @Delete(':id/users/:userId')
-  removeUserFromChannel(@Param('id') id: string, @Param('userId') userId: string) {
-    return this.channelService.removeUserFromChannel(+id, +userId);
-}
+  }
 
   @Delete(':id/admin/:userId')
   removeAdminFromChannel(@Param('id') id: string, @Param('userId') userId: string) {
     return this.channelService.removeAdminFromChannel(+id, +userId);
-}
+  }
 
   @Get()
   findAll() {
     return this.channelService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.channelService.findOne(+id);
+  @Get(':name')
+  findOne(@Param('name') name: string) {
+    return this.channelService.findByName(name);
   }
 
   @Patch(':id')

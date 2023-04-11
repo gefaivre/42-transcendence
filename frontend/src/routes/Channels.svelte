@@ -26,6 +26,7 @@
     }
   }
 
+  // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function remove(name: string) {
     if (!window.confirm("Are you sure ?"))
       return
@@ -37,6 +38,7 @@
     }
   }
 
+  // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function removeAll() {
     if (!window.confirm("Are you sure ?"))
       return
@@ -90,9 +92,9 @@
       {#each channels as c}
       <tr>
         <td>{c.id}</td>
-        <td>{c.name}</td>
+        <td><a contenteditable="false" bind:innerHTML={c.name} href="#/channel/{c.name}"/></td>
         <td><a contenteditable="false" bind:innerHTML={c.owner.username} href="#/users/{c.owner.username}"/></td>
-        <td>???</td>
+        <td>{c.ownerId}</td>
         <td>{c.users.length}</td>
         <td>{c.admins.length}</td>
         <td>{c.status}</td>
@@ -112,9 +114,9 @@
 
   <fieldset>
     <legend>Add Channel</legend><br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Public}>Public<br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Private}>Private<br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected<br>
+    <input type=radio bind:group={channel.status} value={ChannelStatus.Public}>Public &#9989<br>
+    <input type=radio bind:group={channel.status} value={ChannelStatus.Private}>Private &#9940<br>
+    <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected &#128273<br>
     <input type="text" bind:value={channel.channelName} placeholder="channel name">
     <button on:click={create}>Add</button>
     {#if channel.status == ChannelStatus.Protected}
