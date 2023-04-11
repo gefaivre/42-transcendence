@@ -1,10 +1,11 @@
 <script lang="ts">
 
-    import axios from "axios";
-    import { onMount } from "svelte";
-    import { logged, id } from "../stores";
-    import { replace } from "svelte-spa-router";
-    import type { User } from "../types";
+  import axios from "axios";
+  import { onMount } from "svelte";
+  import { logged, id } from "../stores";
+  import { replace } from "svelte-spa-router";
+  import type { User } from "../types";
+  import ChangePp from "./userImages/ChangePp.svelte";
 
     let user: User = {
         id: 0,
@@ -17,6 +18,8 @@
 
     let username: string = null
     let password: string = null
+
+    let reloadImage: number = 0
 
     export let params: any = { }
 
@@ -88,12 +91,16 @@
       } catch (error) {
         alert(error.response.data.message)
       }
-
     }
 
 </script>
 
 {#if $logged === 'true'}
+    <img class="imagePP" src="http://localhost:3000/images/actual/{user.id}?$reload=${reloadImage}" alt="profil">
+    {#if $id === user.id.toString() }
+      <ChangePp bind:reloadImage={reloadImage} />
+    {/if}
+
     <h1>{user.username}</h1>
     <table>
         <tbody>
@@ -132,3 +139,15 @@
 {:else}
     <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
+
+
+<style>
+
+.imagePP {
+  border: 5px solid rgb(78, 78, 78);
+  border-radius: 50%;
+  height: 200px;
+  width: 200px;
+}
+
+</style>

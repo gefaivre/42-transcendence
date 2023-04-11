@@ -2,8 +2,6 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
-import { Request } from 'express';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { ChannelDto } from './dto/channel-dto';
@@ -26,5 +24,4 @@ export class ChatController {
       }
     }
   }
-  
 }

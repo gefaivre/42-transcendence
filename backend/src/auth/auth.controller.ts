@@ -37,7 +37,8 @@ export class AuthController {
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
     // see if this 42 user already in db
-    let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
+    let user
+    user = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
     if (!user) {
@@ -45,7 +46,8 @@ export class AuthController {
       let newUser: CreateUserDto = {
         username: await this.generateUsername(ft_user.login),
         password: '',
-        ft_login: ft_user.login
+        ft_login: ft_user.login,
+        image: new URL(ft_user.image.versions.small)
       }
 
       user = await this.usersService.create(newUser)
@@ -87,14 +89,12 @@ export class AuthController {
     const { password, ...result } = user;
 
     // frontend need to login after
-    return result;
+    return user;
   }
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
-
-    console.log('login')
 
     // bind a jwt to the authenticated user
     const jwt = await this.authService.login(req.user)
@@ -113,9 +113,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   getProfile(@Req() request: any) {
-    console.log('profile', request.user)
     return request.user;
   }
+  
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
   getUser(@Req() request: any) {

@@ -1,16 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable , Inject, HttpException, HttpStatus, forwardRef} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
+import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+    @Inject(forwardRef(() => ImagesService))
+              private images: ImagesService) {}
 
   // START CRUD
-
   async create(createUserDto: CreateUserDto) {
-    try {
+    if (await this.findOne(createUserDto.username) != null)
+      return null
+
+      // Create User
       const user = await this.prisma.user.create({
         data: {
           username: createUserDto.username,
@@ -18,12 +23,34 @@ export class UsersService {
           ft_login: createUserDto.ft_login,
           games:  Math.floor(Math.random() * (150 - 0) + 0),
           mmr: Math.floor(Math.random() * (1500 - 0) + 0),
-        },
+          images: {
+            create: {
+              name: "default",
+              link: "/app/images/basic_pp.jpg",
+            }
+          },
+        }
       })
-      return user
-    } catch (error) {
-      return null
+
+    // Add image to user
+    if (createUserDto.image != null)
+    {
+      let internlink;
+      //create dir app/images/userId/image_name
+      var fs = require('fs');
+      var dir = `/app/images/${user.id}`
+      if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
+      internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
+      this.images.downloadImage(new URL(createUserDto.image),  internlink)
+      await this.prisma.image.create({
+        data: {
+          name: "default42",
+          link: internlink,
+          userId: user.id,
+        }
+      })
     }
+    return user
   }
 
   async findAll() {
@@ -66,8 +93,6 @@ export class UsersService {
   }
 
   async update(name: string, updateUserDto: UpdateUserDto) {
-    console.log(name);
-    console.log(updateUserDto);
     return this.prisma.user.update({
       where: { username: name },
       data: updateUserDto,
