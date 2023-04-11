@@ -7,12 +7,15 @@ import { Room } from './class/Room';
 import { PongUser } from './class/PongUser';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { MatchsService } from 'src/matchs/matchs.service';
+import { GameStateDto } from './dto/game-state-dto';
 
 @Injectable()
 export class PongService {
 
   constructor(private readonly authService: AuthService,
-              private readonly usersService: UsersService) {}
+              private readonly usersService: UsersService,
+              private readonly matchsService: MatchsService) {}
 
   @WebSocketServer() server: Server;
 
@@ -34,59 +37,131 @@ export class PongService {
     }
   }
 
-  async removeUser(clientId: string) {
-  }
+  async removeUser(clientId: string) : Promise<string | undefined> {
+    const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
 
-  startGame(clientId: string) {
-    const toStart: number = this.players.map(player => player.id).indexOf(clientId);
-    this.players[toStart].start = true;
-    if (this.players.filter(player => player.start).length === 2) {
-      console.log("game started");
-      return true;
+    if (user) {
+      const room : string | undefined = await this.removeUserFromRoom(user);
+      return room;
     }
-    return false;
+    return undefined;
   }
 
-  loopGame() {
-    let result = this.game.loop();
-    if (JSON.stringify(result) !== '{}')
-      return false;
-    else
-      return true;
+  handleRequestGame(clientId: string, friend: string | undefined): string | undefined {
+    const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
 
+    if (user) {
+      if (friend) {
+        const room : Room | undefined = this.rooms.find(room => room.player1.username === friend);
+        if (room) {
+          room.player2 = user;
+          room.start = true;
+          return room.id;
+        }
+        else 
+          this.rooms.push({ id: user.username + 'Game', player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: false  });
+        return user.username + 'Game';
+      } else {
+        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true);
+        if (room) {
+          room.player2 = user;
+          room.start = true;
+          return room.id;
+        }
+        else
+          this.rooms.push({ id: user.username + 'Game', player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: true });
+        return user.username + 'Game';
+      }
+    }
+    return undefined;
+  }
+
+  async removeUserFromRoom(user: PongUser) : Promise<string | undefined> {
+    const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+    if (room) {
+      if (room.start) {
+        await this.registerMatch(room, user);
+        const toDelete: number = this.rooms.indexOf(room)
+        this.rooms.splice(toDelete, 1);
+      }
+      return room.id ;
+    }
+    return undefined;
+  }
+
+  async registerMatch(room: Room, loser: PongUser) {
+    if (loser === room.player1) {
+      await this.matchsService.create({ winnerId: room.player2!.id,
+                                      winnerScore: room.game.rightScore, 
+                                      loserId: loser.id, 
+                                      loserScore: room.game.leftScore, 
+                                      date: new Date(), 
+                                      ranked: room.ranked })
+    } else {
+      await this.matchsService.create({ winnerId: room.player1.id,
+                                      winnerScore: room.game.leftScore, 
+                                      loserId: loser.id, 
+                                      loserScore: room.game.rightScore, 
+                                      date: new Date(), 
+                                      ranked: room.ranked })
+    }
+  }
+
+  getGamesState(): GameStateDto[] {
+    const gamesStateDto: GameStateDto[] = [];
+    this.rooms.forEach(room => {
+      let result = room.game.loop();
+      if (room.start) {
+        gamesStateDto.push({ id: room.id, state: room.game.getState() });
+      }
+      if (JSON.stringify(result) !== '{}')
+        this.endMatch(room);
+    });
+    return gamesStateDto;
+  }
+
+  async endMatch(room: Room) {
+    room.start = false;
+    if (room.game.getState().score.leftScore === 10)
+      await this.registerMatch(room, room.player2!);
+    else
+      await this.registerMatch(room, room.player1);
+    const toDelete: number = this.rooms.indexOf(room);
+    this.rooms.splice(toDelete, 1);
   }
 
   handleControls(clientId: string, pressed: boolean, key: string) {
-    const player: Player = this.players[this.players.map(player => player.id).indexOf(clientId)];
-    if (key === 'w' || key === 'ArrowUp') {
-      if (player.left) {
-        if (pressed) 
-          this.game.leftPaddle.moveUp();
-        else
-          this.game.leftPaddle.stop();
-      } else {
-        if (pressed) 
-          this.game.rightPaddle.moveUp();
-        else
-          this.game.rightPaddle.stop();
+    const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
+    const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+
+    if (room) {
+      if (key === 'w' || key === 'ArrowUp') {
+        if (room.player1 === user) {
+          if (pressed) 
+            room.game.leftPaddle.moveUp();
+          else
+            room.game.leftPaddle.stop();
+        } else {
+          if (pressed) 
+            room.game.rightPaddle.moveUp();
+          else
+            room.game.rightPaddle.stop();
+        }
       }
-    }
-    if (key === 's' || key === 'ArrowDown') {
-      if (player.left) {
-        if (pressed) 
-          this.game.leftPaddle.moveDown();
-        else
-          this.game.leftPaddle.stop();
-      } else {
-        if (pressed) 
-          this.game.rightPaddle.moveDown();
-        else
-          this.game.rightPaddle.stop();
+      if (key === 's' || key === 'ArrowDown') {
+        if (room.player1 === user) {
+          if (pressed) 
+            room.game.leftPaddle.moveDown();
+          else
+            room.game.leftPaddle.stop();
+        } else {
+          if (pressed) 
+            room.game.rightPaddle.moveDown();
+          else
+            room.game.rightPaddle.stop();
+        }
       }
     }
   }
 
-  getGameState() {
-    return this.game.getState();
-  }
 }

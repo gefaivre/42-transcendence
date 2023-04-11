@@ -10,7 +10,7 @@ export class Item {;
 
 export class State {
   stop: boolean;
-  Score: Score
+  score: Score
   leftPaddle: Item;
   rightPaddle: Item;
   ball: Item;
