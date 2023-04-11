@@ -13,7 +13,7 @@ export class UsersService {
   // START CRUD
   async create(createUserDto: CreateUserDto) {
     if (await this.findOne(createUserDto.username) != null)
-      throw new HttpException('This username already exists', HttpStatus.CONFLICT)
+      return null
 
       // Create User
       const user = await this.prisma.user.create({
