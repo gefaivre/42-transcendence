@@ -41,32 +41,6 @@ export class ChatService {
     this.users = this.users.filter(user => user.username !== username)
   }
 
-  async joinChannel(username: string, channelName: string) {
-    const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    const channel: Channel | null = await this.channelService.findByName(channelName);
-
-    if (user && channel)
-      await this.channelService.addUserToChannel(channel.id, user.id);
-  }
-
-  async leaveChannel(username: string, channelName: string) {
-    const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    const channel: Channel | null = await this.channelService.findByName(channelName);
-
-    if (channel && user) {
-      this.channelService.removeUserFromChannel(channel.id, user.id);
-    }
-  }
-
-  async registerPost(username: string, payload: PostDto) {
-    const channel: Channel | null = await this.channelService.findByName(payload.channelName);
-    const author: ChatUser | undefined = this.users.find(user => user.username === username);
-
-    if (channel && author) {
-        await this.postsService.create({content: payload.content, channelId: channel.id, authorId: author.id})
-    }
-  }
-
   async isInChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     if (user === undefined)

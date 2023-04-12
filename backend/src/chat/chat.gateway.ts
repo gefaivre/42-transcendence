@@ -8,6 +8,9 @@ import { ChannelDto } from './dto/channel-dto';
 import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureReason, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from './types/types';
 import { BadRequestTransformationFilter } from './chat.filter';
+import { ChannelService } from 'src/channel/channel.service';
+import { ChatUser } from './class/ChatUser';
+import { PostsService } from 'src/posts/posts.service';
 
 // TODO: extract `username` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -35,7 +38,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   private readonly logger: Logger = new Logger(ChatGateway.name, { timestamp: true })
 
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private postsService: PostsService,
+    private channelService: ChannelService,
+  ) {}
 
   @WebSocketServer()
   server: Server
@@ -58,49 +65,58 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
-    // Since `ChatGuard` has been applied we assume `username` is not undefined
-    const username: string = this.chatService.getUsername(client.id) as string
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+
+    // Since `ChatGuard` has been applied we assume the channel exists
+    const channelId: number = (await this.channelService.findByName(channel.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.chatService.joinChannel(username, channel.channelName)
+    await this.channelService.addUserToChannel(channelId, user.id);
 
-    this.server.to(channel.channelName).emit('channelEvent', { user: username, event: 'join' })
+    this.server.to(channel.channelName).emit('channelEvent', { user: user.username, event: 'join' })
 
-    return this.eventHandlerSuccess(client.id, username, channel.channelName, WsActionSuccess.JoinChannel)
+    return this.eventHandlerSuccess(client.id, user.username, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
   @SubscribeMessage('leaveChannel')
   async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
 
-    // Since `ChatGuard` has been applied we assume `username` is not undefined
-    const username: string = this.chatService.getUsername(client.id) as string
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+
+    // Since `ChatGuard` has been applied we assume the channel exists
+    const channelId: number = (await this.channelService.findByName(channel))?.id as number
 
     // TODO (?): try/catch
-    await this.chatService.leaveChannel(username, channel)
+    await this.channelService.removeUserFromChannel(channelId, user.id)
 
     client.leave(channel)
 
-    this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' })
+    this.server.to(channel).emit('channelEvent', { user: user.username, event: 'leave' })
 
-    return this.eventHandlerSuccess(client.id, username, channel, WsActionSuccess.LeaveChannel)
+    return this.eventHandlerSuccess(client.id, user.username, channel, WsActionSuccess.LeaveChannel)
   }
 
   @SubscribeMessage('sendPost')
   async handlePost(@ConnectedSocket() client: Socket, @MessageBody() post: PostDto) {
 
-    // Since `ChatGuard` has been applied we assume `username` is not undefined
-    const username: string = this.chatService.getUsername(client.id) as string
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+
+    // Since `ChatGuard` has been applied we assume the channel exists
+    const channelId: number = (await this.channelService.findByName(post.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.chatService.registerPost(username, post)
+    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.id })
 
     this.server.to(post.channelName).emit('post', {
       channelName: post.channelName,
       content: post.content,
-      author: username
+      author: user.username
     } as PostEmitDto)
 
-    return this.eventHandlerSuccess(client.id, username, post.channelName, WsActionSuccess.Post)
+    return this.eventHandlerSuccess(client.id, user.username, post.channelName, WsActionSuccess.Post)
   }
 
   afterInit() {
