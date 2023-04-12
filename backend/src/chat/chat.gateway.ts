@@ -1,127 +1,161 @@
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
-import { ChannelDto } from './dto/channel-dto';
 import { PostEmitDto } from './dto/post-emit.dto';
-import { ChannelEmitDto } from './dto/channel-emit-dto';
+import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ChannelDto } from './dto/channel-dto';
+import { ChatGuard } from './chat.guard';
+import { WsActionSuccess, WsActionFailure, WsFailureReason, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from './types/types';
+import { BadRequestTransformationFilter } from './chat.filter';
+
+// TODO: extract `username` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
+//       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
+
+// For the moment, when an event handler succeed, backend returns a string.
+// (Yes, this string is typed with something like `WsHandlerSuccessClientLog` but its just a string.)
+// In the frontend, this string is retrieved as parameter of the acknowledgement callback function of the corresponding `emit()`.
+// In the future, if we decide to return a proper `WsResponse` instead of this simple string,
+// note that we will no longer be able to retrieve this return value the same way.
+// We will need to define a proper `socket.on()` event listener:
+//  - the WsResponse's `event` field will be its first parameter (the event to listen to).
+//  - the WsResponse's  `data` field will be the parameter of the callback function (its second parameter).
 
 @WebSocketGateway({
-    path: '/chat',
-    cors: {
-        origin: 'http://localhost:8080',
-        credentials: true
-    },
+  path: '/chat',
+  cors: {
+    origin: 'http://localhost:8080',
+    credentials: true
+  },
 })
+@UseFilters(BadRequestTransformationFilter)
+@UsePipes(ValidationPipe)
+@UseGuards(ChatGuard)
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-  constructor(
-    private chatService: ChatService,
-  ) {}
+  private readonly logger: Logger = new Logger(ChatGateway.name, { timestamp: true })
+
+  constructor(private chatService: ChatService) {}
 
   @WebSocketServer()
-  server: Server;
+  server: Server
+
+  @SubscribeMessage('joinRoom')
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
+
+    // Since `ChatGuard` has been applied we assume `username` is not undefined
+    const username: string = this.chatService.getUsername(client.id) as string
+
+    client.join(room)
+
+    // TODO: add listener for this event in the frontend
+    this.server.to(room).emit('channelEvent', { user: username, event: 'join' })
+
+    const channelPosts: PostEmitDto[] = await this.chatService.retrieveChannelPosts(room)
+    for (const post of channelPosts)
+      client.emit('post', post)
+
+    return this.eventHandlerSuccess(client.id, username, room, WsActionSuccess.JoinRoom)
+  }
 
   @SubscribeMessage('joinChannel')
-  async handleJoinChannel(client: Socket, payload: ChannelDto) {
-    const username: string | undefined = this.chatService.getUsername(client.id);
+  async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
-    if (!username) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
-      if (isInChan)
-        this.server.to(client.id).emit('error', { message: 'already in channel' });
-      else {
-        this.chatService.joinChannel(username, payload.channelName);
-        client.join(payload.channelName);
-        this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'join' });
-        this.server.to(client.id).emit('join', { channelName: payload.channelName});
-        const channelPosts: PostEmitDto[] = await this.chatService.retrieveChannelPosts(payload.channelName)
-        for (const post of channelPosts)
-          this.server.to(client.id).emit('post', post);
-      }
-    }
+    // Since `ChatGuard` has been applied we assume `username` is not undefined
+    const username: string = this.chatService.getUsername(client.id) as string
+
+    // TODO (?): try/catch
+    await this.chatService.joinChannel(username, channel.channelName)
+
+    return this.eventHandlerSuccess(client.id, username, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
   @SubscribeMessage('leaveChannel')
-  async handleLeaveChannel(client: Socket, payload: ChannelDto) {
-    const username: string | undefined = this.chatService.getUsername(client.id)
+  async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
 
-    if (!username) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      const isInChan = await this.chatService.isInChannel(username, payload.channelName)
-      if (!isInChan)
-        this.server.to(client.id).emit('error', { message: 'not in channel' });
-      else {
-        this.chatService.leaveChannel(username, payload.channelName);
-        client.leave(payload.channelName);
-        this.server.to(client.id).emit('leave', { channelName: payload.channelName });
-        this.server.to(payload.channelName).emit('channelEvent', { user: username, event: 'leave' });
-      }
-    }
+    // Since `ChatGuard` has been applied we assume `username` is not undefined
+    const username: string = this.chatService.getUsername(client.id) as string
+
+    // TODO (?): try/catch
+    await this.chatService.leaveChannel(username, channel)
+
+    client.leave(channel)
+
+    // TODO: add listener for this event in the frontend
+    this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' })
+
+    return this.eventHandlerSuccess(client.id, username, channel, WsActionSuccess.LeaveChannel)
   }
 
   @SubscribeMessage('sendPost')
-  handlePost(client: Socket, payload: PostDto): void {
-    const username: string | undefined = this.chatService.getUsername(client.id)
+  async handlePost(@ConnectedSocket() client: Socket, @MessageBody() post: PostDto) {
 
-    if (!username) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      this.chatService.registerPost(username, payload);
-      const postEmit: PostEmitDto = { channelName: payload.channelName, content: payload.content, author: username };
-      this.server.to(payload.channelName).emit('post', postEmit);
-    }
+    // Since `ChatGuard` has been applied we assume `username` is not undefined
+    const username: string = this.chatService.getUsername(client.id) as string
+
+    // TODO (?): try/catch
+    await this.chatService.registerPost(username, post)
+
+    this.server.to(post.channelName).emit('post', {
+      channelName: post.channelName,
+      content: post.content,
+      author: username
+    } as PostEmitDto)
+
+    return this.eventHandlerSuccess(client.id, username, post.channelName, WsActionSuccess.Post)
   }
 
   afterInit() {
-    console.log('chatWebsocket: init');
+    this.logger.log(WsActionSuccess.Init)
   }
 
-  async handleConnection(client: Socket) {
-    const authHeader = client.request.headers.cookie;
+  // guard can't be applied here
+  // see https://github.com/nestjs/nest/issues/882
+  async handleConnection(@ConnectedSocket() client: Socket) {
 
-    if (!authHeader) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      const tokenData = await this.chatService.validateUser(authHeader);
-      const username: string | undefined = await this.chatService.addUser(client.id, tokenData);
+    const authHeader: string | undefined = client.request.headers.cookie
 
-      if (!username) {
-        this.server.to(client.id).emit('unauthorized', {user: client.id});
-        console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-      } else {
-        this.server.to(client.id).emit('welcome', {user: username});
-        const channels: ChannelEmitDto[] = await this.chatService.retrieveAllChannels();
-        for (const channel of channels)
-          this.server.to(client.id).emit('channel', channel);
-        console.log(`chatWebsocket: user ${username} connected`);
-      }
-    }
+    if (!authHeader)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.AuthCookieNotFound)
+
+    const tokenData: any = await this.chatService.validateUser(authHeader as string)
+    const username: string | undefined = await this.chatService.addUser(client.id, tokenData)
+
+    if (!username)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.UserNotFound)
+
+    return this.lifecycleHookSuccess(client.id, username, WsActionSuccess.Connect)
   }
 
-  async handleDisconnect(client: Socket) {
+  // guard can't be applied here
+  // see https://github.com/nestjs/nest/issues/882
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+
+    console.log('users:', this.chatService.users)
+
     const username: string | undefined = this.chatService.getUsername(client.id)
 
-    if (!username) {
-      this.server.to(client.id).emit('unauthorized', {user: client.id});
-      console.log(`chatWebsocket: client ${client.id} is unauthorized`);
-    } else {
-      const channels = await this.chatService.getUserChannels(username);
-      if (channels) {
-        for (const channel of channels) {
-          this.chatService.leaveChannel(username, channel.name);
-          this.server.to(channel.name).emit('channelEvent', { user: username, event: 'leave' });
-        }
-      }
-      this.chatService.removeUser(username);
-      console.log(`chatWebsocket: client ${username} disconnected`);
-    }
+    if (!username)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureReason.UserNotFound)
+
+    this.chatService.removeUser(username as string)
+
+    return this.lifecycleHookSuccess(client.id, username, WsActionSuccess.Disconnect)
   }
+
+  eventHandlerSuccess(id: string,  username: string, channel: string, action: WsActionSuccess) {
+    this.logger.log(`client ${id} (user ${username}) ${action} ${channel}` as WsHandlerSuccessServerLog)
+    return `${action} ${channel}` as WsHandlerSuccessClientLog
+  }
+
+  lifecycleHookFailure(id: string, action: WsActionFailure, reason: WsFailureReason) {
+    this.logger.warn(`client ${id} ${action}: ${reason}` as WsLifecycleHookFailureServerLog)
+    throw new WsException(`${action}: ${reason}` as WsLifecycleHookFailureClientLog)
+  }
+
+  lifecycleHookSuccess(id: string, username: string, action: WsActionSuccess) {
+    this.logger.log(`client ${id} (user ${username}) ${action}` as WsLifecycleHookSuccessServerLog)
+    return action as WsLifecycleHookSuccessClientLog
+  }
+
 }

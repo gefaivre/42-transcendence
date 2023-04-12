@@ -22,7 +22,7 @@
       return alert('error')
 
     try {
-      await axios.post('http://localhost:3000/auth/signup', createUserDto)
+      await axios.post('http://localhost:3000/auth/signup', createUserDto, { withCredentials: true })
       alert('Signup success. Now you can login.')
       createUserDto.username = null
       createUserDto.password = null

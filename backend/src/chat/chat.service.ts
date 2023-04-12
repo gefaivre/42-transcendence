@@ -8,9 +8,9 @@ import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { ChatUser } from './class/ChatUser';
-import { ChatChannel } from './class/ChatChannel';
 import { PostEmitDto } from './dto/post-emit.dto';
 import { ChannelEmitDto } from './dto/channel-emit-dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
@@ -30,33 +30,26 @@ export class ChatService {
     const user: User | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
+      this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
       this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
       return user.username;
     }
   }
 
+  // One username can link to multiple clients (this might/should change)
   removeUser(username: string) {
-    const toRemove: number = this.users.findIndex(user => user.username === username);
-    this.users.splice(toRemove, 1);
-  }
-
-  async createChannel(username: string, channelName: string) {
-    const user: ChatUser | undefined = this.users.find(user => user.username === username);
-
-    if (user) {
-      await this.channelService.create({name: channelName, ownerId:user.id})
-    }
+    this.users = this.users.filter(user => user.username !== username)
   }
 
   async joinChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     const channel: Channel | null = await this.channelService.findByName(channelName);
 
-    if (user && channel) 
-      this.channelService.addUserToChannel(channel.id, user.id);
+    if (user && channel)
+      await this.channelService.addUserToChannel(channel.id, user.id);
   }
 
-  async leaveChannel(channelName: string, username: string) {
+  async leaveChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     const channel: Channel | null = await this.channelService.findByName(channelName);
 
@@ -70,23 +63,15 @@ export class ChatService {
     const author: ChatUser | undefined = this.users.find(user => user.username === username);
 
     if (channel && author) {
-        this.postsService.create({content: payload.content, channelId: channel.id, authorId: author.id})
+        await this.postsService.create({content: payload.content, channelId: channel.id, authorId: author.id})
     }
   }
-  
+
   async isInChannel(username: string, channelName: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
-
-    if (user) {
-      const channels: Channel[] | null  = await this.channelService.findByUser(user.id);
-      if (channels) {
-        for (const channel of channels) {
-          if (channel.name  === channelName)
-            return true
-        }
-      }
-    }
-    return false
+    if (user === undefined)
+      return false
+    return await this.channelService.isInChannel(channelName, user.id)
   }
 
   async getUserChannels(username: string) {
@@ -100,7 +85,7 @@ export class ChatService {
   async retrieveAllChannels(): Promise<ChannelEmitDto[]> {
     let ret: ChannelEmitDto[] = [];
 
-    const channels: Channel[] = await this.channelService.findAll(); 
+    const channels: Channel[] = await this.channelService.findAll();
     for (const channel of channels) {
       ret.push({channelName: channel.name});
     }
@@ -116,16 +101,23 @@ export class ChatService {
       for (const post of posts) {
         const author: User | null = await this.usersService.findById(post.authorId);
         if (author)
-          ret.push({content: post.content, author: author.username, channelName: channelName}); 
+          ret.push({content: post.content, author: author.username, channelName: channelName});
       }
     }
     return ret;
   }
-  
+
   getUsername(clientId: string): string | undefined {
     const user = this.users.find(user => user.clientId === clientId);
     if (user)
       return user.username;
+  }
+
+  async verifyPassword(channelName: string, password: string): Promise<boolean> {
+    const channel = await this.channelService.findByName(channelName)
+    if (!channel)
+      return false
+    return bcrypt.compare(password, channel.password)
   }
 
 }
