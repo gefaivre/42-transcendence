@@ -48,9 +48,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     client.join(room)
 
-    // TODO: add listener for this event in the frontend
-    this.server.to(room).emit('channelEvent', { user: username, event: 'join' })
-
     const channelPosts: PostEmitDto[] = await this.chatService.retrieveChannelPosts(room)
     for (const post of channelPosts)
       client.emit('post', post)
@@ -67,6 +64,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // TODO (?): try/catch
     await this.chatService.joinChannel(username, channel.channelName)
 
+    this.server.to(channel.channelName).emit('channelEvent', { user: username, event: 'join' })
+
     return this.eventHandlerSuccess(client.id, username, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
@@ -81,7 +80,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     client.leave(channel)
 
-    // TODO: add listener for this event in the frontend
     this.server.to(channel).emit('channelEvent', { user: username, event: 'leave' })
 
     return this.eventHandlerSuccess(client.id, username, channel, WsActionSuccess.LeaveChannel)

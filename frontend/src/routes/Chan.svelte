@@ -105,6 +105,13 @@
       return pop()
     })
 
+    socket.on('channelEvent', (event: any) => {
+      if (event.event === 'join')
+        console.log(event.user, 'joined the chanel')
+      else if (event.event === 'leave')
+        console.log(event.user, 'left the chanel')
+    })
+
   })
 
   onDestroy(() => socket.disconnect())
