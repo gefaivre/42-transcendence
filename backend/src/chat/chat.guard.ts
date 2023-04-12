@@ -5,13 +5,17 @@ import { ChannelDto } from "./dto/channel-dto";
 import { PostDto } from "./dto/post-dto";
 import { WsException } from "@nestjs/websockets";
 import { WsActionFailure, WsFailureReason, WsHandlerFailureServerLog, WsHandlerFailureClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from "./types/types"
+import { ChannelService } from "src/channel/channel.service";
 
 @Injectable()
 export class ChatGuard implements CanActivate {
 
   private readonly logger: Logger = new Logger(ChatGuard.name, { timestamp: true })
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly channelService: ChannelService
+  ) {}
 
   eventHandlerFailure(id: string, username: string, channel: string, action: WsActionFailure, reason: WsFailureReason) {
     this.logger.warn(`client ${id} (user ${username}) ${action} ${channel}: ${reason}` as WsHandlerFailureServerLog)
@@ -32,13 +36,17 @@ export class ChatGuard implements CanActivate {
 
     if (handler === 'handleJoinChannel') {
 
+      // verify channel existence
       const channel: ChannelDto = context.getArgByIndex(1)
+      if (await this.channelService.findByName(channel.channelName) === null)
+        this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.ChannelNotFound)
+
+      // verify channel membership
       const isInChannel: boolean = await this.chatService.isInChannel(username, channel.channelName)
-
-      if (isInChannel === true) {
+      if (isInChannel === true)
         this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.UserAlreadyJoined)
-      }
 
+      // verify channel password
       else if (channel.status === 'Protected') {
         if (await this.chatService.verifyPassword(channel.channelName, channel.password) === false) {
           this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.WrongChannelPassword)
@@ -52,27 +60,42 @@ export class ChatGuard implements CanActivate {
     }
 
     else if (handler === 'handleJoinRoom') {
+
+      // verify channel existence
       const room: string = context.getArgByIndex(1)
+      if (await this.channelService.findByName(room) === null)
+        this.eventHandlerFailure(client.id, username, room, WsActionFailure.JoinRoom, WsFailureReason.ChannelNotFound)
+
+      // verify channel membership
       const isInChannel: boolean = await this.chatService.isInChannel(username, room)
-      if (isInChannel === false) {
+      if (isInChannel === false)
         this.eventHandlerFailure(client.id, username, room, WsActionFailure.JoinRoom, WsFailureReason.UserNotInChannel)
-      }
     }
 
     else if (handler === 'handleLeaveChannel') {
+
+      // verify channel existence
       const channel: string = context.getArgByIndex(1)
+      if (await this.channelService.findByName(channel) === null)
+        this.eventHandlerFailure(client.id, username, channel, WsActionFailure.LeaveChannel, WsFailureReason.ChannelNotFound)
+
+      // verify channel membership
       const isInChannel: boolean = await this.chatService.isInChannel(username, channel)
-      if (isInChannel === false) {
+      if (isInChannel === false)
         this.eventHandlerFailure(client.id, username, channel, WsActionFailure.LeaveChannel, WsFailureReason.UserNotInChannel)
-      }
     }
 
     else if (handler === 'sendPost') {
+
+      // verify channel existence
       const post: PostDto = context.getArgByIndex(1)
+      if (await this.channelService.findByName(post.channelName) === null)
+        this.eventHandlerFailure(client.id, username, post.channelName, WsActionFailure.Post, WsFailureReason.ChannelNotFound)
+
+      // verify channel membership
       const isInChannel: boolean = await this.chatService.isInChannel(username, post.channelName)
-      if (isInChannel === false) {
+      if (isInChannel === false)
         this.eventHandlerFailure(client.id, username, post.channelName, WsActionFailure.Post, WsFailureReason.UserNotInChannel)
-      }
     }
 
     return true

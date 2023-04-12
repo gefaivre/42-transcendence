@@ -21,6 +21,7 @@ export const enum WsActionFailure {
 
 export const enum WsFailureReason {
   UserNotFound = 'user not found',
+  ChannelNotFound = 'channel not found',
   UserNotInChannel = 'user not in channel',
   UserAlreadyJoined = 'user already in channel',
   WrongChannelPassword = 'wrong password',
