@@ -41,16 +41,6 @@ export class ChatService {
     this.users = this.users.filter(user => user.username !== username)
   }
 
-  async retrieveAllChannels(): Promise<ChannelEmitDto[]> {
-    let ret: ChannelEmitDto[] = [];
-
-    const channels: Channel[] = await this.channelService.findAll();
-    for (const channel of channels) {
-      ret.push({channelName: channel.name});
-    }
-    return ret;
-  }
-
   async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
     let ret: PostEmitDto[] = [];
     const channel: Channel | null = await this.channelService.findByName(channelName);
