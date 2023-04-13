@@ -9,3 +9,9 @@ export class PostDto {
   @IsString()
   channelName: string;
 }
+
+export class PostEmitDto extends PostDto {
+  @IsNotEmpty()
+  @IsString()
+  author: string;
+}
