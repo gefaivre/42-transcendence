@@ -31,7 +31,7 @@ export class ChatService {
 
     if (user) {
       this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
-      const chatUser: ChatUser = { username: user.username, id: user.id, socketId: socketId }
+      const chatUser: ChatUser = { username: user.username, prismaId: user.id, socketId: socketId }
       this.users.push(chatUser)
       return chatUser
     }

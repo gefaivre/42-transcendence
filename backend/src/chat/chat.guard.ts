@@ -43,7 +43,7 @@ export class ChatGuard implements CanActivate {
         this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(channel.channelName, user.id)
+      const isInChannel: boolean = await this.channelService.isInChannel(channel.channelName, user.prismaId)
       if (isInChannel === true)
         this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.UserAlreadyJoined)
 
@@ -68,7 +68,7 @@ export class ChatGuard implements CanActivate {
         this.eventHandlerFailure(client.id, user.username, room, WsActionFailure.JoinRoom, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(room, user.id)
+      const isInChannel: boolean = await this.channelService.isInChannel(room, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(client.id, user.username, room, WsActionFailure.JoinRoom, WsFailureReason.UserNotInChannel)
     }
@@ -81,7 +81,7 @@ export class ChatGuard implements CanActivate {
         this.eventHandlerFailure(client.id, user.username, channel, WsActionFailure.LeaveChannel, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(channel, user.id)
+      const isInChannel: boolean = await this.channelService.isInChannel(channel, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(client.id, user.username, channel, WsActionFailure.LeaveChannel, WsFailureReason.UserNotInChannel)
     }
@@ -94,7 +94,7 @@ export class ChatGuard implements CanActivate {
         this.eventHandlerFailure(client.id, user.username, post.channelName, WsActionFailure.Post, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(post.channelName, user.id)
+      const isInChannel: boolean = await this.channelService.isInChannel(post.channelName, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(client.id, user.username, post.channelName, WsActionFailure.Post, WsFailureReason.UserNotInChannel)
     }

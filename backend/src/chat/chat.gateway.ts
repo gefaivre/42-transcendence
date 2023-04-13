@@ -72,7 +72,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const channelId: number = (await this.channelService.findByName(channel.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.channelService.addUserToChannel(channelId, user.id);
+    await this.channelService.addUserToChannel(channelId, user.prismaId);
 
     this.server.to(channel.channelName).emit('channelEvent', { user: user.username, event: 'join' })
 
@@ -89,7 +89,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const channelId: number = (await this.channelService.findByName(channel))?.id as number
 
     // TODO (?): try/catch
-    await this.channelService.removeUserFromChannel(channelId, user.id)
+    await this.channelService.removeUserFromChannel(channelId, user.prismaId)
 
     client.leave(channel)
 
@@ -108,7 +108,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const channelId: number = (await this.channelService.findByName(post.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.id })
+    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.prismaId })
 
     this.server.to(post.channelName).emit('post', {
       channelName: post.channelName,
