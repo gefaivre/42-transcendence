@@ -59,7 +59,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     for (const post of channelPosts)
       client.emit('post', post)
 
-    return this.eventHandlerSuccess(client.id, user.username, room, WsActionSuccess.JoinRoom)
+    return this.eventHandlerSuccess(user, room, WsActionSuccess.JoinRoom)
   }
 
   @SubscribeMessage('joinChannel')
@@ -76,7 +76,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     this.server.to(channel.channelName).emit('channelEvent', { user: user.username, event: 'join' })
 
-    return this.eventHandlerSuccess(client.id, user.username, channel.channelName, WsActionSuccess.JoinChannel)
+    return this.eventHandlerSuccess(user, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
   @SubscribeMessage('leaveChannel')
@@ -95,7 +95,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     this.server.to(channel).emit('channelEvent', { user: user.username, event: 'leave' })
 
-    return this.eventHandlerSuccess(client.id, user.username, channel, WsActionSuccess.LeaveChannel)
+    return this.eventHandlerSuccess(user, channel, WsActionSuccess.LeaveChannel)
   }
 
   @SubscribeMessage('sendPost')
@@ -116,7 +116,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       author: user.username
     } as PostEmitDto)
 
-    return this.eventHandlerSuccess(client.id, user.username, post.channelName, WsActionSuccess.Post)
+    return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
   }
 
   afterInit() {
@@ -132,13 +132,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (!authHeader)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.AuthCookieNotFound)
 
-    const tokenData: any = await this.chatService.validateUser(authHeader as string)
-    const username: string | undefined = await this.chatService.addUser(client.id, tokenData)
+    const tokenData: any = await this.chatService.validateUser(authHeader)
+    const user: ChatUser | undefined = await this.chatService.addUser(client.id, tokenData)
 
-    if (!username)
+    if (user == undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.UserNotFound)
 
-    return this.lifecycleHookSuccess(client.id, username, WsActionSuccess.Connect)
+    return this.lifecycleHookSuccess(user, WsActionSuccess.Connect)
   }
 
   // guard can't be applied here
@@ -150,13 +150,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureReason.UserNotFound)
 
-    this.chatService.removeUser(user.username as string)
+    this.chatService.removeUser(user.username)
 
-    return this.lifecycleHookSuccess(client.id, user.username, WsActionSuccess.Disconnect)
+    return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)
   }
 
-  eventHandlerSuccess(id: string,  username: string, channel: string, action: WsActionSuccess) {
-    this.logger.log(`client ${id} (user ${username}) ${action} ${channel}` as WsHandlerSuccessServerLog)
+  eventHandlerSuccess(user: ChatUser, channel: string, action: WsActionSuccess) {
+    this.logger.log(`client ${user.clientId} (user ${user.username}) ${action} ${channel}` as WsHandlerSuccessServerLog)
     return `${action} ${channel}` as WsHandlerSuccessClientLog
   }
 
@@ -165,8 +165,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     throw new WsException(`${action}: ${reason}` as WsLifecycleHookFailureClientLog)
   }
 
-  lifecycleHookSuccess(id: string, username: string, action: WsActionSuccess) {
-    this.logger.log(`client ${id} (user ${username}) ${action}` as WsLifecycleHookSuccessServerLog)
+  lifecycleHookSuccess(user: ChatUser, action: WsActionSuccess) {
+    this.logger.log(`client ${user.clientId} (user ${user.username}) ${action}` as WsLifecycleHookSuccessServerLog)
     return action as WsLifecycleHookSuccessClientLog
   }
 

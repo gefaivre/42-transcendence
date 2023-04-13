@@ -26,13 +26,14 @@ export class ChatService {
     return this.authService.validateToken(token)
   }
 
-  async addUser(clientId: string, tokenData: any): Promise<string | undefined> {
+  async addUser(clientId: string, tokenData: any): Promise<ChatUser | undefined> {
     const user: User | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
-      this.users.push({ username: user!.username, id: user!.id, clientId: clientId })
-      return user.username;
+      const chatUser: ChatUser = { username: user.username, id: user.id, clientId: clientId }
+      this.users.push(chatUser)
+      return chatUser
     }
   }
 
