@@ -3,13 +3,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { ChannelService } from 'src/channel/channel.service';
 import { PostsService } from 'src/posts/posts.service';
 import { UsersService } from 'src/users/users.service';
-import { PostDto } from './dto/post-dto';
 import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { ChatUser } from './class/ChatUser';
 import { PostEmitDto } from './dto/post-emit.dto';
-import { ChannelEmitDto } from './dto/channel-emit-dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
