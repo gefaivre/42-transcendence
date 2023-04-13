@@ -12,7 +12,7 @@ import { ChannelService } from 'src/channel/channel.service';
 import { ChatUser } from './class/ChatUser';
 import { PostsService } from 'src/posts/posts.service';
 
-// TODO: extract `username` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
+// TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
 
 // For the moment, when an event handler succeed, backend returns a string.
