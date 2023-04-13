@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { ChatUser } from './class/ChatUser';
-import { PostEmitDto } from './dto/post-dto';
+import { PostEmitDto } from './dto/post.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

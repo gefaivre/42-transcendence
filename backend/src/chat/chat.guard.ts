@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, Logger } from "@nestjs/commo
 import { Socket } from 'socket.io'
 import { ChatService } from "./chat.service";
 import { ChannelDto } from "./dto/channel.dto";
-import { PostDto } from "./dto/post-dto";
+import { PostDto } from "./dto/post.dto";
 import { WsException } from "@nestjs/websockets";
 import { WsActionFailure, WsFailureReason, WsHandlerFailureServerLog, WsHandlerFailureClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from "./types/types"
 import { ChannelService } from "src/channel/channel.service";

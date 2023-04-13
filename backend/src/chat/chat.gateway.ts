@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
-import { PostDto, PostEmitDto } from './dto/post-dto';
+import { PostDto, PostEmitDto } from './dto/post.dto';
 import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ChannelDto } from './dto/channel.dto';
 import { ChatGuard } from './chat.guard';
