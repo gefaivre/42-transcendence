@@ -6,7 +6,7 @@ export class Room {
   game: Game;
   player1: PongUser;
   player2: PongUser | undefined;
-  watchers: string[];
+  watchers: PongUser[];
   start: boolean;
   ranked: boolean;
 }

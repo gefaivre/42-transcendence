@@ -16,21 +16,28 @@
   let rightScore: number = 0;
   let stop: boolean = true;
 
-  const socket = ioClient('http://localhost:3000', {path: '/pong'});
+  let inGame: boolean = false;
+
+  const socket = ioClient('http://localhost:3000', {
+    path: '/pong',
+    withCredentials: true
+    });
 
   onMount(() => {
     ctx = canvas.getContext("2d");
     draw();
 
-    socket.on('disconnectMessage', (side: string) => {
-      console.log(side + " has disconnected");
+    console.log('test');
+    socket.on('newPlayer', () => {
+      console.log("new player connected");
     });
     
-    socket.on('startMessage', () => {
-      console.log("start Message received");
+    socket.on('watchGame', () => {
+      console.log('watcherMode on');
     });
-
-    socket.on('gameStateMessage', (state) => {
+    
+    socket.on('gameState', (state) => {
+      inGame = true;
       stop = state.stop;
 
       leftScore = state.score.leftScore;
@@ -57,11 +64,9 @@
     draw();
   }
 
-  function startGame() {
-    socket.emit('start', {});
-  }
-
   function handleKeyup(e: KeyboardEvent) {
+    if (stop) 
+      return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
       e.preventDefault()
@@ -70,14 +75,14 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if (stop) 
+      return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
       e.preventDefault()
 
     socket.emit('control', { press: true, key: e.key });
   }
-  
-
   
   function drawPaddles() {
     ctx.fillStyle = "green";
@@ -100,14 +105,37 @@
     drawBall();
   };
 
+  function requestGame() {
+    socket.emit('requestGame', {});
+  }
+
+  function joinFriendly(event) {
+    const formData = new FormData(event.target);
+
+    for (let field of formData) {
+      const [key, value] = field;
+      if (key === 'friend') {
+        socket.emit('requestGame', { friend: value });
+      }
+    }
+  }
+
 </script>
 
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
+{#if !inGame}
+<button on:click={requestGame}>request random game</button>
+<form on:submit|preventDefault={(event) => joinFriendly(event)}>
+    <input id="friend" name="friend" type="text" placeholder="type friend username">
+    <button type="submit">play a friendly match</button>
+</form>
+{/if}
+
+
+{#if inGame}
 <p>{leftScore} - {rightScore}</p>
 <canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
-{#if stop}
-<button on:click|preventDefault={startGame}> START </button>
 {/if}
 
 <style>

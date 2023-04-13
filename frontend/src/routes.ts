@@ -12,6 +12,7 @@ import Game from './routes/Game.svelte'
 import Channels from './routes/Channels.svelte'
 import Signup from './routes/Signup.svelte'
 import Login from './routes/Login.svelte'
+import Pong from './routes/pong/Pong.svelte'
 
 export default {
     '/': Home,
@@ -27,5 +28,6 @@ export default {
     '/channel': Channel,
     '/message': Message,
     '/game': Game,
+    '/pong': Pong,
     '*': NotFound
 };

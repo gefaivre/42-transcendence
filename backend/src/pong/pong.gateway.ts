@@ -5,6 +5,7 @@ import { Interval } from '@nestjs/schedule';
 import { KeyEventDto } from './dto/key-event-dto';
 import { RequestGameDto } from './dto/request-game-dto';
 import { GameStateDto } from './dto/game-state-dto';
+import { GameDto } from './dto/game-dto';
 
 @WebSocketGateway({
     path: '/pong',
@@ -23,6 +24,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     const room: string | undefined = this.pongService.handleRequestGame(client.id, requestGameDto.friend);
+    this.server.to(client.id).emit('newPlayer', {});
     if (room) {
       client.join(room);
       this.server.to(room).emit('newPlayer', {});
@@ -35,9 +37,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('watchGame')
-  handleWatchGame(client: Socket, game: gameDto) {
-    this.pongService.handleWatchGame(client.id, game);
-    this.server.to(client.id).emit('watchGame', { response: true });
+  handleWatchGame(client: Socket, game: GameDto) {
+    const room: string | undefined = this.pongService.handleWatchGame(client.id, game);
+    if (room) {
+      client.join(room);
+      this.server.to(client.id).emit('watchGame', { response: true });
+    }
   }
 
   @Interval(1000 / 120)
@@ -63,6 +68,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log(`pongWebsocket: client ${client.id} is unauthorized`);
       } else {
         this.server.to(client.id).emit('welcome', { user: client.id });
+        const gameList : string[] = this.pongService.getGameList();
+        this.server.to(client.id).emit('gameList', { gameList: gameList });
         console.log(`pongWebsocket: user ${username} connected`);
       }
     }
@@ -71,8 +78,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     const room: string | undefined = await this.pongService.removeUser(client.id);
     if (room) {
-      client.leave(room);
       this.server.to(room).emit('disconnect', {});
+      client.leave(room);
     }
   }
 }
