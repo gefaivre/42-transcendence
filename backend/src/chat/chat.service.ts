@@ -66,12 +66,6 @@ export class ChatService {
     return ret;
   }
 
-  getUsername(clientId: string): string | undefined {
-    const user = this.users.find(user => user.clientId === clientId);
-    if (user)
-      return user.username;
-  }
-
   getUserBySocketId(id: string): ChatUser | undefined {
     return this.users.find(user => user.clientId === id)
   }

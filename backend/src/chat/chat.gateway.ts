@@ -50,8 +50,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
 
-    // Since `ChatGuard` has been applied we assume `username` is not undefined
-    const username: string = this.chatService.getUsername(client.id) as string
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
 
     client.join(room)
 
@@ -59,7 +59,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     for (const post of channelPosts)
       client.emit('post', post)
 
-    return this.eventHandlerSuccess(client.id, username, room, WsActionSuccess.JoinRoom)
+    return this.eventHandlerSuccess(client.id, user.username, room, WsActionSuccess.JoinRoom)
   }
 
   @SubscribeMessage('joinChannel')
@@ -145,16 +145,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // see https://github.com/nestjs/nest/issues/882
   async handleDisconnect(@ConnectedSocket() client: Socket) {
 
-    console.log('users:', this.chatService.users)
+    const user: ChatUser | undefined = this.chatService.getUserBySocketId(client.id)
 
-    const username: string | undefined = this.chatService.getUsername(client.id)
-
-    if (!username)
+    if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureReason.UserNotFound)
 
-    this.chatService.removeUser(username as string)
+    this.chatService.removeUser(user.username as string)
 
-    return this.lifecycleHookSuccess(client.id, username, WsActionSuccess.Disconnect)
+    return this.lifecycleHookSuccess(client.id, user.username, WsActionSuccess.Disconnect)
   }
 
   eventHandlerSuccess(id: string,  username: string, channel: string, action: WsActionSuccess) {
