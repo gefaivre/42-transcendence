@@ -12,8 +12,3 @@ export class ChannelDto {
   @IsString()
   password: string
 }
-
-export class CreateChannelDto extends ChannelDto {
-  @IsNotEmpty()
-  ownerId: number;
-}

@@ -36,6 +36,13 @@
 
   socket.on('exception', (e: WsException) => console.error(e))
 
+  socket.on('channelEvent', (event: any) => {
+    if (event.event === 'join')
+      console.log(event.user, 'joined the chanel')
+    else if (event.event === 'leave')
+      console.log(event.user, 'left the chanel')
+  })
+
   function joinChannel(channel: ChannelBis) {
       socket.emit('joinChannel', {
         channelName: channel.name,
