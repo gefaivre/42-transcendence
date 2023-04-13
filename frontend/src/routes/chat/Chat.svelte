@@ -44,14 +44,22 @@
   })
 
   function joinChannel(channel: ChannelBis) {
-      socket.emit('joinChannel', {
-        channelName: channel.name,
-        status: channel.status,
-        password: ''
-      } as ChannelDto, (response: any) => {
-        console.log(response)
-        joinRoom(channel.name)
-      })
+    let password: string = ''
+    if (channel.status === 'Protected') {
+      password = prompt('Enter password')
+      if (password === '')
+        return console.error(`Unable to join channel ${channel.name}: Empty password.`)
+      if (!password)
+        return console.error(`Unable to join channel ${channel.name}: No password provided.`)
+    }
+    socket.emit('joinChannel', {
+      channelName: channel.name,
+      status: channel.status,
+      password: password
+    } as ChannelDto, (response: any) => {
+      console.log(response)
+      joinRoom(channel.name)
+    })
   }
 
   function joinRoom(channelName: string) {
