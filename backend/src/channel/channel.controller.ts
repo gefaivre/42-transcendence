@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException, UnprocessableEntityException, ConsoleLogger, ParseIntPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { CreateChannelDto } from 'src/chat/dto/channel.dto';
+import { CreateChannelDto } from './dto/create-channel.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -8,7 +8,7 @@ import { UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { UsersService } from './../users/users.service';
-import { ChannelDto } from 'src/chat/dto/channel.dto';
+import { ChannelDto } from './dto/channel.dto';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
