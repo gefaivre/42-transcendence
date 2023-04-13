@@ -41,13 +41,6 @@ export class ChatService {
     this.users = this.users.filter(user => user.username !== username)
   }
 
-  async isInChannel(username: string, channelName: string) {
-    const user: ChatUser | undefined = this.users.find(user => user.username === username);
-    if (user === undefined)
-      return false
-    return await this.channelService.isInChannel(channelName, user.id)
-  }
-
   async getUserChannels(username: string) {
     const user: ChatUser | undefined = this.users.find(user => user.username === username);
     if (user) {
@@ -85,6 +78,10 @@ export class ChatService {
     const user = this.users.find(user => user.clientId === clientId);
     if (user)
       return user.username;
+  }
+
+  getUserBySocketId(id: string): ChatUser | undefined {
+    return this.users.find(user => user.clientId === id)
   }
 
   async verifyPassword(channelName: string, password: string): Promise<boolean> {

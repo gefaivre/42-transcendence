@@ -6,6 +6,7 @@ import { PostDto } from "./dto/post-dto";
 import { WsException } from "@nestjs/websockets";
 import { WsActionFailure, WsFailureReason, WsHandlerFailureServerLog, WsHandlerFailureClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from "./types/types"
 import { ChannelService } from "src/channel/channel.service";
+import { ChatUser } from "./class/ChatUser";
 
 @Injectable()
 export class ChatGuard implements CanActivate {
@@ -26,10 +27,10 @@ export class ChatGuard implements CanActivate {
 
     const handler: string = context.getHandler().name
     const client: Socket = context.switchToWs().getClient<Socket>()
-    const username: string | undefined = this.chatService.getUsername(client.id)
+    const user: ChatUser | undefined = this.chatService.getUserBySocketId(client.id)
 
     // yes, this is a `lifecycleHookFailure()` doppelganger even if we not into a lifecycle hook
-    if (!username) {
+    if (user === undefined) {
       this.logger.warn(`client ${client.id} ${WsActionFailure.Connect}: ${WsFailureReason.UserNotFound}` as WsLifecycleHookFailureServerLog)
       throw new WsException(`${WsActionFailure.Connect}: ${WsFailureReason.UserNotFound}` as WsLifecycleHookFailureClientLog)
     }
@@ -39,23 +40,23 @@ export class ChatGuard implements CanActivate {
       // verify channel existence
       const channel: ChannelDto = context.getArgByIndex(1)
       if (await this.channelService.findByName(channel.channelName) === null)
-        this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.ChannelNotFound)
+        this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.chatService.isInChannel(username, channel.channelName)
+      const isInChannel: boolean = await this.channelService.isInChannel(channel.channelName, user.id)
       if (isInChannel === true)
-        this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.UserAlreadyJoined)
+        this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.UserAlreadyJoined)
 
       // verify channel password
       else if (channel.status === 'Protected') {
         if (await this.chatService.verifyPassword(channel.channelName, channel.password) === false) {
-          this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.WrongChannelPassword)
+          this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.WrongChannelPassword)
         }
       }
 
       // TODO
       else if (channel.status === 'Private') {
-        this.eventHandlerFailure(client.id, username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.PrivateChannel)
+        this.eventHandlerFailure(client.id, user.username, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.PrivateChannel)
       }
     }
 
@@ -64,12 +65,12 @@ export class ChatGuard implements CanActivate {
       // verify channel existence
       const room: string = context.getArgByIndex(1)
       if (await this.channelService.findByName(room) === null)
-        this.eventHandlerFailure(client.id, username, room, WsActionFailure.JoinRoom, WsFailureReason.ChannelNotFound)
+        this.eventHandlerFailure(client.id, user.username, room, WsActionFailure.JoinRoom, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.chatService.isInChannel(username, room)
+      const isInChannel: boolean = await this.channelService.isInChannel(room, user.id)
       if (isInChannel === false)
-        this.eventHandlerFailure(client.id, username, room, WsActionFailure.JoinRoom, WsFailureReason.UserNotInChannel)
+        this.eventHandlerFailure(client.id, user.username, room, WsActionFailure.JoinRoom, WsFailureReason.UserNotInChannel)
     }
 
     else if (handler === 'handleLeaveChannel') {
@@ -77,12 +78,12 @@ export class ChatGuard implements CanActivate {
       // verify channel existence
       const channel: string = context.getArgByIndex(1)
       if (await this.channelService.findByName(channel) === null)
-        this.eventHandlerFailure(client.id, username, channel, WsActionFailure.LeaveChannel, WsFailureReason.ChannelNotFound)
+        this.eventHandlerFailure(client.id, user.username, channel, WsActionFailure.LeaveChannel, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.chatService.isInChannel(username, channel)
+      const isInChannel: boolean = await this.channelService.isInChannel(channel, user.id)
       if (isInChannel === false)
-        this.eventHandlerFailure(client.id, username, channel, WsActionFailure.LeaveChannel, WsFailureReason.UserNotInChannel)
+        this.eventHandlerFailure(client.id, user.username, channel, WsActionFailure.LeaveChannel, WsFailureReason.UserNotInChannel)
     }
 
     else if (handler === 'sendPost') {
@@ -90,12 +91,12 @@ export class ChatGuard implements CanActivate {
       // verify channel existence
       const post: PostDto = context.getArgByIndex(1)
       if (await this.channelService.findByName(post.channelName) === null)
-        this.eventHandlerFailure(client.id, username, post.channelName, WsActionFailure.Post, WsFailureReason.ChannelNotFound)
+        this.eventHandlerFailure(client.id, user.username, post.channelName, WsActionFailure.Post, WsFailureReason.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.chatService.isInChannel(username, post.channelName)
+      const isInChannel: boolean = await this.channelService.isInChannel(post.channelName, user.id)
       if (isInChannel === false)
-        this.eventHandlerFailure(client.id, username, post.channelName, WsActionFailure.Post, WsFailureReason.UserNotInChannel)
+        this.eventHandlerFailure(client.id, user.username, post.channelName, WsActionFailure.Post, WsFailureReason.UserNotInChannel)
     }
 
     return true
