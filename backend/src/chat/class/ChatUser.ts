@@ -1,5 +1,5 @@
 export class ChatUser {
   id: number;
-  clientId: string;
+  socketId: string;
   username: string;
 }

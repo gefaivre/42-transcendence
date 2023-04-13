@@ -51,7 +51,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+    const user: ChatUser = this.chatService.users.find(user => user.socketId === client.id) as ChatUser
 
     client.join(room)
 
@@ -66,7 +66,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+    const user: ChatUser = this.chatService.users.find(user => user.socketId === client.id) as ChatUser
 
     // Since `ChatGuard` has been applied we assume the channel exists
     const channelId: number = (await this.channelService.findByName(channel.channelName))?.id as number
@@ -83,7 +83,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+    const user: ChatUser = this.chatService.users.find(user => user.socketId === client.id) as ChatUser
 
     // Since `ChatGuard` has been applied we assume the channel exists
     const channelId: number = (await this.channelService.findByName(channel))?.id as number
@@ -102,7 +102,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handlePost(@ConnectedSocket() client: Socket, @MessageBody() post: PostDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chatService.users.find(user => user.clientId === client.id) as ChatUser
+    const user: ChatUser = this.chatService.users.find(user => user.socketId === client.id) as ChatUser
 
     // Since `ChatGuard` has been applied we assume the channel exists
     const channelId: number = (await this.channelService.findByName(post.channelName))?.id as number
@@ -156,7 +156,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   eventHandlerSuccess(user: ChatUser, channel: string, action: WsActionSuccess) {
-    this.logger.log(`client ${user.clientId} (user ${user.username}) ${action} ${channel}` as WsHandlerSuccessServerLog)
+    this.logger.log(`client ${user.socketId} (user ${user.username}) ${action} ${channel}` as WsHandlerSuccessServerLog)
     return `${action} ${channel}` as WsHandlerSuccessClientLog
   }
 
@@ -166,7 +166,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   lifecycleHookSuccess(user: ChatUser, action: WsActionSuccess) {
-    this.logger.log(`client ${user.clientId} (user ${user.username}) ${action}` as WsLifecycleHookSuccessServerLog)
+    this.logger.log(`client ${user.socketId} (user ${user.username}) ${action}` as WsLifecycleHookSuccessServerLog)
     return action as WsLifecycleHookSuccessClientLog
   }
 

@@ -26,12 +26,12 @@ export class ChatService {
     return this.authService.validateToken(token)
   }
 
-  async addUser(clientId: string, tokenData: any): Promise<ChatUser | undefined> {
+  async addUser(socketId: string, tokenData: any): Promise<ChatUser | undefined> {
     const user: User | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
-      const chatUser: ChatUser = { username: user.username, id: user.id, clientId: clientId }
+      const chatUser: ChatUser = { username: user.username, id: user.id, socketId: socketId }
       this.users.push(chatUser)
       return chatUser
     }
@@ -58,7 +58,7 @@ export class ChatService {
   }
 
   getUserBySocketId(id: string): ChatUser | undefined {
-    return this.users.find(user => user.clientId === id)
+    return this.users.find(user => user.socketId === id)
   }
 
   async verifyPassword(channelName: string, password: string): Promise<boolean> {
