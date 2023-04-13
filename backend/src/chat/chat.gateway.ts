@@ -4,7 +4,7 @@ import { ChatService } from './chat.service';
 import { PostDto } from './dto/post-dto';
 import { PostEmitDto } from './dto/post-emit.dto';
 import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ChannelDto } from './dto/channel-dto';
+import { ChannelDto } from './dto/channel.dto';
 import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureReason, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from './types/types';
 import { BadRequestTransformationFilter } from './chat.filter';
