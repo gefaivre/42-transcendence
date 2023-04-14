@@ -21,7 +21,7 @@ export class ImagesController {
         if (request.user == undefined)
           return "You shall not pass";
         var fs = require('fs');
-        const directory  = `/app/images/${request.user.id}`
+        const directory  = `/app/images/${request.user}`
         if (!fs.existsSync(directory)){
             fs.mkdirSync(directory);
         }

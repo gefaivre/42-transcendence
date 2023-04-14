@@ -25,7 +25,6 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
-    draw();
 
     console.log('test');
     socket.on('newPlayer', () => {
@@ -37,8 +36,12 @@
     });
     
     socket.on('gameState', (state) => {
+      if (!inGame)
+        game_loop();
       inGame = true;
       stop = state.stop;
+      if (stop)
+        inGame = false
 
       leftScore = state.score.leftScore;
       rightScore = state.score.rightScore;
@@ -53,7 +56,6 @@
       ball.posy = state.ball.posy;
     });
     
-    game_loop();
     return () => {
       cancelAnimationFrame(animationId);
     };
@@ -132,11 +134,10 @@
 </form>
 {/if}
 
-
 {#if inGame}
 <p>{leftScore} - {rightScore}</p>
-<canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
 {/if}
+<canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
 
 <style>
 
