@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChannelStatus {
+  Public
+  Private
+  Protected
+}
+
 model User {
   id             Int       @id @default(autoincrement())
   username       String    @unique
@@ -46,6 +52,8 @@ model Channel {
   admins      User[] @relation("channel_admins")
   users       User[] @relation("channel_users")
   posts       Post[]
+  status      ChannelStatus
+  password    String
 }
 
 model Match {
@@ -65,6 +73,6 @@ model Post {
   content   String
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
-  channel   Channel @relation(fields: [channelId], references: [id])
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int
 }

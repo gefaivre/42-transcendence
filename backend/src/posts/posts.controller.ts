@@ -31,4 +31,11 @@ export class PostsController {
   remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
   }
+
+  // TODO: get rid of parseInt()
+  @Get('/channel/:id')
+  findByChannel(@Param('id') id: string) {
+    return this.postsService.findByChannel(parseInt(id))
+  }
+
 }

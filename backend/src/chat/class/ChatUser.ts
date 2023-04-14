@@ -1,5 +1,5 @@
 export class ChatUser {
-  id: number;
-  clientId: string;
+  prismaId: number;
+  socketId: string;
   username: string;
 }

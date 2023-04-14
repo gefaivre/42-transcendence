@@ -1,4 +1,4 @@
-import { ImATeapotException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -11,17 +11,20 @@ export class ChannelService {
   constructor(private prisma: PrismaService){}
 
   async create(createChannelDto: CreateChannelDto) {
-    if (await this.findByName(createChannelDto.name))
-      return "Channel " + createChannelDto.name + " already exist";
-    await this.prisma.channel.create({
-      data: {
-        name: createChannelDto.name,
-        ownerId: createChannelDto.ownerId,
-        admins: { connect: [{ id: createChannelDto.ownerId }] },
-        //users: { connect: [{ id: createChannelDto.ownerId }] }
-      }
-    })
-    return 'New channel add! :  ' + createChannelDto.name;
+    try {
+      const channel = await this.prisma.channel.create({
+        data: {
+          name: createChannelDto.channelName,
+          ownerId: createChannelDto.ownerId,
+          admins: { connect: [{ id: createChannelDto.ownerId }] },
+          status: createChannelDto.status,
+          password: createChannelDto.password
+        }
+      })
+      return channel
+    } catch (error) {
+      return null
+    }
   }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
 
   async findAll() {
@@ -29,7 +32,8 @@ export class ChannelService {
       include: {
         owner: true,
         users: true,
-        admins: true
+        admins: true,
+        posts: true
       }
     });
   }
@@ -42,12 +46,13 @@ export class ChannelService {
       include: {
         owner: true,
         users: true,
-        admins: true
+        admins: true,
+        posts: true
       }
     });
   }
 
-  async findByName(name: string) {
+  findByName(name: string) {
     return this.prisma.channel.findFirst({
       where: {
         name: name
@@ -55,7 +60,8 @@ export class ChannelService {
       include: {
         owner: true,
         users: true,
-        admins: true
+        admins: true,
+        posts: true
       }
     });
   }
@@ -72,11 +78,20 @@ export class ChannelService {
     })
   }
 
+  async isInChannel(channelName: string, userId: number) {
+    const channel = await this.findByName(channelName)
+    if (channel)
+      for (const user of channel.users)
+        if (user.id == userId)
+          return true
+    return false
+  }
+
   async update(id: number, updateChannelDto: UpdateChannelDto) {
     return await this.prisma.channel.update({
       where: {id: id},
       data: {
-        name: updateChannelDto.name,
+        name: updateChannelDto.channelName,
         ownerId: updateChannelDto.ownerId,
       },
     });
@@ -181,7 +196,7 @@ export class ChannelService {
     });
     return updatedChannel;
   }
-  
+
   async remove(id: number) {
     return await this.prisma.channel.delete({
       where:
@@ -195,39 +210,27 @@ export class ChannelService {
     return await this.prisma.channel.deleteMany();
   }
 
-  async removeUserFromChannel(channelId: number, userId: number) {//utiliser les anciennes plutot
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId }
-    }); //const channel = this.findOne(channelId)
-
-    if (!channel) {
-      //throw new NotFoundException(`Channel with ID ${channelId} not found`);
-      return "wrong channel";
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
-      return "wrong user";
-      //throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-    
-
-    const updatedChannel = await this.prisma.channel.update({
-      where: { id: channelId },
-      data: {
-        users: {
-          disconnect: { id: userId }
+  async removeUserFromChannel(chanId: number, userId: number): Promise<boolean> {
+    try {
+      await this.prisma.channel.update({
+        where: {
+          id: chanId
+        },
+        data: {
+          users: {
+            disconnect: { id: userId }
+          }
+        },
+        include: {
+          users: true
         }
-      },
-      include: { users: true }
-    });
-    return updatedChannel;
-    //return user.username + "  has been disconect from " + channel.name;
-    //return updatedChannel;
-  }
+      })
+      return true
+    } catch(error) {
+      console.log(error)
+      return false
+    }
+}
 
   async safeRemoveUserFromChannel(channelId: number, userId: number, requestingUserId: number): Promise<void> {
     const channel = await this.prisma.channel.findUnique({
@@ -256,6 +259,5 @@ export class ChannelService {
       data: { users: { disconnect: { id: userId } } },
     });
   }
-
 
 }

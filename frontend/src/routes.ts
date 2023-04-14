@@ -16,12 +16,14 @@ import Login from './routes/Login.svelte'
 import UserProfile from './routes/UserProfile.svelte';
 import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
+import ThomasChan from './routes/Chan.svelte'
 
 export default {
     '/': Home,
     '/signup': Signup,
     '/login': Login,
     '/chat': Chat,
+    '/channel/:name': ThomasChan,
     '/UserCRUD': UserCRUD,
     '/Channels': Channels,
     '/leaderboard': Leaderboard,
