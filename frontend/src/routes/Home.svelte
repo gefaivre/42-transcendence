@@ -2,21 +2,29 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { id, logged } from "../stores";
+    import type { User } from '../types'
 
     // TODO: typedef
-    let user = { id: null }
+    let user: User = {
+        username: '',
+        password: '',
+        mmr: 0,
+        games: 0,
+        ft_login: '',
+        id : 0
+    }
 
     onMount(() => getProfile())
 
     async function getProfile() {
       try {
-        const response = await
-        axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
+        let response = await axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
         user = response.data // TODO: typedef
         logged.set('true')
         id.set(response.data.id.toString())
+        response = await axios.get(`http://localhost:3000/users/id/${user.id}`, { withCredentials: true })
+        user = response.data
       } catch (error) {
-        user.id = null
         logged.set('false')
         id.set('0')
       }
@@ -53,7 +61,7 @@
         <button on:click={logout}>logout</button>
         <br>
         <br>
-        <p>You successfully authenticated as user n.<b>{user.id}</b></p>
+        <p>You successfully authenticated as <a href="#/users/{user.username}">{user.username}</a></p>
     {:else}
         <a href={FT_AUTHORIZE} style="font-size: 30px;">Signin with 42</a>
         <br>

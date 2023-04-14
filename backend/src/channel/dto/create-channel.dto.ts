@@ -1,20 +1,7 @@
-import {
-    IsNotEmpty,
-    IsInt,
-    IsBoolean,
-    IsDate,
-    Min,
-    Max,
-    IsString,
-  } from 'class-validator';
-export class CreateChannelDto {
-    @IsNotEmpty()
-    @IsString()
-    name: string;
+import { IsNotEmpty } from 'class-validator'
+import { ChannelDto } from 'src/channel/dto/channel.dto';
 
-    @IsNotEmpty()
-    @IsInt()
-    ownerId: number;
-
-
+export class CreateChannelDto extends ChannelDto {
+  @IsNotEmpty()
+  ownerId: number;
 }

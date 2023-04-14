@@ -10,12 +10,13 @@ import { MatchsModule } from './matchs/matchs.module';
 import { AuthModule } from './auth/auth.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { ChannelModule } from './channel/channel.module';
+import { ImagesModule } from './images/images.module';
 import { PostsModule } from './posts/posts.module';
-
+import { ImagesService } from './images/images.service';
 
 @Module({
-  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule, ChatModule, PostsModule, PongModule],
+  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, LeaderboardModule, ChannelModule, ChatModule, PostsModule, ImagesModule, PongModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService, ImagesService]
 })
 export class AppModule {}

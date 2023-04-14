@@ -10,12 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChannelStatus {
+  Public
+  Private
+  Protected
+}
+
 model User {
   id             Int       @id @default(autoincrement())
   username       String    @unique
   password       String
   games          Int
   mmr            Int
+  images         Image[]
   ft_login       String?   @unique
   wins           Match[]   @relation("winner")
   loses          Match[]   @relation("loser")
@@ -24,6 +31,16 @@ model User {
   bannedChannels Channel[] @relation("channel_banned_users")
   adminChannels  Channel[] @relation("channel_admins")
   posts          Post[]
+}
+
+model Image {
+  id             Int     @id @default(autoincrement())
+  name           String?
+  link           String
+  createdAt      DateTime   @default(now())
+  lastuse        DateTime   @default(now())
+  User   User?   @relation(fields: [userId], references: [id])
+  userId Int?
 }
 
 model Channel {
@@ -35,14 +52,16 @@ model Channel {
   admins      User[] @relation("channel_admins")
   users       User[] @relation("channel_users")
   posts       Post[]
+  status      ChannelStatus
+  password    String
 }
 
 model Match {
-  id          Int       @id @default(autoincrement())
-  winner      User      @relation(name: "winner", fields: [winnerId], references: [id])
+  id          Int      @id @default(autoincrement())
+  winner      User     @relation(name: "winner", fields: [winnerId], references: [id])
   winnerId    Int
   winnerScore Int
-  loser       User      @relation(name: "loser", fields: [loserId], references: [id])
+  loser       User     @relation(name: "loser", fields: [loserId], references: [id])
   loserId     Int
   loserScore  Int
   date        DateTime
@@ -54,6 +73,6 @@ model Post {
   content   String
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
-  channel   Channel @relation(fields: [channelId], references: [id])
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int
 }

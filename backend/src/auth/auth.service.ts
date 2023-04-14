@@ -30,7 +30,6 @@ export class AuthService {
       })
       return res.data.access_token
     } catch (error) {
-        console.log(error.response.data)
         return null
     }
   }
