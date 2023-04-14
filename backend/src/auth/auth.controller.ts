@@ -115,7 +115,7 @@ export class AuthController {
   getProfile(@Req() request: any) {
     return request.user;
   }
-  
+
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
   getUser(@Req() request: any) {
