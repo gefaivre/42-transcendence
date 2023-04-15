@@ -7,13 +7,24 @@
   import type { User } from "../types";
   import ChangePp from "./userImages/ChangePp.svelte";
 
-    let user: User = {
+    type Friends = {
+      friends: { id: number, username: string }[]
+      friendOf: { id: number, username: string }[]
+      pendingFriends: { id: number, username: string }[]
+      requestFriends: { id: number, username: string }[]
+    }
+
+    let user: User & Friends = {
         id: 0,
         username: null,
         password: null,
         mmr: null,
         games: null,
-        ft_login: null
+        ft_login: null,
+        friends: [],
+        friendOf: [],
+        pendingFriends: [],
+        requestFriends: [],
     }
 
     let username: string = null
@@ -23,7 +34,7 @@
 
     export let params: any = { }
 
-    onMount(async () => await getUser())
+    onMount(async () => { await getUser(); console.log(user) })
 
     async function getUser() {
         user = (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
@@ -93,6 +104,91 @@
       }
     }
 
+    async function requestFriendship() {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/request/${user.id}`, null, { withCredentials: true })
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function acceptFriendshipRequestById() {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/acceptById/${user.id}`, null, { withCredentials: true })
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function acceptFriendshipRequestByName(name: string) {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function dismissFriendshipRequestById() {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/dismissById/${user.id}`, null, { withCredentials: true })
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function dismissFriendshipRequestByName(name: string) {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/dismissByName/${name}`, null, { withCredentials: true })
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function cancelFriendshipRequestById() {
+      try {
+        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${user.id}`, null, { withCredentials: true })
+        console.log(cancel)
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function cancelFriendshipRequestByName(name: string) {
+      try {
+        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelByName/${name}`, null, { withCredentials: true })
+        console.log(cancel)
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function removeFriendById() {
+      try {
+        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${user.id}`, null, { withCredentials: true })
+        console.log(cancel)
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function removeFriendByName(name: string) {
+      try {
+        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeByName/${name}`, null, { withCredentials: true })
+        console.log(cancel)
+        getUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
 </script>
 
 {#if $logged === 'true'}
@@ -122,6 +218,17 @@
             <tr>
                 <td>42 login</td> <td>{user.ft_login}</td>
             </tr>
+            <tr>
+                <td>Friends</td>
+                <td>
+                  {#each user.friends as friend}
+                    {friend.username}
+                    {#if $id === user.id.toString()}
+                      <button on:click={() => removeFriendByName(friend.username)}>remove</button>
+                    {/if}
+                  {/each}
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -134,6 +241,38 @@
       <br>
       <input type="text" placeholder="new password" bind:value={password}>
       <button on:click={updatePassword}>Update</button>
+      <br>
+      <br>
+      <ul>
+      {#each user.requestFriends as requestFriends}
+        <li>
+          <b>{requestFriends?.username}</b> requested you as friend
+          <button on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>Accept</button>
+          <button on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>Dismiss</button>
+        </li>
+      {/each}
+      </ul>
+      <br>
+      <ul>
+      {#each user.pendingFriends as pendingFriends}
+        <li>
+          You requested <b>{pendingFriends?.username}</b> as friend
+          <button on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>Cancel</button>
+        </li>
+      {/each}
+      </ul>
+    {:else if user.friends.some(user => user.id.toString() === $id)}
+      This user is your friend !
+      <button on:click={removeFriendById}>Remove</button>
+    {:else if user.requestFriends.some(user => user.id.toString() === $id)}
+      Pending friend invitation...
+      <button on:click={cancelFriendshipRequestById}>Cancel</button>
+    {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
+      This user requested you as friend
+      <button on:click={acceptFriendshipRequestById}>Accept</button>
+      <button on:click={dismissFriendshipRequestById}>Dismiss</button>
+    {:else}
+      <button on:click={requestFriendship}>Request friendship</button>
     {/if}
 
 {:else}
