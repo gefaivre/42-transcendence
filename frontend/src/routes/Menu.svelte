@@ -7,6 +7,10 @@
     import logo         from '../assets/testPong.png'
     import Layout from "./Layout.svelte";
 
+    export let user;
+
+    console.log(user);
+
   </script>
 
   <style>
@@ -20,6 +24,4 @@
   }
  </style>
 
- <Layout>
   <img class=logo src={logo} alt=pong>
- </Layout>

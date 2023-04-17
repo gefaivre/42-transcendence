@@ -8,8 +8,16 @@
     import uploadImg from '../assets/upload.png';
     import { getContext } from 'svelte'
     import type { User } from "../types";
+    import { userStore } from "../stores";
 
-    let user: User;
+    // export let user: User;
+
+
+    export let user;
+
+
+    console.log("Store in Profil = ", user);
+
 
 
     let game = [];
@@ -17,30 +25,23 @@
     let avatar, fileinput;
 
     avatar = "https://flowbite.com/docs/images/people/profile-picture-5.jpg";
+
     const onFileSelected = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(image);
-    reader.onload = e => {
-      avatar = e.target.result;
+        let image = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e => {
+        avatar = e.target.result;
     };
   }
 
-  function toggle() {
-    if (!toggleValue)
-    toggleValue == 1;
-    else
-    toggleValue ==0;
-    console.log(toggleValue);
+    function toggle() {
+        if (!toggleValue)
+        toggleValue == 1;
+        else
+        toggleValue ==0;
+        console.log(toggleValue);
     }
-
-    // onMount(async () => {
-    // game = MatchHistory;
-    console.log(game);
-    user = getContext('user')
-    console.log("USER +++++++++++++")
-    console.log("USER ==================",user)
-    // });
 
 </script>
 

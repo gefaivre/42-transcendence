@@ -6,6 +6,9 @@
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
 
+    export let user;
+    console.log(user);
+
   </script>
 
   <style>
@@ -19,7 +22,6 @@
   }
  </style>
 
- <Layout>
     <div class=toDo >
         <ul>To do: <ul>
             <li>sidebar avec toute les channels</li>
@@ -27,4 +29,3 @@
             <li>sidebar avec les users?</li>
             <li>ou alors les friends ici</li>
     </div>
- </Layout>

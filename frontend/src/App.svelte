@@ -3,77 +3,83 @@
     export const title = 'Mon titre';
 
     import axios from "axios";
-    import { onMount } from "svelte";
+    import { onMount, setContext } from "svelte";
     import type { User } from "./types";
-    import { setContext } from 'svelte'
     //import groupe from "../../icons/groupe.png"'
     import channelIcon  from './assets/whiteChannel.png';
     import homeIcon     from './assets/whiteHome.png'
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
-    import Router from "svelte-spa-router";
-    import Users from "./routes/Users.svelte";
-    import Leaderboard from "./routes/Leaderboard.svelte";
-    import UserCrud from "./routes/UserCRUD.svelte";
-    import Channels from "./routes/Channels.svelte";
-    import Chat from "./routes/chat/Chat.svelte";
+    import { id, logged } from "./stores";
     import Profil from "./routes/Profil.svelte";
-
+    import Home from "./routes/Home.svelte";
+    import Menu from "./routes/Menu.svelte";
+    import Channel from "./routes/Channel.svelte";
+    import Message from "./routes/Message.svelte";
+    import Game from "./routes/Game.svelte";
 
     let user: User;
-
-    let groupeImage = "../assets/groupe.png"
+    let component = Menu;
 
     const menuItems = [
-      { label: 'Home', icon: homeIcon, link: '#/Menu' },
-      { label: 'Channel', icon: channelIcon, link: '#/Channel' },
-      { label: 'Messages', icon: messageIcon, link: '#/Message' },
-      { label: 'Game', icon: gameIcon, link: '#/Game' }
+      { label: 'Home', icon: homeIcon, link: '#/Menu', component: Menu},
+      { label: 'Channel', icon: channelIcon, link: '#/Channel', component: Channel },
+      { label: 'Messages', icon: messageIcon, link: '#/Message', component:  Message },
+      { label: 'Game', icon: gameIcon, link: '#/Game', component:  Game }
     ];
 
-    onMount(async () => {
+    onMount(() => getProfile())
+
+    async function getProfile() {
       try {
-          const response = await axios.get('http://localhost:3000/auth/whoami', {
-              withCredentials: true
-            });
-            user = response.data;
-            console.log(user);
-            console.log(user.id);
-            setContext('user', user)
+        let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
+        user = response.data // TODO: typedef
+        console.log(user)
+        logged.set('true')
+        id.set(response.data.id.toString())
       } catch (error) {
-        console.error(error);
+        logged.set('false')
+        id.set('0')
       }
-    });
+    }
+
+    async function set_component(name: any) {
+      component = name;
+    }
 
 
   </script>
 
+  {#if $logged === 'true'}
     <div class="menu">
-      <a class= testLink href="#/profil">
+      <a on:click={() => set_component(Profil)}  class= testLink href="#/profil">
         {#if user}
             <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{user.id}' alt="Rounded avatar">
         {/if}
       </a>
 
-      {#each menuItems as item, i}
-      <a href={item.link}>
-
-        <img class="menu-item-image" src={item.icon} alt={item.label} />
+      {#each menuItems as item}
+      <a on:click={() => set_component(item.component)} href={item.link}>
+        <img  class="menu-item-image" src={item.icon} alt={item.label} />
       </a>
       {/each}
     </div>
 
+    <svelte:component this={component} {user}/>
 
-    <!-- <div class="container m-0"> -->
-        <Router  routes={{
-            '/profil': Profil,
-            '/Users/:name': Users,
-            '/Leaderboard': Leaderboard,
-            '/UserCRUD': UserCrud,
-            '/channel': Channels,
-            '/Chat': Chat,
-        }}/>
-    <!-- </div> -->
+
+    <!-- <Router {routes}/> -->
+
+
+  {:else}
+    <a href={FT_AUTHORIZE} style="font-size: 30px;">Signin with 42</a>
+    <br>
+    <br>
+    <a href="#/signup" style="font-size: 30px;">Signup with username</a>
+    <br>
+    <br>
+    <a href="#/login" style="font-size: 30px;">Login with username</a>
+  {/if}
 
   <style>
 
