@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // définir les boutons du menu
 
     import axios from "axios";

@@ -23,7 +23,7 @@ export class ChannelService {
       })
       return channel
     } catch (error) {
-      return null
+      return "error creating channel";
     }
   }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
 

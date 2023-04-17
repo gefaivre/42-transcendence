@@ -59,8 +59,9 @@ export class ChannelController {
   @Post('newChan')
   createChan(@Body() createChannelDto: CreateChannelDto, @Req() request: any) {
     const whoami = request.user;
-    console.log("ça apsse bien par newChan");
+    console.log("ça apsse bien par newChan" + " " + whoami.id);
     createChannelDto.ownerId = whoami.id;
+    console.log(createChannelDto);
     return this.channelService.create(createChannelDto);
   }
 

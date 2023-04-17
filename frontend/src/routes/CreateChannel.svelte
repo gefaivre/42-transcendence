@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // définir les boutons du menu
 
     import axios from "axios";
@@ -54,9 +54,9 @@
             <div class="mb-4">
               <label for="visibility" class="block text-purple-700 font-bold mb-2">Visibility</label>
               <select id="visibility" class="border border-gray-400 p-2 w-full" bind:value={visibility}>
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-                <option value="protected">Protected</option>
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+                <option value="Protected">Protected</option>
               </select>
             </div>
             {#if visibility === 'protected'}
