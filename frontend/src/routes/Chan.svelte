@@ -112,7 +112,7 @@
         console.log(event.user, 'left the chanel')
     })
 
-  })
+  })//fin
 
   onDestroy(() => socket.disconnect())
 

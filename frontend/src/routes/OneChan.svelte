@@ -1,34 +1,101 @@
-<script>
+<script lang=ts>
     import Layout from "./Layout.svelte";
     import axios from "axios";
-    import { onMount} from "svelte";
+    import { onMount, onDestroy} from "svelte";
     import ChanMenu from "./chanLayouts.svelte";
     import settingsImage from "../assets/settings.png"
-  
+    import { logged, id } from "../stores";
+    import { pop } from "svelte-spa-router";
+    import ioClient from 'socket.io-client';
+    import type { Socket } from "socket.io-client";
+    import type { Channel, PostEmitDto, ChannelDto, WsException } from "../types";
+    
     let chan = null;
     let chanName = window.location.hash.substr(10);
+    let socket: Socket = null
+    let message: string = '';
+    let password: string = '';
+    let channel: Channel = null;
+    let isMember: boolean = false;
+    let posts: PostEmitDto[] = [];
+    
+    function post() {
+    socket.emit('sendPost', {
+      content: message,
+      channelName: channel.name,
+    }, (response: string) => {
+      console.log(response)
+      message = ''
+    })
+  }
+
+    function joinRoom() {
+    socket.emit('joinRoom', channel.name, (response: string) => {
+      console.log(response)
+    })
+  }
+
+  function joinChannel() {
+      socket.emit('joinChannel', {
+        channelName: channel.name,
+        status: channel.status,
+        password: password
+      } as ChannelDto, (response: string) => {
+        console.log(response)
+        joinRoom()
+      })
+  }
+
+  function leaveChannel() {
+    socket.emit('leaveChannel', channel.name, (response: string) => {
+      console.log(response)
+      return pop()
+    })
+  }
   
-    const getChan = async () => {
+  const getChan = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/channel/${chanName}`, {
           withCredentials: true
         });
         chan = response.data;
+        channel = response.data;
         console.log(chan);
       } catch (error) {
-        console.log("error getting user");
+        console.log("error getting channel");
         //chanName = 'notfound';
       }
     }
   
-    onMount(() => {
+    onMount(async () => {
       // ajoute un écouteur d'événement pour "popstate"
       window.addEventListener('popstate', async () => {
         chanName = window.location.hash.substr(10);
         await getChan();
+        socket = ioClient('http://localhost:3000', {
+        path: '/chat',
+        withCredentials: true
       });
-    });
+      if (channel.users.find(user => user.id.toString() === $id))
+        joinRoom()
+      else {
+        if (!confirm('Join this channel ?'))
+          return await pop()
+        if (channel.status === 'Protected') {
+          password = prompt('Enter password')
+          if (password === '')
+            console.error(`Unable to join channel ${channel.name}: Empty password.`)
+          if (!password)
+            return await pop()
+        }
+        joinChannel()
+      }
+      });//fin du addEventListener
+
+    
+    });//fin onMount
     getChan();
+    onDestroy(() => socket.disconnect());
   </script>
 {#if chan}
 <Layout>
