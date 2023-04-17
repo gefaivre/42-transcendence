@@ -24,7 +24,7 @@ export class ChannelController {
   async create(@Req() request: any, @Body(new ValidationPipe({ transform: true })) channelDto: ChannelDto) {
 
     const user: User | null = await this.usersService.findById(request.user.id);
-
+    
     // is it really possible ??
     if (user == null)
       throw new BadRequestException("User cannot create a channel because he doesn't exist !...")
@@ -37,14 +37,12 @@ export class ChannelController {
         throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
-
     const channel: CreateChannelDto = {
       channelName: channelDto.channelName,
       ownerId: user.id,
       status: channelDto.status,
       password: channelDto.password
     }
-
     if (await this.channelService.create(channel) === null)
       throw new ConflictException('This channel already exists.')
   }
@@ -59,11 +57,11 @@ export class ChannelController {
   @Post('newChan')
   createChan(@Body() createChannelDto: CreateChannelDto, @Req() request: any) {
     const whoami = request.user;
-    console.log("ça apsse bien par newChan" + " " + whoami.id);
-    createChannelDto.ownerId = whoami.id;
+    //createChannelDto.ownerId = whoami.id;
+    console.log("newChan")
     console.log(createChannelDto);
     return this.channelService.create(createChannelDto);
-  }
+  }// a supprimer du coup
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('/users/:id')

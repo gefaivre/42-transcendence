@@ -7,15 +7,18 @@
     import Layout from "./Layout.svelte";
     import ChanMenu from "./chanLayouts.svelte";
     let channelName = '';
-    let visibility = 'public';
+    let visibility = 'Public';
     let password = '';
     
     async function createChan(channelData){
-        let channel = { name: null, ownerId: 1 };
+        let channel = { channelName: null, status: null, password: ''};
         console.log(channelData);
-        channel.name = channelData.name;
+        channel.channelName = channelData.name;
+        channel.status = visibility;
+        if (channel.status == 'Protected')
+          channel.password = password;
         const response = await
-        axios.post('http://localhost:3000/channel/newChan', channel, { withCredentials: true });
+        axios.post('http://localhost:3000/channel', channel, { withCredentials: true });
         console.log(response);
 
     }
@@ -59,7 +62,7 @@
                 <option value="Protected">Protected</option>
               </select>
             </div>
-            {#if visibility === 'protected'}
+            {#if visibility === 'Protected'}
               <div class="mb-4">
                 <label for="password" class="block text-purple-700 font-bold mb-2">Password</label>
                 <input type="password" id="password" class="border border-gray-400 p-2 w-full" bind:value={password} required />
