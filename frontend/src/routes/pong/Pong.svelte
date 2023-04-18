@@ -2,6 +2,7 @@
   import { onMount } from "svelte"
   import  ioClient  from 'socket.io-client';
   import { Ball, Frame, Paddle } from './Objects'
+  import axios  from "axios";
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -12,6 +13,8 @@
   const leftPaddle: Paddle = new Paddle(true, frame); 
   const rightPaddle: Paddle = new Paddle(false, frame); 
   
+  let gameList: string[];
+
   let leftScore: number = 0;
   let rightScore: number = 0;
   let stop: boolean = true;
@@ -60,6 +63,17 @@
       cancelAnimationFrame(animationId);
     };
   });
+
+  getGames();
+
+  
+  async function getGames() {
+    let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
+    for (const game of games) {
+      gameList.push(game);
+    }
+  }
+    
   
   function game_loop() {
     requestAnimationFrame(game_loop);
@@ -111,7 +125,7 @@
     socket.emit('requestGame', {});
   }
 
-  function joinFriendly(event) {
+  function joinFriendly(event: any) {
     const formData = new FormData(event.target);
 
     for (let field of formData) {
@@ -127,6 +141,11 @@
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 {#if !inGame}
+<ul>
+  {#each gameList as game}
+  <li>{game} game</li>
+  {/each}
+</ul>
 <button on:click={requestGame}>request random game</button>
 <form on:submit|preventDefault={(event) => joinFriendly(event)}>
     <input id="friend" name="friend" type="text" placeholder="type friend username">
@@ -137,12 +156,16 @@
 {#if inGame}
 <p>{leftScore} - {rightScore}</p>
 {/if}
+
+<div class:inGame={inGame}>
 <canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
+</div>
 
 <style>
 
-canvas {
+.inGame {
   border: 1px solid;
+  display: inline-block;
 }
 
 </style>

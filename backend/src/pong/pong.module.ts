@@ -8,6 +8,7 @@ import { MatchsModule } from 'src/matchs/matchs.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { MatchsService } from 'src/matchs/matchs.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PongController } from './pong.controller';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
     MatchsModule,
     PrismaModule
   ],
-  providers: [PongGateway, PongService, MatchsService, PrismaService]
+  providers: [PongGateway, PongService, MatchsService, PrismaService],
+  controllers: [PongController]
 })
 export class PongModule {}
