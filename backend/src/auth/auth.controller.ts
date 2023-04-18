@@ -118,9 +118,11 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
-  getUser(@Req() request: any) {
+  async getUser(@Req() request: any) { // Set to async for the console.log(user) (await)
     const whoami = request.user;
-    return this.usersService.findById(whoami?.id);
+    let user = await  this.usersService.findById(whoami?.id)
+    console.log(user);
+    return user;
   }
 
 }

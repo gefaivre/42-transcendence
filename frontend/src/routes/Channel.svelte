@@ -6,9 +6,6 @@
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
 
-    export let user;
-    console.log(user);
-
   </script>
 
   <style>

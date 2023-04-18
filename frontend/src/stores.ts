@@ -9,4 +9,5 @@ export const id = writable(localStorage.getItem('id') || '0')
 id.subscribe(val => localStorage.setItem('id', val))
 
 
-export const userStore = writable(null)
+export const user = writable<User>(null)
+// user.subscribe(val => localStorage.setItem('user', ))

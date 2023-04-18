@@ -4,28 +4,20 @@
 
     import axios from "axios";
     import { onMount, setContext } from "svelte";
-    import type { User } from "./types";
     //import groupe from "../../icons/groupe.png"'
     import channelIcon  from './assets/whiteChannel.png';
     import homeIcon     from './assets/whiteHome.png'
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
-    import { id, logged } from "./stores";
-    import Profil from "./routes/Profil.svelte";
-    import Home from "./routes/Home.svelte";
-    import Menu from "./routes/Menu.svelte";
-    import Channel from "./routes/Channel.svelte";
-    import Message from "./routes/Message.svelte";
-    import Game from "./routes/Game.svelte";
-
-    let user: User;
-    let component = Menu;
+    import { id, logged, user } from "./stores";
+    import routes from "./routes";
+    import Router from "svelte-spa-router";
 
     const menuItems = [
-      { label: 'Home', icon: homeIcon, link: '#/Menu', component: Menu},
-      { label: 'Channel', icon: channelIcon, link: '#/Channel', component: Channel },
-      { label: 'Messages', icon: messageIcon, link: '#/Message', component:  Message },
-      { label: 'Game', icon: gameIcon, link: '#/Game', component:  Game }
+      { label: 'Home', icon: homeIcon, link: '#/Menu'},
+      { label: 'Channel', icon: channelIcon, link: '#/Channel'},
+      { label: 'Messages', icon: messageIcon, link: '#/Message' },
+      { label: 'Game', icon: gameIcon, link: '#/Game'}
     ];
 
     onMount(() => getProfile())
@@ -33,8 +25,8 @@
     async function getProfile() {
       try {
         let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
-        user = response.data // TODO: typedef
-        console.log(user)
+        user.set(response.data)
+        console.log($user)
         logged.set('true')
         id.set(response.data.id.toString())
       } catch (error) {
@@ -43,33 +35,24 @@
       }
     }
 
-    async function set_component(name: any) {
-      component = name;
-    }
-
-
   </script>
 
   {#if $logged === 'true'}
     <div class="menu">
-      <a on:click={() => set_component(Profil)}  class= testLink href="#/profil">
-        {#if user}
-            <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{user.id}' alt="Rounded avatar">
+      <a  class= testLink href="#/profil">
+        {#if $user}
+            <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{$user.id}' alt="Rounded avatar">
         {/if}
       </a>
 
       {#each menuItems as item}
-      <a on:click={() => set_component(item.component)} href={item.link}>
+      <a href={item.link}>
         <img  class="menu-item-image" src={item.icon} alt={item.label} />
       </a>
       {/each}
     </div>
 
-    <svelte:component this={component} {user}/>
-
-
-    <!-- <Router {routes}/> -->
-
+    <Router {routes}/>
 
   {:else}
     <a href={FT_AUTHORIZE} style="font-size: 30px;">Signin with 42</a>
@@ -89,7 +72,6 @@
       left: 0;
       height: 100%;
       width: 88px;
-      background-color: #f2f2f2;
       display: flex;
       flex-direction: column;
       align-items: center;

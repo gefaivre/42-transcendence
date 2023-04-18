@@ -5,18 +5,14 @@
     import greenWin from '../assets/greenWin.png';
     import redLose from "../assets/redLose.png";
     // import MatchHistory from './assets/match_history.json';
-    import uploadImg from '../assets/upload.png';
-    import { getContext } from 'svelte'
-    import type { User } from "../types";
-    import { userStore } from "../stores";
+    import ChangePp from "./userImages/ChangePp.svelte";
+    import { user } from "../stores";
 
-    // export let user: User;
+    // console.log("Store in Profil = ", user);
 
+    let changePp: Boolean = false;
 
-    export let user;
-
-
-    console.log("Store in Profil = ", user);
+    let reloadImage:number;
 
 
 
@@ -24,7 +20,6 @@
     let toggleValue = 1;
     let avatar, fileinput;
 
-    avatar = "https://flowbite.com/docs/images/people/profile-picture-5.jpg";
 
     const onFileSelected = (e) => {
         let image = e.target.files[0];
@@ -45,22 +40,25 @@
 
 </script>
 
+
+
+    {#if $user}
+
     <div class="rectangle">
         <h1 class="text-5xl font-extrabold text-pink-500 text-center">Profil</h1>
-        <h1 class="text-5xl text-center font-inter"style="color: #9E27D9;">Profil</h1>
+        <h1 class="text-5xl text-center font-inter"style="color: #9E27D9;">{$user.username}</h1>
 
         <div class="ftbigAvatar">
             {#if user}
-                <img class="rounded-full w-100 h-100" src='http://localhost:3000/images/actual/{user.id}' alt="Rounded avatar">
+                <img class="rounded-full w-100 h-100" src='http://localhost:3000/images/actual/{$user.id}' alt="Rounded avatar">
             {/if}
         </div>
         <div class="uploadAvatar">
-            <!-- <img src={uploadImg} alt="upload avatar" on:click={()=>{fileinput.click();}}> -->
-            <input style="display:none" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+           <button on:click={() => (changePp = !changePp)} class="changePp">ChangePp</button>
         </div>
         {#if user}
         <div class="username">
-            <div class="text-4xl text-white text-center font-inter">{user.username}</div>
+            <div class="text-4xl text-white text-center font-inter">{$user.username}</div>
         </div>
         <div class="togleFa">
             <label class="relative inline-flex mr-5 cursor-pointer">
@@ -76,6 +74,8 @@
         </div>
         {/if}
     </div>
+
+    {#if !changePp}
     <div class="gameHistory">
         <h1 class="text-4xl font-inter" style="color: #9E27D9;">Game History</h1>
         <div class=scrolable style="overflow-y: scroll;">
@@ -101,9 +101,9 @@
         </div>
 
     </div>
-    {#if user}
+    {#if $user}
     <div class="mmr">
-        <span style="position: relative; color: #CDCDCD; font-size: 32px; font-family: Arial; top: 50%">Elo points : {user.mmr}</span>
+        <span style="position: relative; color: #CDCDCD; font-size: 32px; font-family: Arial; top: 50%">Elo points : {$user.mmr}</span>
     </div>
     <div class="statistics">
             <h1 class="text-4xl font-inter" style="color: #9E27D9;">Statistics</h1>
@@ -113,7 +113,7 @@
                     <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Won games</span>
                 </div>
                 <div class="displaynb">
-                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.wins.length}</span>
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{$user.wins.length}</span>
                 </div>
 
             </div>
@@ -123,7 +123,7 @@
                     <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Lost games</span>
                 </div>
                 <div class="displaynb">
-                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.loses.length}</span>
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{$user.loses.length}</span>
 
                 </div>
 
@@ -133,16 +133,21 @@
                     <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">Ratio</span>
                 </div>
                 <div class="displaynb">
-                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{user.wins.length/user.loses.length}</span>
+                    <span style="color: white; font-size: 20px; position: relative; top:30%; font-family: Arial;">{$user.wins.length/$user.loses.length}</span>
                 </div>
             </div>
 
 
     </div>
     {/if}
+    {:else}
+    <!-- Inlude component dosen't work, tailwindcss issue -->
+        <p>COOUCOU</p>
+        <ChangePp bind:reloadImage={reloadImage} />
+    {/if}
+    {/if}
 
 <style>
-
     .rectangle {
     position: fixed;
     top: 0;

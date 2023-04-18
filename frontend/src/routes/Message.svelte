@@ -7,9 +7,6 @@
     import Layout from "./Layout.svelte";
     import ChanMenu from "./chanLayouts.svelte";
 
-    export let user;
-    console.log(user);
-
   </script>
 
   <style>

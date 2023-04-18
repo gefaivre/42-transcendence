@@ -66,7 +66,6 @@
     left: 0;
     height: 100%;
     width: 88px;
-    background-color: #f2f2f2;
     display: flex;
     flex-direction: column;
     align-items: center;
