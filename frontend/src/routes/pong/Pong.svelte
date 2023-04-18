@@ -3,6 +3,7 @@
   import  ioClient  from 'socket.io-client';
   import { Ball, Frame, Paddle } from './Objects'
   import axios  from "axios";
+    import Game from "../Game.svelte";
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -13,7 +14,7 @@
   const leftPaddle: Paddle = new Paddle(true, frame); 
   const rightPaddle: Paddle = new Paddle(false, frame); 
   
-  let gameList: string[];
+  let gameList: string[] = [];
 
   let leftScore: number = 0;
   let rightScore: number = 0;
@@ -29,7 +30,6 @@
   onMount(() => {
     ctx = canvas.getContext("2d");
 
-    console.log('test');
     socket.on('newPlayer', () => {
       console.log("new player connected");
     });
@@ -65,6 +65,7 @@
   });
 
   getGames();
+  console.log('gameList', gameList);
 
   
   async function getGames() {
@@ -72,6 +73,7 @@
     for (const game of games) {
       gameList.push(game);
     }
+    gameList = gameList;
   }
     
   
@@ -136,16 +138,26 @@
     }
   }
 
+  function watchGame(game: string) {
+    socket.emit('watchGame', {gameName: game});
+  }
+
 </script>
 
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 {#if !inGame}
-<ul>
-  {#each gameList as game}
-  <li>{game} game</li>
-  {/each}
-</ul>
+
+{#if gameList}
+  <ul>
+    {#each gameList as game}
+      <li>{game} game</li>
+      <button on:click={() => watchGame(game)}>watch</button>
+    {/each}
+  </ul>
+{/if}
+
+
 <button on:click={requestGame}>request random game</button>
 <form on:submit|preventDefault={(event) => joinFriendly(event)}>
     <input id="friend" name="friend" type="text" placeholder="type friend username">
