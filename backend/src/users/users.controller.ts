@@ -95,4 +95,58 @@ export class UsersController {
 
   // END CRUD
 
+  @Post('friendship/request/:id')
+  requestFriendship(@Param('id') id: string, @Req() req: any) {
+    console.log('controller request friendship')
+    return this.usersService.requestFriendship(req.user.id, +id)
+  }
+
+  @Post('friendship/cancelById/:id')
+  cancelFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+    console.log('controller cancel friendship request by id')
+    return this.usersService.cancelFriendshipRequestById(req.user.id, +id)
+  }
+
+  @Post('friendship/cancelByName/:name')
+  cancelFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
+    console.log('controller cancel friendship request by name')
+    return this.usersService.cancelFriendshipRequestByName(req.user.id, name)
+  }
+
+  @Post('friendship/acceptById/:id')
+  acceptFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+    console.log('controller accept friendship request by id')
+    return this.usersService.acceptFriendshipRequestById(req.user.id, +id)
+  }
+
+  @Post('friendship/acceptByName/:name')
+  acceptFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
+    console.log('controller accept friendship request by name')
+    return this.usersService.acceptFriendshipRequestByName(req.user.id, name)
+  }
+
+  @Post('friendship/dismissById/:id')
+  dismissFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+    console.log('controller dismiss friendship request by id')
+    return this.usersService.dismissFriendshipRequestById(req.user.id, +id)
+  }
+
+  @Post('friendship/dismissByName/:name')
+  dismissFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
+    console.log('controller dismiss friendship request by name')
+    return this.usersService.dismissFriendshipRequestByName(req.user.id, name)
+  }
+
+  @Post('friendship/removeById/:id')
+  removeFriendById(@Param('id') id: string, @Req() req: any) {
+    console.log('controller remove friend by id')
+    return this.usersService.removeFriendById(req.user.id, +id)
+  }
+
+  @Post('friendship/removeByName/:name')
+  removeFriendByName(@Param('name') name: string, @Req() req: any) {
+    console.log('controller remove friend by name')
+    return this.usersService.removeFriendByName(req.user.id, name)
+  }
+
 }

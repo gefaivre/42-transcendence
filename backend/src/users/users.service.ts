@@ -78,10 +78,33 @@ export class UsersService {
     return await this.prisma.user.findUnique({
       where: {
         username: name,
+      },
+      include: {
+        pendingFriends: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        requestFriends: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        friends: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        friendOf: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
       }
-      // include: {
-      //   channels: true
-      // }
     })
   }
 
@@ -131,6 +154,150 @@ export class UsersService {
           mmr: 'desc',
       }
     })
+  }
+
+  requestFriendship(id: number, friendId: number) {
+    console.log('service request friendship')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        pendingFriends: {
+          connect: { id: friendId }
+        }
+      }
+    });
+  }
+
+  cancelFriendshipRequestById(id: number, friendId: number) {
+    console.log('service cancel friendship request by id')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        pendingFriends: {
+          disconnect: [{ id: friendId }]
+        }
+      },
+    });
+  }
+
+  cancelFriendshipRequestByName(id: number, name: string) {
+    console.log('service cancel friendship request by name')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        pendingFriends: {
+          disconnect: [{ username: name }]
+        }
+      },
+    });
+  }
+
+  acceptFriendshipRequestById(id: number, friendId: number) {
+    console.log('service accept friendship request by id')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        requestFriends: {
+          disconnect: [{ id: friendId }]
+        },
+        friends: {
+          connect: [{ id: friendId }]
+        },
+        friendOf: {
+          connect: [{ id: friendId }]
+        },
+      },
+    });
+  }
+
+  acceptFriendshipRequestByName(id: number, name: string) {
+    console.log('service accept friendship request by name')
+    this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        requestFriends: {
+          disconnect: [{ username: name }]
+        },
+        friends: {
+          connect: [{ username: name }]
+        },
+        friendOf: {
+          connect: [{ username: name }]
+        },
+      },
+    });
+  }
+
+  dismissFriendshipRequestById(id: number, friendId: number) {
+    console.log('service dismiss friendship request by id')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        requestFriends: {
+          disconnect: [{ id: friendId }]
+        }
+      },
+    });
+  }
+
+  dismissFriendshipRequestByName(id: number, name: string) {
+    console.log('service dismiss friendship request by name')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        requestFriends: {
+          disconnect: [{ username: name }]
+        }
+      },
+    });
+  }
+
+  removeFriendById(id: number, friendId: number) {
+    console.log('service remove friend by id')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        friends: {
+          disconnect: [{ id: friendId }]
+        },
+        friendOf: {
+          disconnect: [{ id: friendId }]
+        },
+      },
+    });
+  }
+
+  removeFriendByName(id: number, name: string) {
+    console.log('service remove friend by name')
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        friends: {
+          disconnect: [{ username: name }]
+        },
+        friendOf: {
+          disconnect: [{ username: name }]
+        },
+      },
+    });
   }
 
 }
