@@ -3,7 +3,7 @@
     import axios from "axios";
     import { onMount, onDestroy} from "svelte";
     import ChanMenu from "./chanLayouts.svelte";
-    import settingsImage from "../assets/settings.png"
+    import settingsImage from "../assets/settings.png";
     import { logged, id } from "../stores";
     import { pop } from "svelte-spa-router";
     import ioClient from 'socket.io-client';
@@ -90,6 +90,42 @@
         }
         joinChannel()
       }
+
+      isMember = true
+
+    socket.on('connect', () => {
+      console.log('Connected')
+    })
+
+    socket.on('disconnect', (reason) => {
+      console.log('Disconnected:', reason)
+    })
+
+    socket.on('post', (post: PostEmitDto) => {
+      console.log('receive post')
+      posts.push(post)
+      posts = posts
+    })
+
+    // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
+    socket.on('exception', (e: WsException) => {
+      console.error(e)
+      return pop()
+    })
+
+    // TODO: is it used ?
+    socket.on('error', (e) => {
+      console.error(e)
+      return pop()
+    })
+
+    socket.on('channelEvent', (event: any) => {
+      if (event.event === 'join')
+        console.log(event.user, 'joined the chanel')
+      else if (event.event === 'leave')
+        console.log(event.user, 'left the chanel')
+    })
+
       });//fin du addEventListener
 
     
@@ -109,11 +145,14 @@
 
     </div>
     <div class="Wall">
+      {#each posts as post}
+         <li><b>{post.author}</b>: {post.content}</li>
+      {/each}
     </div>
     <div class="prompt">
-        <form>
+        <form on:submit|preventDefault={post}>
             <label for="chat" class="sr-only">Your message</label>
-            <textarea id="chat" rows="1" class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
+            <textarea id="chat" bind:value={message} rows="1" class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
             <button type="submit" class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-white">
               <svg aria-hidden="true" class="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
               <span class="sr-only">Send message</span>
@@ -133,6 +172,8 @@
         position: absolute;
         left: 448px;
         top: 56px;
+        background-color: aliceblue;
+        overflow-y: auto;
             }
     .prompt{
         position: absolute;
