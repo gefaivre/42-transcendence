@@ -10,16 +10,17 @@
     import type { Socket } from "socket.io-client";
     import type { Channel, PostEmitDto, ChannelDto, WsException } from "../types";
     
-    let chan = null;
-    let chanName = window.location.hash.substr(10);
+    export let params: any = {}
     let socket: Socket = null
-    let message: string = '';
-    let password: string = '';
-    let channel: Channel = null;
-    let isMember: boolean = false;
-    let posts: PostEmitDto[] = [];
-    
-    function post() {
+    let message: string = ''
+    let password: string = ''
+    let channel: Channel = null
+    let isMember: boolean = false
+    let posts: PostEmitDto[] = []
+
+  // $: foo = posts
+
+  function post() {
     socket.emit('sendPost', {
       content: message,
       channelName: channel.name,
@@ -29,7 +30,7 @@
     })
   }
 
-    function joinRoom() {
+  function joinRoom() {
     socket.emit('joinRoom', channel.name, (response: string) => {
       console.log(response)
     })
@@ -52,46 +53,33 @@
       return pop()
     })
   }
-  
-  const getChan = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/channel/${chanName}`, {
-          withCredentials: true
-        });
-        chan = response.data;
-        channel = response.data;
-        console.log(chan);
-      } catch (error) {
-        console.log("error getting channel");
-        //chanName = 'notfound';
-      }
-    }
-  
-    onMount(async () => {
-      // ajoute un écouteur d'événement pour "popstate"
-      window.addEventListener('popstate', async () => {
-        chanName = window.location.hash.substr(10);
-        await getChan();
-        socket = ioClient('http://localhost:3000', {
-        path: '/chat',
-        withCredentials: true
-      });
-      if (channel.users.find(user => user.id.toString() === $id))
-        joinRoom()
-      else {
-        if (!confirm('Join this channel ?'))
-          return await pop()
-        if (channel.status === 'Protected') {
-          password = prompt('Enter password')
-          if (password === '')
-            console.error(`Unable to join channel ${channel.name}: Empty password.`)
-          if (!password)
-            return await pop()
-        }
-        joinChannel()
-      }
 
-      isMember = true
+  // TODO: what if we manually change `id` store value ?
+  onMount(async () => {
+
+    channel = (await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })).data
+
+    socket = ioClient('http://localhost:3000', {
+      path: '/chat',
+      withCredentials: true
+    })
+
+    if (channel.users.find(user => user.id.toString() === $id))
+      joinRoom()
+    else {
+      if (!confirm('Join this channel ?'))
+        return await pop()
+      if (channel.status === 'Protected') {
+        password = prompt('Enter password')
+        if (password === '')
+          console.error(`Unable to join channel ${channel.name}: Empty password.`)
+        if (!password)
+          return await pop()
+      }
+      joinChannel()
+    }
+
+    isMember = true
 
     socket.on('connect', () => {
       console.log('Connected')
@@ -126,19 +114,16 @@
         console.log(event.user, 'left the chanel')
     })
 
-      });//fin du addEventListener
+  })//fin
 
-    
-    });//fin onMount
-    getChan();
-    onDestroy(() => socket.disconnect());
+  onDestroy(() => socket.disconnect())
   </script>
-{#if chan}
+{#if channel}
 <Layout>
     <ChanMenu>
     </ChanMenu>
     <div class="horizontalBar">
-        <h1>{chan.name}</h1>
+        <h1>{channel.name}</h1>
         <div class="settings">
             <img src={settingsImage} alt="settings whell">
         </div>
@@ -146,7 +131,9 @@
     </div>
     <div class="Wall">
       {#each posts as post}
-         <li><b>{post.author}</b>: {post.content}</li>
+      <div class="post">
+        <b>{post.author}</b>: {post.content}
+      </div>
       {/each}
     </div>
     <div class="prompt">
@@ -174,7 +161,16 @@
         top: 56px;
         background-color: aliceblue;
         overflow-y: auto;
-            }
+      }
+      .post {
+  padding: 10px;
+  margin: 5px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  max-height: 100%;
+  overflow-y: auto;
+  word-wrap: break-word;
+}
     .prompt{
         position: absolute;
         width: calc(100% - 448px);
