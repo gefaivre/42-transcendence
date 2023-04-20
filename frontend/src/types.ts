@@ -5,6 +5,7 @@ export type User = {
   mmr: number
   games: number
   ft_login: string
+  TwoFA: boolean
 }
 
 // mirrors prisma

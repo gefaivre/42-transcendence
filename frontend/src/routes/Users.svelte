@@ -21,6 +21,7 @@
         mmr: null,
         games: null,
         ft_login: null,
+        TwoFA: false,
         friends: [],
         friendOf: [],
         pendingFriends: [],
@@ -31,6 +32,8 @@
     let password: string = null
 
     let reloadImage: number = 0
+
+    let qrcode = ''
 
     export let params: any = { }
 
@@ -102,6 +105,26 @@
       } catch (error) {
         alert(error.response.data.message)
       }
+    }
+
+    async function enable2FA() {
+        try {
+            const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
+            console.log(response)
+            qrcode = response.data
+            getUser()
+        } catch (error) {
+            console.log(error.response.message)
+        }
+    }
+
+    async function disable2FA() {
+        try {
+            await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
+            getUser()
+        } catch (error) {
+            console.log(error.response.message)
+        }
     }
 
     async function requestFriendship() {
@@ -219,6 +242,9 @@
                 <td>42 login</td> <td>{user.ft_login}</td>
             </tr>
             <tr>
+                <td>2FA</td><td>{user.TwoFA}</td>
+            </tr>
+            <tr>
                 <td>Friends</td>
                 <td>
                   {#each user.friends as friend}
@@ -243,6 +269,18 @@
       <button on:click={updatePassword}>Update</button>
       <br>
       <br>
+      {#if user.TwoFA === false}
+        <button on:click={enable2FA}>Enable TWOFA</button>
+      {:else}
+        <button on:click={disable2FA}>Disable TWOFA</button>
+      {/if}
+      {#if qrcode !== ''}
+        <br>
+        <br>
+        <img alt='qrcode' src={qrcode}>
+      {/if}
+      <br>
+      <br>
       <ul>
       {#each user.requestFriends as requestFriends}
         <li>
@@ -261,6 +299,8 @@
         </li>
       {/each}
       </ul>
+    <br>
+    <br>
     {:else if user.friends.some(user => user.id.toString() === $id)}
       This user is your friend !
       <button on:click={removeFriendById}>Remove</button>
