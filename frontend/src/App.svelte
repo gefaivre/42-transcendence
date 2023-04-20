@@ -35,99 +35,112 @@
       }
     }
 
-  </script>
+</script>
 
   {#if $logged === 'true'}
-    <div class="menu">
-      <a  class= testLink href="#/profil">
-        {#if $user}
-            <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{$user.id}' alt="Rounded avatar">
-        {/if}
+  <div class="screen">
+    <div class="profileLink">
+    {#if $user}
+      <a href="/#/users/{$user.username}">
+        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}' alt="profile">
       </a>
-
+    {/if}
+    </div>
+    <div class="nav">
       {#each menuItems as item}
       <a href={item.link}>
-        <img  class="menu-item-image" src={item.icon} alt={item.label} />
+        <img  class="linkButton" src={item.icon} alt={item.label} />
       </a>
       {/each}
     </div>
+    <div class="fillSpace">
+    </div>
 
-    <Router {routes}/>
+    <div class="routes">
+      {#if $user}
+        <Router {routes}/>
+      {/if}
+    </div>
+  </div>
 
   {:else}
-    <a href={FT_AUTHORIZE} style="font-size: 30px;">Signin with 42</a>
+    <a href={FT_AUTHORIZE}>Signin with 42</a>
     <br>
+    <a href="#/signup">Signup with username</a>
     <br>
-    <a href="#/signup" style="font-size: 30px;">Signup with username</a>
-    <br>
-    <br>
-    <a href="#/login" style="font-size: 30px;">Login with username</a>
+    <a href="#/login">Login with username</a>
   {/if}
 
   <style>
 
-    .menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 88px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background-color: #222222;
-    }
+   :root {
+    --lite-grey: #707070;
+    --grey: #222222;
+    --black: black;
+    --white: white;
+    --pink: rgb(255, 88, 171);
+    --imageRadius: 50%;
+   }
 
-    /* style pour les boutons du menu */
-    .menu a {
-      margin-bottom: 10px;
-      border: none;
-      padding: 10px;
-      width: 80%;
-      text-align: center;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #222222;
-    }
 
-    /* style pour les icônes des boutons */
-    .menu a  {
-      margin-right: 5px;
-    }
+  .screen {
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 90px 1fr;
+    grid-template-rows: 90px 1fr 90px;
+  }
 
-    .menu a img {
-    margin-right: 5px;
-    height: 55px;
-    width: 55px;
-    }
 
-    .menu a .menu-item-image {
-      margin-right: 5px;
-      height: 55px;
-      width: 55px;
-    }
+  .profileLink {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    background-color: var(--grey);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .testLink {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1;
-    }
+  .profileLink .profilePicture {
+    height: 50px;
+    width: 50px;
+    border-radius: var(--imageRadius);
+  }
 
-    .menu a:hover {
-      background-color: #4D4D4D;}
-      @media (max-width: 768px) {
-      .menu {
-      width: 50px;
-      }
+  .profileLink .profilePicture:hover {
+    transform: scale(1.10);
+    overflow: hidden;
+  }
 
-      .menu a img {
-      height: 30px;
-      width: 30px;
-      }
-    }
+  .nav {
+    grid-column: 1/2;
+    grid-row: 2/3;
+    background-color: var(--grey);
+    display: flex;
+    row-gap: 35px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-  </style>
+  .nav .linkButton {
+    height: 50px;
+    width: 50px;
+  }
+
+  .nav .linkButton:hover {
+    transform: scale(1.10);
+    overflow: hidden;
+  }
+
+  .fillSpace {
+    grid-column: 1/2;
+    grid-row: 3/4;
+    background-color: var(--grey);
+  }
+
+  .routes {
+    grid-column: 2 / 3;
+    grid-row: 1 /4;
+  }
+
+</style>

@@ -1,42 +1,19 @@
 <script lang="ts">
-    import Layout from "./Layout.svelte";
-    import axios from "axios";
-    import { onMount } from "svelte";
+
     import greenWin from '../assets/greenWin.png';
     import redLose from "../assets/redLose.png";
-    // import MatchHistory from './assets/match_history.json';
-    import ChangePp from "./userImages/ChangePp.svelte";
+    import ChangePp from "./usersComponents/ChangePp.svelte";
     import { user } from "../stores";
 
-    // console.log("Store in Profil = ", user);
 
     let changePp: Boolean = false;
 
     let reloadImage:number;
 
-
-
     let game = [];
     let toggleValue = 1;
     let avatar, fileinput;
 
-
-    const onFileSelected = (e) => {
-        let image = e.target.files[0];
-        let reader = new FileReader();
-        reader.readAsDataURL(image);
-        reader.onload = e => {
-        avatar = e.target.result;
-    };
-  }
-
-    function toggle() {
-        if (!toggleValue)
-        toggleValue == 1;
-        else
-        toggleValue ==0;
-        console.log(toggleValue);
-    }
 
 </script>
 
@@ -46,13 +23,9 @@
 
     <div class="rectangle">
         <h1 class="text-5xl font-extrabold text-pink-500 text-center">Profil</h1>
-        <h1 class="text-5xl text-center font-inter"style="color: #9E27D9;">{$user.username}</h1>
-
-        <div class="ftbigAvatar">
             {#if user}
-                <img class="rounded-full w-100 h-100" src='http://localhost:3000/images/actual/{$user.id}' alt="Rounded avatar">
+                <img class="ftbigAvatar rounded-full w-100 h-100" src='http://localhost:3000/images/actual/{$user.id}' alt="Rounded avatar">
             {/if}
-        </div>
         <div class="uploadAvatar">
            <button on:click={() => (changePp = !changePp)} class="changePp">ChangePp</button>
         </div>
@@ -317,13 +290,5 @@
         cursor: pointer;
 
     }
-    /* .uploadAvatar img{
-        position: relative;
-        height: 40px;
-        width: 40px;
-        left: 50%;
-        transform: translate(-50%, 0%);
-    } */
-
 
 </style>

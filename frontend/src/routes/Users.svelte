@@ -1,153 +1,135 @@
 <script lang="ts">
 
-  import axios from "axios";
-  import { onMount } from "svelte";
-  import { logged, id } from "../stores";
-  import { replace } from "svelte-spa-router";
-  import type { User } from "../types";
-  import ChangePp from "./userImages/ChangePp.svelte";
 
-    let user: User = {
-        id: 0,
-        username: null,
-        password: null,
-        mmr: null,
-        games: null,
-        ft_login: null
-    }
+  import { user} from "../stores";
 
-    let username: string = null
-    let password: string = null
+  import UsersInfo from "./usersComponents/UsersInfo.svelte";
+  import UsersSettings from "./usersComponents/UsersSettings.svelte";
 
     let reloadImage: number = 0
 
-    export let params: any = { }
+    let settings: boolean = false;
 
-    onMount(async () => await getUser())
-
-    async function getUser() {
-        user = (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
-    }
-
-    async function updateUsername() {
-
-      // guards
-      if (username == null) { return alert('empty username') }
-      if (username == user.username) { return alert('same username') }
-
-      try {
-
-        // Yes, this body is dirty.
-        await axios.patch(`http://localhost:3000/users/username/${user.username}`, {
-          id: $id,
-          username: username
-        }, {
-          withCredentials: true
-        })
-
-        alert('Username successfully updated!')
-
-        // update component state
-        user.username = username
-        username = null
-
-        // redirect to your new user page
-        replace(`/users/${user.username}`)
-
-      } catch (error) {
-        alert(error.response.data.message)
-      }
-
-    }
-
-    // before update, password displayed in table is the hash
-    // after update, password displayed in table is in clear
-    // you'll need to refresh the page to see the new password in its hashed version
-    // this is not big deal since this table entry will be removed anyway
-    async function updatePassword() {
-
-      // guards
-      if (password == null) { return alert('empty password') }
-
-      try {
-
-        // Yes, this body is dirty.
-        await axios.patch(`http://localhost:3000/users/password/${user.username}`, {
-          id: $id,
-          password: password
-        }, {
-          withCredentials: true
-        })
-
-        alert('Password successfully updated!')
-
-        // update component state
-        user.password = password
-        password = null
-
-        // redirect to your new user page
-        replace(`/users/${user.username}`)
-
-      } catch (error) {
-        alert(error.response.data.message)
-      }
-    }
 
 </script>
 
-{#if $logged === 'true'}
-    <img class="imagePP" src="http://localhost:3000/images/actual/{user.id}?$reload=${reloadImage}" alt="profil">
-    {#if $id === user.id.toString() }
-      <ChangePp bind:reloadImage={reloadImage} />
+  <div class="component">
+    <div class="userPanel">
+
+      <h1 class="componentName">Profile</h1>
+
+      <div class="clickableImage">
+        <button on:click={() => settings = !settings}>
+          <img class="userImage" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
+        </button>
+      </div>
+      <!-- {#if $id === $user.id.toString() }
+        <ChangePp bind:reloadImage={reloadImage} />
+        {/if} -->
+
+      <span class="username">{$user.username}</span>
+      <div class="twofa">
+        <input type="checkbox"> <span>2fa?</span>
+      </div>
+
+    </div>
+
+    {#if settings}
+      <UsersSettings/>
+    {:else}
+      <UsersInfo/>
     {/if}
 
-    <h1>{user.username}</h1>
-    <table>
+
+
+      <!-- <table>
         <tbody>
-            <tr>
-                <td>id</td> <td>{user.id}</td>
-            </tr>
-            <tr>
-                <td>Username</td> <td>{user.username}</td>
-            </tr>
-            <tr>
-                <td>Password</td> <td>{user.password}</td>
-            </tr>
-            <tr>
-                <td>Games played</td> <td>{user.games}</td>
-            </tr>
-            <tr>
-                <td>Mmr</td> <td>{user.mmr}</td>
-            </tr>
-            <tr>
-                <td>42 login</td> <td>{user.ft_login}</td>
-            </tr>
-        </tbody>
-    </table>
+          <tr>
+            <td>id</td> <td>{$user.id}</td>
+          </tr>
+          <tr>
+            <td>Username</td> <td>{$user.username}</td>
+          </tr>
+          <tr>
+                <td>Password</td> <td>{$user.password}</td>
+              </tr>
+              <tr>
+                <td>Games played</td> <td>{$user.games}</td>
+              </tr>
+              <tr>
+                <td>Mmr</td> <td>{$user.mmr}</td>
+              </tr>
+              <tr>
+                <td>42 login</td> <td>{$user.ft_login}</td>
+              </tr>
+            </tbody>
+          </table>
 
-    <br>
-    <br>
+          <br>
+          <br>
 
-    {#if $id === user.id.toString()}
-      <input type="text" placeholder="new username" bind:value={username}>
-      <button on:click={updateUsername}>Update</button>
-      <br>
-      <input type="text" placeholder="new password" bind:value={password}>
-      <button on:click={updatePassword}>Update</button>
-    {/if}
-
-{:else}
-    <h1>UNAUTHORIZED ACCESS</h1>
-{/if}
+          {#if $id === $user.id.toString()}
+          <input type="text" placeholder="new username" bind:value={username}>
+          <button on:click={updateUsername}>Update</button>
+          <br>
+          <input type="text" placeholder="new password" bind:value={password}>
+          <button on:click={updatePassword}>Update</button>
+          {/if} -->
 
 
+  </div>
 <style>
 
-.imagePP {
-  border: 5px solid rgb(78, 78, 78);
-  border-radius: 50%;
-  height: 200px;
-  width: 200px;
-}
+
+  .component {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    background-color: var(--black);
+  }
+
+  .componentName {
+    font-size: 50px;
+    text-shadow: 0 0 20px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.5px;
+    color: var(--pink);
+  }
+
+  .userPanel {
+    height: 100vh;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--grey);
+    border: solid 1px var(--lite-grey);
+    border-top-width: 0;
+    border-bottom-width: 0;
+
+  }
+
+  .userImage {
+    border-radius: var(--imageRadius);
+    height: 200px;
+    width: 200px;
+  }
+
+
+  .clickableImage:after {
+    content: "\2699";
+    color: white;
+  }
+
+  .username {
+
+    font-size: 50px;
+    color: var(--white);
+    /* grid-column: 3/4;
+    grid-row: 1/3; */
+  }
+  .twofa {
+    color: var(--white);
+  }
 
 </style>
