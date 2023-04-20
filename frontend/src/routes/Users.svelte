@@ -18,19 +18,17 @@
 
       <h1 class="componentName">Profile</h1>
 
-      <div class="clickableImage">
-        <button on:click={() => settings = !settings}>
-          <img class="userImage" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
-        </button>
-      </div>
-      <!-- {#if $id === $user.id.toString() }
-        <ChangePp bind:reloadImage={reloadImage} />
-        {/if} -->
+      <button class="clickableImageButton" on:click={() => settings = !settings}>
+        <img class="userImage" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
+      </button>
 
-      <span class="username">{$user.username}</span>
-      <div class="twofa">
-        <input type="checkbox"> <span>2fa?</span>
-      </div>
+      <button class="clickableUsernameButton" on:click={() => settings = !settings}>
+        <span class="username">{$user.username}</span>
+      </button>
+
+      <button class="clickableTwofaButton" on:click={() => settings = !settings}>
+        <p class="twofa">Your 2FA  is not activated</p>
+      </button>
 
     </div>
 
@@ -42,39 +40,6 @@
 
 
 
-      <!-- <table>
-        <tbody>
-          <tr>
-            <td>id</td> <td>{$user.id}</td>
-          </tr>
-          <tr>
-            <td>Username</td> <td>{$user.username}</td>
-          </tr>
-          <tr>
-                <td>Password</td> <td>{$user.password}</td>
-              </tr>
-              <tr>
-                <td>Games played</td> <td>{$user.games}</td>
-              </tr>
-              <tr>
-                <td>Mmr</td> <td>{$user.mmr}</td>
-              </tr>
-              <tr>
-                <td>42 login</td> <td>{$user.ft_login}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <br>
-          <br>
-
-          {#if $id === $user.id.toString()}
-          <input type="text" placeholder="new username" bind:value={username}>
-          <button on:click={updateUsername}>Update</button>
-          <br>
-          <input type="text" placeholder="new password" bind:value={password}>
-          <button on:click={updatePassword}>Update</button>
-          {/if} -->
 
 
   </div>
@@ -109,27 +74,93 @@
 
   }
 
+  .clickableImageButton {
+    position: relative;
+    pointer-events: none;
+
+  }
+
+  .clickableImageButton:after {
+    position: absolute;
+    content: "\2699";
+    font-size: 1.5em;
+    pointer-events: all;
+    height: 40px;
+    width: 40px;
+    background-color: var(--lite-grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    left: 100%;
+    top: 0;
+    transform: translate(-110%, 0px);
+
+
+  }
+
   .userImage {
     border-radius: var(--imageRadius);
     height: 200px;
     width: 200px;
+    position: relative;
+    pointer-events: none;
   }
 
-
-  .clickableImage:after {
-    content: "\2699";
-    color: white;
+  .clickableUsernameButton {
+    position: relative;
+    pointer-events: none;
   }
 
   .username {
-
     font-size: 50px;
     color: var(--white);
-    /* grid-column: 3/4;
-    grid-row: 1/3; */
+
   }
+
+  .clickableUsernameButton:after {
+    position: absolute;
+    content: "\2699";
+    font-size: 1.2em;
+    pointer-events: all;
+    height: 30px;
+    width: 30px;
+    background-color: var(--lite-grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    left: 100%;
+    top: 0;
+
+
+  }
+
   .twofa {
     color: var(--white);
+  }
+
+  .clickableTwofaButton {
+    position: relative;
+  }
+
+  .clickableTwofaButton:after {
+    position: absolute;
+    content: "\2699";
+    font-size: 1.2em;
+    pointer-events: all;
+    height: 30px;
+    width: 30px;
+    background-color: var(--lite-grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    left: 100%;
+    top: 0;
+    transform: translate(6px, -20px);
+
+
   }
 
 </style>
