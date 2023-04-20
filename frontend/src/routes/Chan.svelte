@@ -105,11 +105,18 @@
       return pop()
     })
 
+    // TODO: typedef event
     socket.on('channelEvent', (event: any) => {
-      if (event.event === 'join')
-        console.log(event.user, 'joined the chanel')
-      else if (event.event === 'leave')
-        console.log(event.user, 'left the chanel')
+      if (event.event === 'join') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+      else if (event.event === 'leave') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
     })
 
   })
