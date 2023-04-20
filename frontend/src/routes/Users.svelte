@@ -16,7 +16,7 @@
   <div class="component">
     <div class="userPanel">
 
-      <h1 class="componentName">Profile</h1>
+      <h1 class="title">Profile</h1>
 
       <button class="clickableImageButton" on:click={() => settings = !settings}>
         <img class="userImage" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
@@ -32,12 +32,13 @@
 
     </div>
 
-    {#if settings}
-      <UsersSettings/>
-    {:else}
-      <UsersInfo/>
-    {/if}
-
+    <div class="secondPanel">
+      {#if settings}
+        <UsersSettings reloadImage={reloadImage}/>
+      {:else}
+        <UsersInfo/>
+      {/if}
+    </div>
 
 
 
@@ -53,16 +54,8 @@
     background-color: var(--black);
   }
 
-  .componentName {
-    font-size: 50px;
-    text-shadow: 0 0 20px;
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 0.5px;
-    color: var(--pink);
-  }
-
   .userPanel {
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: space-around;
     flex-direction: column;
@@ -74,6 +67,17 @@
 
   }
 
+  .secondPanel {
+    grid-column: 2 / 3;
+  }
+
+  .title {
+    font-size: 50px;
+    text-shadow: 0 0 20px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.5px;
+    color: var(--pink);
+  }
   .clickableImageButton {
     position: relative;
     pointer-events: none;
