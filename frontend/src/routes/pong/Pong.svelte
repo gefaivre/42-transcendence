@@ -3,7 +3,6 @@
   import  ioClient  from 'socket.io-client';
   import { Ball, Frame, Paddle } from './Objects'
   import axios  from "axios";
-    import Game from "../Game.svelte";
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -14,13 +13,21 @@
   const leftPaddle: Paddle = new Paddle(true, frame); 
   const rightPaddle: Paddle = new Paddle(false, frame); 
   
-  let gameList: string[] = [];
+
+  class Game { 
+    id: string;
+    player1: string;
+    player2: string;
+  }
+
+  let gameList: Game[] = [];
 
   let leftScore: number = 0;
   let rightScore: number = 0;
   let stop: boolean = true;
 
   let inGame: boolean = false;
+  let gameRequest: boolean = false;
 
   const socket = ioClient('http://localhost:3000', {
     path: '/pong',
@@ -42,6 +49,7 @@
       if (!inGame)
         game_loop();
       inGame = true;
+      gameRequest = false;
       stop = state.stop;
       if (stop)
         inGame = false
@@ -67,7 +75,6 @@
   getGames();
   console.log('gameList', gameList);
 
-  
   async function getGames() {
     let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
     for (const game of games) {
@@ -125,6 +132,7 @@
 
   function requestGame() {
     socket.emit('requestGame', {});
+    gameRequest = true;
   }
 
   function joinFriendly(event: any) {
@@ -151,18 +159,20 @@
 {#if gameList}
   <ul>
     {#each gameList as game}
-      <li>{game} game</li>
-      <button on:click={() => watchGame(game)}>watch</button>
+      <li>{game.player1 + ' vs ' + game.player2} game</li>
+      <button on:click={() => watchGame(game.id)}>watch</button>
     {/each}
   </ul>
 {/if}
 
 
-<button on:click={requestGame}>request random game</button>
-<form on:submit|preventDefault={(event) => joinFriendly(event)}>
-    <input id="friend" name="friend" type="text" placeholder="type friend username">
-    <button type="submit">play a friendly match</button>
-</form>
+  {#if !gameRequest}
+  <button on:click={requestGame}>request random game</button>
+  <form on:submit|preventDefault={(event) => joinFriendly(event)}>
+      <input id="friend" name="friend" type="text" placeholder="type friend username">
+      <button type="submit">play a friendly match</button>
+  </form>
+  {/if}
 {/if}
 
 {#if inGame}
@@ -172,6 +182,10 @@
 <div class:inGame={inGame}>
 <canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
 </div>
+
+{#if gameRequest}
+<h2>Game requested !</h2>
+{/if}
 
 <style>
 
