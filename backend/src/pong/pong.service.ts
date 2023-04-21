@@ -10,6 +10,7 @@ import { UsersService } from 'src/users/users.service';
 import { MatchsService } from 'src/matchs/matchs.service';
 import { GameStateDto } from './dto/game-state-dto';
 import { GameDto } from './dto/game-dto';
+import { RoomDto } from './dto/room-dto';
 
 @Injectable()
 export class PongService {
@@ -132,8 +133,14 @@ export class PongService {
     return gamesStateDto;
   }
 
-  getGameList() : string[] {
-    return this.rooms.map(room => room.id);
+  getRoomList() : RoomDto[] {
+    let roomList: RoomDto[] = [];
+
+    this.rooms.forEach(room => {
+      if (room.start)
+        roomList.push({roomId: room.id, player1: room.player1.username, player2: room.player2!.username});
+    });
+    return roomList;
   }
 
   async endMatch(room: Room) {
@@ -180,4 +187,25 @@ export class PongService {
     }
   }
 
+  getWinner(roomId: string) : string {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId)
+    if (room) {
+      if (room.game.leftScore === 10)
+        return room.player1.clientId;
+      else
+        return room.player2!.clientId;
+    }
+    return '';
+  }
+
+  getLoser(roomId: string) : string {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId)
+    if (room) {
+      if (room.game.leftScore === 10)
+        return room.player2!.clientId;
+      else
+        return room.player1.clientId;
+    }
+    return '';
+  }
 }

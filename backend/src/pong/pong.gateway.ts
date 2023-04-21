@@ -6,6 +6,7 @@ import { KeyEventDto } from './dto/key-event-dto';
 import { RequestGameDto } from './dto/request-game-dto';
 import { GameStateDto } from './dto/game-state-dto';
 import { GameDto } from './dto/game-dto';
+import { RoomDto } from './dto/room-dto';
 
 @WebSocketGateway({
     path: '/pong',
@@ -50,6 +51,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const gamesState: GameStateDto[] = this.pongService.getGamesState();
     gamesState.forEach(game => {
       this.server.to(game.id).emit('gameState', game.state);
+      if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
+        const winnerId: string = this.pongService.getWinner(game.id);
+        this.server.to(winnerId).emit('win', {});
+        const loserId: string = this.pongService.getWinner(game.id);
+        this.server.to(loserId).emit('lose', {});
+      }
     });
   }
 
@@ -68,7 +75,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log(`pongWebsocket: client ${client.id} is unauthorized`);
       } else {
         this.server.to(client.id).emit('welcome', { user: client.id });
-        const gameList : string[] = this.pongService.getGameList();
+        const roomList : RoomDto[] = this.pongService.getRoomList();
         this.server.to(client.id).emit('gameList', { gameList: gameList });
         console.log(`pongWebsocket: user ${username} connected`);
       }
