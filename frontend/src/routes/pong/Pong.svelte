@@ -44,7 +44,15 @@
     socket.on('watchGame', () => {
       console.log('watcherMode on');
     });
+
+    socket.on('win', () => {
+      alert('you win! refresh page to play another game');
+    });
     
+    socket.on('lose', () => {
+      alert('you lose! refresh page to play another game');
+    });
+
     socket.on('gameState', (state) => {
       if (!inGame)
         game_loop();
