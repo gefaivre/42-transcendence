@@ -2,15 +2,15 @@
 
 </script>
 
-	<div class="infoContainer">
+	<div class="info-container">
 
-		<div class="boxInfo friends">
+		<div class="box-info friends">
 			<h1> Friends</h1>
 		</div>
-		<div class="boxInfo gamesHistory">
+		<div class="box-info games">
 			<h1>Game history</h1>
 		</div>
-		<div class="boxInfo statistics">
+		<div class="box-info statistics">
 			<h1>Statistics</h1>
 		</div>
 
@@ -19,24 +19,25 @@
 
 <style>
 
-	h1 {
-		color: var(--white);
-	}
-
-	.infoContainer {
-		display: grid;
+	.info-container {
+		display: flex;
 		height: 100%;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
 		background-color: var(--grey);
 	}
+	h1 {
+		color: var(--white);
+		text-align: center;
+	}
 
-	.boxInfo {
+
+	.box-info {
 		margin: 50px;
 		border: solid 2px var(--grey);
 		box-shadow: 0 0 10px var(--lite-grey);
 		background-color: var(--black);
-		border-radius: 10%;
+		border-radius: 5%;
+		height: 450px;
+		width: 450px;
 	}
 
 </style>

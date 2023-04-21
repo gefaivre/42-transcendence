@@ -127,33 +127,70 @@
 
 </script>
 
-	<div class="settingsContainer">
-		<h1>TESTTSTST</h1>
-		<div class="image-list">
-			{#each imagesTab as i}
-			<button class="hidden-button"  on:click={() => { UpdatePP(i.id) }}>
-				<img class="pp" src="http://localhost:3000/images/{i.id}" alt="{i.name}">
-			</button>
-			{/each}
-		</div>
-		<form on:submit|preventDefault={submitImage}>
-			<input type="file" bind:this={fileInput} accept="image/*">
-			<button type="submit">Upload</button>
-		</form>
+	<div class="settings-container">
+
+    <div class="box-info image">
+      <h1>Change your pp</h1>
+      <div class="image-list">
+        {#each imagesTab as i}
+        <button class="hidden-button"  on:click={() => { UpdatePP(i.id) }}>
+          <img class="pp" src="http://localhost:3000/images/{i.id}" alt="{i.name}">
+        </button>
+        {/each}
+          <form class="form" on:change|preventDefault={submitImage}>
+            <label for="file-upload" >Add Image</label>
+            <input bind:this={fileInput} type="file" style="visibility: hidden;" id="file-upload"/>
+          </form>
+      </div>
+    </div>
+
+    <div class="box-info username">
+      <h1>change your username</h1>
+    </div>
+
+    <div class="box-info twof2a">
+      <h1>Toggle 2fa</h1>
+    </div>
+
+
 	</div>
 
 
 <style>
 
 
-	.settingsContainer {
+	.settings-container {
+    display: flex;
+    flex-wrap: wrap;
 		height: 100%;
-		width: 100%;
-		background-color: var(--white);
+		background-color: var(--grey);
 	}
 
+  h1 {
+		color: var(--white);
+		text-align: center;
+	}
+
+
+  .box-info {
+    margin: 50px;
+		border: solid 2px var(--grey);
+		box-shadow: 0 0 10px var(--lite-grey);
+		background-color: var(--black);
+		border-radius: 5%;
+		height: 450px;
+		width: 450px;
+  }
+
+  .image{
+    background-color: var(--white);
+    overflow: hidden;
+  }
+  .image h1{
+    color: var(--balck);
+  }
+
 .image-list {
-    border: 2px solid black;
     padding-left: 2%;
     padding-right: 2%;
     display: flex;
@@ -162,17 +199,30 @@
     justify-content:space-between;
     margin: auto;
     width: 100%;
-    max-width: 50vw;
-    max-height: 270px;
-    overflow: auto;
+    height: 100%;
+    padding-bottom: 20px;
+    overflow-y: scroll;
 }
 
-.image-list .pp {
+.image-list .pp{
     width: 100px;
     height: 100px;
     object-fit: cover;
     margin: auto;
     cursor: pointer;
+}
+
+.form{
+    width: 100px;
+    height: 100px;
+    border: solid 2px var(--back);
+    pointer-events: none;
+}
+
+.form label {
+  width: 100%;
+  height: 100%;
+  pointer-events: all;
 }
 
 .image-list .pp:hover {
@@ -184,7 +234,7 @@
 
 .hidden-button {
   border: none;
-  background-color: transparent;
+  background-color: var(--white);
   outline: none;
   box-shadow: none;
 }

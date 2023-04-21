@@ -13,39 +13,36 @@
 
 </script>
 
-  <div class="component">
-    <div class="userPanel">
+<div class="component">
+  <div class="user-panel">
 
-      <h1 class="title">Profile</h1>
+    <h1 class="title">Profile</h1>
 
-      <button class="clickableImageButton" on:click={() => settings = !settings}>
-        <img class="userImage" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
-      </button>
+    <button class="image-button" on:click={() => settings = !settings}>
+      <img class="image" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
+    </button>
 
-      <button class="clickableUsernameButton" on:click={() => settings = !settings}>
-        <span class="username">{$user.username}</span>
-      </button>
+    <button class="username-button" on:click={() => settings = !settings}>
+      <span class="username">{$user.username}</span>
+    </button>
 
-      <button class="clickableTwofaButton" on:click={() => settings = !settings}>
-        <p class="twofa">Your 2FA  is not activated</p>
-      </button>
-
-    </div>
-
-    <div class="secondPanel">
-      {#if settings}
-        <UsersSettings reloadImage={reloadImage}/>
-      {:else}
-        <UsersInfo/>
-      {/if}
-    </div>
-
-
-
+    <button class="twofa-button" on:click={() => settings = !settings}>
+      <p class="twofa">Your 2FA  is not activated</p>
+    </button>
 
   </div>
-<style>
 
+  <div class="second-panel">
+    {#if settings}
+      <UsersSettings reloadImage={reloadImage}/>
+    {:else}
+      <UsersInfo/>
+    {/if}
+  </div>
+
+</div>
+
+<style>
 
   .component {
     height: 100vh;
@@ -54,7 +51,7 @@
     background-color: var(--black);
   }
 
-  .userPanel {
+  .user-panel {
     height: 100%;
     display: flex;
     justify-content: space-around;
@@ -67,24 +64,22 @@
 
   }
 
-  .secondPanel {
-    grid-column: 2 / 3;
-  }
 
-  .title {
+  .user-panel .title {
     font-size: 50px;
     text-shadow: 0 0 20px;
     font-family: 'Courier New', Courier, monospace;
     letter-spacing: 0.5px;
     color: var(--pink);
   }
-  .clickableImageButton {
+
+  .user-panel .image-button {
     position: relative;
     pointer-events: none;
 
   }
 
-  .clickableImageButton:after {
+  .user-panel .image-button:after {
     position: absolute;
     content: "\2699";
     font-size: 1.5em;
@@ -99,30 +94,29 @@
     left: 100%;
     top: 0;
     transform: translate(-110%, 0px);
-
-
   }
 
-  .userImage {
+  .user-panel .image-button .image {
     border-radius: var(--imageRadius);
     height: 200px;
     width: 200px;
     position: relative;
     pointer-events: none;
+    border: solid 6px var(--lite-grey);
   }
 
-  .clickableUsernameButton {
+  .user-panel .username-button {
     position: relative;
     pointer-events: none;
   }
 
-  .username {
+  .user-panel .username-button .username {
     font-size: 50px;
     color: var(--white);
 
   }
 
-  .clickableUsernameButton:after {
+  .user-panel .username-button:after {
     position: absolute;
     content: "\2699";
     font-size: 1.2em;
@@ -140,15 +134,15 @@
 
   }
 
-  .twofa {
+  .user-panel .twofa-button .twofa {
     color: var(--white);
   }
 
-  .clickableTwofaButton {
+  .user-panel .twofa-button {
     position: relative;
   }
 
-  .clickableTwofaButton:after {
+  .user-panel .twofa-button:after {
     position: absolute;
     content: "\2699";
     font-size: 1.2em;
@@ -163,8 +157,10 @@
     left: 100%;
     top: 0;
     transform: translate(6px, -20px);
+  }
 
-
+  .second-panel {
+    grid-column: 2 / 3;
   }
 
 </style>
