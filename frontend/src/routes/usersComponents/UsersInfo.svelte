@@ -35,7 +35,7 @@
 		border: solid 2px var(--grey);
 		box-shadow: 0 0 10px var(--lite-grey);
 		background-color: var(--black);
-		border-radius: 5%;
+		border-radius: 30px;
 		height: 450px;
 		width: 450px;
 	}

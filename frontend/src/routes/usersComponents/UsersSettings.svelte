@@ -122,7 +122,10 @@
 
 </script>
 
-	<div class="settings-container">
+
+  <div class="settings-container">
+
+    <h1 class="title">Settings</h1>
 
     <div class="box-info image">
       <h1>Change your pp</h1>
@@ -143,7 +146,7 @@
       <h1>change your username</h1>
     </div>
 
-    <div class="box-info twof2a">
+    <div class="box-info twofa">
       <h1>Toggle 2fa</h1>
     </div>
 
@@ -155,11 +158,23 @@
 
 
 	.settings-container {
-    display: flex;
-    flex-wrap: wrap;
-		height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 150px repeat(2, 1fr);
 		background-color: var(--grey);
+    height: 100vh;
 	}
+
+  .title {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    font-size: 50px;
+    text-shadow: 0 0 20px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.5px;
+    color: var(--pink);
+    margin-top: 50px;
+  }
 
   h1 {
 		color: var(--white);
@@ -171,19 +186,39 @@
     margin: 50px;
 		border: solid 2px var(--grey);
 		box-shadow: 0 0 10px var(--lite-grey);
-		background-color: var(--black);
-		border-radius: 5%;
-		height: 450px;
-		width: 450px;
+		background-color: var(--lite-grey);
+		border-radius: 30px;
   }
 
   .image{
-    background-color: var(--white);
+    grid-column: 1 / 2;
+    grid-row: 2 / 4 ;
+    width: 80%;
+    height: 80%;
+    place-self: center;
     overflow: hidden;
   }
-  .image h1{
-    color: var(--balck);
+
+  .username {
+    grid-row: 2 / 3;
+    grid-column: 2 / 3;
+    place-self: center;
+    width: 40%;
+    height: 40%;
+
   }
+
+  .twofa {
+    grid-row: 3 / 4;
+    grid-column: 2 / 3;
+    place-self: center;
+    width: 40%;
+    height: 40%;
+
+  }
+
+
+
 
 .image-list {
     padding-left: 2%;
@@ -191,7 +226,7 @@
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    justify-content:space-between;
+    justify-content:space-around;
     margin: auto;
     width: 100%;
     height: 100%;
@@ -210,7 +245,7 @@
 .form{
     width: 100px;
     height: 100px;
-    border: solid 2px var(--back);
+    border: solid 2px var(--black);
     pointer-events: none;
 }
 
@@ -229,7 +264,6 @@
 
 .hidden-button {
   border: none;
-  background-color: var(--white);
   outline: none;
   box-shadow: none;
 }

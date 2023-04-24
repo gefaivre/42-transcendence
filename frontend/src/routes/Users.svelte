@@ -18,7 +18,6 @@
 
     <button class="image-button" on:click={() => settings = !settings}>
       <img class="image" src="http://localhost:3000/images/actual/{$user.id}?$reload=${$reloadImage}" alt="profil">
-      <p>{$reloadImage}</p>
     </button>
 
     <button class="username-button" on:click={() => settings = !settings}>
@@ -160,6 +159,8 @@
 
   .second-panel {
     grid-column: 2 / 3;
+    background-color: var(--grey);
+    overflow-y: scroll;
   }
 
 </style>
