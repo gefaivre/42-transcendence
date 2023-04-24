@@ -144,6 +144,10 @@
 
     <div class="box-info username">
       <h1>change your username</h1>
+      <div class="content">
+        <input type="text" placeholder="new username" bind:value={username}>
+        <button on:click={updateUsername}>Update</button>
+      </div>
     </div>
 
     <div class="box-info twofa">
@@ -159,7 +163,7 @@
 
 	.settings-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 2fr;
     grid-template-rows: 150px repeat(2, 1fr);
 		background-color: var(--grey);
     height: 100vh;
@@ -183,7 +187,6 @@
 
 
   .box-info {
-    margin: 50px;
 		border: solid 2px var(--grey);
 		box-shadow: 0 0 10px var(--lite-grey);
 		background-color: var(--lite-grey);
@@ -193,6 +196,7 @@
   .image{
     grid-column: 1 / 2;
     grid-row: 2 / 4 ;
+    min-width: 140px;
     width: 80%;
     height: 80%;
     place-self: center;
@@ -203,8 +207,9 @@
     grid-row: 2 / 3;
     grid-column: 2 / 3;
     place-self: center;
-    width: 40%;
-    height: 40%;
+    min-width: 250px;
+    width: 50%;
+    height: 20%;
 
   }
 
@@ -212,13 +217,10 @@
     grid-row: 3 / 4;
     grid-column: 2 / 3;
     place-self: center;
-    width: 40%;
-    height: 40%;
+    width: 20%;
+    height: 20%;
 
   }
-
-
-
 
 .image-list {
     padding-left: 2%;
@@ -266,6 +268,19 @@
   border: none;
   outline: none;
   box-shadow: none;
+}
+
+
+.username .content{
+  margin-top:  5%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.username .content input {
+  border-radius: 10px;
 }
 
 </style>

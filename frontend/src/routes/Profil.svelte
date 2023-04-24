@@ -2,7 +2,6 @@
 
     import greenWin from '../assets/greenWin.png';
     import redLose from "../assets/redLose.png";
-    import ChangePp from "./usersComponents/ChangePp.svelte";
     import { user } from "../stores";
 
 
@@ -116,7 +115,6 @@
     {:else}
     <!-- Inlude component dosen't work, tailwindcss issue -->
         <p>COOUCOU</p>
-        <ChangePp bind:reloadImage={reloadImage} />
     {/if}
     {/if}
 
