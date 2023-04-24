@@ -7,8 +7,6 @@
 
     let fileInput: any = null
 
-    let ImageParameter: boolean = false
-
     let imagesTab = []
 
     export let reloadImage
@@ -31,17 +29,14 @@
                 'Content-Type': 'multipart/form-data'
             },
             withCredentials: true
-        });
+          });
+        downloadImages();
         reloadImage++
         } catch (error) {
         console.error(error)
         }
         fileInput == null;
     };
-
-    async function toggleImageParameter() {
-      ImageParameter = !ImageParameter
-    }
 
     async function downloadImages() {
       axios.get('http://localhost:3000/images/all', { withCredentials: true })
@@ -63,6 +58,7 @@
         .catch(err => {
             console.log(err)
         })
+
 
     }
 
