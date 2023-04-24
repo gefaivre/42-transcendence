@@ -9,7 +9,7 @@
     import homeIcon     from './assets/whiteHome.png'
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
-    import { id, logged, user } from "./stores";
+    import { id, logged, user, reloadImage} from "./stores";
     import routes from "./routes";
     import Router from "svelte-spa-router";
 
@@ -42,7 +42,7 @@
     <div class="profileLink">
     {#if $user}
       <a href="/#/users/{$user.username}">
-        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}' alt="profile">
+        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' alt="profile">
       </a>
     {/if}
     </div>

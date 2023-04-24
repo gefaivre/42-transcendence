@@ -1,6 +1,6 @@
 <script lang="ts">
     import axios from "axios";
-	import {id , user} from "../../stores";
+	import {id , user, reloadImage} from "../../stores";
     import { replace } from "svelte-spa-router";
     import { onMount } from "svelte";
 
@@ -8,8 +8,6 @@
     let fileInput: any = null
 
     let imagesTab = []
-
-    export let reloadImage
 
 		onMount(() => downloadImages())
 
@@ -31,7 +29,7 @@
             withCredentials: true
           });
         downloadImages();
-        reloadImage++
+        $reloadImage++
         } catch (error) {
         console.error(error)
         }
@@ -42,6 +40,7 @@
       axios.get('http://localhost:3000/images/all', { withCredentials: true })
       .then(res => {
         imagesTab = res.data;
+        downloadImages();
       })
       .catch(err => {
         console.log(err)
@@ -53,7 +52,7 @@
         await axios.get(`http://localhost:3000/images/set/${id}`, { withCredentials: true })
         .then(res => {
             console.log(res.data)
-            reloadImage++
+            $reloadImage++
         })
         .catch(err => {
             console.log(err)

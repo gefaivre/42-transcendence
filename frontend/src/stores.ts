@@ -10,4 +10,5 @@ id.subscribe(val => localStorage.setItem('id', val))
 
 
 export const user = writable<User>(null)
-// user.subscribe(val => localStorage.setItem('user', ))
+
+export const reloadImage = writable<number>(0)

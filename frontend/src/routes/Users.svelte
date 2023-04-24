@@ -1,12 +1,10 @@
 <script lang="ts">
 
 
-  import { user} from "../stores";
+  import { user, reloadImage} from "../stores";
 
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
-
-    let reloadImage: number = 0
 
     let settings: boolean = false;
 
@@ -19,7 +17,8 @@
     <h1 class="title">Profile</h1>
 
     <button class="image-button" on:click={() => settings = !settings}>
-      <img class="image" src="http://localhost:3000/images/actual/{$user.id}?$reload=${reloadImage}" alt="profil">
+      <img class="image" src="http://localhost:3000/images/actual/{$user.id}?$reload=${$reloadImage}" alt="profil">
+      <p>{$reloadImage}</p>
     </button>
 
     <button class="username-button" on:click={() => settings = !settings}>
@@ -34,7 +33,7 @@
 
   <div class="second-panel">
     {#if settings}
-      <UsersSettings reloadImage={reloadImage}/>
+      <UsersSettings/>
     {:else}
       <UsersInfo/>
     {/if}
