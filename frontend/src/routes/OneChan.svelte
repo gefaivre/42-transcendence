@@ -54,6 +54,13 @@
       return pop()
     })
   }
+  function getAvatar(username) {
+    let user = channel.users.find(user => user.username === username);
+    if (user)
+      return "http://localhost:3000/images/actual/" + user.id;
+      else
+       return defaultAvatar;
+  }
 
   // TODO: what if we manually change `id` store value ?
   onMount(async () => {
@@ -94,7 +101,6 @@
       console.log('receive post')
       posts.push(post)
       posts = posts
-      console.log(post);
     })
 
     // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
@@ -127,7 +133,7 @@
     <div class="horizontalBar">
         <h1>{channel.name}</h1>
         <div class="settings">
-            <img src={settingsImage} alt="settings whell">
+            <img src={settingsImage} alt="settings wheel">
         </div>
 
     </div>
@@ -135,7 +141,7 @@
       {#each posts as post}
       <div class="post">
         <div class="marge">
-          <img src={defaultAvatar} alt="avatar">
+          <img class="rounded-full" src={getAvatar(post.author)} alt="avatar">
         </div>
         <div class="user">
           <span style="color: #9E27D9; font-size: 20px; position: relative; top:30%; font-family: Arial;">
