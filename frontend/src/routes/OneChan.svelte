@@ -8,7 +8,8 @@
     import { pop } from "svelte-spa-router";
     import ioClient from 'socket.io-client';
     import type { Socket } from "socket.io-client";
-    import type { Channel, PostEmitDto, ChannelDto, WsException } from "../types";
+    import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto } from "../types";
+    import defaultAvatar from '../assets/008-utilisateur.png';
     
     export let params: any = {}
     let socket: Socket = null
@@ -16,7 +17,7 @@
     let password: string = ''
     let channel: Channel = null
     let isMember: boolean = false
-    let posts: PostEmitDto[] = []
+    let posts: newPostEmitDto[] = []
 
   // $: foo = posts
 
@@ -89,10 +90,11 @@
       console.log('Disconnected:', reason)
     })
 
-    socket.on('post', (post: PostEmitDto) => {
+    socket.on('post', (post: newPostEmitDto) => {
       console.log('receive post')
       posts.push(post)
       posts = posts
+      console.log(post);
     })
 
     // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
@@ -113,7 +115,7 @@
       else if (event.event === 'leave')
         console.log(event.user, 'left the chanel')
     })
-
+    console.log(channel.users)
   })//fin
 
   onDestroy(() => socket.disconnect())
@@ -132,7 +134,23 @@
     <div class="Wall">
       {#each posts as post}
       <div class="post">
-        <b>{post.author}</b>: {post.content}
+        <div class="marge">
+          <img src={defaultAvatar} alt="avatar">
+        </div>
+        <div class="user">
+          <span style="color: #9E27D9; font-size: 20px; position: relative; top:30%; font-family: Arial;">
+            {post.author}
+            
+          </span>
+        </div>
+        <div class="postContent">
+          <span style="color: #FFFFFF; font-family: Arial;">
+            {post.content}
+
+          </span>
+
+        </div>
+        <br>
       </div>
       {/each}
     </div>
@@ -159,18 +177,50 @@
         position: absolute;
         left: 448px;
         top: 56px;
-        background-color: aliceblue;
         overflow-y: auto;
       }
+      .Wall img{
+        height: 30px;
+        widows: 30px;
+      }
       .post {
-  padding: 10px;
-  margin: 5px;
-  background-color: #f1f1f1;
-  border-radius: 5px;
-  max-height: 100%;
-  overflow-y: auto;
-  word-wrap: break-word;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      max-height: 100%;
+      max-width: 100%;
+      overflow-y: auto;
+      word-wrap: break-word;
+      position: relative;
 }
+      .post .user {
+        position: absolute;
+        top: 0;
+        left: 45px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        z-index: 1;
+      }
+    .post .postContent{
+      position: absolute;
+      width: calc(100% - 44px);
+      max-height: 100%;
+      left:45px;
+      overflow-y: auto;
+      word-wrap: break-word;
+      position: relative;
+      z-index: 2;
+      padding-top: 15px;
+      text-align-last: left;
+    }
+      .marge{
+        position: absolute;
+        top:0px;
+        left:0px;
+
+        height:100%;
+        width:45px;
+      }
     .prompt{
         position: absolute;
         width: calc(100% - 448px);

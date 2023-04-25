@@ -42,7 +42,11 @@ export type PostEmitDto = {
   content: string
   author: string
 }
-
+export type newPostEmitDto = {
+  channelName: string
+  content: string
+  author: User
+}
 // mirros the object backend sends with `throw new WsException()`
 export type WsException = {
   status: string
