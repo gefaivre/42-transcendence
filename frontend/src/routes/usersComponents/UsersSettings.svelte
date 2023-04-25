@@ -135,10 +135,11 @@
           <img class="pp" src="http://localhost:3000/images/{i.id}" alt="{i.name}">
         </button>
         {/each}
-          <form class="form" on:change|preventDefault={submitImage}>
-            <label for="file-upload" >Add Image</label>
+        <form class="form" on:change|preventDefault={submitImage}>
+          <label for="file-upload" >Add Image
             <input bind:this={fileInput} type="file" style="visibility: hidden;" id="file-upload"/>
-          </form>
+          </label>
+        </form>
       </div>
     </div>
 
@@ -200,7 +201,9 @@
     width: 80%;
     height: 80%;
     place-self: center;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+
   }
 
   .username {
@@ -223,38 +226,32 @@
   }
 
 .image-list {
-    padding-left: 2%;
-    padding-right: 2%;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content:space-around;
-    margin: auto;
-    width: 100%;
-    height: 100%;
-    padding-bottom: 20px;
-    overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-gap: 1em;
+    justify-items: center;
 }
 
 .image-list .pp{
     width: 100px;
     height: 100px;
-    object-fit: cover;
-    margin: auto;
     cursor: pointer;
 }
 
-.form{
-    width: 100px;
-    height: 100px;
-    border: solid 2px var(--black);
-    pointer-events: none;
+form {
+  height: 100px;
+  width: 100px;
 }
 
-.form label {
-  width: 100%;
-  height: 100%;
-  pointer-events: all;
+label {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  border: solid 2px var(--black);
+  cursor: crosshair;
+  background-color: var(--white);
+  font-size: 30px;
+  text-align: center;
 }
 
 .image-list .pp:hover {
@@ -265,6 +262,8 @@
 }
 
 .hidden-button {
+  height: 100px;
+  width: 100px;
   border: none;
   outline: none;
   box-shadow: none;
@@ -282,5 +281,27 @@
 .username .content input {
   border-radius: 10px;
 }
+
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: 7px;
+    scrollbar-color: var(--pink) ;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--pink);
+    border-radius: 10px;
+  }
 
 </style>

@@ -74,7 +74,8 @@
   .user-panel .image-button {
     position: relative;
     pointer-events: none;
-
+    background-color: var(--grey);
+    border: none;
   }
 
   .user-panel .image-button:after {

@@ -82,7 +82,6 @@
     --imageRadius: 50%;
    }
 
-
   .screen {
     display: grid;
     height: 100vh;
