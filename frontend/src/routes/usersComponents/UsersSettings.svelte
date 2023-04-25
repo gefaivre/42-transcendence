@@ -153,6 +153,7 @@
 
     <div class="box-info twofa">
       <h1>Toggle 2fa</h1>
+      <img class="qrcode" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Qrcode_wikipedia_fr_v2clean.png?uselang=fr" alt="qr code">
     </div>
 
 
@@ -210,9 +211,8 @@
     grid-row: 2 / 3;
     grid-column: 2 / 3;
     place-self: center;
-    min-width: 250px;
-    width: 50%;
-    height: 20%;
+    width: 250px;
+    height: 100px;
 
   }
 
@@ -220,8 +220,8 @@
     grid-row: 3 / 4;
     grid-column: 2 / 3;
     place-self: center;
-    width: 20%;
-    height: 20%;
+    width: 250px;
+    height: 250px;
 
   }
 
@@ -267,6 +267,13 @@ label {
   border: none;
   outline: none;
   box-shadow: none;
+}
+
+.twofa .qrcode {
+  display: block;
+  height: 200px;
+  width: 200px;
+  margin: auto;
 }
 
 
