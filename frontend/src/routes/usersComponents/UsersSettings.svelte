@@ -153,7 +153,7 @@
 
     <div class="box-info twofa">
       <h1>Toggle 2fa</h1>
-      <img class="qrcode" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Qrcode_wikipedia_fr_v2clean.png?uselang=fr" alt="qr code">
+      <img id="qrcode" class="qrcode" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Qrcode_wikipedia_fr_v2clean.png?uselang=fr" alt="qr code">
     </div>
 
 
@@ -274,6 +274,11 @@ label {
   height: 200px;
   width: 200px;
   margin: auto;
+  filter: blur(10px);
+}
+
+.twofa .qrcode:active {
+  filter: blur(0px);
 }
 
 
