@@ -29,6 +29,7 @@
       console.log(response)
       message = ''
     })
+    scrollToBottom();
   }
 
   function joinRoom() {
@@ -61,6 +62,10 @@
       else
        return defaultAvatar;
   }
+  function scrollToBottom() {
+    const el = document.getElementById('Wall');
+    el.scrollTop = el.scrollHeight;
+}
 
   // TODO: what if we manually change `id` store value ?
   onMount(async () => {
@@ -101,6 +106,7 @@
       console.log('receive post')
       posts.push(post)
       posts = posts
+      scrollToBottom();
     })
 
     // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
@@ -122,6 +128,7 @@
         console.log(event.user, 'left the chanel')
     })
     console.log(channel.users)
+
   })//fin
 
   onDestroy(() => socket.disconnect())
@@ -137,11 +144,11 @@
         </div>
 
     </div>
-    <div class="Wall">
+    <div class="Wall" id="Wall">
       {#each posts as post}
       <div class="post">
         <div class="marge">
-          <img class="rounded-full" src={getAvatar(post.author)} alt="avatar">
+          <img class="rounded-full" src={getAvatar(post.author)} style="height: 30px; width: 30px;" alt="avatar">
         </div>
         <div class="user">
           <span style="color: #9E27D9; font-size: 20px; position: relative; top:30%; font-family: Arial;">
