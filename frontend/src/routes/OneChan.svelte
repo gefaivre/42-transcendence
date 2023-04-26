@@ -1,7 +1,7 @@
 <script lang=ts>
     import Layout from "./Layout.svelte";
     import axios from "axios";
-    import { onMount, onDestroy} from "svelte";
+    import { onMount, onDestroy, afterUpdate} from "svelte";
     import ChanMenu from "./chanLayouts.svelte";
     import settingsImage from "../assets/settings.png";
     import { logged, id } from "../stores";
@@ -18,8 +18,18 @@
     let channel: Channel = null
     let isMember: boolean = false
     let posts: newPostEmitDto[] = []
+    let element;
 
   // $: foo = posts
+  afterUpdate(() => {
+		console.log("afterUpdate");
+		if(posts) newscrollToBottom(element);
+  });
+	
+	$: if(posts && element) {
+		console.log("tick");
+		newscrollToBottom(element);
+	}
 
   function post() {
     socket.emit('sendPost', {
@@ -29,7 +39,6 @@
       console.log(response)
       message = ''
     })
-    scrollToBottom();
   }
 
   function joinRoom() {
@@ -66,6 +75,9 @@
     const el = document.getElementById('Wall');
     el.scrollTop = el.scrollHeight;
 }
+const newscrollToBottom = async (node) => {
+    node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+  }; 
 
   // TODO: what if we manually change `id` store value ?
   onMount(async () => {
@@ -106,7 +118,6 @@
       console.log('receive post')
       posts.push(post)
       posts = posts
-      scrollToBottom();
     })
 
     // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
@@ -144,7 +155,7 @@
         </div>
 
     </div>
-    <div class="Wall" id="Wall">
+    <div class="Wall" id="Wall" bind:this={element}>
       {#each posts as post}
       <div class="post">
         <div class="marge">
