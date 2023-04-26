@@ -17,6 +17,7 @@ import UserProfile from './routes/UserProfile.svelte';
 import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
 import ThomasChan from './routes/Chan.svelte'
+import Pong from './routes/pong/Pong.svelte'
 
 export default {
     '/': Home,
@@ -37,5 +38,6 @@ export default {
     '/:username': UserProfile,
     '/message/create': CreateChannel,
     '/message/:name': Chan,
+    '/pong': Pong,
     '*': NotFound
 };

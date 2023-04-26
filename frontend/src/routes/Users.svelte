@@ -1,10 +1,33 @@
 <script lang="ts">
 
 
-  import { user, reloadImage} from "../stores";
-
+import axios from "axios";
+  import { onMount } from "svelte";
+  import { logged, id, reloadImage, user } from "../stores";
+  import { replace } from "svelte-spa-router";
+  import type { User} from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
+
+  // type Friends = {
+  //     friends: { id: number, username: string }[]
+  //     friendOf: { id: number, username: string }[]
+  //     pendingFriends: { id: number, username: string }[]
+  //     requestFriends: { id: number, username: string }[]
+  //   }
+
+  //   let user: User & Friends = {
+  //       id: 0,
+  //       username: null,
+  //       password: null,
+  //       mmr: null,
+  //       games: null,
+  //       ft_login: null,
+  //       friends: [],
+  //       friendOf: [],
+  //       pendingFriends: [],
+  //       requestFriends: [],
+  //   }
 
     let settings: boolean = false;
 
@@ -39,6 +62,11 @@
   </div>
 
 </div>
+
+
+
+
+
 
 <style>
 

@@ -56,6 +56,7 @@
         <br>
         <a href="#/Menu">testfront</a>
         <br>
+        <a href="#/pong">pong</a>
         <br>
         <button on:click={logout}>logout</button>
         <br>
