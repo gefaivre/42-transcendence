@@ -123,12 +123,12 @@ export class PongService {
   getGamesState(): GameStateDto[] {
     const gamesStateDto: GameStateDto[] = [];
     this.rooms.forEach(room => {
-      let result = room.game.loop();
       if (room.start) {
+        let result = room.game.loop();
         gamesStateDto.push({ id: room.id, state: room.game.getState() });
+        if (JSON.stringify(result) !== '{}')
+         this.endMatch(room);
       }
-      if (JSON.stringify(result) !== '{}')
-        this.endMatch(room);
     });
     return gamesStateDto;
   }

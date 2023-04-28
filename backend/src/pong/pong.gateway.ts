@@ -54,7 +54,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
         const winnerId: string = this.pongService.getWinner(game.id);
         this.server.to(winnerId).emit('win', {});
-        const loserId: string = this.pongService.getWinner(game.id);
+        const loserId: string = this.pongService.getLoser(game.id);
         this.server.to(loserId).emit('lose', {});
       }
     });
