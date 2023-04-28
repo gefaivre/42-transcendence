@@ -11,7 +11,11 @@
         mmr: 0,
         games: 0,
         ft_login: '',
-        id : 0
+        id : 0,
+        friends: [],
+        friendOf: [],
+        pendingFriends: [],
+        requestFriends: [],
     }
 
     onMount(() => getProfile())

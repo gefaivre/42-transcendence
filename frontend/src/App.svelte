@@ -4,20 +4,21 @@
 
     import axios from "axios";
     import { onMount, setContext } from "svelte";
-    //import groupe from "../../icons/groupe.png"'
     import channelIcon  from './assets/whiteChannel.png';
     import homeIcon     from './assets/whiteHome.png'
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
+    import leaderIcon     from './assets/podium.png'
     import { id, logged, user, reloadImage} from "./stores";
     import routes from "./routes";
-    import Router from "svelte-spa-router";
+    import Router, { link } from "svelte-spa-router";
 
     const menuItems = [
       { label: 'Home', icon: homeIcon, link: '#/Menu'},
       { label: 'Channel', icon: channelIcon, link: '#/Channel'},
       { label: 'Messages', icon: messageIcon, link: '#/Message' },
-      { label: 'Game', icon: gameIcon, link: '#/Game'}
+      { label: 'Game', icon: gameIcon, link: '#/Game'},
+      { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
     ];
 
     onMount(() => getProfile())
@@ -25,6 +26,7 @@
     async function getProfile() {
       try {
         let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
+        // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
         user.set(response.data)
         console.log($user)
         logged.set('true')
@@ -41,7 +43,7 @@
   <div class="screen">
     <div class="profileLink">
     {#if $user}
-      <a href="/#/users/{$user.username}">
+      <a  use:link href="/users/{$user.username}">
         <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' alt="profile">
       </a>
     {/if}
@@ -69,11 +71,14 @@
     <a href="#/signup">Signup with username</a>
     <br>
     <a href="#/login">Login with username</a>
+    <Router {routes}/>
   {/if}
 
   <style>
 
    :root {
+    --lite-lite-lite-grey: #acacac;
+    --lite-lite-grey: #888888;
     --lite-grey: #707070;
     --grey: #222222;
     --black: black;

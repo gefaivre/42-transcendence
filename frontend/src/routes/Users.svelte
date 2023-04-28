@@ -3,53 +3,102 @@
 
 import axios from "axios";
   import { onMount } from "svelte";
-  import { logged, id, reloadImage, user } from "../stores";
-  import { replace } from "svelte-spa-router";
+  import { id, reloadImage, user } from "../stores";
   import type { User} from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
+  import NotFound from "./NotFound.svelte";
 
-  // type Friends = {
-  //     friends: { id: number, username: string }[]
-  //     friendOf: { id: number, username: string }[]
-  //     pendingFriends: { id: number, username: string }[]
-  //     requestFriends: { id: number, username: string }[]
-  //   }
 
-  //   let user: User & Friends = {
-  //       id: 0,
-  //       username: null,
-  //       password: null,
-  //       mmr: null,
-  //       games: null,
-  //       ft_login: null,
-  //       friends: [],
-  //       friendOf: [],
-  //       pendingFriends: [],
-  //       requestFriends: [],
-  //   }
+  export let params;
 
-    let settings: boolean = false;
+  const name = params.name
+
+  let settings: boolean = false;
+
+  let pageUser: User = {
+      id: 0,
+      username: null,
+      password: null,
+      mmr: null,
+      games: null,
+      ft_login: null,
+      friends: [],
+      friendOf: [],
+      pendingFriends: [],
+      requestFriends: [],
+
+    }
+
+    $: {
+      const { name: newName } = params.name;
+      if (newName !== name) {
+        selectUser();
+      }
+    }
+
+
+    $: onMount(() => selectUser())
+
+  async function getUser(): Promise <User> {
+      return (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
+    }
+
+    async function selectUser() {
+    if (params.name != $user.username)
+    {
+      console.log("changement de uesr")
+      pageUser = await getUser();
+    }
+    else
+    pageUser = $user;
+  }
+
+  async function requestFriendship() {
+    try {
+      await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
+      getUser()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
 </script>
+
+{#if pageUser.username != null}
 
 <div class="component">
   <div class="user-panel">
 
     <h1 class="title">Profile</h1>
 
-    <button class="image-button" on:click={() => settings = !settings}>
-      <img class="image" src="http://localhost:3000/images/actual/{$user.id}?$reload=${$reloadImage}" alt="profil">
-    </button>
+    <!-- toggle edditing button (class after) -->
+    {#if pageUser.id.toString() == $id}
+      <button class="image-button imageAfter" on:click={() => settings = !settings}>
+        <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
+      </button>
 
-    <button class="username-button" on:click={() => settings = !settings}>
-      <span class="username">{$user.username}</span>
-    </button>
+      <button class="username-button usernameAfter" on:click={() => settings = !settings}>
+        <span class="username">{pageUser.username}</span>
+      </button>
 
-    <button class="twofa-button" on:click={() => settings = !settings}>
-      <p class="twofa">Your 2FA  is not activated</p>
-    </button>
+      <button class="twofa-button twofaAfter" on:click={() => settings = !settings}>
+        <p class="twofa">Your 2FA  is not activated</p>
+      </button>
+    {:else}
+      <button class="image-button" on:click={() => settings = !settings}>
+        <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
+      </button>
+
+      <button class="username-button" on:click={() => settings = !settings}>
+        <span class="username">{pageUser.username}</span>
+      </button>
+
+      <button class="friendrequest" on:click={() => requestFriendship()}>friends request</button>
+    {/if}
+
+
 
   </div>
 
@@ -57,11 +106,15 @@ import axios from "axios";
     {#if settings}
       <UsersSettings/>
     {:else}
-      <UsersInfo/>
+      <UsersInfo bind:pageUser={pageUser}/>
     {/if}
   </div>
 
 </div>
+
+{:else}
+  <NotFound/>
+{/if}
 
 
 
@@ -106,7 +159,7 @@ import axios from "axios";
     border: none;
   }
 
-  .user-panel .image-button:after {
+  .user-panel .imageAfter:after {
     position: absolute;
     content: "\2699";
     font-size: 1.5em;
@@ -143,7 +196,7 @@ import axios from "axios";
 
   }
 
-  .user-panel .username-button:after {
+  .user-panel .usernameAfter:after {
     position: absolute;
     content: "\2699";
     font-size: 1.2em;
@@ -169,7 +222,7 @@ import axios from "axios";
     position: relative;
   }
 
-  .user-panel .twofa-button:after {
+  .user-panel .twofaAfter:after {
     position: absolute;
     content: "\2699";
     font-size: 1.2em;
@@ -184,6 +237,12 @@ import axios from "axios";
     left: 100%;
     top: 0;
     transform: translate(6px, -20px);
+  }
+
+  .friendrequest {
+    background-color: aliceblue;
+    border: solid 2px black;
+    border-radius: 5px;
   }
 
   .second-panel {

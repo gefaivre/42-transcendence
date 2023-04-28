@@ -1,17 +1,19 @@
 <script lang="ts">
     import axios from "axios";
 		import { logged, id, reloadImage, user } from "../../stores";
+    import deleteIcon        from '../../assets/redLose.png';
 
 
+    export let pageUser;
 
 
 	async function getUser() {
 
 	}
 
-async function requestFriendship() {
+    async function requestFriendship() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/request/${$user.id}`, null, { withCredentials: true })
+        await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
         getUser()
       } catch (error) {
         console.log(error)
@@ -100,64 +102,27 @@ async function requestFriendship() {
 
 		<div class="box-info friends">
 			<h1> Friends</h1>
-		</div>
-		<div class="box-info games">
-			<h1>Game history</h1>
-		</div>
-		<div class="box-info statistics">
-			<h1>Statistics</h1>
-		</div>
 
-	</div>
-
-	    <!-- <h1>{user.username}</h1>
-    <table>
-        <tbody>
-            <tr>
-                <td>id</td> <td>{user.id}</td>
-            </tr>
-            <tr>
-                <td>Username</td> <td>{user.username}</td>
-            </tr>
-            <tr>
-                <td>Password</td> <td>{user.password}</td>
-            </tr>
-            <tr>
-                <td>Games played</td> <td>{user.games}</td>
-            </tr>
-            <tr>
-                <td>Mmr</td> <td>{user.mmr}</td>
-            </tr>
-            <tr>
-                <td>42 login</td> <td>{user.ft_login}</td>
-            </tr>
-            <tr>
-                <td>Friends</td>
-                <td>
-                  {#each user.friends as friend}
-                    {friend.username}
-                    {#if $id === user.id.toString()}
-                      <button on:click={() => removeFriendByName(friend.username)}>remove</button>
-                    {/if}
-                  {/each}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br>
-    <br>
-
-    {#if $id === user.id.toString()}
-      <input type="text" placeholder="new username" bind:value={username}>
-      <button on:click={updateUsername}>Update</button>
-      <br>
-      <input type="text" placeholder="new password" bind:value={password}>
-      <button on:click={updatePassword}>Update</button>
-      <br>
-      <br>
       <ul>
-      {#each user.requestFriends as requestFriends}
+
+        {#each pageUser.friends as friend}
+        <li class="lineFriend">
+          <a class="name" href="#/users/{friend.username}">{friend.username}</a>
+          {#if $id === pageUser.id.toString()}
+          <button class="deleteFriendBtn" on:click={() => removeFriendByName(friend.username)}>
+            <img class="btnImage" src={deleteIcon} alt="deleteicon">
+          </button>
+          {/if}
+        </li>
+        {/each}
+
+      </ul>
+    <br>
+    <br>
+
+    {#if $id === pageUser.id.toString()}
+      <ul>
+      {#each pageUser.requestFriends as requestFriends}
         <li>
           <b>{requestFriends?.username}</b> requested you as friend
           <button on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>Accept</button>
@@ -167,20 +132,20 @@ async function requestFriendship() {
       </ul>
       <br>
       <ul>
-      {#each user.pendingFriends as pendingFriends}
+      {#each pageUser.pendingFriends as pendingFriends}
         <li>
           You requested <b>{pendingFriends?.username}</b> as friend
-          <button on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>Cancel</button>
+          <button  on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>Cancel</button>
         </li>
       {/each}
       </ul>
-    {:else if user.friends.some(user => user.id.toString() === $id)}
+    {:else if pageUser.friends.some(user => user.id.toString() === $id)}
       This user is your friend !
       <button on:click={removeFriendById}>Remove</button>
-    {:else if user.requestFriends.some(user => user.id.toString() === $id)}
+    {:else if pageUser.requestFriends.some(user => user.id.toString() === $id)}
       Pending friend invitation...
       <button on:click={cancelFriendshipRequestById}>Cancel</button>
-    {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
+    {:else if pageUser.pendingFriends.some(user => user.id.toString() === $id)}
       This user requested you as friend
       <button on:click={acceptFriendshipRequestById}>Accept</button>
       <button on:click={dismissFriendshipRequestById}>Dismiss</button>
@@ -188,9 +153,15 @@ async function requestFriendship() {
       <button on:click={requestFriendship}>Request friendship</button>
     {/if}
 
-{:else}
-    <h1>UNAUTHORIZED ACCESS</h1>
-{/if} -->
+	</div>
+
+    <div class="box-info games">
+      <h1>Game history</h1>
+    </div>
+    <div class="box-info statistics">
+      <h1>Statistics</h1>
+    </div>
+  </div>
 
 
 <style>
@@ -215,7 +186,7 @@ async function requestFriendship() {
 		margin: 50px;
 		border: solid 2px var(--grey);
 		box-shadow: 0 0 10px var(--lite-grey);
-		background-color: var(--black);
+		background-color: var(--lite-grey);
 		border-radius: 30px;
 		height: 80%;
 		width: 80%;
@@ -225,5 +196,48 @@ async function requestFriendship() {
 		grid-column: 1 / 2;
 		grid-row: 1 / 3;
 	}
+
+
+  .lineFriend{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    /* border-top: solid 2px var(--grey); */
+    background-color: var(--lite-lite-lite-grey);
+
+  }
+
+  .lineFriend:nth-child(2n + 1){
+
+    background-color: var(--lite-lite-grey);
+  }
+
+  /* .lineFriend:last-child {
+    border-bottom: solid 2px var(--grey);
+  } */
+
+  .lineFriend .name {
+    margin-left: 10px;
+  }
+
+  .deleteFriendBtn {
+    background-color: aliceblue;
+    border: solid 2px black;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  .btnImage {
+    height: 25px;
+    width: 25px;
+  }
+
 
 </style>

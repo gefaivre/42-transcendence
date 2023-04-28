@@ -18,6 +18,7 @@ import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
 import ThomasChan from './routes/Chan.svelte'
 import Pong from './routes/pong/Pong.svelte'
+import { wrap } from 'svelte-spa-router/wrap'
 
 export default {
     '/': Home,

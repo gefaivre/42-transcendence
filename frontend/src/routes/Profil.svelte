@@ -35,7 +35,7 @@
         <div class="togleFa">
             <label class="relative inline-flex mr-5 cursor-pointer">
                 <div class="relative inline-block w-11 h-6 dark:bg-gray-700">
-                    <input type="checkbox" class="peer hidden dark:checked:bg-purple-600" bind:checked={toggleValue} on:change={toggle}/>
+                    <input type="checkbox" class="peer hidden dark:checked:bg-purple-600" bind:checked={toggleValue} />
                     <div class="absolute inset-0 rounded-full bg-gray-200 peer-checked:bg-purple-600 peer-checked:peer-focus:ring-4 peer-checked:peer-focus:ring-purple-300 dark:peer-checked:peer-focus:ring-purple-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600">
                     </div>
                 </div>
@@ -140,11 +140,11 @@
         height: 200px;
 
     }
-    .ftbigAvatar img{
+    /* .ftbigAvatar img{
         position: absolute;
         width: 100%;
         height: 100%;
-    }
+    } */
     .username{
         position: absolute;
         top: 75%;
