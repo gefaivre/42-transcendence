@@ -34,6 +34,7 @@
     let reloadImage: number = 0
 
     let qrcode = ''
+    let code2FA = ''
 
     export let params: any = { }
 
@@ -107,12 +108,21 @@
       }
     }
 
+    async function validate2FA() {
+        try {
+            await axios.post('http://localhost:3000/auth/2FA/validate', { token: code2FA }, { withCredentials: true })
+            qrcode = ''
+            code2FA = ''
+            getUser()
+        } catch (error) {
+            console.log(error.response.message)
+        }
+    }
+
     async function enable2FA() {
         try {
             const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
-            console.log(response)
             qrcode = response.data
-            getUser()
         } catch (error) {
             console.log(error.response.message)
         }
@@ -278,6 +288,10 @@
         <br>
         <br>
         <img alt='qrcode' src={qrcode}>
+        <br>
+        <br>
+        <input type="text" placeholder="code" bind:value={code2FA}>
+        <button on:click={validate2FA}>Validate</button>
       {/if}
       <br>
       <br>

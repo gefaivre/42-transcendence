@@ -125,16 +125,38 @@ export class AuthController {
     return request.user
   }
 
+  // Step 1/2 to enable 2FA
   @UseGuards(AuthGuard('jwt'))
   @Patch('2FA/enable')
   enable2FA(@Req() request: any) {
     return this.authService.enable2FA(+request.user.id)
   }
 
+  // Step 2/2 to enable 2FA
+  @UseGuards(AuthGuard('jwt'))
+  @Post('2FA/validate')
+  async validate2FA(@Req() request: any, @Body() body: any) {
+
+    const isValid: boolean = this.authService.validate2FA(body.token, request.user.id)
+
+    // register in db
+    if (isValid === true) {
+      try {
+        await this.usersService.update2FA(request.user.id, true)
+      } catch(e) {
+        throw new ConflictException()
+      }
+    }
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Patch('2FA/disable')
-  disabe2FA(@Req() request: any) {
-    return this.authService.disable2FA(+request.user.id)
+  async disable2FA(@Req() request: any) {
+    try {
+      await this.usersService.update2FA(+request.user.id, false)
+    } catch(e) {
+      throw new ConflictException()
+    }
   }
 
   @UseGuards(AuthGuard('jwt-2fa'))
