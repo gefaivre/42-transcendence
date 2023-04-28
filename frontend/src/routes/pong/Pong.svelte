@@ -53,6 +53,10 @@
       alert('you lose! refresh page to play another game');
     });
 
+    socket.on('opponentLeft', () => {
+      alert('your opponent has left the game, you win! refresh page to play another game');
+    });
+
     socket.on('gameState', (state) => {
       if (!inGame)
         game_loop();
