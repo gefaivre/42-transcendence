@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException } from '@nestjs/common';
+import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request} from 'express';
@@ -37,8 +37,7 @@ export class AuthController {
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
     // see if this 42 user already in db
-    let user
-    user = await this.usersService.findByFortyTwoLogin(ft_user.login)
+    let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
     if (!user) {
@@ -57,14 +56,18 @@ export class AuthController {
         return
     }
 
+    // if 2FA enabled, we will issue a second jwt after authentication complete
+    const jwtKey = user.TwoFA === true ? 'jwt2fa' : 'jwt'
+
     // bind a jwt to the authenticated user
-    const jwt = await this.authService.login(user)
+    const jwtValue = this.authService.login(user)
 
     // return the jwt as a cookie into frontend
-    response.cookie('jwt', jwt, { httpOnly: true })
+    response.cookie(jwtKey, jwtValue, { httpOnly: true })
 
-    // redirect to frontend
-    return response.redirect('http://localhost:8080')
+    return user.TwoFA === true
+    ? response.redirect('http://localhost:8080/#/2FA')
+    : response.redirect('http://localhost:8080')
   }
 
   @Post('signup')
@@ -94,13 +97,19 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
+  async login(@Req() req: any, @Res({ passthrough: true }) response: Response) {
+
+    // if 2FA enabled, we will issue a second jwt after authentication complete
+    const jwtKey = req.user.TwoFA === true ? 'jwt2fa' : 'jwt'
 
     // bind a jwt to the authenticated user
-    const jwt = await this.authService.login(req.user)
+    const jwtValue = this.authService.login(req.user)
 
     // return the jwt as a cookie into frontend
-    response.cookie('jwt', jwt, { httpOnly: true })
+    response.cookie(jwtKey, jwtValue, { httpOnly: true })
+
+    // let the frontend know if it has to handle 2FA
+    return jwtKey
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -114,6 +123,62 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() request: any) {
     return request.user
+  }
+
+  // Step 1/2 to enable 2FA
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('2FA/enable')
+  enable2FA(@Req() request: any) {
+    return this.authService.enable2FA(+request.user.id)
+  }
+
+  // Step 2/2 to enable 2FA
+  @UseGuards(AuthGuard('jwt'))
+  @Post('2FA/validate')
+  async validate2FA(@Req() request: any, @Body() body: any) {
+
+    const isValid: boolean = this.authService.validate2FA(body.token, request.user.id)
+
+    // register in db
+    if (isValid === true) {
+      try {
+        await this.usersService.update2FA(request.user.id, true)
+      } catch(e) {
+        throw new ConflictException()
+      }
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('2FA/disable')
+  async disable2FA(@Req() request: any) {
+    try {
+      await this.usersService.update2FA(+request.user.id, false)
+    } catch(e) {
+      throw new ConflictException()
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt-2fa'))
+  @Post('2FA/login')
+  async login2FA(@Req() request: any, @Body() body: any, @Res({ passthrough: true }) response: Response) {
+
+    const isValid: boolean = this.authService.validate2FA(body.token, request.user.id)
+
+    if (isValid === true) {
+
+      // bind the 'definitive' jwt to the authenticated user
+      const jwt = this.authService.login(request.user)
+
+      // return the jwt as a cookie into frontend
+      response.cookie('jwt', jwt, { httpOnly: true })
+
+      // expire the 'temporary' jwt only used for 2FA
+      response.cookie('jwt2fa', '', { expires: new Date(0) });
+    }
+
+    // let the backend know if login succeeded
+    return isValid
   }
 
 }

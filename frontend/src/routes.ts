@@ -14,6 +14,7 @@ import Signup from './routes/Signup.svelte'
 import Login from './routes/Login.svelte'
 import Pong from './routes/pong/Pong.svelte'
 import Chan from './routes/Chan.svelte'
+import TwoFA from './routes/2FA.svelte'
 
 export default {
     '/': Home,
@@ -30,6 +31,7 @@ export default {
     '/channel': Channel,
     '/message': Message,
     '/game': Game,
+    '/2FA': TwoFA,
     '/pong': Pong,
     '*': NotFound
 };

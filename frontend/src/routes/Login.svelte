@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import axios from "axios";
-  import { push } from "svelte-spa-router";
+  import { push, replace } from "svelte-spa-router";
   import { logged } from "../stores";
 
   // cf. /backend/src/users/dto/create-user.dto.ts
@@ -23,13 +23,19 @@
       return alert('error')
 
     try {
-      await axios.post('http://localhost:3000/auth/login', createUserDto, { withCredentials: true })
-      alert('Success ! Welcome !')
-      createUserDto.username = null
-      createUserDto.password = null
-      logged.set('true')
-      push('/')
+      const response = await axios.post('http://localhost:3000/auth/login', createUserDto, { withCredentials: true })
+      console.log('response', response)
+      if (response.data === 'jwt2fa') {
+        replace('/2FA')
+      } else {
+        alert('Success ! Welcome !')
+        createUserDto.username = null
+        createUserDto.password = null
+        logged.set('true')
+        push('/')
+      }
     } catch (error) {
+      console.log(error)
       alert(error.response.data.message)
       createUserDto.username = null
       createUserDto.password = null
