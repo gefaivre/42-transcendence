@@ -266,7 +266,7 @@ export class UsersService {
 
   async dismissFriendshipRequestById(id: number, friendId: number) {
     console.log('service dismiss friendship request by id')
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: {
         id: id
       },

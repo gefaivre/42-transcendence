@@ -3,7 +3,7 @@
 
 import axios from "axios";
   import { onMount } from "svelte";
-  import { id, reloadImage, user } from "../stores";
+  import { id, reloadImage, user, logged } from "../stores";
   import type { User} from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
@@ -33,35 +33,106 @@ import axios from "axios";
     $: {
       const { name: newName } = params.name;
       if (newName !== name) {
-        selectUser();
+        reload();
       }
     }
 
 
-    $: onMount(() => selectUser())
+    $: onMount(() => reload())
 
-  async function getUser(): Promise <User> {
+
+    async function reload() {
+      getUser();
+      selectprofile();
+    }
+
+    async function getUser() {
+      try {
+        let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
+        // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
+        user.set(response.data)
+        console.log($user)
+        logged.set('true')
+        id.set(response.data.id.toString())
+      } catch (error) {
+        logged.set('false')
+        id.set('0')
+      }
+    }
+
+  async function getprofile(): Promise <User> {
       return (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
     }
 
-    async function selectUser() {
-    if (params.name != $user.username)
-    {
-      console.log("changement de uesr")
-      pageUser = await getUser();
-    }
-    else
+  async function selectprofile() {
+  if (params.name != $user.username)
+  {
+    console.log("changement de uesr")
+    pageUser = await getprofile();
+    console.log(pageUser)
+  }
+  else
     pageUser = $user;
   }
+
 
   async function requestFriendship() {
     try {
       await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
-      getUser()
+      reload()
     } catch (error) {
       console.log(error)
     }
   }
+
+  async function logout() {
+    try {
+      await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
+      logged.set('false')
+      id.set('0')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function removeFriendById() {
+    try {
+      const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${pageUser.id}`, null, { withCredentials: true })
+      console.log(cancel)
+      reload()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function cancelFriendshipRequestById() {
+    try {
+      const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${pageUser.id}`, null, { withCredentials: true })
+      console.log(cancel)
+      reload()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function acceptFriendshipRequestById() {
+    try {
+      await axios.post(`http://localhost:3000/users/friendship/acceptById/${pageUser.id}`, null, { withCredentials: true })
+      reload()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function dismissFriendshipRequestById() {
+    try {
+      await axios.post(`http://localhost:3000/users/friendship/dismissById/${pageUser.id}`, null, { withCredentials: true })
+      reload()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
 
 
 </script>
@@ -75,27 +146,41 @@ import axios from "axios";
 
     <!-- toggle edditing button (class after) -->
     {#if pageUser.id.toString() == $id}
-      <button class="image-button imageAfter" on:click={() => settings = !settings}>
+      <button class="image-button">
         <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
       </button>
 
-      <button class="username-button usernameAfter" on:click={() => settings = !settings}>
+      <button class="username-button">
         <span class="username">{pageUser.username}</span>
       </button>
 
-      <button class="twofa-button twofaAfter" on:click={() => settings = !settings}>
-        <p class="twofa">Your 2FA  is not activated</p>
-      </button>
+
+      <div>
+        <button class="parameter" on:click={() => settings = !settings}>settings</button>
+        <button class="logout" on:click={() => logout()}>logout</button>
+      </div>
     {:else}
-      <button class="image-button" on:click={() => settings = !settings}>
+      <button class="image-button">
         <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
       </button>
 
-      <button class="username-button" on:click={() => settings = !settings}>
+      <button class="username-button">
         <span class="username">{pageUser.username}</span>
       </button>
 
-      <button class="friendrequest" on:click={() => requestFriendship()}>friends request</button>
+      {#if pageUser.friends.some(user => user.id.toString() === $id)}
+        <span style="color: white">This user is your friend !</span>
+        <button on:click={removeFriendById}>Remove</button>
+      {:else if pageUser.requestFriends.some(user => user.id.toString() === $id)}
+      <span style="color: white">Pending friend invitation...</span>
+        <button on:click={cancelFriendshipRequestById}>Cancel</button>
+      {:else if pageUser.pendingFriends.some(user => user.id.toString() === $id)}
+      <span style="color: white">This user requested you as friend</span>
+        <button on:click={acceptFriendshipRequestById}>Accept</button>
+        <button on:click={dismissFriendshipRequestById}>Dismiss</button>
+      {:else}
+        <button on:click={requestFriendship}>Request friendship</button>
+      {/if}
     {/if}
 
 
@@ -106,7 +191,7 @@ import axios from "axios";
     {#if settings}
       <UsersSettings/>
     {:else}
-      <UsersInfo bind:pageUser={pageUser}/>
+      <UsersInfo bind:pageUser={pageUser} bind:params={params}/>
     {/if}
   </div>
 
@@ -122,6 +207,11 @@ import axios from "axios";
 
 
 <style>
+
+
+  button {
+    color: aliceblue;
+  }
 
   .component {
     height: 100vh;
@@ -143,7 +233,6 @@ import axios from "axios";
 
   }
 
-
   .user-panel .title {
     font-size: 50px;
     text-shadow: 0 0 20px;
@@ -158,24 +247,6 @@ import axios from "axios";
     background-color: var(--grey);
     border: none;
   }
-
-  .user-panel .imageAfter:after {
-    position: absolute;
-    content: "\2699";
-    font-size: 1.5em;
-    pointer-events: all;
-    height: 40px;
-    width: 40px;
-    background-color: var(--lite-grey);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    left: 100%;
-    top: 0;
-    transform: translate(-110%, 0px);
-  }
-
   .user-panel .image-button .image {
     border-radius: var(--imageRadius);
     height: 200px;
@@ -196,53 +267,8 @@ import axios from "axios";
 
   }
 
-  .user-panel .usernameAfter:after {
-    position: absolute;
-    content: "\2699";
-    font-size: 1.2em;
-    pointer-events: all;
-    height: 30px;
-    width: 30px;
-    background-color: var(--lite-grey);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    left: 100%;
-    top: 0;
-
-
-  }
-
-  .user-panel .twofa-button .twofa {
-    color: var(--white);
-  }
-
-  .user-panel .twofa-button {
-    position: relative;
-  }
-
-  .user-panel .twofaAfter:after {
-    position: absolute;
-    content: "\2699";
-    font-size: 1.2em;
-    pointer-events: all;
-    height: 30px;
-    width: 30px;
-    background-color: var(--lite-grey);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    left: 100%;
-    top: 0;
-    transform: translate(6px, -20px);
-  }
-
-  .friendrequest {
-    background-color: aliceblue;
-    border: solid 2px black;
-    border-radius: 5px;
+  .user-panel .logout, .user-panel .parameter {
+  color: var(--white);
   }
 
   .second-panel {
