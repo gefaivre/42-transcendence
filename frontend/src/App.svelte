@@ -12,6 +12,8 @@
     import { id, logged, user, reloadImage} from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
+    import Signup from "./routes/Signup.svelte";
+    import Login from "./routes/Login.svelte";
 
     const menuItems = [
       { label: 'Home', icon: homeIcon, link: '#/Menu'},
@@ -68,10 +70,8 @@
   {:else}
     <a href={FT_AUTHORIZE}>Signin with 42</a>
     <br>
-    <a href="#/signup">Signup with username</a>
-    <br>
-    <a href="#/login">Login with username</a>
-    <Router {routes}/>
+    <Signup/>
+    <Login/>
   {/if}
 
   <style>
