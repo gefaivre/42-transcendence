@@ -34,7 +34,7 @@ function createpending(user: User) {
     },
     data: {
       pendingFriends: {
-        connect: { id: friendId }
+        connect: { id: user.id }
       }
     }
   })
