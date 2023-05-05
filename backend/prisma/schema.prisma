@@ -31,6 +31,11 @@ model User {
   bannedChannels Channel[] @relation("channel_banned_users")
   adminChannels  Channel[] @relation("channel_admins")
   posts          Post[]
+  friends        User[]  @relation("friends")
+  friendOf       User[]  @relation("friends")
+  pendingFriends User[]  @relation("pending")
+  requestFriends User[]  @relation("pending")
+  TwoFA          Boolean @default(false)
 }
 
 model Image {

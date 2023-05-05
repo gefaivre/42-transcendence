@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import axios from 'axios'
 import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from './constants';
+import * as qrcode from 'qrcode';
+import * as OTPAuth from "otpauth";
 
 @Injectable()
 export class AuthService {
@@ -11,8 +13,8 @@ export class AuthService {
     private userService: UsersService
   ) {}
 
-  // TODO (?): remove async
-  async login(user: any) {
+  // TODO: rename and typedef argument
+  login(user: any) {
     const payload = { sub: user.id };
     return this.jwtService.sign(payload)
   }
@@ -47,6 +49,37 @@ export class AuthService {
 
   decode(jwt: string) {
     return this.jwtService.decode(jwt)
+  }
+
+  // Step 1/2 to enable 2FA
+  async enable2FA(userId: number) {
+
+    const totp = new OTPAuth.TOTP({
+      issuer: 'ft-transcendence',
+      label: userId.toString(),
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromUTF8(process.env.OTP_SECRET as string) // better to be custom for each client
+    })
+
+    return await qrcode.toDataURL(totp.toString())
+  }
+
+  // Step 2/2 to enable 2FA
+  validate2FA(token: string, userId: string) {
+
+    const totp = new OTPAuth.TOTP({
+      issuer: 'ft-transcendence',
+      label: userId.toString(),
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromUTF8(process.env.OTP_SECRET as string) // better to be custom for each client
+    })
+
+    // success only if validate returns zero
+    return totp.validate({ token }) === 0
   }
 
 }

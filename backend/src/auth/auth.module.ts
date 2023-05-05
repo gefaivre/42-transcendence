@@ -7,6 +7,7 @@ import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './local.strategy';
+import { Jwt2FAStrategy } from './jwt.2fa.strategy';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { LocalStrategy } from './local.strategy';
           signOptions: { expiresIn: '60s' }
       })
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy, Jwt2FAStrategy],
   exports: [AuthService],
   controllers: [AuthController]
 })
