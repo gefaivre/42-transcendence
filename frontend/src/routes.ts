@@ -37,7 +37,6 @@ export default {
     '/message': Message,
     '/game': Game,
     '/test': Test,
-    '/:username': UserProfile,
     '/message/create': CreateChannel,
     '/message/:name': Chan,
     '/2FA': TwoFA,
