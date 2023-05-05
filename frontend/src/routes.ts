@@ -13,12 +13,13 @@ import Test from './routes/test.svelte'
 import Channels from './routes/Channels.svelte'
 import Signup from './routes/Signup.svelte'
 import Login from './routes/Login.svelte'
-import Pong from './routes/pong/Pong.svelte'
-import TwoFA from './routes/2FA.svelte'
-import ThomasChan from './routes/Chan.svelte'
-import createChan from './routes/CreateChannel.svelte'
+import UserProfile from './routes/UserProfile.svelte';
+import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
-import test from './routes/test.svelte'
+import ThomasChan from './routes/Chan.svelte'
+import Pong from './routes/pong/Pong.svelte'
+import { wrap } from 'svelte-spa-router/wrap'
+import TwoFA from './routes/2FA.svelte'
 
 export default {
     '/': Home,
@@ -34,11 +35,12 @@ export default {
     '/profil': Profil,
     '/channel': Channel,
     '/message': Message,
-    '/message/create': createChan,
-    '/message/:name': Chan,
     '/game': Game,
+    '/test': Test,
+    '/:username': UserProfile,
+    '/message/create': CreateChannel,
+    '/message/:name': Chan,
     '/2FA': TwoFA,
     '/pong': Pong,
-    '/test': test,
     '*': NotFound
 };

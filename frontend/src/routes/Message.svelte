@@ -10,7 +10,7 @@
   </script>
 
   <style>
-  .toDo {
+  /* .toDo {
     width: 400px;
     height: 500px;
     background-color: aliceblue;
@@ -18,10 +18,8 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-  }
+  } */
  </style>
 
- <Layout>
     <ChanMenu>
     </ChanMenu>
- </Layout>

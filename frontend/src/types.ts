@@ -5,6 +5,10 @@ export type User = {
   mmr: number
   games: number
   ft_login: string
+  friends: { id: number, username: string }[]
+  friendOf: { id: number, username: string }[]
+  pendingFriends: { id: number, username: string }[]
+  requestFriends: { id: number, username: string }[]
   TwoFA: boolean
 }
 

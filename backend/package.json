@@ -5,7 +5,10 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "prisma": {
+  },
   "scripts": {
+    "fill": "ts-node prisma/fill.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

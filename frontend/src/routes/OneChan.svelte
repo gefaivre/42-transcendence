@@ -154,7 +154,6 @@ function testlink()
 }
 </script>
 {#if channel}
-<Layout>
   <ChanMenu>
   </ChanMenu>
   <div class="horizontalBar">
@@ -200,7 +199,6 @@ function testlink()
         </form> 
   </div>
 
-</Layout>
 {:else}
   <p>404 channel not found</p>
 {/if}
@@ -213,6 +211,7 @@ function testlink()
       left: 448px;
       top: 56px;
       overflow-y: auto;
+      background-color: var(--black);
     }
     .Wall img{
       height: 30px;
@@ -262,6 +261,7 @@ function testlink()
       height: 100px;
       bottom: 0px;
       left: 448px;
+      background-color: var(--black);
 
   }
   .prompt form {
