@@ -18,6 +18,7 @@ import TwoFA from './routes/2FA.svelte'
 import ThomasChan from './routes/Chan.svelte'
 import createChan from './routes/CreateChannel.svelte'
 import Chan from './routes/OneChan.svelte'
+import test from './routes/test.svelte'
 
 export default {
     '/': Home,
@@ -38,5 +39,6 @@ export default {
     '/game': Game,
     '/2FA': TwoFA,
     '/pong': Pong,
+    '/test': test,
     '*': NotFound
 };
