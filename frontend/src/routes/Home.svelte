@@ -4,7 +4,6 @@
     import { id, logged } from "../stores";
     import type { User } from '../types'
 
-    // TODO: typedef
     let user: User = {
         username: '',
         password: '',
@@ -12,6 +11,7 @@
         games: 0,
         ft_login: '',
         id : 0,
+        TwoFA: null,
         friends: [],
         friendOf: [],
         pendingFriends: [],
@@ -23,7 +23,7 @@
     async function getProfile() {
       try {
         let response = await axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
-        user = response.data // TODO: typedef
+        user = response.data
         logged.set('true')
         id.set(response.data.id.toString())
         response = await axios.get(`http://localhost:3000/users/id/${user.id}`, { withCredentials: true })

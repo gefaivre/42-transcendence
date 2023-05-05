@@ -9,6 +9,7 @@ export type User = {
   friendOf: { id: number, username: string }[]
   pendingFriends: { id: number, username: string }[]
   requestFriends: { id: number, username: string }[]
+  TwoFA: boolean
 }
 
 // mirrors prisma

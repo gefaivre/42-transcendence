@@ -19,6 +19,7 @@ import Chan from './routes/OneChan.svelte'
 import ThomasChan from './routes/Chan.svelte'
 import Pong from './routes/pong/Pong.svelte'
 import { wrap } from 'svelte-spa-router/wrap'
+import TwoFA from './routes/2FA.svelte'
 
 export default {
     '/': Home,
@@ -39,6 +40,7 @@ export default {
     '/:username': UserProfile,
     '/message/create': CreateChannel,
     '/message/:name': Chan,
+    '/2FA': TwoFA,
     '/pong': Pong,
     '*': NotFound
 };
