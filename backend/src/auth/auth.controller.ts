@@ -17,7 +17,7 @@ export class AuthController {
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)
   private async generateUsername(login: string) {
-    while (await this.usersService.findOne(login))
+    while (await this.usersService.findByUsername(login))
       login = login + '_'
     return login
   }

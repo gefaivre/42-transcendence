@@ -8,6 +8,7 @@ export const enum WsActionSuccess {
   JoinRoom = 'joined room',
   JoinChannel = 'joined channel',
   LeaveChannel = 'left channel',
+  DirectMessage = 'send dm to'
 }
 
 export const enum WsActionFailure {
@@ -17,6 +18,7 @@ export const enum WsActionFailure {
   JoinRoom = 'unauthorized to join room',
   JoinChannel = 'unauthorized to join channel',
   LeaveChannel = 'unauthorized to leave channel',
+  DirectMessage = 'unable to dm'
 }
 
 export const enum WsFailureReason {
@@ -27,16 +29,18 @@ export const enum WsFailureReason {
   WrongChannelPassword = 'wrong password',
   PrivateChannel = 'this channel is private',
   AuthCookieNotFound = 'authentication header not found',
+  InternalError = 'internal error',
 }
 
 type UserID = string
 type Username = string
 type ChannelName = string
+type Recipient = ChannelName | Username
 
-export type WsHandlerSuccessClientLog = `${WsActionSuccess} ${ChannelName}`
+export type WsHandlerSuccessClientLog = `${WsActionSuccess} ${Recipient}`
 export type WsHandlerSuccessServerLog = `client ${UserID} (user ${Username}) ${WsHandlerSuccessClientLog}`
 
-export type WsHandlerFailureClientLog = `${WsActionFailure} ${ChannelName}: ${WsFailureReason}`
+export type WsHandlerFailureClientLog = `${WsActionFailure} ${Recipient}: ${WsFailureReason}`
 export type WsHandlerFailureServerLog = `client ${UserID} (user ${Username}) ${WsHandlerFailureClientLog}`
 
 export type WsLifecycleHookSuccessClientLog = WsActionSuccess

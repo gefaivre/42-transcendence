@@ -315,18 +315,21 @@
       </ul>
     <br>
     <br>
-    {:else if user.friends.some(user => user.id.toString() === $id)}
-      This user is your friend !
-      <button on:click={removeFriendById}>Remove</button>
-    {:else if user.requestFriends.some(user => user.id.toString() === $id)}
-      Pending friend invitation...
-      <button on:click={cancelFriendshipRequestById}>Cancel</button>
-    {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
-      This user requested you as friend
-      <button on:click={acceptFriendshipRequestById}>Accept</button>
-      <button on:click={dismissFriendshipRequestById}>Dismiss</button>
     {:else}
-      <button on:click={requestFriendship}>Request friendship</button>
+      {#if user.friends.some(user => user.id.toString() === $id)}
+        This user is your friend !
+        <button on:click={removeFriendById}>Remove</button>
+      {:else if user.requestFriends.some(user => user.id.toString() === $id)}
+        Pending friend invitation...
+        <button on:click={cancelFriendshipRequestById}>Cancel</button>
+      {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
+        This user requested you as friend
+        <button on:click={acceptFriendshipRequestById}>Accept</button>
+        <button on:click={dismissFriendshipRequestById}>Dismiss</button>
+      {:else}
+        <button on:click={requestFriendship}>Request friendship</button>
+      {/if}
+        <button on:click={() => replace(`/dm/${user.username}`)}>DM</button>
     {/if}
 
 {:else}
