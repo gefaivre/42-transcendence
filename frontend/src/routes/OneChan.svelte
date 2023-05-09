@@ -8,7 +8,7 @@
   import { pop } from "svelte-spa-router";
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
-  import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto } from "../types";
+  import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto, User } from "../types";
   import defaultAvatar from '../assets/008-utilisateur.png';
   
   export let params: any = {}
@@ -19,15 +19,37 @@
   let isMember: boolean = false
   let posts: newPostEmitDto[] = []
   let element;
+  let showsettings: boolean = false;
+  let users: User[] = [];
 
 // $: foo = posts
 afterUpdate(() => {
+  const adminButton = document.getElementById('admin-button');
+  const memberButton = document.getElementById('member-button');
   console.log("afterUpdate");
-  if(posts) newscrollToBottom(element);
-      if (channel && params && params.name != channel.name)
-          location.reload();
+  if(posts) 
+    newscrollToBottom(element);
+  if (channel && params && params.name != channel.name)
+    location.reload();
+  if (adminButton && channel && memberButton)
+  {
 
-});
+    adminButton.addEventListener('click', () => {
+      adminButton.classList.add('active');
+      memberButton.classList.remove('active');
+      users = channel.admins;
+    });
+  }
+  if (memberButton && channel)
+  {
+
+    memberButton.addEventListener('click', () => {
+      memberButton.classList.add('active');
+      adminButton.classList.remove('active');
+      users = channel.users;
+    });
+  }
+  });
 
 $: if(posts && element) {
   console.log("tick");
@@ -149,13 +171,34 @@ onMount(async () => {
 onDestroy(() => socket.disconnect())
 function testlink()
 {
-  console.log("bouton settings");
-  window.location.href="/#/testchan/tesr"
+  if (!showsettings)
+    showsettings = true;
+  else
+    showsettings = false;
+  console.log(showsettings);
 }
 </script>
 {#if channel}
   <ChanMenu>
   </ChanMenu>
+  {#if showsettings}
+  <div class="settingsCard">
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="flex justify-between mb-4">
+        <button class="text-gray-600 hover:text-gray-800 font-medium focus:outline-none" id="member-button">Member</button>
+        <button class="text-gray-600 hover:text-gray-800 font-medium focus:outline-none" id="admin-button">Admin</button>
+      </div>
+      <div id="card-content" class="text-gray-700">
+        {#each users as user}
+          <p> {user.username}</p>
+          <br>
+        {/each}
+      </div>
+    </div>
+
+  </div>
+{/if}
   <div class="horizontalBar">
       <h1>{channel.name}</h1>
       <div class="settings">
@@ -197,7 +240,8 @@ function testlink()
             <span class="sr-only">Send message</span>
           </button>
         </form> 
-  </div>
+
+</div>
 
 {:else}
   <p>404 channel not found</p>
@@ -233,7 +277,6 @@ function testlink()
       left: 45px;
       font-weight: bold;
       margin-bottom: 5px;
-      z-index: 1;
     }
   .post .postContent{
     position: absolute;
@@ -243,7 +286,6 @@ function testlink()
     overflow-y: auto;
     word-wrap: break-word;
     position: relative;
-    z-index: 2;
     padding-top: 15px;
     text-align-last: left;
   }
@@ -304,4 +346,23 @@ height: 40px;
       width: 100%;
       height: 100%;
   }
+  .settingsCard{
+      height: 800px;
+      width: 200px;
+      z-index: 1;
+      position: relative;
+      top :10%;
+      left: 50%;
+    }
+    #member-button:focus {
+        background-color: #801e6b;
+        color: purple;
+    }
+    #admin-button:focus {
+        background-color: #1e4e80;
+        color: purple;
+    }
+    #card-content{
+      overflow-y: scroll;
+    }
 </style>
