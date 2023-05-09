@@ -1,0 +1,38 @@
+<script lang="ts">
+
+  import axios from "axios";
+  import { push } from "svelte-spa-router";
+  import { logged } from "../stores";
+
+  let code: number = null
+
+  function success2FA() {
+    code = null
+    alert('Success ! Welcome !')
+    logged.set('true')
+    push('/')
+  }
+
+  function failure2FA() {
+    code = null
+    alert('Error')
+    logged.set('false')
+  }
+
+  async function validate2FA() {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/2FA/login', { token: code }, { withCredentials: true })
+      return response.data === true ? success2FA() : failure2FA()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+</script>
+
+<br>
+<br>
+<br>
+
+<input type="text" inputmode="numeric" bind:value={code}>
+<button on:click={validate2FA}>2FA Validate</button>

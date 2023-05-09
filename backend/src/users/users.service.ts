@@ -12,7 +12,7 @@ export class UsersService {
 
   // START CRUD
   async create(createUserDto: CreateUserDto) {
-    if (await this.findOne(createUserDto.username) != null)
+    if (await this.findByUsername(createUserDto.username) != null)
       return null
 
       // Create User
@@ -74,7 +74,7 @@ export class UsersService {
 
   }
 
-  async findOne(name: string) {
+  async findByUsername(name: string) {
     return await this.prisma.user.findUnique({
       where: {
         username: name,
@@ -153,6 +153,17 @@ export class UsersService {
       orderBy: {
           mmr: 'desc',
       }
+    })
+  }
+
+  update2FA(id: number, twofa: boolean) {
+    return this.prisma.user.update({
+        where: {
+            id: id
+        },
+        data: {
+            TwoFA: twofa
+        }
     })
   }
 

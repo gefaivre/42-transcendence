@@ -13,10 +13,10 @@
   let message: string = ''
   let password: string = ''
   let channel: Channel = null
+  let isOwner: boolean = false
+  let isAdmin: boolean = false
   let isMember: boolean = false
   let posts: PostEmitDto[] = []
-
-  // $: foo = posts
 
   function post() {
     socket.emit('sendPost', {
@@ -52,6 +52,44 @@
     })
   }
 
+  async function getChannel() {
+    try {
+      const response = await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })
+      channel = response.data
+    } catch (error) {
+      channel = null
+      console.log(error)
+    }
+  }
+
+  async function revokeAdmin(id: number) {
+    try {
+      await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/revoke/${id}`, null, { withCredentials: true })
+      getChannel()
+    } catch (error) {
+      console.log(error.response.data.message)
+    }
+  }
+
+  async function promoteAdmin(id: number) {
+    try {
+      await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/promote/${id}`, null, { withCredentials: true })
+      getChannel()
+    } catch (error) {
+      console.log(error.response.data.message)
+    }
+  }
+
+  async function ban(userId: number) {
+    try {
+      const response = await axios.delete(`http://localhost:3000/channel/${channel.name}/${userId}`, { withCredentials: true })
+      console.log(response)
+      getChannel()
+    } catch (error) {
+      console.log(error.response.data.message)
+    }
+  }
+
   // TODO: what if we manually change `id` store value ?
   onMount(async () => {
 
@@ -77,6 +115,8 @@
       joinChannel()
     }
 
+    isOwner = channel.ownerId.toString() === $id
+    isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
     isMember = true
 
     socket.on('connect', () => {
@@ -105,11 +145,18 @@
       return pop()
     })
 
+    // TODO: typedef event
     socket.on('channelEvent', (event: any) => {
-      if (event.event === 'join')
-        console.log(event.user, 'joined the chanel')
-      else if (event.event === 'leave')
-        console.log(event.user, 'left the chanel')
+      if (event.event === 'join') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+      else if (event.event === 'leave') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
     })
 
   })
@@ -121,7 +168,6 @@
 {#if $logged === 'true'}
   <br>
   <br>
-  <!-- TODO: display admins and users -->
   {#if isMember}
     <table>
       <tbody>
@@ -132,10 +178,39 @@
           <td>name</td> <td>{channel.name}</td>
         </tr>
         <tr>
-          <td>Owner</td> <td>{channel.ownerId}</td>
+          <td>Status</td> <td>{channel.status}</td>
         </tr>
         <tr>
-          <td>Status</td> <td>{channel.status}</td>
+          <td>Owner</td>
+          <td><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></td>
+        </tr>
+        <tr>
+          <td>Admins</td>
+          <td>
+          {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
+            <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
+            {#if isOwner}
+              <button on:click={() => revokeAdmin(admin.id)}>revoke admin</button>
+              <button on:click={() => ban(admin.id)}>ban</button>
+            {/if}
+            <br>
+          {/each}
+          </td>
+        </tr>
+        <tr>
+          <td>Members</td>
+          <td>
+          {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
+            <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
+            {#if isOwner}
+              <button on:click={() => promoteAdmin(user.id)}>promote admin</button>
+            {/if}
+            {#if isAdmin}
+              <button on:click={() => ban(user.id)}>ban</button>
+            {/if}
+            <br>
+          {/each}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -157,3 +232,10 @@
 {:else}
   <h1>UNAUTHORIZED ACCESS</h1>
 {/if}
+
+<style>
+  ul {
+    display: inline-block;
+    text-align: left;
+  }
+</style>

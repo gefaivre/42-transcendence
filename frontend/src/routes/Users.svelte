@@ -21,6 +21,7 @@
         mmr: null,
         games: null,
         ft_login: null,
+        TwoFA: false,
         friends: [],
         friendOf: [],
         pendingFriends: [],
@@ -31,6 +32,9 @@
     let password: string = null
 
     let reloadImage: number = 0
+
+    let qrcode = ''
+    let code2FA = ''
 
     export let params: any = { }
 
@@ -102,6 +106,35 @@
       } catch (error) {
         alert(error.response.data.message)
       }
+    }
+
+    async function validate2FA() {
+        try {
+            await axios.post('http://localhost:3000/auth/2FA/validate', { token: code2FA }, { withCredentials: true })
+            qrcode = ''
+            code2FA = ''
+            getUser()
+        } catch (error) {
+            console.log(error.response.message)
+        }
+    }
+
+    async function enable2FA() {
+        try {
+            const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
+            qrcode = response.data
+        } catch (error) {
+            console.log(error.response.message)
+        }
+    }
+
+    async function disable2FA() {
+        try {
+            await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
+            getUser()
+        } catch (error) {
+            console.log(error.response.message)
+        }
     }
 
     async function requestFriendship() {
@@ -219,6 +252,9 @@
                 <td>42 login</td> <td>{user.ft_login}</td>
             </tr>
             <tr>
+                <td>2FA</td><td>{user.TwoFA}</td>
+            </tr>
+            <tr>
                 <td>Friends</td>
                 <td>
                   {#each user.friends as friend}
@@ -243,6 +279,22 @@
       <button on:click={updatePassword}>Update</button>
       <br>
       <br>
+      {#if user.TwoFA === false}
+        <button on:click={enable2FA}>Enable TWOFA</button>
+      {:else}
+        <button on:click={disable2FA}>Disable TWOFA</button>
+      {/if}
+      {#if qrcode !== ''}
+        <br>
+        <br>
+        <img alt='qrcode' src={qrcode}>
+        <br>
+        <br>
+        <input type="text" placeholder="code" bind:value={code2FA}>
+        <button on:click={validate2FA}>Validate</button>
+      {/if}
+      <br>
+      <br>
       <ul>
       {#each user.requestFriends as requestFriends}
         <li>
@@ -261,18 +313,23 @@
         </li>
       {/each}
       </ul>
-    {:else if user.friends.some(user => user.id.toString() === $id)}
-      This user is your friend !
-      <button on:click={removeFriendById}>Remove</button>
-    {:else if user.requestFriends.some(user => user.id.toString() === $id)}
-      Pending friend invitation...
-      <button on:click={cancelFriendshipRequestById}>Cancel</button>
-    {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
-      This user requested you as friend
-      <button on:click={acceptFriendshipRequestById}>Accept</button>
-      <button on:click={dismissFriendshipRequestById}>Dismiss</button>
+    <br>
+    <br>
     {:else}
-      <button on:click={requestFriendship}>Request friendship</button>
+      {#if user.friends.some(user => user.id.toString() === $id)}
+        This user is your friend !
+        <button on:click={removeFriendById}>Remove</button>
+      {:else if user.requestFriends.some(user => user.id.toString() === $id)}
+        Pending friend invitation...
+        <button on:click={cancelFriendshipRequestById}>Cancel</button>
+      {:else if user.pendingFriends.some(user => user.id.toString() === $id)}
+        This user requested you as friend
+        <button on:click={acceptFriendshipRequestById}>Accept</button>
+        <button on:click={dismissFriendshipRequestById}>Dismiss</button>
+      {:else}
+        <button on:click={requestFriendship}>Request friendship</button>
+      {/if}
+        <button on:click={() => replace(`/dm/${user.username}`)}>DM</button>
     {/if}
 
 {:else}
