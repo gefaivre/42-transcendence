@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
 
@@ -11,6 +13,18 @@ async function bootstrap() {
     credentials: true,
     origin: 'http://localhost:8080'
   })
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      validateCustomDecorators: true
+    })
+  )
+
+  // rationale https://stackoverflow.com/a/60141437
+  useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   app.use(cookieParser())
 

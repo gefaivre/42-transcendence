@@ -1,12 +1,13 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { Request } from "express";
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly userService: UsersService) {
     super({
       ignoreExpiration: true,
       secretOrKey: jwtConstants.secret,
@@ -18,7 +19,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // TODO (?): typedef the payload
   async validate(payload: any) {
-    return { id: payload.sub };
+
+    const user = await this.userService.findById(payload.sub)
+
+    if (user === null)
+      throw new BadRequestException('User not found')
+
+    const { password, ...result } = user
+
+    return result
   }
 }
 
