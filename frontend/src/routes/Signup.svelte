@@ -27,8 +27,8 @@
       createUserDto.username = null
       createUserDto.password = null
       push('/login')
-    } catch (error) {
-      alert(error.response.data.message)
+    } catch(e) {
+      alert(e.response.data.message)
       createUserDto.username = null
       createUserDto.password = null
     }

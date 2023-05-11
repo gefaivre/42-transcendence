@@ -128,8 +128,8 @@
       await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
       console.log(`Channel ${channel.channelName} successfully created.`)
       getAll()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch(e) {
+      console.log(e.response.data.message)
     }
   }
 

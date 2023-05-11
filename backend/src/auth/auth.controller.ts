@@ -78,7 +78,7 @@ export class AuthController {
     // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
-    } catch (error) {
+    } catch(e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 

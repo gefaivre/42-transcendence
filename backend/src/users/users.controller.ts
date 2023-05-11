@@ -53,7 +53,7 @@ export class UsersController {
     // check that new username is not already used
     try {
       await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
-    } catch (error) {
+    } catch(e) {
       throw new ConflictException('This username is already used.')
     }
   }
@@ -71,14 +71,14 @@ export class UsersController {
     // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
-    } catch (error) {
+    } catch(e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 
     // update password
     try {
       await this.usersService.updatePassword(name, { password: hash } as UpdatePasswordDto);
-    } catch (error) {
+    } catch(e) {
       throw new ConflictException('Error while updating your password')
     }
   }

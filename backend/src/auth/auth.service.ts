@@ -31,7 +31,7 @@ export class AuthService {
         }
       })
       return res.data.access_token
-    } catch (error) {
+    } catch(e) {
         return null
     }
   }

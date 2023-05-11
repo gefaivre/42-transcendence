@@ -12,8 +12,8 @@
       try {
         tab = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
         console.log(tab)
-      } catch (error) {
-        console.log(error)
+      } catch(e) {
+        console.log(e)
       }
     };
 
@@ -21,8 +21,8 @@
       try {
         tab = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
         console.log(tab)
-      } catch (error) {
-        console.log(error)
+      } catch(e) {
+        console.log(e)
       }
     }
 

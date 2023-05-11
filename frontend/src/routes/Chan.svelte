@@ -56,9 +56,9 @@
     try {
       const response = await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })
       channel = response.data
-    } catch (error) {
+    } catch(e) {
       channel = null
-      console.log(error)
+      console.log(e)
     }
   }
 
@@ -66,8 +66,8 @@
     try {
       await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/revoke/${id}`, null, { withCredentials: true })
       getChannel()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch(e) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -75,8 +75,8 @@
     try {
       await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/promote/${id}`, null, { withCredentials: true })
       getChannel()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch(e) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -85,8 +85,8 @@
       const response = await axios.delete(`http://localhost:3000/channel/${channel.name}/${userId}`, { withCredentials: true })
       console.log(response)
       getChannel()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch(e) {
+      console.log(e.response.data.message)
     }
   }
 

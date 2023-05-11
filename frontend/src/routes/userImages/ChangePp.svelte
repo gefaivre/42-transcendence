@@ -29,8 +29,8 @@
             withCredentials: true
         });
         reloadImage++
-        } catch (error) {
-        console.error(error)
+        } catch(e) {
+        console.error(e)
         }
         fileInput == null;
     };
