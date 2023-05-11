@@ -4,7 +4,7 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService){}
 
   create(createChannelDto: CreateChannelDto) {
     return this.prisma.channel.create({

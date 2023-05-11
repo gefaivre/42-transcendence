@@ -9,8 +9,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ImagesService {
   constructor(@Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
-    private PrismaService: PrismaService) {}
+    private readonly usersService: UsersService,
+    private readonly PrismaService: PrismaService) {}
 
 
   async AddImage(userId: number, file: Express.Multer.File)
