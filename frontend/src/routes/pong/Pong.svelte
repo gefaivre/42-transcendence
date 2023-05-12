@@ -15,7 +15,6 @@
   
 
   class Game { 
-    id: string;
     player1: string;
     player2: string;
   }
@@ -156,7 +155,7 @@
 
     for (let field of formData) {
       const [key, value] = field;
-      if (key === 'friend') {
+      if (key === 'friend' && value) {
         socket.emit('requestGame', { friend: value });
       }
     }
