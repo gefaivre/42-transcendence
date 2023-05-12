@@ -28,6 +28,7 @@
 
   let inGame: boolean = false;
   let gameRequest: boolean = false;
+  let watch = false;
 
   const socket = ioClient('http://localhost:3000', {
     path: '/pong',
@@ -42,6 +43,7 @@
     });
     
     socket.on('watchGame', () => {
+      watch = true;
       console.log('watcherMode on');
     });
 
@@ -54,6 +56,8 @@
     });
 
     socket.on('opponentLeft', () => {
+      if (watch)
+        alert('A player has left the game. Refresh page to watch another game');
       alert('your opponent has left the game, you win! refresh page to play another game');
     });
 
@@ -172,7 +176,7 @@
   <ul>
     {#each gameList as game}
       <li>{game.player1 + ' vs ' + game.player2} game</li>
-      <button on:click={() => watchGame(game.id)}>watch</button>
+      <button on:click={() => watchGame(game.player1)}>watch</button>
     {/each}
   </ul>
 {/if}
