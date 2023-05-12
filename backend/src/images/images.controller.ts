@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
@@ -38,7 +38,7 @@ export class ImagesController {
 
   @Get('/set/:Id')
   @UseGuards(AuthGuard('jwt'))
-  setImage(@Req() request: any, @Param('Id') ImageId: number) {
+  setImage(@Req() request: any, @Param('Id', ParseIntPipe) ImageId: number) {
     return this.imagesService.setImage(request.user.id, ImageId);
   }
 
@@ -56,13 +56,13 @@ export class ImagesController {
 
   @Get(':Id')
   @UseGuards(AuthGuard('jwt'))
-  findUserOne(@Req() request: any, @Param('Id') Id: string) {
-    return this.imagesService.findOne(request.user.id, +Id);
+  findUserOne(@Req() request: any, @Param('Id', ParseIntPipe) Id: number) {
+    return this.imagesService.findOne(request.user.id, Id);
   }
 
   @Delete('/delete/:id')
   @UseGuards(AuthGuard('jwt'))
-  removeOne(@Param('id') id: string) {
-    return this.imagesService.remove(+id);
+  removeOne(@Param('id', ParseIntPipe) id: number) {
+    return this.imagesService.remove(id);
   }
 }
