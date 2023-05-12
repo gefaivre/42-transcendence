@@ -6,6 +6,7 @@ import { DirectMessageService } from 'src/chat/dm.service';
 import { UserByUsernamePipe } from './pipes/user-by-username.pipe';
 import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('posts')
 export class PostsController {
   constructor(
