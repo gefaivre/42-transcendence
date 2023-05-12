@@ -11,8 +11,8 @@ import * as bcrypt from 'bcrypt';
 export class AuthController {
 
   constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)

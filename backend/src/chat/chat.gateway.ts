@@ -42,11 +42,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private readonly logger: Logger = new Logger(ChatGateway.name, { timestamp: true })
 
   constructor(
-    private chatService: ChatService,
-    private postsService: PostsService,
-    private channelService: ChannelService,
-    private usersService: UsersService,
-    private dmService: DirectMessageService
+    private readonly chatService: ChatService,
+    private readonly postsService: PostsService,
+    private readonly channelService: ChannelService,
+    private readonly usersService: UsersService,
+    private readonly dmService: DirectMessageService
   ) {}
 
   @WebSocketServer()
