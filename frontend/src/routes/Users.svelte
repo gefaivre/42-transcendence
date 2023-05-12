@@ -69,8 +69,8 @@
         // redirect to your new user page
         replace(`/users/${user.username}`)
 
-      } catch (error) {
-        alert(error.response.data.message)
+      } catch (e) {
+        alert(e.response.data.message)
       }
 
     }
@@ -103,8 +103,8 @@
         // redirect to your new user page
         replace(`/users/${user.username}`)
 
-      } catch (error) {
-        alert(error.response.data.message)
+      } catch (e) {
+        alert(e.response.data.message)
       }
     }
 
@@ -114,8 +114,8 @@
             qrcode = ''
             code2FA = ''
             getUser()
-        } catch (error) {
-            console.log(error.response.message)
+        } catch (e) {
+            console.log(e.response.message)
         }
     }
 
@@ -123,8 +123,8 @@
         try {
             const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
             qrcode = response.data
-        } catch (error) {
-            console.log(error.response.message)
+        } catch (e) {
+            console.log(e.response.message)
         }
     }
 
@@ -132,8 +132,8 @@
         try {
             await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
             getUser()
-        } catch (error) {
-            console.log(error.response.message)
+        } catch (e) {
+            console.log(e.response.message)
         }
     }
 
@@ -141,8 +141,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/request/${user.id}`, null, { withCredentials: true })
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -150,8 +150,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/acceptById/${user.id}`, null, { withCredentials: true })
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -159,8 +159,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -168,8 +168,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/dismissById/${user.id}`, null, { withCredentials: true })
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -177,8 +177,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/dismissByName/${name}`, null, { withCredentials: true })
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -187,8 +187,8 @@
         const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${user.id}`, null, { withCredentials: true })
         console.log(cancel)
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -197,8 +197,8 @@
         const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelByName/${name}`, null, { withCredentials: true })
         console.log(cancel)
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -207,8 +207,8 @@
         const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${user.id}`, null, { withCredentials: true })
         console.log(cancel)
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -217,8 +217,8 @@
         const cancel = await axios.post(`http://localhost:3000/users/friendship/removeByName/${name}`, null, { withCredentials: true })
         console.log(cancel)
         getUser()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 

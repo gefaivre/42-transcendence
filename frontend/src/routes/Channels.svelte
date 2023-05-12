@@ -21,8 +21,8 @@
     try {
       channels = (await axios.get('http://localhost:3000/channel', { withCredentials: true })).data
       console.log(channels)
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch (e) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -33,8 +33,8 @@
     try {
       await axios.delete(`http://localhost:3000/channel/${name}`, { withCredentials: true })
       getAll()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch (e) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -45,8 +45,8 @@
     try {
       await axios.delete(`http://localhost:3000/channel`, { withCredentials: true })
       getAll()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch (e) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -60,8 +60,8 @@
     try {
       await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
       getAll()
-    } catch (error) {
-      console.log(error.response.data.message)
+    } catch (e) {
+      console.log(e.response.data.message)
     }
     channel.channelName = null
     channel.status = null
