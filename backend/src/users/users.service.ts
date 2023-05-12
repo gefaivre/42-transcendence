@@ -6,9 +6,12 @@ import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService,
+
+  constructor(
+    private readonly prisma: PrismaService,
     @Inject(forwardRef(() => ImagesService))
-              private images: ImagesService) {}
+    private readonly images: ImagesService
+  ) {}
 
   // START CRUD
   async create(createUserDto: CreateUserDto) {

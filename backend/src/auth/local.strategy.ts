@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private userService: UsersService) {
+  constructor(private readonly userService: UsersService) {
     super();
   }
 

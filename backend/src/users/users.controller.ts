@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
@@ -28,7 +28,7 @@ export class UsersController {
   }
 
   @Get('/id/:id')
-  findOneById(@Param('id') id: number) {
+  findOneById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOneById(id);
   }
 
@@ -53,7 +53,7 @@ export class UsersController {
     // check that new username is not already used
     try {
       await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
-    } catch (error) {
+    } catch (e) {
       throw new ConflictException('This username is already used.')
     }
   }
@@ -71,14 +71,14 @@ export class UsersController {
     // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
-    } catch (error) {
+    } catch (e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 
     // update password
     try {
       await this.usersService.updatePassword(name, { password: hash } as UpdatePasswordDto);
-    } catch (error) {
+    } catch (e) {
       throw new ConflictException('Error while updating your password')
     }
   }
@@ -96,15 +96,15 @@ export class UsersController {
   // END CRUD
 
   @Post('friendship/request/:id')
-  requestFriendship(@Param('id') id: string, @Req() req: any) {
+  requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller request friendship')
-    return this.usersService.requestFriendship(req.user.id, +id)
+    return this.usersService.requestFriendship(req.user.id, id)
   }
 
   @Post('friendship/cancelById/:id')
-  cancelFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+  cancelFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller cancel friendship request by id')
-    return this.usersService.cancelFriendshipRequestById(req.user.id, +id)
+    return this.usersService.cancelFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/cancelByName/:name')
@@ -114,9 +114,9 @@ export class UsersController {
   }
 
   @Post('friendship/acceptById/:id')
-  acceptFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+  acceptFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller accept friendship request by id')
-    return this.usersService.acceptFriendshipRequestById(req.user.id, +id)
+    return this.usersService.acceptFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/acceptByName/:name')
@@ -126,9 +126,9 @@ export class UsersController {
   }
 
   @Post('friendship/dismissById/:id')
-  dismissFriendshipRequestById(@Param('id') id: string, @Req() req: any) {
+  dismissFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller dismiss friendship request by id')
-    return this.usersService.dismissFriendshipRequestById(req.user.id, +id)
+    return this.usersService.dismissFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/dismissByName/:name')
@@ -138,9 +138,9 @@ export class UsersController {
   }
 
   @Post('friendship/removeById/:id')
-  removeFriendById(@Param('id') id: string, @Req() req: any) {
+  removeFriendById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller remove friend by id')
-    return this.usersService.removeFriendById(req.user.id, +id)
+    return this.usersService.removeFriendById(req.user.id, id)
   }
 
   @Post('friendship/removeByName/:name')
