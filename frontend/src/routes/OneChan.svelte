@@ -10,6 +10,7 @@
   import type { Socket } from "socket.io-client";
   import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto, User } from "../types";
   import defaultAvatar from '../assets/008-utilisateur.png';
+  import moreImg from '../assets/more.png';
   
   export let params: any = {}
   let socket: Socket = null
@@ -20,6 +21,7 @@
   let posts: newPostEmitDto[] = []
   let element;
   let showsettings: boolean = false;
+  let usersettings: boolean = false;
   let users: User[] = [];
 
 // $: foo = posts
@@ -175,7 +177,16 @@ function testlink()
     showsettings = true;
   else
     showsettings = false;
+  usersettings = false;
   console.log(showsettings);
+}
+function openUserSettings()
+{
+  if (!usersettings)
+    usersettings = true;
+  else
+    usersettings = false;
+  console.log(usersettings);
 }
 </script>
 {#if channel}
@@ -191,12 +202,43 @@ function testlink()
       </div>
       <div id="card-content" class="text-gray-700">
         {#each users as user}
-          <p> {user.username}</p>
-          <br>
+        <div class="users">
+          <div class="avatarSettings">
+            <img class="rounded-full" src={getAvatar(user.username)} style="height: 40px; width: 40px;" alt="avatar">
+          </div>
+          <div class="username">
+            <span style="color: grey; font-size: 20px; position: relative; top:30%; position: relative; font-family: Arial; left:20%;">
+              {user.username}  
+            </span>
+          </div>
+          <div class="btnSettingsUser">
+            <img class="rounded-full" src={moreImg} style="height: 30px; width: 30px;" alt="three dots" on:click={openUserSettings}>
+          </div>
+        </div>
+
         {/each}
       </div>
     </div>
-
+    {#if usersettings}
+    <div class="dotsCard">
+      <div id="dropdownNavbar" class="z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+        <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+          <li>
+            <a href="sqd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Send a DM</a>
+          </li>
+          <li>
+            <span class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">See profil</span>
+          </li>
+          <li>
+            <a href="qsd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Block</a>
+          </li>
+        </ul>
+        <div class="py-1">
+          <a href="qds" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">Delete member</a>
+        </div>
+      </div>
+    </div>
+    {/if}
   </div>
 {/if}
   <div class="horizontalBar">
@@ -217,7 +259,6 @@ function testlink()
       <div class="user">
         <span style="color: #9E27D9; font-size: 20px; position: relative; top:30%; font-family: Arial;">
           {post.author}
-          
         </span>
       </div>
       <div class="postContent">
@@ -347,22 +388,62 @@ height: 40px;
       height: 100%;
   }
   .settingsCard{
-      height: 800px;
-      width: 200px;
+      height: 400px;
+      width: 400px;
       z-index: 1;
       position: relative;
       top :10%;
-      left: 50%;
+      left: 200px;
     }
     #member-button:focus {
-        background-color: #801e6b;
-        color: purple;
+        background-color: grey;
     }
     #admin-button:focus {
-        background-color: #1e4e80;
-        color: purple;
+        background-color: grey;
     }
     #card-content{
       overflow-y: scroll;
+    }
+    .users{
+      position: relative;
+      height: 50px;
+      width: 100%;
+    }
+    .avatarSettings{
+      position: absolute;
+      top:0px;
+      left:0px;
+
+      height:100%;
+      width:45px;
+    }
+    .username {
+      position: absolute;
+      top: 0;
+      left: 45px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .btnSettingsUser{
+      position: relative;
+      top: 0px;
+      left: calc(100% - 60px);
+      width: 60px;
+      height: 100%;
+    }
+    .btnSettingsUser img{
+      cursor: pointer;
+    }
+    .btnSettingsUser img:hover{
+      cursor: pointer;
+      background-color: grey;
+    }
+    .dotsCard{
+      height: 300px;
+      width: 300px;
+      z-index: 1;
+      position: absolute;
+      top: 0px;
+      left: 400px;
     }
 </style>
