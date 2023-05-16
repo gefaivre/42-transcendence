@@ -3,7 +3,6 @@
   import  ioClient  from 'socket.io-client';
   import { Ball, Frame, Paddle } from './Objects'
   import axios  from "axios";
-    import Game from "../Game.svelte";
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -14,13 +13,21 @@
   const leftPaddle: Paddle = new Paddle(true, frame); 
   const rightPaddle: Paddle = new Paddle(false, frame); 
   
-  let gameList: string[] = [];
+
+  class Game { 
+    player1: string;
+    player2: string;
+  }
+
+  let gameList: Game[] = [];
 
   let leftScore: number = 0;
   let rightScore: number = 0;
   let stop: boolean = true;
 
   let inGame: boolean = false;
+  let gameRequest: boolean = false;
+  let watch = false;
 
   const socket = ioClient('http://localhost:3000', {
     path: '/pong',
@@ -35,13 +42,29 @@
     });
     
     socket.on('watchGame', () => {
+      watch = true;
       console.log('watcherMode on');
     });
+
+    socket.on('win', () => {
+      alert('you win! refresh page to play another game');
+    });
     
+    socket.on('lose', () => {
+      alert('you lose! refresh page to play another game');
+    });
+
+    socket.on('opponentLeft', () => {
+      if (watch)
+        alert('A player has left the game. Refresh page to watch another game');
+      alert('your opponent has left the game, you win! refresh page to play another game');
+    });
+
     socket.on('gameState', (state) => {
       if (!inGame)
         game_loop();
       inGame = true;
+      gameRequest = false;
       stop = state.stop;
       if (stop)
         inGame = false
@@ -67,7 +90,6 @@
   getGames();
   console.log('gameList', gameList);
 
-  
   async function getGames() {
     let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
     for (const game of games) {
@@ -125,6 +147,7 @@
 
   function requestGame() {
     socket.emit('requestGame', {});
+    gameRequest = true;
   }
 
   function joinFriendly(event: any) {
@@ -132,7 +155,7 @@
 
     for (let field of formData) {
       const [key, value] = field;
-      if (key === 'friend') {
+      if (key === 'friend' && value) {
         socket.emit('requestGame', { friend: value });
       }
     }
@@ -151,18 +174,20 @@
 {#if gameList}
   <ul>
     {#each gameList as game}
-      <li>{game} game</li>
-      <button on:click={() => watchGame(game)}>watch</button>
+      <li>{game.player1 + ' vs ' + game.player2} game</li>
+      <button on:click={() => watchGame(game.player1)}>watch</button>
     {/each}
   </ul>
 {/if}
 
 
-<button on:click={requestGame}>request random game</button>
-<form on:submit|preventDefault={(event) => joinFriendly(event)}>
-    <input id="friend" name="friend" type="text" placeholder="type friend username">
-    <button type="submit">play a friendly match</button>
-</form>
+  {#if !gameRequest}
+  <button on:click={requestGame}>request random game</button>
+  <form on:submit|preventDefault={(event) => joinFriendly(event)}>
+      <input id="friend" name="friend" type="text" placeholder="type friend username">
+      <button type="submit">play a friendly match</button>
+  </form>
+  {/if}
 {/if}
 
 {#if inGame}
@@ -172,6 +197,10 @@
 <div class:inGame={inGame}>
 <canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
 </div>
+
+{#if gameRequest}
+<h2>Game requested !</h2>
+{/if}
 
 <style>
 
