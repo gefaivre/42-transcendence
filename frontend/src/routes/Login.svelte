@@ -34,9 +34,9 @@
         logged.set('true')
         push('/')
       }
-    } catch (error) {
-      console.log(error)
-      alert(error.response.data.message)
+    } catch (e) {
+      console.log(e)
+      alert(e.response.data.message)
       createUserDto.username = null
       createUserDto.password = null
     }

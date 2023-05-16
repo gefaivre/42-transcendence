@@ -54,7 +54,7 @@
           console.log($user)
           logged.set('true')
           id.set(response.data.id.toString())
-        } catch (error) {
+        } catch (e) {
           logged.set('false')
           id.set('0')
         }
@@ -80,8 +80,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
         reload()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -90,18 +90,28 @@
         await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
         logged.set('false')
         id.set('0')
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
     async function removeFriendById() {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${pageUser.id}`, null, { withCredentials: true })
-        console.log(cancel)
+        await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
+        getUser()
         reload()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    async function dismissFriendshipRequestById() {
+      try {
+        await axios.post(`http://localhost:3000/users/friendship/dismissById/${pageUser.id}`, null, { withCredentials: true })
+        getUser()
+        reload()
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -109,9 +119,10 @@
       try {
         const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${pageUser.id}`, null, { withCredentials: true })
         console.log(cancel)
+        getUser()
         reload()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 
@@ -119,17 +130,8 @@
       try {
         await axios.post(`http://localhost:3000/users/friendship/acceptById/${pageUser.id}`, null, { withCredentials: true })
         reload()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    async function dismissFriendshipRequestById() {
-      try {
-        await axios.post(`http://localhost:3000/users/friendship/dismissById/${pageUser.id}`, null, { withCredentials: true })
-        reload()
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 

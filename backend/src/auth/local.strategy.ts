@@ -6,14 +6,14 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private userService: UsersService) {
+  constructor(private readonly userService: UsersService) {
     super();
   }
 
   // TODO: typedef arguments with proper dto
   async validate(username: string, _password: string): Promise<any> {
 
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findByUsername(username);
 
     if (!user)
       throw new BadRequestException("Username doesn't exist")

@@ -25,7 +25,7 @@ export type Channel = {
   ownerId: number
   owner: User
   users: User[]
-  admins: []
+  admins: User[]
   posts: PostEmitDto[]
   status: ChannelStatus
 }
@@ -62,4 +62,10 @@ export type WsException = {
 export type ChatResponse = {
   event: string
   data: string
+}
+
+export type DirectMessage = {
+  content: string
+  sender: string
+  recipient: string
 }

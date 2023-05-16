@@ -6,13 +6,16 @@ import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService,
+
+  constructor(
+    private readonly prisma: PrismaService,
     @Inject(forwardRef(() => ImagesService))
-              private images: ImagesService) {}
+    private readonly images: ImagesService
+  ) {}
 
   // START CRUD
   async create(createUserDto: CreateUserDto) {
-    if (await this.findOne(createUserDto.username) != null)
+    if (await this.findByUsername(createUserDto.username) != null)
       return null
 
       // Create User
@@ -100,7 +103,7 @@ export class UsersService {
 
   }
 
-  async findOne(name: string) {
+  async findByUsername(name: string) {
     return await this.prisma.user.findUnique({
       where: {
         username: name,

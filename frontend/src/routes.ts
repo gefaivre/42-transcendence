@@ -20,6 +20,7 @@ import ThomasChan from './routes/Chan.svelte'
 import Pong from './routes/pong/Pong.svelte'
 import { wrap } from 'svelte-spa-router/wrap'
 import TwoFA from './routes/2FA.svelte'
+import DirectMessage from './routes/DirectMessage.svelte'
 
 export default {
     '/': Home,
@@ -41,5 +42,6 @@ export default {
     '/message/:name': Chan,
     '/2FA': TwoFA,
     '/pong': Pong,
+    '/dm/:username': DirectMessage,
     '*': NotFound
 };

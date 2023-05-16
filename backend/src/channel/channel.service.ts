@@ -1,34 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-
-
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService){}
 
-  async create(createChannelDto: CreateChannelDto) {
-    try {
-      const channel = await this.prisma.channel.create({
-        data: {
-          name: createChannelDto.channelName,
-          ownerId: createChannelDto.ownerId,
-          admins: { connect: [{ id: createChannelDto.ownerId }] },
-          status: createChannelDto.status,
-          password: createChannelDto.password
-        }
-      })
-      return channel
-    } catch (error) {
-      return "error creating channel";
-    }
-  }// verifier le ownerId avant pour que prisma ne cree pas un user, ou se servir de la methode connect
+  create(createChannelDto: CreateChannelDto) {
+    return this.prisma.channel.create({
+      data: {
+        name: createChannelDto.channelName, // P2002
+        ownerId: createChannelDto.ownerId, // P2003
+        admins: { connect: { id: createChannelDto.ownerId } }, // P2025
+        users: { connect: { id: createChannelDto.ownerId } }, // P2025
+        status: createChannelDto.status, // checked by ValidationPipe
+        password: createChannelDto.password // ??
+      }
+    })
+  }
 
-  async findAll() {
-    return await this.prisma.channel.findMany({
+  findAll() {
+    return this.prisma.channel.findMany({
       include: {
         owner: true,
         users: true,
@@ -38,10 +30,10 @@ export class ChannelService {
     });
   }
 
-  async findOne(id: number)  {
+  findById(channelId: number)  {
     return this.prisma.channel.findUnique({
       where: {
-        id: id
+        id: channelId
       },
       include: {
         owner: true,
@@ -52,10 +44,10 @@ export class ChannelService {
     });
   }
 
-  findByName(name: string) {
+  findByName(channelName: string) {
     return this.prisma.channel.findFirst({
       where: {
-        name: name
+        name: channelName
       },
       include: {
         owner: true,
@@ -66,11 +58,41 @@ export class ChannelService {
     });
   }
 
-  async findByUser(userId: number) {
-    return this.prisma.channel.findMany({
+  deleteByName(channelName: string) {
+    return this.prisma.channel.delete({
       where: {
+        name: channelName
+      }
+    })
+  }
+
+  deleteAll() {
+    return this.prisma.channel.deleteMany();
+  }
+
+  async isInChannel(channelName: string, userId: number): Promise<boolean> {
+    const channel = await this.findByName(channelName)
+    return channel !== null && channel.users.some(user => user.id == userId)
+  }
+
+  async isOwner(channelName: string, userId: number): Promise<boolean> {
+    const channel = await this.findByName(channelName)
+    return channel !== null && channel.owner.id === userId
+  }
+
+  async isAdmin(channelName: string, userId: number): Promise<boolean> {
+    const channel = await this.findByName(channelName)
+    return channel !== null && channel.admins.some(admin => admin.id === userId)
+  }
+
+  addUserToChannel(channelName: string, userId: number) {
+    return this.prisma.channel.update({
+      where: {
+        name: channelName
+      },
+      data: {
         users: {
-          some: {
+          connect: {
             id: userId
           }
         }
@@ -78,186 +100,95 @@ export class ChannelService {
     })
   }
 
-  async isInChannel(channelName: string, userId: number) {
+  async leave(channelName: string, userId: number) {
+
     const channel = await this.findByName(channelName)
-    if (channel)
-      for (const user of channel.users)
-        if (user.id == userId)
-          return true
-    return false
+
+    // if the last member leave, we delete the channel
+    if (channel?.users?.length === 1)
+      return this.deleteByName(channelName)
+
+    // if the owner leave, we transfer ownership
+    if (channel?.ownerId === userId) {
+
+      // prioritize admins to be the new owner
+      let newOwner = channel.admins.find(admin => admin.id !== userId)
+
+      if (newOwner === undefined)
+        newOwner = channel.users.find(user => user.id !== userId)
+
+      // promote new owner as admin if not already
+      if (channel.admins.some(admin => admin.id === newOwner?.id))
+        this.promoteAdmin(channelName, newOwner?.id as number)
+
+      // set new owner
+      try {
+        await this.prisma.channel.update({
+          where: {
+            name: channelName
+          },
+          data: {
+            ownerId: newOwner?.id
+          }
+        })
+      } catch(e) {
+        throw new InternalServerErrorException('')
+      }
+
+    }
+
+    // now you can leave
+    return this.removeUser(channelName, userId)
   }
 
-  async update(id: number, updateChannelDto: UpdateChannelDto) {
-    return await this.prisma.channel.update({
-      where: {id: id},
-      data: {
-        name: updateChannelDto.channelName,
-        ownerId: updateChannelDto.ownerId,
+  removeUser(channelName: string, userId: number) {
+    return this.prisma.channel.update({
+      where: {
+        name: channelName
       },
-    });
-    //return `This action updates a #${id} channel`;
-  }
-
-  async addUserToChannel(channelId: number, userId: number) {//utiliser les anciennes plutot
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId }
-    }); //const channel = this.findOne(channelId)
-
-    if (!channel) {
-      //throw new NotFoundException(`Channel with ID ${channelId} not found`);
-      return "wrong channel";
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
-      return "wrong user";
-      //throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
-    const updatedChannel = await this.prisma.channel.update({
-      where: { id: channelId },
       data: {
         users: {
-          connect: { id: userId }
-        }
-      },
-      include: { users: true }
-    });
-
-    return updatedChannel;
-  }
-
-  async addAdminToChannel(channelId: number, userId: number) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId }
-    }); //const channel = this.findOne(channelId)
-
-    if (!channel) {
-      //throw new NotFoundException(`Channel with ID ${channelId} not found`);
-      return "wrong channel";
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
-      return "wrong user";
-      //throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
-    const updatedChannel = await this.prisma.channel.update({
-      where: { id: channelId },
-      data: {
-        admins: {
-          connect: { id: userId }
-        }
-      },
-      include: {  users: true,
-                  admins: true
-      }
-    });
-
-    return updatedChannel;
-  }
-
-  async removeAdminFromChannel(channelId: number, userId: number) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId }
-    }); //const channel = this.findOne(channelId)
-
-    if (!channel) {
-      //throw new NotFoundException(`Channel with ID ${channelId} not found`);
-      return "wrong channel";
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      return "wrong user";
-      //throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
-    const updatedChannel = await this.prisma.channel.update({
-      where: { id: channelId },
-      data: {
-        admins: {
-          disconnect: { id: userId }
-        }
-      },
-      include: {  users: true,
-                  admins: true
-      }
-    });
-    return updatedChannel;
-  }
-
-  async remove(id: number) {
-    return await this.prisma.channel.delete({
-      where:
-    {
-      id: id
-    }});
-   // return `This action removes a #${id} channel`;
-  }
-
-  async removeAll() {
-    return await this.prisma.channel.deleteMany();
-  }
-
-  async removeUserFromChannel(chanId: number, userId: number): Promise<boolean> {
-    try {
-      await this.prisma.channel.update({
-        where: {
-          id: chanId
-        },
-        data: {
-          users: {
-            disconnect: { id: userId }
+          disconnect: {
+            id: userId
           }
         },
-        include: {
-          users: true
+        admins: {
+          disconnect: {
+            id: userId
+          }
         }
-      })
-      return true
-    } catch(error) {
-      console.log(error)
-      return false
-    }
-}
+      }
+    })
+  }
 
-  async safeRemoveUserFromChannel(channelId: number, userId: number, requestingUserId: number): Promise<void> {
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId },
-      include: { users: true, admins: true},
-    });
-    if (!channel) {
-      throw new NotFoundException(`Channel with id ${channelId} not found`);
-    }
+  promoteAdmin(channelName: string, userId: number) {
+    return this.prisma.channel.update({
+      where: {
+        name: channelName
+      },
+      data: {
+        admins: {
+          connect: {
+            id: userId
+          }
+        }
+      }
+    })
+  }
 
-    // Vérifier que l'utilisateur qui demande la suppression est l'administrateur du canal
-    const isAdmin = channel.admins.some((admin: any) => admin.id === requestingUserId);
-
-    // Vérifier que l'utilisateur à retirer est soit l'utilisateur qui fait la demande,
-    // soit un administrateur du canal
-    const isSelfRemove = userId === requestingUserId;
-    const isChannelUser = channel.users.some((user: any) => user.id === userId);
-    if (!isSelfRemove && !isAdmin) {
-      throw new UnauthorizedException('Only channel admins can remove users from the channel');
-    } else if (!isSelfRemove && !isChannelUser) {
-      throw new NotFoundException(`User with id ${userId} is not a member of channel with id ${channelId}`);
-    }
-
-    await this.prisma.channel.update({
-      where: { id: channelId },
-      data: { users: { disconnect: { id: userId } } },
-    });
+  revokeAdmin(channelName: string, userId: number) {
+    return this.prisma.channel.update({
+      where: {
+        name: channelName
+      },
+      data: {
+        admins: {
+          disconnect: {
+            id: userId
+          }
+        }
+      }
+    })
   }
 
 }

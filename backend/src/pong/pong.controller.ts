@@ -9,6 +9,6 @@ export class PongController {
   @Get()
   @UseGuards(AuthGuard('jwt'))
   getGames() {
-    return this.pongService.getGameList()
+    return this.pongService.getRoomList()
   }
 }

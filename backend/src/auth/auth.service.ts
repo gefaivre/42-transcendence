@@ -9,8 +9,8 @@ import * as OTPAuth from "otpauth";
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
-    private userService: UsersService
+    private readonly jwtService: JwtService,
+    private readonly userService: UsersService
   ) {}
 
   // TODO: rename and typedef argument
@@ -31,7 +31,7 @@ export class AuthService {
         }
       })
       return res.data.access_token
-    } catch (error) {
+    } catch (e) {
         return null
     }
   }

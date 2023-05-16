@@ -11,13 +11,13 @@ import * as bcrypt from 'bcrypt';
 export class AuthController {
 
   constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)
   private async generateUsername(login: string) {
-    while (await this.usersService.findOne(login))
+    while (await this.usersService.findByUsername(login))
       login = login + '_'
     return login
   }
@@ -78,7 +78,7 @@ export class AuthController {
     // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
-    } catch (error) {
+    } catch (e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 

@@ -12,10 +12,13 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
-  constructor(private authService: AuthService,
-              private usersService: UsersService,
-              private channelService: ChannelService,
-              private postsService: PostsService) {}
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+    private readonly channelService: ChannelService,
+    private readonly postsService: PostsService,
+  ) {}
 
   users: ChatUser[] = [];
 

@@ -28,7 +28,7 @@ model User {
   loses          Match[]   @relation("loser")
   channels       Channel[] @relation("channel_users")
   ownedChannels  Channel[] @relation("channel_owner")
-  bannedChannels Channel[] @relation("channel_banned_users")
+  bannedChannels Channel[] @relation("channel_banned")
   adminChannels  Channel[] @relation("channel_admins")
   posts          Post[]
   friends        User[]  @relation("friends")
@@ -36,6 +36,8 @@ model User {
   pendingFriends User[]  @relation("pending")
   requestFriends User[]  @relation("pending")
   TwoFA          Boolean @default(false)
+  SentDM DirectMessage[] @relation("SentDM")
+  RecvDM DirectMessage[] @relation("RecvDM")
 }
 
 model Image {
@@ -52,8 +54,8 @@ model Channel {
   id          Int    @id @default(autoincrement())
   name        String @unique
   ownerId     Int
-  owner       User   @relation("channel_owner", fields: [ownerId], references: [id])
-  bannedUsers User[] @relation("channel_banned_users")
+  owner       User   @relation("channel_owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  banned      User[] @relation("channel_banned")
   admins      User[] @relation("channel_admins")
   users       User[] @relation("channel_users")
   posts       Post[]
@@ -63,10 +65,10 @@ model Channel {
 
 model Match {
   id          Int      @id @default(autoincrement())
-  winner      User     @relation(name: "winner", fields: [winnerId], references: [id])
+  winner      User     @relation(name: "winner", fields: [winnerId], references: [id], onDelete: Cascade)
   winnerId    Int
   winnerScore Int
-  loser       User     @relation(name: "loser", fields: [loserId], references: [id])
+  loser       User     @relation(name: "loser", fields: [loserId], references: [id], onDelete: Cascade)
   loserId     Int
   loserScore  Int
   date        DateTime
@@ -76,8 +78,17 @@ model Match {
 model Post {
   id        Int     @id @default(autoincrement())
   content   String
-  author    User    @relation(fields: [authorId], references: [id])
+  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int
+}
+
+model DirectMessage {
+  id          Int   @id @default(autoincrement())
+  content     String
+  senderId    Int
+  receiverId  Int
+  sender      User  @relation("SentDM", fields: [senderId], references: [id])
+  receiver    User  @relation("RecvDM", fields: [receiverId], references: [id])
 }
