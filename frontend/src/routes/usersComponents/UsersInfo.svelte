@@ -2,8 +2,9 @@
     import axios from "axios";
 		import { id, logged, user } from "../../stores";
     import deleteIcon        from '../../assets/redLose.png';
+    import acceptIcon        from '../../assets/greenWin.png';
     import { onMount } from "svelte";
-    import type { User } from "../../types";
+    import type { Match, User } from "../../types";
 
 
     export let pageUser;
@@ -12,6 +13,8 @@
 
     let friendspage: String = 'Friends';
 
+    let matchHistory: Match[] = [];
+
 
     $: onMount(() => reload())
 
@@ -19,12 +22,12 @@
     async function reload() {
       getUser();
       selectprofile();
+      getMatch();
     }
 
     async function getUser() {
       try {
         let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
-        // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
         user.set(response.data)
         console.log($user)
         logged.set('true')
@@ -37,6 +40,11 @@
 
     async function getprofile(): Promise <User> {
       return (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
+    }
+
+    async function getMatch(){
+      matchHistory = (await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`, { withCredentials: true })).data
+      console.log(matchHistory)
     }
 
     async function selectprofile() {
@@ -171,8 +179,12 @@
       {#each pageUser.requestFriends as requestFriends}
         <li>
           <b>{requestFriends?.username}</b> requested you as friend
-          <button on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>Accept</button>
-          <button on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>Dismiss</button>
+          <button class="deleteFriendBtn" on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
+            <img class="btnImage" src={acceptIcon} alt="accept">
+          </button>
+          <button class="deleteFriendBtn" on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
+            <img class="btnImage" src={deleteIcon} alt="delete">
+          </button>
         </li>
       {/each}
       </ul>
@@ -193,13 +205,21 @@
 
 	</div>
 
-    <div class="box-info games">
-      <h1>Game history</h1>
-    </div>
-    <div class="box-info statistics">
-      <h1>Statistics</h1>
-    </div>
+  <div class="box-info games">
+    <h1>Game history</h1>
+    <ul>
+    {#each matchHistory as match}
+      <li class="lineFriend">
+        <span>    {match.loserScore} - {match.winnerScore}</span>
+      </li>
+    {/each}
+    </ul>
   </div>
+
+  <div class="box-info statistics">
+    <h1>Statistics</h1>
+  </div>
+</div>
 
 
 <style>
