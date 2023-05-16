@@ -13,8 +13,7 @@
   let gameList: Match[] = [];
 
   let update_child: (state: GameState) => void;
-
-  let unique = {} //use to restart Game component
+  let loop_child: () => void;
 
   let inGame: boolean = false;
   let gameRequest: boolean = false;
@@ -37,14 +36,10 @@
 
     socket.on('win', () => {
       alert('you win! refresh page to play another game');
-      restart();
-      inGame = false;
     });
     
     socket.on('lose', () => {
       alert('you lose! refresh page to play another game');
-      restart();
-      inGame = false;
     });
 
     socket.on('opponentLeft', () => {
@@ -52,13 +47,14 @@
         alert('A player has left the game. Refresh page to watch another game');
       else
         alert('your opponent has left the game, you win! refresh page to play another game');
-      restart();
-      inGame = false;
     });
 
     socket.on('gameState', (state) => {
+      if (!inGame) {
+        update(state);
+        loop();
+      }
       inGame = true;
-      update(state);
       gameRequest = false;
       if (state.stop)
         inGame = false
@@ -69,8 +65,8 @@
     update_child(state);
   }
 
-  function restart() { 
-    unique = {};
+  function loop() {
+    loop_child();
   }
 
   getGames();
@@ -84,8 +80,9 @@
     gameList = gameList;
   }
   
+
   function handleKeyup(e: KeyboardEvent) {
-    if (!inGame)
+    if (stop) 
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -95,7 +92,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (!inGame)
+    if (stop) 
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -151,9 +148,8 @@
 {/if}
 
 {#if inGame}
-{#key unique}
-<Game bind:update_state={update_child}></Game>
-{/key}
+<Game bind:update_state={update_child} bind:game_loop={loop_child} />
+
 {/if}
 
 {#if gameRequest}
