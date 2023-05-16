@@ -57,7 +57,8 @@
     socket.on('opponentLeft', () => {
       if (watch)
         alert('A player has left the game. Refresh page to watch another game');
-      alert('your opponent has left the game, you win! refresh page to play another game');
+      else
+        alert('your opponent has left the game, you win! refresh page to play another game');
     });
 
     socket.on('gameState', (state) => {
