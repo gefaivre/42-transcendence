@@ -219,7 +219,6 @@
 		text-align: center;
 	}
 
-
 	.box-info {
 		margin: 50px;
 		border: solid 2px var(--grey);
@@ -290,6 +289,28 @@
     height: 25px;
     width: 25px;
   }
+
+  @media screen and (max-width: 1150px) {
+    .info-container {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr, 1fr, 1fr;
+    }
+
+    .friends{
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+
+    .games{
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+    }
+
+    .statistics{
+      grid-column: 1 / 2;
+      grid-row: 3 / 4;
+    }
+}
 
 
 </style>

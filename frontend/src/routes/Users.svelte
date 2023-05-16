@@ -185,8 +185,6 @@
         {/if}
       {/if}
 
-
-
     </div>
 
     <div class="second-panel">
