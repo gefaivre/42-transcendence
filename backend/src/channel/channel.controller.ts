@@ -30,11 +30,10 @@ export class ChannelController {
     if (channelDto.status === 'Protected') {
       try {
         channelDto.password = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
-      } catch (error) {
+      } catch (e) {
         throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
-
     const channel: CreateChannelDto = {
       channelName: channelDto.channelName,
       ownerId: request.user.id,
@@ -138,7 +137,6 @@ export class ChannelController {
   findAll() {
     return this.channelService.findAll();
   }
-
   @Get(':name')
   async findOne(@Param('name', ChannelByNamePipe) channel: any) {
     return channel

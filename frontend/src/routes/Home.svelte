@@ -11,7 +11,11 @@
         games: 0,
         ft_login: '',
         id : 0,
-        TwoFA: null
+        TwoFA: null,
+        friends: [],
+        friendOf: [],
+        pendingFriends: [],
+        requestFriends: [],
     }
 
     onMount(() => getProfile())
@@ -24,7 +28,7 @@
         id.set(response.data.id.toString())
         response = await axios.get(`http://localhost:3000/users/id/${user.id}`, { withCredentials: true })
         user = response.data
-      } catch (error) {
+      } catch (e) {
         logged.set('false')
         id.set('0')
       }
@@ -35,8 +39,8 @@
         await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
         logged.set('false')
         id.set('0')
-      } catch (error) {
-        console.log(error)
+      } catch (e) {
+        console.log(e)
       }
     }
 

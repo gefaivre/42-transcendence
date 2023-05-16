@@ -8,14 +8,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ImagesService {
-  constructor(@Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
-    private PrismaService: PrismaService) {}
 
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+    private readonly PrismaService: PrismaService
+  ) {}
 
   async AddImage(userId: number, file: Express.Multer.File)
   {
-    let image = await this.PrismaService.image.create({
+    const image = await this.PrismaService.image.create({
       data: {
         name: file.filename,
         link: `${file.destination}/${file.filename}`,
@@ -27,7 +29,7 @@ export class ImagesService {
   }
 
   async setImage(UserId: number, imageId:number) {
-    let result = await this.PrismaService.image.update({
+    const result = await this.PrismaService.image.update({
       where: { id: +imageId },
       data: {lastuse: new Date()}
     })
@@ -35,7 +37,7 @@ export class ImagesService {
   }
 
   async findAll(userId: number) {
-    let images = await this.PrismaService.image.findMany({
+    const images = await this.PrismaService.image.findMany({
       where: {
         User: {
           id: userId
@@ -49,11 +51,10 @@ export class ImagesService {
   }
 
   async getImage(userId: string) {
-    let image;
-    let user = await this.usersService.findById(+userId)
+    const user = await this.usersService.findById(+userId)
     if (user == null)
       return null;
-    image = await this.PrismaService.image.findMany({
+    const image = await this.PrismaService.image.findMany({
       take: 1,
       where: {
         User: {
@@ -69,8 +70,7 @@ export class ImagesService {
   }
 
   async findOne(userId: number, Id: number) {
-    let image
-    image = await this.PrismaService.image.findUnique({
+    const image = await this.PrismaService.image.findUnique({
       where: {
         id: Id
       }

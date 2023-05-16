@@ -11,8 +11,8 @@ import * as bcrypt from 'bcrypt';
 export class AuthController {
 
   constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)
@@ -78,7 +78,7 @@ export class AuthController {
     // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
-    } catch (error) {
+    } catch (e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 
@@ -122,7 +122,16 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   getProfile(@Req() request: any) {
-    return request.user
+    return request.user;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('whoami')
+  async getUser(@Req() request: any) { // Set to async for the console.log(user) (await)
+    const whoami = request.user;
+    let user = await  this.usersService.findById(whoami?.id)
+    console.log(user);
+    return user;
   }
 
   // Step 1/2 to enable 2FA

@@ -5,7 +5,6 @@
     import { onMount } from "svelte";
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
-
   </script>
 
   <style>
@@ -15,9 +14,7 @@
   }
  </style>
 
- <Layout>
     <div class=toDo >
         <ul>To do: <ul>
             <p>The game mdr</p>
     </div>
- </Layout>

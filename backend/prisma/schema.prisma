@@ -28,7 +28,7 @@ model User {
   loses          Match[]   @relation("loser")
   channels       Channel[] @relation("channel_users")
   ownedChannels  Channel[] @relation("channel_owner")
-  bannedChannels Channel[] @relation("channel_banned_users")
+  bannedChannels Channel[] @relation("channel_banned")
   adminChannels  Channel[] @relation("channel_admins")
   posts          Post[]
   friends        User[]  @relation("friends")
@@ -55,7 +55,7 @@ model Channel {
   name        String @unique
   ownerId     Int
   owner       User   @relation("channel_owner", fields: [ownerId], references: [id], onDelete: Cascade)
-  bannedUsers User[] @relation("channel_banned_users")
+  banned      User[] @relation("channel_banned")
   admins      User[] @relation("channel_admins")
   users       User[] @relation("channel_users")
   posts       Post[]

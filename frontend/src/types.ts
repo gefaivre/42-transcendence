@@ -5,6 +5,10 @@ export type User = {
   mmr: number
   games: number
   ft_login: string
+  friends: { id: number, username: string }[]
+  friendOf: { id: number, username: string }[]
+  pendingFriends: { id: number, username: string }[]
+  requestFriends: { id: number, username: string }[]
   TwoFA: boolean
 }
 
@@ -43,7 +47,11 @@ export type PostEmitDto = {
   content: string
   author: string
 }
-
+export type newPostEmitDto = {
+  channelName: string
+  content: string
+  author: User
+}
 // mirros the object backend sends with `throw new WsException()`
 export type WsException = {
   status: string
