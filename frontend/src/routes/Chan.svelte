@@ -159,7 +159,7 @@
       }
     })
 
-  })
+  })//fin
 
   onDestroy(() => socket.disconnect())
 

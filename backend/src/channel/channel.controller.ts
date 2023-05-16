@@ -34,7 +34,6 @@ export class ChannelController {
         throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
-
     const channel: CreateChannelDto = {
       channelName: channelDto.channelName,
       ownerId: request.user.id,
@@ -138,7 +137,6 @@ export class ChannelController {
   findAll() {
     return this.channelService.findAll();
   }
-
   @Get(':name')
   async findOne(@Param('name', ChannelByNamePipe) channel: any) {
     return channel

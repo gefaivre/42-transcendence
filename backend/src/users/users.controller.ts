@@ -121,7 +121,7 @@ export class UsersController {
 
   @Post('friendship/acceptByName/:name')
   acceptFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
-    console.log('controller accept friendship request by name')
+    console.log('controller accept friendship request by name(', req.user.id, 'accept', name, ')')
     return this.usersService.acceptFriendshipRequestByName(req.user.id, name)
   }
 

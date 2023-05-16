@@ -58,6 +58,7 @@
     if (channel.status === ChannelStatus.Protected && channel.password === '')
       return alert('Empty channel password')
     try {
+      console.log(channel);
       await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
       getAll()
     } catch (e) {
