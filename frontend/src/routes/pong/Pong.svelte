@@ -129,7 +129,11 @@
 
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
+<div id="all">
+
 {#if !inGame}
+
+<h2 id="title"> Pong </h2>
 
 {#if gameList}
   <ul>
@@ -142,11 +146,16 @@
 
 
   {#if !gameRequest}
+  <div id="randomGame">
   <button on:click={requestGame}>request random game</button>
+  </div>
+
+  <div id="friendlyGame">
   <form on:submit|preventDefault={(event) => joinFriendly(event)}>
       <input id="friend" name="friend" type="text" placeholder="type friend username">
       <button type="submit">play a friendly match</button>
   </form>
+  </div>
   {/if}
 {/if}
 
@@ -159,3 +168,45 @@
 {#if gameRequest}
 <h2>Game requested !</h2>
 {/if}
+
+</div>
+
+<style>
+
+#all {
+  color: var(--white);
+  height: 100vh;
+  background-color: var(--grey);
+  border-left: 1px solid grey;
+  text-align: center;
+}
+
+#title {
+  color: rgb(158, 39, 217);
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom:2em;
+}
+
+#randomGame {
+  margin-bottom: 2em;
+}
+
+button {
+  background-color:#3b82f6;
+  font-weight: bold;
+  border: 1px solid #1d4ed8;
+  border-radius:4px;
+  padding:0.5em;
+}
+button:hover {
+  background-color:#1d4ed8
+}
+
+input {
+  border-radius: 2px;
+  padding:0.2em;
+  margin:0.5em;
+  color: black;
+}
+</style>
