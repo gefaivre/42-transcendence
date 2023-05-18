@@ -23,6 +23,7 @@
   let showsettings: boolean = false;
   let usersettings: boolean = false;
   let users: User[] = [];
+  let username = null // the user settings are about to operate upon
 
 // $: foo = posts
 afterUpdate(() => {
@@ -180,13 +181,14 @@ function testlink()
   usersettings = false;
   console.log(showsettings);
 }
-function openUserSettings()
+function openUserSettings(_username: string)
 {
   if (!usersettings)
     usersettings = true;
   else
     usersettings = false;
   console.log(usersettings);
+  username = _username;
 }
 </script>
 {#if channel}
@@ -212,7 +214,7 @@ function openUserSettings()
             </span>
           </div>
           <div class="btnSettingsUser">
-            <img class="rounded-full" src={moreImg} style="height: 30px; width: 30px;" alt="three dots" on:click={openUserSettings}>
+            <img class="rounded-full" src={moreImg} style="height: 30px; width: 30px;" alt="three dots" on:click={openUserSettings(user.username)}>
           </div>
         </div>
 
@@ -227,7 +229,7 @@ function openUserSettings()
             <a href="sqd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Send a DM</a>
           </li>
           <li>
-            <span class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">See profil</span>
+            <a href={'#/users/' + username} class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">See profile</a>
           </li>
           <li>
             <a href="qsd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Block</a>
