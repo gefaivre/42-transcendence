@@ -139,8 +139,8 @@ onMount(async () => {
     console.log('Connected')
   })
 
-  socket.on('disconnect', (reason) => {
-    console.log('Disconnected:', reason)
+  socket.on('disconnect', (cause) => {
+    console.log('Disconnected:', cause)
   })
 
   socket.on('post', (post: newPostEmitDto) => {

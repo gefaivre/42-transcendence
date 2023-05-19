@@ -21,7 +21,7 @@ export const enum WsActionFailure {
   DirectMessage = 'unable to dm'
 }
 
-export const enum WsFailureReason {
+export const enum WsFailureCause {
   UserNotFound = 'user not found',
   ChannelNotFound = 'channel not found',
   UserNotInChannel = 'user not in channel',
@@ -40,13 +40,13 @@ type Recipient = ChannelName | Username
 export type WsHandlerSuccessClientLog = `${WsActionSuccess} ${Recipient}`
 export type WsHandlerSuccessServerLog = `client ${UserID} (user ${Username}) ${WsHandlerSuccessClientLog}`
 
-export type WsHandlerFailureClientLog = `${WsActionFailure} ${Recipient}: ${WsFailureReason}`
+export type WsHandlerFailureClientLog = `${WsActionFailure} ${Recipient}: ${WsFailureCause}`
 export type WsHandlerFailureServerLog = `client ${UserID} (user ${Username}) ${WsHandlerFailureClientLog}`
 
 export type WsLifecycleHookSuccessClientLog = WsActionSuccess
 export type WsLifecycleHookSuccessServerLog = `client ${UserID} (user ${Username}) ${WsLifecycleHookSuccessClientLog}`
 
-export type WsLifecycleHookFailureClientLog = `${WsActionFailure}: ${WsFailureReason}`
+export type WsLifecycleHookFailureClientLog = `${WsActionFailure}: ${WsFailureCause}`
 export type WsLifecycleHookFailureServerLog = `client ${UserID} ${WsLifecycleHookFailureClientLog}`
 
 // export class ChatResponse implements WsResponse {
