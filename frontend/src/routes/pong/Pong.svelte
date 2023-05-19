@@ -12,6 +12,8 @@
 
   let gameList: Match[] = [];
 
+  let currentMatch: Match = { player1: '', player2: '' }
+
   let update_child: (state: GameState) => void;
 
   let unique = {} //use to restart Game component
@@ -26,8 +28,9 @@
     });
 
   onMount(() => {
-    socket.on('newPlayer', () => {
-      console.log("new player connected");
+    socket.on('gameStart', (match) => {
+      currentMatch = match;
+      console.log("game started");
     });
     
     socket.on('watchGame', () => {
@@ -161,7 +164,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:update_state={update_child}></Game>
+<Game bind:players={currentMatch} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 

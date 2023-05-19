@@ -17,6 +17,8 @@
     ball.posy = state.ball.posy;
   };
 
+  export let players = {player1: '', player2: ''};
+
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
   let animationId: number;
@@ -68,6 +70,7 @@
 <div id="all">
 <p id="score">{leftScore}  -  {rightScore}</p>
 <canvas id="canvas" bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
+<p id="players">{players.player1}  VS  {players.player2}</p>
 </div>
 
 <style>
@@ -81,6 +84,13 @@
   text-align: center;
   font-weight: bold;
   color:var(--pink);
+  margin-bottom: 1em;
+}
+
+#players {
+  text-align: center;
+  font-weight: bold;
+  color:#3b82f6;
   margin-bottom: 1em;
 }
 
