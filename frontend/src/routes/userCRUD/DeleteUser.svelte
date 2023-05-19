@@ -1,13 +1,11 @@
 <script lang="ts">
 
-    import axios from "axios";
+    import axios from "../../axios.config";
 
     let username: string;
 
     function DeleteUser() {
-        axios.delete(`http://localhost:3000/users/${username}`, {
-            withCredentials: true
-        })
+        axios.delete(`/users/${username}`)
         .then(res => { console.log(res.data) })
         .catch(err => { console.log(err) })
     }

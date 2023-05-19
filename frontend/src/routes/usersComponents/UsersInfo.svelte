@@ -1,5 +1,5 @@
 <script lang="ts">
-    import axios from "axios";
+    import axios from "../../axios.config";
 		import { id, logged, user } from "../../stores";
     import deleteIcon        from '../../assets/redLose.png';
     import { onMount } from "svelte";
@@ -23,8 +23,8 @@
 
     async function getUser() {
       try {
-        let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
-        // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
+        let response = await axios.get('/auth/whoami');
+        // let response = await axios.get('/users/gefaivre');
         user.set(response.data)
         console.log($user)
         logged.set('true')
@@ -36,7 +36,7 @@
     }
 
     async function getprofile(): Promise <User> {
-      return (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
+      return (await axios.get(`/users/${params.name}`)).data
     }
 
     async function selectprofile() {
@@ -53,7 +53,7 @@
 
     async function requestFriendship() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/request/${pageUser.id}`, null)
         reload()
       } catch (error) {
         console.log(error)
@@ -62,7 +62,7 @@
 
     async function acceptFriendshipRequestById() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/acceptById/${$user.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/acceptById/${$user.id}`, null)
         reload()
       } catch (error) {
         console.log(error)
@@ -71,7 +71,7 @@
 
     async function acceptFriendshipRequestByName(name: string) {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/acceptByName/${name}`, null)
         reload()
       } catch (error) {
         console.log(error)
@@ -80,7 +80,7 @@
 
     async function dismissFriendshipRequestById() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/dismissById/${$user.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/dismissById/${$user.id}`, null)
         reload()
       } catch (error) {
         console.log(error)
@@ -89,7 +89,7 @@
 
     async function dismissFriendshipRequestByName(name: string) {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/dismissByName/${name}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/dismissByName/${name}`, null)
         reload()
       } catch (error) {
         console.log(error)
@@ -98,7 +98,7 @@
 
     async function cancelFriendshipRequestById() {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${$user.id}`, null, { withCredentials: true })
+        const cancel = await axios.post(`/users/friendship/cancelById/${$user.id}`, null)
         console.log(cancel)
         reload()
       } catch (error) {
@@ -108,7 +108,7 @@
 
     async function cancelFriendshipRequestByName(name: string) {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelByName/${name}`, null, { withCredentials: true })
+        const cancel = await axios.post(`/users/friendship/cancelByName/${name}`, null)
         console.log(cancel)
         reload()
       } catch (error) {
@@ -118,7 +118,7 @@
 
     async function removeFriendById() {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${$user.id}`, null, { withCredentials: true })
+        const cancel = await axios.post(`/users/friendship/removeById/${$user.id}`, null)
         console.log(cancel)
         reload()
       } catch (error) {
@@ -128,7 +128,7 @@
 
     async function removeFriendByName(name: string) {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeByName/${name}`, null, { withCredentials: true })
+        const cancel = await axios.post(`/users/friendship/removeByName/${name}`, null)
         console.log(cancel)
         reload()
       } catch (error) {

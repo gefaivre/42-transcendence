@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import axios from "axios";
+  import axios from "../axios.config";
   import { push, replace } from "svelte-spa-router";
   import { logged } from "../stores";
 
@@ -23,7 +23,7 @@
       return alert('error')
 
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', createUserDto, { withCredentials: true })
+      const response = await axios.post('/auth/login', createUserDto)
       console.log('response', response)
       if (response.data === 'jwt2fa') {
         replace('/2FA')

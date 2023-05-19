@@ -1,7 +1,7 @@
 <script lang="ts">
 
 
-  import axios from "axios";
+  import axios from "../axios.config";
     import { onMount } from "svelte";
     import { id, reloadImage, user, logged } from "../stores";
     import type { User} from "../types";
@@ -48,8 +48,8 @@
 
       async function getUser() {
         try {
-          let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
-          // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
+          let response = await axios.get('/auth/whoami');
+          // let response = await axios.get('/users/gefaivre');
           user.set(response.data)
           console.log($user)
           logged.set('true')
@@ -61,7 +61,7 @@
       }
 
     async function getprofile(): Promise <User> {
-        return (await axios.get(`http://localhost:3000/users/${params.name}`, { withCredentials: true })).data
+        return (await axios.get(`/users/${params.name}`)).data
       }
 
     async function selectprofile() {
@@ -78,7 +78,7 @@
 
     async function requestFriendship() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/request/${pageUser.id}`, null)
         reload()
       } catch (e) {
         console.log(e)
@@ -87,7 +87,7 @@
 
     async function logout() {
       try {
-        await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
+        await axios.get('/auth/logout')
         logged.set('false')
         id.set('0')
       } catch (e) {
@@ -97,7 +97,7 @@
 
     async function removeFriendById() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/acceptByName/${name}`, null)
         getUser()
         reload()
       } catch (e) {
@@ -107,7 +107,7 @@
 
     async function dismissFriendshipRequestById() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/dismissById/${pageUser.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/dismissById/${pageUser.id}`, null)
         getUser()
         reload()
       } catch (e) {
@@ -117,7 +117,7 @@
 
     async function cancelFriendshipRequestById() {
       try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${pageUser.id}`, null, { withCredentials: true })
+        const cancel = await axios.post(`/users/friendship/cancelById/${pageUser.id}`, null)
         console.log(cancel)
         getUser()
         reload()
@@ -128,7 +128,7 @@
 
     async function acceptFriendshipRequestById() {
       try {
-        await axios.post(`http://localhost:3000/users/friendship/acceptById/${pageUser.id}`, null, { withCredentials: true })
+        await axios.post(`/users/friendship/acceptById/${pageUser.id}`, null)
         reload()
       } catch (e) {
         console.log(e)

@@ -1,6 +1,6 @@
 <script>
     import Layout from "./Layout.svelte";
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount} from "svelte";
     import avatar from '../assets/008-utilisateur.png';
     import greenWin from '../assets/greenWin.png';
@@ -13,9 +13,7 @@
   
     const getUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/users/${username}`, {
-          withCredentials: true
-        });
+        const response = await axios.get(`/users/${username}`);
         user = response.data;
         console.log(user);
         game = MatchHistory;

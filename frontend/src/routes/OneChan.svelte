@@ -1,6 +1,6 @@
 <script lang=ts>
   import Layout from "./Layout.svelte";
-  import axios from "axios";
+  import axios from "../axios.config";
   import { onMount, onDestroy, afterUpdate} from "svelte";
   import ChanMenu from "./chanLayouts.svelte";
   import settingsImage from "../assets/settings.png";
@@ -111,7 +111,7 @@ const newscrollToBottom = async (node) => {
 // TODO: what if we manually change `id` store value ?
 onMount(async () => {
 
-  channel = (await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })).data
+  channel = (await axios.get(`/channel/${params.name}`)).data
 
   socket = ioClient('http://localhost:3000', {
     path: '/chat',

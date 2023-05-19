@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import axios from 'axios';
+  import axios from '../axios.config';
   import { logged } from "../stores";
   import { onMount } from "svelte";
   import type { Channel, ChannelDto } from "../types";
@@ -19,7 +19,7 @@
 
   async function getAll() {
     try {
-      channels = (await axios.get('http://localhost:3000/channel', { withCredentials: true })).data
+      channels = (await axios.get('/channel')).data
       console.log(channels)
     } catch (e) {
       console.log(e.response.data.message)
@@ -31,7 +31,7 @@
     if (!window.confirm("Are you sure ?"))
       return
     try {
-      await axios.delete(`http://localhost:3000/channel/${name}`, { withCredentials: true })
+      await axios.delete(`/channel/${name}`)
       getAll()
     } catch (e) {
       console.log(e.response.data.message)
@@ -43,7 +43,7 @@
     if (!window.confirm("Are you sure ?"))
       return
     try {
-      await axios.delete(`http://localhost:3000/channel`, { withCredentials: true })
+      await axios.delete(`/channel`)
       getAll()
     } catch (e) {
       console.log(e.response.data.message)
@@ -59,7 +59,7 @@
       return alert('Empty channel password')
     try {
       console.log(channel);
-      await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
+      await axios.post('/channel', channel)
       getAll()
     } catch (e) {
       console.log(e.response.data.message)

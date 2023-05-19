@@ -1,7 +1,7 @@
 <script lang="ts">
     // définir les boutons du menu
 
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount } from "svelte";
     import { logged } from "../stores";
     
@@ -11,9 +11,7 @@
   }
   onMount(async () => {
         try {
-          const response = await axios.get('http://localhost:3000/channel', {
-            withCredentials: true
-        });
+          const response = await axios.get('channel');
              chans = response.data;
              console.log(chans);
   } catch (error) {

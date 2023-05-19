@@ -5,7 +5,7 @@
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
   import type { DirectMessage, WsException } from "../types";
-  import axios from "axios";
+  import axios from "../axios.config";
 
   export let params: any = {}
   let socket: Socket = null
@@ -15,7 +15,7 @@
   onMount(async () => {
 
     try {
-      const response = await axios.get(`http://localhost:3000/posts/dm/${params.username}`, { withCredentials: true })
+      const response = await axios.get(`/posts/dm/${params.username}`)
       messages = response.data
       console.log(response)
     } catch (e) {

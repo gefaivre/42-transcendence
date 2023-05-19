@@ -2,7 +2,7 @@
 <script lang="ts">
     export const title = 'Mon titre';
 
-    import axios from "axios";
+    import axios from './axios.config'
     import { onMount, setContext } from "svelte";
     import channelIcon  from './assets/whiteChannel.png';
     import homeIcon     from './assets/whiteHome.png'
@@ -27,8 +27,8 @@
 
     async function getProfile() {
       try {
-        let response = await axios.get('http://localhost:3000/auth/whoami', {withCredentials: true});
-        // let response = await axios.get('http://localhost:3000/users/gefaivre', {withCredentials: true});
+        let response = await axios.get('/auth/whoami');
+        // let response = await axios.get('/users/gefaivre');
         user.set(response.data)
         console.log($user)
         logged.set('true')

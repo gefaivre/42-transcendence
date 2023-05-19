@@ -1,7 +1,7 @@
 <script lang="ts">
     // définir les boutons du menu
 
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount } from "svelte";
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";
@@ -18,7 +18,7 @@
         if (channel.status == 'Protected')
           channel.password = password;
         const response = await
-        axios.post('http://localhost:3000/channel', channel, { withCredentials: true });
+        axios.post('/channel', channel);
         console.log(response);
 
     }

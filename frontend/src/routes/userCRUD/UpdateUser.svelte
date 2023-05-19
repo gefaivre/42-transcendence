@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import axios from 'axios'
+    import axios from '../../axios.config'
     import type { User } from '../../types'
 
     let user: User = {
@@ -16,9 +16,7 @@
 
     function UpdateUser() {
         Object.keys(user).forEach((k) => user[k] == null && delete user[k]);
-        axios.patch(`http://localhost:3000/users/${username}`, user, {
-            withCredentials: true
-        })
+        axios.patch(`/users/${username}`, user)
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });
     };

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import axios from "axios";
+  import axios from "../axios.config";
   import { onDestroy, onMount } from "svelte";
   import { logged, id } from "../stores";
   import { pop } from "svelte-spa-router";
@@ -54,7 +54,7 @@
 
   async function getChannel() {
     try {
-      const response = await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })
+      const response = await axios.get(`/channel/${params.name}`)
       channel = response.data
     } catch (e) {
       channel = null
@@ -64,7 +64,7 @@
 
   async function revokeAdmin(id: number) {
     try {
-      await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/revoke/${id}`, null, { withCredentials: true })
+      await axios.patch(`/channel/${channel.name}/admin/revoke/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
@@ -73,7 +73,7 @@
 
   async function promoteAdmin(id: number) {
     try {
-      await axios.patch(`http://localhost:3000/channel/${channel.name}/admin/promote/${id}`, null, { withCredentials: true })
+      await axios.patch(`/channel/${channel.name}/admin/promote/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
@@ -82,7 +82,7 @@
 
   async function ban(userId: number) {
     try {
-      const response = await axios.delete(`http://localhost:3000/channel/${channel.name}/${userId}`, { withCredentials: true })
+      const response = await axios.delete(`/channel/${channel.name}/${userId}`)
       console.log(response)
       getChannel()
     } catch (e) {
@@ -93,7 +93,7 @@
   // TODO: what if we manually change `id` store value ?
   onMount(async () => {
 
-    channel = (await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })).data
+    channel = (await axios.get(`/channel/${params.name}`)).data
 
     socket = ioClient('http://localhost:3000', {
       path: '/chat',
