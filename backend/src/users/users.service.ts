@@ -13,8 +13,8 @@ export class UsersService {
     private readonly images: ImagesService
   ) {}
 
-  // START CRUD
   async create(createUserDto: CreateUserDto) {
+
     if (await this.findByUsername(createUserDto.username) != null)
       return null
 
@@ -137,16 +137,15 @@ export class UsersService {
         channels: true,
         wins: true,
         loses:true
-
       }
     })
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async findOneById(userid: number) {
+  async findOneById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id: +userid,
+        id: id,
       }
     })
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
@@ -184,8 +183,6 @@ export class UsersService {
   async removeAllUsers() {
     return this.prisma.user.deleteMany();
   }
-
-  // END CRUD
 
   async getTopMmr(){
     return await this.prisma.user.findMany({
