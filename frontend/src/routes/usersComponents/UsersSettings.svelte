@@ -70,8 +70,7 @@
 		if (username == $user.username) { return alert('same username') }
 
 		try {
-			// Yes, this body is dirty.
-			await axios.patch(`/users/username/${$user.username}`, { id: $id, username: username })
+			await axios.patch(`/users/username/${$user.username}`, { username: username })
 
 			alert('Username successfully updated!')
 
@@ -95,8 +94,7 @@
 		// guards
 		if (password == null) { return alert('empty password') }
 		try {
-			// Yes, this body is dirty.
-			await axios.patch(`/users/password/${$user.username}`, { id: $id, password: password })
+			await axios.patch(`/users/password/${$user.username}`, { password: password })
 
 			alert('Password successfully updated!')
 

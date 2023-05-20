@@ -3,19 +3,13 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from 'src/auth/auth.service';
-import { Request} from 'express';
 import * as bcrypt from 'bcrypt';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly authService: AuthService
-  ) {}
 
-  // START CRUD
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -44,27 +38,27 @@ export class UsersController {
 
   // We might use guards someway to handle those verifications
   @Patch('username/:name')
-  async updateUsername(@Param('name') name: string, @Body() body: any, @Req() req: Request) {
+  async updateUsername(@Param('name') name: string, @Body() body: UpdateUsernameDto, @Req() req: any) {
 
-    // check that user is changing its own username
-    if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
-      throw new UnauthorizedException('Unauthorized to change other player username.')
+    // check that user updates its own username
+    if (req.user.username !== body.username)
+      throw new UnauthorizedException('Unauthorized to update other player username')
 
     // check that new username is not already used
     try {
-      await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
+      await this.usersService.updateUsername(username, body.username);
     } catch (e) {
-      throw new ConflictException('This username is already used.')
+      throw new ConflictException('This username is already used')
     }
   }
 
   // We might use guards someway to handle those verifications
   @Patch('password/:name')
-  async updatePassword(@Param('name') name: string, @Body() body: any, @Req() req: Request) {
+  async updatePassword(@Param('name') name: string, @Body() body: UpdatePasswordDto, @Req() req: any) {
 
-    // check that user is changing its own password
-    if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
-      throw new UnauthorizedException('Unauthorized to change other player password.')
+    // check that user updates its own password
+    if (req.user.username !== username)
+      throw new UnauthorizedException('Unauthorized to update other player password')
 
     let hash
 
@@ -77,7 +71,7 @@ export class UsersController {
 
     // update password
     try {
-      await this.usersService.updatePassword(name, { password: hash } as UpdatePasswordDto);
+      await this.usersService.updatePassword(username, hash);
     } catch (e) {
       throw new ConflictException('Error while updating your password')
     }
@@ -92,8 +86,6 @@ export class UsersController {
   removeAllUsers() {
     return this.usersService.removeAllUsers();
   }
-
-  // END CRUD
 
   @Post('friendship/request/:id')
   requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {

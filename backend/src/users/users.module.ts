@@ -10,7 +10,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ImagesService } from 'src/images/images.service';
 
 @Module({
-  imports: [forwardRef(() => ImagesModule), forwardRef(() => AuthModule)],
+  imports: [forwardRef(() => ImagesModule)],
   controllers: [UsersController],
   providers: [UsersService, PrismaService],
   exports: [UsersService]

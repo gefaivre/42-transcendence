@@ -1,7 +1,7 @@
 import { Injectable , Inject, HttpException, HttpStatus, forwardRef} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
@@ -160,18 +160,18 @@ export class UsersService {
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async updateUsername(name: string, updateUsernameDto: UpdateUsernameDto) {
+  async updateUsername(name: string, newName: string) {
     const user = await this.prisma.user.update({
       where: { username: name },
-      data: { username: updateUsernameDto.username }
+      data: { username: newName }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async updatePassword(name: string, updatePasswordDto: UpdatePasswordDto) {
+  async updatePassword(name: string, newPassword: string) {
     const user = await this.prisma.user.update({
       where: { username: name },
-      data: { password: updatePasswordDto.password }
+      data: { password: newPassword }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
