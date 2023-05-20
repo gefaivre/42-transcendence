@@ -28,7 +28,7 @@ export class ChatService {
   }
 
   async addUser(socketId: string, tokenData: any): Promise<ChatUser | undefined> {
-    const user: User | null = await this.usersService.findById(tokenData.sub);
+    const user: Omit<User, 'password'> | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
@@ -50,7 +50,7 @@ export class ChatService {
     if (channel) {
       const posts: Post[] = await this.postsService.findByChannel(channel.id);
       for (const post of posts) {
-        const author: User | null = await this.usersService.findById(post.authorId);
+        const author: Omit<User, 'password'> | null = await this.usersService.findById(post.authorId);
         if (author)
           ret.push({content: post.content, author: author.username, channelName: channelName});
       }

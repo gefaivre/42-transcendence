@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -37,7 +38,7 @@ export class AuthController {
     const ft_user = await this.authService.getFortyTwoUser(access_token);
 
     // see if this 42 user already in db
-    let user = await this.usersService.findByFortyTwoLogin(ft_user.login)
+    let user: Omit<User, 'password'> | null = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
     if (!user) {
@@ -84,12 +85,9 @@ export class AuthController {
 
     // create user
     body.password = hash
-    const user = await this.usersService.create(body)
+    const user: Omit<User, 'password'> | null = await this.usersService.create(body)
     if (user == null)
       throw new ConflictException('This username already exists')
-
-    // remove password field from user object
-    const { password, ...result } = user;
 
     // frontend need to login after
     return user;

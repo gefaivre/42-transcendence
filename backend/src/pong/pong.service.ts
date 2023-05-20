@@ -31,7 +31,7 @@ export class PongService {
   }
 
   async addUser(clientId: string, tokenData: any) {
-    const user: User | null = await this.usersService.findById(tokenData.sub);
+    const user: Omit<User, 'password'> | null = await this.usersService.findById(tokenData.sub);
 
     if (user) {
       this.users.push({ username: user!.username, id: user!.id, clientId: clientId })

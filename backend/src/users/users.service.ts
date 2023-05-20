@@ -53,7 +53,7 @@ export class UsersService {
         }
       })
     }
-    return user
+    return this.prisma.exclude(user, ['password'])
   }
 
   async findAll() {
@@ -61,7 +61,7 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: id,
       },
@@ -92,19 +92,20 @@ export class UsersService {
         },
       }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async findByFortyTwoLogin(login: string) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         ft_login: login
       }
     })
-
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async findByUsername(name: string) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         username: name,
       },
@@ -139,39 +140,45 @@ export class UsersService {
 
       }
     })
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async findOneById(userid: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: +userid,
       }
     })
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async update(name: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { username: name },
       data: updateUserDto,
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updateUsername(name: string, updateUsernameDto: UpdateUsernameDto) {
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { username: name },
       data: { username: updateUsernameDto.username }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updatePassword(name: string, updatePasswordDto: UpdatePasswordDto) {
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { username: name },
       data: { password: updatePasswordDto.password }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async remove(name: string) {
-    return this.prisma.user.delete({ where: { username: name } });
+    const user = await this.prisma.user.delete({ where: { username: name } });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async removeAllUsers() {
