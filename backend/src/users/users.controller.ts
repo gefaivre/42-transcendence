@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
@@ -32,8 +32,13 @@ export class UsersController {
   }
 
   @Patch(':name')
-  update(@Param('name') name: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(name, updateUserDto);
+  update(@Param('name') name: string, @Body() body: UpdateUserDto, @Req() req: any) {
+
+    // check that user updates itself
+    if (req.user.username !== name)
+      throw new UnauthorizedException('Unauthorized to update other player')
+
+    return this.usersService.update(name, body);
   }
 
   // We might use guards someway to handle those verifications
@@ -78,8 +83,17 @@ export class UsersController {
   }
 
   @Delete(':name')
-  remove(@Param('name') name: string) {
-    return this.usersService.remove(name);
+  async remove(@Param('name') name: string, @Req() req: any) {
+
+    // check that user deletes itself
+    if (req.user.username !== name)
+      throw new UnauthorizedException('Unauthorized to delete other player')
+
+    try {
+      await this.usersService.remove(name)
+    } catch(e) {
+      throw new NotFoundException('User not found')
+    }
   }
 
   @Delete()
