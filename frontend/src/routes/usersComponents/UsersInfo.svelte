@@ -148,7 +148,7 @@
         <button on:click={() => friendspage = 'Pending'}>pending</button>
       </div>
 
-      {#if friendspage == 'Friends'}
+      {#if friendspage === 'Friends'}
 
       <ul>
 
@@ -165,7 +165,7 @@
 
       </ul>
 
-    {:else if friendspage == 'Request' && $id === pageUser.id.toString()}
+    {:else if friendspage === 'Request' && $id === pageUser.id.toString()}
 
     <ul>
       {#each pageUser.requestFriends as requestFriends}
@@ -178,7 +178,7 @@
       </ul>
 
 
-    {:else if friendspage == 'Pending'}
+    {:else if friendspage === 'Pending'}
 
       <ul>
         {#each pageUser.pendingFriends as pendingFriends}

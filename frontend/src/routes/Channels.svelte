@@ -120,7 +120,7 @@
     <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected &#128273<br>
     <input type="text" bind:value={channel.channelName} placeholder="channel name">
     <button on:click={create}>Add</button>
-    {#if channel.status == ChannelStatus.Protected}
+    {#if channel.status === ChannelStatus.Protected}
       <input type="text" bind:value={channel.password} placeholder="password">
     {/if}
   </fieldset>

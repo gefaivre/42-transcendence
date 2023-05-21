@@ -14,7 +14,8 @@
     async function submitImage() {
         console.log(fileInput.files[0])
 
-        if (fileInput.files[0] == null) { return alert('empty file') }
+        if (fileInput.files[0] === null || fileInput.files[0] === undefined)
+          return alert('empty file')
 
 
         const file = fileInput.files[0]
@@ -32,7 +33,6 @@
         } catch (error) {
         console.error(error)
         }
-        fileInput == null;
     };
 
     async function downloadImages() {
@@ -66,8 +66,8 @@
 	async function updateUsername() {
 
 		// guards
-		if (username == null) { return alert('empty username') }
-		if (username == $user.username) { return alert('same username') }
+		if (username === null) { return alert('empty username') }
+		if (username === $user.username) { return alert('same username') }
 
 		try {
 			await axios.patch(`/users/username/${$user.username}`, { username: username })
@@ -92,7 +92,7 @@
 	// this is not big deal since this table entry will be removed anyway
 	async function updatePassword() {
 		// guards
-		if (password == null) { return alert('empty password') }
+		if (password === null) { return alert('empty password') }
 		try {
 			await axios.patch(`/users/password/${$user.username}`, { password: password })
 

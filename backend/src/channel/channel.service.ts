@@ -73,7 +73,7 @@ export class ChannelService {
 
   async isInChannel(channelName: string, userId: number): Promise<boolean> {
     const channel = await this.findByName(channelName)
-    return channel !== null && channel.users.some(user => user.id == userId)
+    return channel !== null && channel.users.some(user => user.id === userId)
   }
 
   async isOwner(channelName: string, userId: number): Promise<boolean> {

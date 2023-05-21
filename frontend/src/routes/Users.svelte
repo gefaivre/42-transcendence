@@ -147,7 +147,7 @@
       <h1 class="title">Profile</h1>
 
       <!-- toggle edditing button (class after) -->
-      {#if pageUser.id.toString() == $id}
+      {#if pageUser.id.toString() === $id}
         <button class="image-button">
           <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
         </button>

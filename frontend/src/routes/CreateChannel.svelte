@@ -15,7 +15,7 @@
         console.log(channelData);
         channel.channelName = channelData.name;
         channel.status = visibility;
-        if (channel.status == 'Protected')
+        if (channel.status === 'Protected')
           channel.password = password;
         const response = await
         axios.post('/channel', channel);

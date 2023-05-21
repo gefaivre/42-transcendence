@@ -30,7 +30,7 @@ export class AuthController {
 
     // TODO (?): throw http exception
     // code we sent could have been wrong
-    if (access_token == null)
+    if (access_token === null)
       return response.redirect('http://localhost:8080')
 
     // exchange access token for user data
@@ -40,7 +40,7 @@ export class AuthController {
     let user: Omit<User, 'password'> | null = await this.usersService.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
-    if (!user) {
+    if (user === null) {
 
       let newUser: CreateUserDto = {
         username: await this.generateUsername(ft_user.login),
@@ -52,7 +52,7 @@ export class AuthController {
       user = await this.usersService.create(newUser)
 
       // TODO
-      if (user == null)
+      if (user === null)
         return
     }
 
@@ -85,7 +85,7 @@ export class AuthController {
     // create user
     body.password = hash
     const user: Omit<User, 'password'> | null = await this.usersService.create(body)
-    if (user == null)
+    if (user === null)
       throw new ConflictException('This username already exists')
 
     // frontend need to login after

@@ -14,7 +14,8 @@
     async function submitImage() {
         console.log(fileInput.files[0])
 
-        if (fileInput.files[0] == null) { return alert('empty file') }
+        if (fileInput.files[0] === null || fileInput.files[0] === undefined)
+          return alert('empty file')
 
 
         const file = fileInput.files[0]
@@ -31,7 +32,6 @@
         } catch (e) {
         console.error(e)
         }
-        fileInput == null;
     };
 
     async function toggleImageParameter() {

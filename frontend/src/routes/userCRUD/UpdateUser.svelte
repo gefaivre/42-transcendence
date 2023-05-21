@@ -15,7 +15,7 @@
     let username: string
 
     function UpdateUser() {
-        Object.keys(user).forEach((k) => user[k] == null && delete user[k]);
+        Object.keys(user).forEach((k) => user[k] === null && delete user[k]);
         axios.patch(`/users/${username}`, user)
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });

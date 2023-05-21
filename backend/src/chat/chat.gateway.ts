@@ -168,7 +168,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const tokenData: any = await this.chatService.validateUser(authHeader)
     const user: ChatUser | undefined = await this.chatService.addUser(client.id, tokenData)
 
-    if (user == undefined)
+    if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Connect)

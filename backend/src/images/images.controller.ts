@@ -16,7 +16,7 @@ export class ImagesController {
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request, file, cb) => {
-        if (request.user == undefined)
+        if (request.user === undefined || request.user === null)
           return "You shall not pass";
         const fs = require('fs');
         const directory  = `/app/images/${request.user}`

@@ -18,7 +18,7 @@
 
   async function signup() {
 
-    if (createUserDto.username == null || createUserDto.password == null)
+    if (createUserDto.username === null || createUserDto.password === null)
       return alert('error')
 
     try {

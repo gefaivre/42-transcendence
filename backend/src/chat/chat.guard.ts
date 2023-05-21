@@ -60,7 +60,7 @@ export class ChatGuard implements CanActivate {
 
       // TODO
       else if (channel.status === 'Private') {
-        if (await this.channelService.isOwner(channel.channelName, user.prismaId) == false) {
+        if (await this.channelService.isOwner(channel.channelName, user.prismaId) === false) {
           this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.PrivateChannel)
         }
       }
