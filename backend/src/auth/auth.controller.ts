@@ -1,7 +1,6 @@
-import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-import { Request} from 'express';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
