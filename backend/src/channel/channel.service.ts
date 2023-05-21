@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
@@ -133,7 +133,7 @@ export class ChannelService {
           }
         })
       } catch(e) {
-        throw new InternalServerErrorException('')
+        throw new NotFoundException('channel not found')
       }
 
     }
