@@ -108,8 +108,9 @@
     if (formData.has('channelStatus') === false)
       return alert('Empty status')
 
+    let pass: string
     if (formData.get('channelStatus') === 'Protected') {
-      var pass: string = window.prompt('Enter password');
+      pass = window.prompt('Enter password');
       if (pass === '')
         return alert('Empty password')
       if (!pass)

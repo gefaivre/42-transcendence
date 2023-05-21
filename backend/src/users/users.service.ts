@@ -40,8 +40,8 @@ export class UsersService {
     {
       let internlink;
       //create dir app/images/userId/image_name
-      var fs = require('fs');
-      var dir = `/app/images/${user.id}`
+      const fs = require('fs');
+      const dir = `/app/images/${user.id}`
       if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
       internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
       this.images.downloadImage(new URL(createUserDto.image),  internlink)
