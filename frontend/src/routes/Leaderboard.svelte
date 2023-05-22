@@ -33,13 +33,13 @@
 		<table class="leaderboard">
 				<thead>
 					<tr>
-								<th colspan="4">The big leaderboard</th>
+							<th colspan="4">The big leaderboard</th>
 						</tr>
 						<tr>
-								<th>Rank</th>
-								<th>User</th>
-								<th><a class="clickable" href="/#/leaderboard" on:click={() => getMmr()}>Mmr</a></th>
-								<th><a class="clickable" href="/#/leaderboard" on:click={() => getGames()}>Games</a></th>
+							<th>Rank</th>
+							<th>User</th>
+							<th><a class="clickable" href="/#/leaderboard" on:click={() => getMmr()}>Mmr</a></th>
+							<th><a class="clickable" href="/#/leaderboard" on:click={() => getGames()}>Games</a></th>
 						</tr>
 				</thead>
 				<tbody>

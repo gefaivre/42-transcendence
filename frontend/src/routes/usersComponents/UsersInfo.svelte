@@ -15,6 +15,8 @@
 
     let matchHistory: Match[] = [];
 
+    let opponent;
+
 
     $: onMount(() => reload())
 
@@ -56,6 +58,17 @@
     }
     else
     pageUser = $user;
+    }
+
+    async function getUsernameById(id: number) {
+      try {
+        let response = await axios.get(`http://localhost:3000/users/id/${id}`, { withCredentials: true })
+        console.log(response.data.username)
+        return response.data.username;
+      } catch (e) {
+        console.log(e);
+      }
+
     }
 
 
@@ -149,57 +162,91 @@
 	<div class="info-container">
 
     <div class="box-info friends">
-      <h1> Friends</h1>
       <div class="nav">
-        <button on:click={() => friendspage = 'Friends'}>friends</button>
+        {#if friendspage == 'Friends'}
+          <button class="activeButton" on:click={() => friendspage = 'Friends'}>friends</button>
+        {:else}
+          <button on:click={() => friendspage = 'Friends'}>friends</button>
+        {/if}
+
+        {#if friendspage == 'Request'}
+          <button class="activeButton" on:click={() => friendspage = 'Request'}>request</button>
+        {:else}
         <button on:click={() => friendspage = 'Request'}>request</button>
-        <button on:click={() => friendspage = 'Pending'}>pending</button>
+        {/if}
+
+        {#if friendspage == 'Pending'}
+          <button class="activeButton" on:click={() => friendspage = 'Pending'}>pending</button>
+        {:else}
+          <button on:click={() => friendspage = 'Pending'}>pending</button>
+        {/if}
       </div>
 
       {#if friendspage == 'Friends'}
 
+    <div class="overflow">
       <ul>
-
         {#each pageUser.friends as friend}
-        <li class="lineFriend">
-          <a class="name" href="#/users/{friend.username}">{friend.username}</a>
+        <li>
+          <div class="user">
+            <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+            <a class="name" href="#/users/{friend.username}">{friend.username}</a>
+          </div>
           {#if $id === pageUser.id.toString()}
-          <button class="deleteFriendBtn" on:click={() => removeFriendByName(friend.username)}>
-            <img class="btnImage" src={deleteIcon} alt="deleteicon">
-          </button>
+          <div class="actions">
+            <button class="actionsButton" on:click={() => removeFriendByName(friend.username)}>
+              <img class="btnImage" src={deleteIcon} alt="deleteicon">
+            </button>
+          </div>
           {/if}
         </li>
         {/each}
-
       </ul>
+    </div>
 
     {:else if friendspage == 'Request' && $id === pageUser.id.toString()}
-
-    <ul>
-      {#each pageUser.requestFriends as requestFriends}
+    <div class="overflow">
+      <ul>
+        {#each pageUser.requestFriends as requestFriends}
         <li>
-          <b>{requestFriends?.username}</b> requested you as friend
-          <button class="deleteFriendBtn" on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
-            <img class="btnImage" src={acceptIcon} alt="accept">
-          </button>
-          <button class="deleteFriendBtn" on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
-            <img class="btnImage" src={deleteIcon} alt="delete">
-          </button>
+          <div class="user">
+            <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
+            <a class="name" href="#/users/{requestFriends?.username}">{requestFriends?.username}</a>
+          </div>
+          <div class="actions">
+            <button class="actionsButton" on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
+              <img class="btnImage" src={acceptIcon} alt="accept">
+            </button>
+            <button class="actionsButton" on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
+              <img class="btnImage" src={deleteIcon} alt="delete">
+            </button>
+          </div>
         </li>
-      {/each}
+        {/each}
       </ul>
+    </div>
 
 
-    {:else if friendspage == 'Pending'}
+    {:else if friendspage == 'Pending' && $id === pageUser.id.toString()}
+    <div class="overflow">
+
 
       <ul>
         {#each pageUser.pendingFriends as pendingFriends}
-          <li>
-            You requested <b>{pendingFriends?.username}</b> as friend
-            <button  on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>Cancel</button>
-          </li>
+        <li>
+          <div class="user">
+            <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
+            <a class="name" href="#/users/{pendingFriends?.username}">{pendingFriends?.username}</a>
+          </div>
+          <div class="actions">
+            <button class="actionsButton" on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
+              <img class="btnImage" src={deleteIcon} alt="delete">
+            </button>
+          </div>
+        </li>
         {/each}
       </ul>
+    </div>
 
     {/if}
 
@@ -207,17 +254,44 @@
 
   <div class="box-info games">
     <h1>Game history</h1>
-    <ul>
-    {#each matchHistory as match}
-      <li class="lineFriend">
-        <span>    {match.loserScore} - {match.winnerScore}</span>
-      </li>
-    {/each}
-    </ul>
+    <div class="overflow">
+      <ul>
+        {#each matchHistory as match}
+        {#if match.winnerId == pageUser.id}
+        <li class="lineFriends" id="win">
+          <span >-</span>
+          <span id="flexEnd"> {pageUser.username} </span>
+          <span> <img class="pp" src="http://localhost:3000/images/actual/{pageUser.id}" alt="pp"/> </span>
+          <span>{match.winnerScore}</span>
+          <span>-</span>
+          <span>{match.loserScore}</span>
+          <span><img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/></span>
+          <span id="flexStart"> {#await opponent = getUsernameById(match.loserId)} ... {:then opponent} {opponent} {/await} </span>
+          <span>{match.ranked}</span>
+        </li>
+        {:else}
+        <li class="lineFriends" id="lose">
+          <span class="redDot">-</span>
+          <span id="flexEnd"> {#await opponent = getUsernameById(match.winnerId)} ... {:then opponent} {opponent} {/await} </span>
+          <span><img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/> </span>
+          <span>{match.loserScore} </span>
+          <span>-</span>
+          <span>{match.winnerScore}</span>
+          <span ><img class="pp" src="http://localhost:3000/images/actual/{pageUser.id}" alt="pp"/>  </span>
+          <span id="flexStart">{pageUser.username} </span>
+          <span>{match.ranked}</span>
+        </li>
+          {/if}
+        {/each}
+      </ul>
+    </div>
   </div>
 
   <div class="box-info statistics">
     <h1>Statistics</h1>
+    <div class="overflow">
+
+    </div>
   </div>
 </div>
 
@@ -228,15 +302,10 @@
 		height: 100%;
 		background-color: var(--grey);
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr, 1fr;
+		grid-template-columns:1fr 1fr;
+    grid-template-rows: minmax(0px, 1fr) minmax(0px, 1fr);
 		justify-items: center;
     align-items: center;
-	}
-
-	h1 {
-		color: var(--white);
-		text-align: center;
 	}
 
 	.box-info {
@@ -247,7 +316,47 @@
 		border-radius: 30px;
 		height: 80%;
 		width: 80%;
+    display: flex;
+    flex-direction: column;
 	}
+  .box-info h1{
+		height: 40px;
+    border-bottom: solid 1px black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	}
+
+  .info-container li{
+    height: 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    background-color: var(--lite-lite-lite-grey);
+  }
+
+  .info-container li:nth-child(2n + 1){
+    background-color: var(--lite-lite-grey);
+  }
+
+  .friends .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 5%;
+  }
+
+  .friends .user .name{
+    margin-left: 5%;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 5%;
+    gap: 5px;
+  }
 
 	.friends{
 		grid-column: 1 / 2;
@@ -255,50 +364,32 @@
 	}
 
   .friends .nav {
+    height: 40px;
     display: flex;
     justify-content: space-around;
   }
 
+
   .friends .nav button {
-    border-top: solid 1px var(--black);
     border-bottom: solid 1px var(--black);
     flex: auto;
   }
 
+  .friends .nav .activeButton {
+    border-bottom: none;
+  }
+
   .friends .nav button:nth-child(2) {
-    border: solid 1px var(--black);
+    border-left: solid 1px var(--black);
+    border-right: solid 1px var(--black);
   }
 
-  .lineFriend{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    /* border-top: solid 2px var(--grey); */
-    background-color: var(--lite-lite-lite-grey);
-
-  }
-
-  .lineFriend:nth-child(2n + 1){
-
-    background-color: var(--lite-lite-grey);
-  }
-
-  /* .lineFriend:last-child {
-    border-bottom: solid 2px var(--grey);
-  } */
-
-  .lineFriend .name {
-    margin-left: 10px;
-  }
-
-  .deleteFriendBtn {
-    background-color: aliceblue;
+  .actionsButton {
+    background-color: var(--white);
     border: solid 2px black;
     border-radius: 50%;
-    height: 40px;
-    width: 40px;
+    height: 35px;
+    width: 35px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -309,6 +400,68 @@
     height: 25px;
     width: 25px;
   }
+
+  .box-info h1{
+    height: 40px;
+  }
+
+  .box-info .pp{
+    width: 35px;
+    height: 35px;
+    border: 1px solid rgb(78, 78, 78);
+    border-radius: 50%;
+  }
+
+  .box-info .overflow{
+    flex: 1;
+    overflow:auto;
+    border-radius: 0 0 30px 30px;
+
+
+  }
+
+  .games .lineFriends {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr 0.5fr 0.5fr 0.5fr 1fr 3fr 1fr;
+
+
+  }
+  .games .lineFriends span{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .games .lineFriends #flexStart {
+    justify-content: flex-start;
+  }
+
+  .games .lineFriends #flexEnd {
+    justify-content: flex-end;
+  }
+
+  .games .lineFriends .redDot{
+    height: 25px;
+    width: 25px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    display:contents;
+  }
+
+  /* .games .lineFriends .greenDot{
+    height: 25px;
+    width: 25px;
+    background-color: #15ff00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  } */
+
+
+
+
 
   @media screen and (max-width: 1150px) {
     .info-container {
@@ -331,6 +484,30 @@
       grid-row: 3 / 4;
     }
 }
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: 7px;
+    scrollbar-color: var(--pink) ;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 7px;
+    display: none;
+
+
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--pink);
+    border-radius: 10px;
+  }
 
 
 </style>

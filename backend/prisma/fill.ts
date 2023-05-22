@@ -1,6 +1,6 @@
 import { PrismaClient} from '@prisma/client'
 
-const numberOfUsers = 1 // How many user do you want to add ?
+const numberOfUsers = 10 // How many user do you want to add ?
 const yourUsername = "test" // Your username
 
   type User = {
@@ -163,14 +163,34 @@ function RelationMatchBetween(user1: User, user2:number):boolean
 }
 
 async function createMatchrelation(user1: number, user2: number) {
+
+    let winnerCoin = Math.random() < 0.5
+    let rankedCoin = Math.random() < 0.9
+    let loserScore = Math.floor(Math.random() * (10 - 0) + 0)
+
+    let winner: number;
+    let loser: number;
+
+    if (winnerCoin)
+    {
+      winner = user1;
+      loser = user2;
+    }
+    else
+    {
+      winner = user2;
+      loser = user1;
+    }
+
+
   await prisma.match.create({
     data: {
-      winnerId: tab[user1].id,
+      winnerId: tab[winner].id,
       winnerScore: 10,
-      loserId: tab[user2].id,
-      loserScore: 0,
+      loserId: tab[loser].id,
+      loserScore: loserScore,
       date: new Date(),
-      ranked: true,
+      ranked: rankedCoin,
     },
   })
   let user;
