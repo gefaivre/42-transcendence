@@ -62,7 +62,7 @@ export class PongService {
         }
         else 
           this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: false  });
-        return user.username;
+        return undefined;
       } else {
         const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true);
         if (room) {
@@ -72,7 +72,7 @@ export class PongService {
         }
         else
           this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: true });
-        return user.username;
+        return undefined;
       }
     }
     return undefined;
@@ -208,4 +208,18 @@ export class PongService {
     }
     return '';
   }
+
+  getUsername(clientId: string) : string  | undefined {
+    const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
+    if (user)
+      return user.username;
+  }
+
+  getRoomPlayers(roomId: string) : { player1: string; player2: string } | undefined {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId)
+    if (room && room.player2) {
+      return { player1: room.player1.username, player2: room.player2.username }
+    }
+  }
+
 }
