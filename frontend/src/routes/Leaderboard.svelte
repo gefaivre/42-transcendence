@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount } from "svelte";
     import { logged } from "../stores";
 
@@ -10,7 +10,7 @@
 
     async function getMmr() {
       try {
-        tab = (await axios.get(`http://localhost:3000/leaderboard/mmr`, { withCredentials: true })).data
+        tab = (await axios.get(`/leaderboard/mmr`)).data
         console.log(tab)
       } catch (e) {
         console.log(e)
@@ -19,7 +19,7 @@
 
     async function getGames() {
       try {
-        tab = (await axios.get(`http://localhost:3000/leaderboard/games`, { withCredentials: true })).data
+        tab = (await axios.get(`/leaderboard/games`)).data
         console.log(tab)
       } catch (e) {
         console.log(e)

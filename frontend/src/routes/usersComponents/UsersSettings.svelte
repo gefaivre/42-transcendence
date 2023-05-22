@@ -1,5 +1,5 @@
 <script lang="ts">
-    import axios from "axios";
+    import axios from "../../axios.config";
 	import {id , user, reloadImage} from "../../stores";
     import { replace } from "svelte-spa-router";
     import { onMount } from "svelte";
@@ -14,7 +14,8 @@
     async function submitImage() {
         console.log(fileInput.files[0])
 
-        if (fileInput.files[0] == null) { return alert('empty file') }
+        if (fileInput.files[0] === null || fileInput.files[0] === undefined)
+          return alert('empty file')
 
 
         const file = fileInput.files[0]
@@ -22,22 +23,20 @@
         formData.append('file', file)
 
         try {
-            const response = await axios.post('http://localhost:3000/images/add', formData, {
+            const response = await axios.post('/images/add', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             },
-            withCredentials: true
           });
         downloadImages();
         $reloadImage++
         } catch (error) {
         console.error(error)
         }
-        fileInput == null;
     };
 
     async function downloadImages() {
-      axios.get('http://localhost:3000/images/all', { withCredentials: true })
+      axios.get('/images/all')
       .then(res => {
         imagesTab = res.data;
         downloadImages();
@@ -49,7 +48,7 @@
 
     async function UpdatePP(id:number) {
         console.log("Update PP")
-        await axios.get(`http://localhost:3000/images/set/${id}`, { withCredentials: true })
+        await axios.get(`/images/set/${id}`)
         .then(res => {
             console.log(res.data)
             $reloadImage++
@@ -67,18 +66,14 @@
 	async function updateUsername() {
 
 		// guards
-		if (username == null) { return alert('empty username') }
-		if (username == $user.username) { return alert('same username') }
+		if (username === null) { return alert('empty username') }
+		if (username === $user.username) { return alert('same username') }
 
 		try {
-			// Yes, this body is dirty.
-			await axios.patch(`http://localhost:3000/users/username/${$user.username}`, {
-				id: $id,
-				username: username
-			}, {
-				withCredentials: true
-			})
+			await axios.patch(`/users/username/${$user.username}`, { username: username })
+
 			alert('Username successfully updated!')
+
 			// update component state
 			$user.username = username
 			username = null
@@ -97,15 +92,9 @@
 	// this is not big deal since this table entry will be removed anyway
 	async function updatePassword() {
 		// guards
-		if (password == null) { return alert('empty password') }
+		if (password === null) { return alert('empty password') }
 		try {
-			// Yes, this body is dirty.
-			await axios.patch(`http://localhost:3000/users/password/${$user.username}`, {
-				id: $id,
-				password: password
-			}, {
-				withCredentials: true
-			})
+			await axios.patch(`/users/password/${$user.username}`, { password: password })
 
 			alert('Password successfully updated!')
 

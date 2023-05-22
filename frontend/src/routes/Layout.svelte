@@ -2,7 +2,7 @@
 <script lang="ts">
   export const title = 'Mon titre';
 
-  import axios from "axios";
+  import axios from "../axios.config";
   import { onMount } from "svelte";
   import type { User } from "../types";
   //import groupe from "../../icons/groupe.png"'
@@ -24,9 +24,7 @@
 
   onMount(async () => {
     try {
-      const response = await axios.get('http://localhost:3000/auth/whoami', {
-        withCredentials: true
-    });
+      const response = await axios.get('http://localhost:3000/auth/whoami');
           user = response.data;
           console.log(user);
           console.log(user.id);

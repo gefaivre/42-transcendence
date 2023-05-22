@@ -1,7 +1,7 @@
 <script>
     // définir les boutons du menu
 
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount } from "svelte";
     import { logged } from "../stores";
     import Layout from "./Layout.svelte";

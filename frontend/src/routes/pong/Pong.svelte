@@ -80,7 +80,7 @@
   console.log('gameList', gameList);
 
   async function getGames() {
-    let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
+    let games = (await axios.get('/pong')).data;
     for (const game of games) {
       gameList.push(game);
     }
