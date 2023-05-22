@@ -52,7 +52,7 @@ export class ChatService {
       for (const post of posts) {
         const author: Omit<User, 'password'> | null = await this.usersService.findById(post.authorId);
         if (author)
-          ret.push({content: post.content, author: author.username, channelName: channelName});
+          ret.push({content: post.content, author: author.username, channelName: channelName, date: post.date});
       }
     }
     return ret;

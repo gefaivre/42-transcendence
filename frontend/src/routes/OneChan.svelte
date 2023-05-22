@@ -266,9 +266,12 @@ function openUserSettings(_username: string)
       <div class="postContent">
         <span style="color: #FFFFFF; font-family: Arial;">
           {post.content}
-
         </span>
-
+      </div>
+      <div class="postDate">
+        <span style="color: #FFFFFF; font-family: Arial;">
+          {post.date}
+        </span>
       </div>
       <br>
     </div>

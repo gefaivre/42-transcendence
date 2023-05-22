@@ -13,7 +13,8 @@ export class PostsService {
       data: {
         content: createPostDto.content,
         authorId: createPostDto.authorId,
-        channelId: createPostDto.channelId
+        channelId: createPostDto.channelId,
+        date: createPostDto.date
       }
     });
   }

@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, IsDate } from "class-validator";
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -12,4 +12,8 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsInt()
   channelId:  number;
+
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
 }
