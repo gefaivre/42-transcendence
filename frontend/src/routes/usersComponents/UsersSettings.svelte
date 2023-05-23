@@ -70,7 +70,7 @@
 		if (username === $user.username) { return alert('same username') }
 
 		try {
-			await axios.patch(`/users/username/${$user.username}`, { username: username })
+			await axios.patch('/users/username', { username: username })
 
 			alert('Username successfully updated!')
 
@@ -94,7 +94,7 @@
 		// guards
 		if (password === null) { return alert('empty password') }
 		try {
-			await axios.patch(`/users/password/${$user.username}`, { password: password })
+			await axios.patch('/users/password', { password: password })
 
 			alert('Password successfully updated!')
 
