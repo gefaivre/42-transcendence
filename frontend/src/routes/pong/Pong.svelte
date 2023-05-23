@@ -16,7 +16,7 @@
 
   let update_child: (state: GameState) => void;
 
-  let unique = {} //use to restart Game component
+  let unique = {} //used to restart Game component
 
   let inGame: boolean = false;
   let gameRequest: boolean = false;
@@ -33,29 +33,33 @@
       console.log("game started");
     });
     
-    socket.on('watchGame', () => {
-      watch = true;
-      console.log('watcherMode on');
+    socket.on('watchGame', (res) => {
+      if (res.response === true) {
+        watch = true;
+        console.log('watcherMode on');
+      } else {
+        alert('This match is no longer played, refresh the page');
+      }
     });
 
     socket.on('win', () => {
-      alert('you win! refresh page to play another game');
       restart();
+      alert('you win!');
       inGame = false;
     });
     
     socket.on('lose', () => {
-      alert('you lose! refresh page to play another game');
       restart();
+      alert('you lose!');
       inGame = false;
     });
 
-    socket.on('opponentLeft', () => {
-      if (watch)
-        alert('A player has left the game. Refresh page to watch another game');
-      else
-        alert('your opponent has left the game, you win! refresh page to play another game');
+    socket.on('opponentLeft', (player) => {
       restart();
+      if (watch)
+        alert(player.username + ' has left the game');
+      else
+        alert(player.username + ' has left the game, you win!');
       inGame = false;
     });
 
@@ -66,6 +70,10 @@
       if (state.stop)
         inGame = false
     });
+
+    return ()=> {
+      socket.close();
+    };
   });
 
   function update(state: GameState) {
@@ -218,4 +226,5 @@ input {
   margin:0.5em;
   color: black;
 }
+
 </style>
