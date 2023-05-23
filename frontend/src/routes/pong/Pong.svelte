@@ -121,6 +121,11 @@
     gameRequest = true;
   }
 
+  function cancelRequest() {
+    socket.emit('cancelRequest', {});
+    gameRequest = false;
+  }
+
   function joinFriendly(event: any) {
     const formData = new FormData(event.target);
 
@@ -128,6 +133,7 @@
       const [key, value] = field;
       if (key === 'friend' && value) {
         socket.emit('requestGame', { friend: value });
+        gameRequest = true;
       }
     }
   }
@@ -176,7 +182,8 @@
 {/if}
 
 {#if gameRequest}
-<h2>Game requested !</h2>
+<h2>Game requested ! Waiting for your opponent ...</h2>
+<button on:click={cancelRequest}>Cancel</button>
 {/if}
 
 </div>

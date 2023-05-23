@@ -36,6 +36,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('cancelRequest')
+  handleCancel(client: Socket) {
+    this.pongService.cancelRequest(client.id);
+  }
+
   @SubscribeMessage('control')
   handleControls(client: Socket, keyEventDto: KeyEventDto) {
     this.pongService.handleControls(client.id, keyEventDto.press, keyEventDto.key);
