@@ -9,11 +9,11 @@ export class Item {;
 }
 
 export class State {
-  stop: boolean;
   score: Score
   leftPaddle: Item;
   rightPaddle: Item;
   ball: Item;
+  countdown: number;
 }
 
 export class GameStateDto {

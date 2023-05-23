@@ -21,4 +21,6 @@ export class GameState {
       posx: number;
       posy: number;
     };
+    
+    countdown: number;
   }

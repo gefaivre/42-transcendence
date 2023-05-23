@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import type { GameState } from './Class';
   import { Ball, Frame, Paddle } from './Objects'
+  import { fade } from 'svelte/transition';
 
   export const update_state = (state: GameState) => {
     leftScore = state.score.leftScore;
@@ -15,6 +16,15 @@
 
     ball.posx = state.ball.posx;
     ball.posy = state.ball.posy;
+    
+    if (state.countdown === 0)
+      countdown = 0;
+    else if (state.countdown <= 100)
+      countdown = 1;
+    else if (state.countdown <= 200)
+      countdown = 2;
+    else
+      countdown = 3;
   };
 
   export let players = {player1: '', player2: ''};
@@ -22,6 +32,8 @@
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
   let animationId: number;
+
+  let countdown: number = 3;
 
   const frame: Frame =  new Frame(600, 400);
   const ball: Ball =  new Ball(frame); 
@@ -69,7 +81,12 @@
 
 <div id="all">
 <p id="score">{leftScore}  -  {rightScore}</p>
-<canvas id="canvas" bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
+<div id="game">
+  <canvas id="canvas" bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
+  {#if countdown != 0}
+  <p transition:fade id="countdown">{countdown}</p>
+  {/if}
+</div>
 <p id="players">{players.player1}  VS  {players.player2}</p>
 </div>
 
@@ -94,11 +111,30 @@
   margin-bottom: 1em;
 }
 
-#canvas {
-  border: 1px solid grey;
+#game {
+  min-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  display: block;
+  margin-bottom: auto;
+  margin-top: auto;
+}
+
+#canvas {
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid grey;
+}
+
+#countdown {
+  position: absolute;
+  margin-left:0.5em;
+  left: 50%;
+  top:200px;
+
+  font-size: 4em;
+  font-weight: bold;
+  color: var(--lite-lite-lite-grey);
+
 }
 </style>
 

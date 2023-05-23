@@ -8,6 +8,7 @@ export class Game {
   stop: boolean;
   leftScore: number;
   rightScore: number;
+  countdown: number;
 
   constructor (width: number, height: number){
     this.frame = new Frame(width, height);
@@ -19,10 +20,16 @@ export class Game {
     this.stop = false;
     this.leftScore = 0;
     this.rightScore = 0;
+
+    this.countdown = 300;
   }
 
   
   loop() {
+    if (this.countdown != 0) {
+      this.countdown -= 1;
+      return ({});
+    }
       this.leftPaddle.updatePos();
       this.rightPaddle.updatePos();
       this.handleCollision();
@@ -34,6 +41,7 @@ export class Game {
         || this.ball.posx + this.ball.radius >= this.frame.width) {
         this.updateScore();
         this.ball.reset();
+        this.countdown = 300;
       }
       if (this.leftScore === 10 || this.rightScore === 10) {
         return ({ 
@@ -76,7 +84,6 @@ export class Game {
 
   getState() {
     return {
-      stop: this.stop,
       score: {
         leftScore: this.leftScore,
         rightScore: this.rightScore,
@@ -93,6 +100,7 @@ export class Game {
         posx: this.ball.posx,
         posy: this.ball.posy,
       },
+      countdown: this.countdown,
     };
   }
 }
