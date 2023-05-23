@@ -1,9 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @Injectable()
 export class ChannelService {
+
   constructor(private readonly prisma: PrismaService){}
 
   create(createChannelDto: CreateChannelDto) {
@@ -72,7 +73,7 @@ export class ChannelService {
 
   async isInChannel(channelName: string, userId: number): Promise<boolean> {
     const channel = await this.findByName(channelName)
-    return channel !== null && channel.users.some(user => user.id == userId)
+    return channel !== null && channel.users.some(user => user.id === userId)
   }
 
   async isOwner(channelName: string, userId: number): Promise<boolean> {
@@ -132,7 +133,7 @@ export class ChannelService {
           }
         })
       } catch(e) {
-        throw new InternalServerErrorException('')
+        throw new NotFoundException('channel not found')
       }
 
     }

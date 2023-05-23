@@ -25,10 +25,14 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     const room: string | undefined = this.pongService.handleRequestGame(client.id, requestGameDto.friend);
-    this.server.to(client.id).emit('newPlayer', {});
-    if (room) {
+    if (!room) {
+      const username: string | undefined = this.pongService.getUsername(client.id);
+      if (username)
+        client.join(username);
+    } else {
       client.join(room);
-      this.server.to(room).emit('newPlayer', {});
+      const players = this.pongService.getRoomPlayers(room);
+      this.server.to(room).emit('gameStart', players);
     }
   }
 

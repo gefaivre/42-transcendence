@@ -1,11 +1,9 @@
 <script lang="ts">
 
-    import axios from "axios";
+    import axios from "../../axios.config";
 
     function getAllUser() {
-        axios.get(`http://localhost:3000/users/`, {
-            withCredentials: true
-        })
+        axios.get(`/users/`)
         .then(res => { console.log(res.data) })
         .catch(err => { console.log(err) })
     }

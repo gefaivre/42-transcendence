@@ -1,6 +1,6 @@
 
 <script lang="ts">
-    import axios from 'axios';
+    import axios from '../../axios.config';
 
     let fileInput: any = null
 
@@ -14,7 +14,8 @@
     async function submitImage() {
         console.log(fileInput.files[0])
 
-        if (fileInput.files[0] == null) { return alert('empty file') }
+        if (fileInput.files[0] === null || fileInput.files[0] === undefined)
+          return alert('empty file')
 
 
         const file = fileInput.files[0]
@@ -22,17 +23,15 @@
         formData.append('file', file)
 
         try {
-            const response = await axios.post('http://localhost:3000/images/add', formData, {
+            const response = await axios.post('/images/add', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             },
-            withCredentials: true
         });
         reloadImage++
         } catch (e) {
         console.error(e)
         }
-        fileInput == null;
     };
 
     async function toggleImageParameter() {
@@ -40,7 +39,7 @@
     }
 
     async function downloadImages() {
-      axios.get('http://localhost:3000/images/all', { withCredentials: true })
+      axios.get('/images/all')
       .then(res => {
         imagesTab = res.data;
       })
@@ -51,7 +50,7 @@
 
     async function UpdatePP(id:number) {
         console.log("Update PP")
-        await axios.get(`http://localhost:3000/images/set/${id}`, { withCredentials: true })
+        await axios.get(`/images/set/${id}`)
         .then(res => {
             console.log(res.data)
             reloadImage++

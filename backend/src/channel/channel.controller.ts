@@ -1,14 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, NotFoundException, ValidationPipe, ConflictException, UnprocessableEntityException, ParseIntPipe, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from './../users/users.service';
 import { ChannelDto } from './dto/channel.dto';
-import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { ChannelExceptionsFilter } from './channel.filter';
 import { UserByIdPipe } from './pipes/user-by-id.pipe';
-import { UpdateChannelMemberDto } from './dto/update-member.dto';
 import { ChannelByNamePipe } from './pipes/channel-by-name.pipe';
 
 @Controller('channel')
@@ -18,10 +15,7 @@ export class ChannelController {
 
   private readonly logger: Logger = new Logger(ChannelController.name, { timestamp: true })
 
-  constructor(
-    private readonly channelService: ChannelService, @Inject(UsersService)
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly channelService: ChannelService) {}
 
   @Post()
   async create(@Req() request: any, @Body() channelDto: ChannelDto) {

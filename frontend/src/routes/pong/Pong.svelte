@@ -12,6 +12,8 @@
 
   let gameList: Match[] = [];
 
+  let currentMatch: Match = { player1: '', player2: '' }
+
   let update_child: (state: GameState) => void;
 
   let unique = {} //use to restart Game component
@@ -26,8 +28,9 @@
     });
 
   onMount(() => {
-    socket.on('newPlayer', () => {
-      console.log("new player connected");
+    socket.on('gameStart', (match) => {
+      currentMatch = match;
+      console.log("game started");
     });
     
     socket.on('watchGame', () => {
@@ -77,7 +80,7 @@
   console.log('gameList', gameList);
 
   async function getGames() {
-    let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
+    let games = (await axios.get('/pong')).data;
     for (const game of games) {
       gameList.push(game);
     }
@@ -129,33 +132,90 @@
 
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
+<div id="all">
+
 {#if !inGame}
 
+<h2 id="title"> Pong </h2>
+
 {#if gameList}
-  <ul>
+  <ul id="gameList">
     {#each gameList as game}
-      <li>{game.player1 + ' vs ' + game.player2} game</li>
-      <button on:click={() => watchGame(game.player1)}>watch</button>
+      <li>{game.player1 + ' vs ' + game.player2} <button on:click={() => watchGame(game.player1)}>watch</button></li>
     {/each}
   </ul>
 {/if}
 
 
   {#if !gameRequest}
+  <div id="randomGame">
   <button on:click={requestGame}>request random game</button>
+  </div>
+
+  <div id="friendlyGame">
   <form on:submit|preventDefault={(event) => joinFriendly(event)}>
       <input id="friend" name="friend" type="text" placeholder="type friend username">
       <button type="submit">play a friendly match</button>
   </form>
+  </div>
   {/if}
 {/if}
 
 {#if inGame}
 {#key unique}
-<Game bind:update_state={update_child}></Game>
+<Game bind:players={currentMatch} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 
 {#if gameRequest}
 <h2>Game requested !</h2>
 {/if}
+
+</div>
+
+<style>
+
+#all {
+  color: var(--white);
+  height: 100vh;
+  background-color: var(--grey);
+  border-left: 1px solid grey;
+  text-align: center;
+}
+
+#title {
+  color: rgb(158, 39, 217);
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom:2em;
+}
+
+#gameList {
+  font-weight: bold;
+  font-size: 1.25em;
+  color: var(--pink);
+}
+
+#randomGame {
+  margin-bottom: 2em;
+}
+
+button {
+  background-color:#3b82f6;
+  font-weight: bold;
+  border: 1px solid #1d4ed8;
+  border-radius:4px;
+  padding:0.5em;
+  color: var(--white);
+}
+button:hover {
+  background-color:#1d4ed8
+}
+
+input {
+  border-radius: 2px;
+  padding:0.2em;
+  margin:0.5em;
+  color: black;
+}
+</style>

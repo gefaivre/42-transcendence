@@ -1,26 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { CreateImageDto } from './dto/create-image.dto';
-import { UpdateImageDto } from './dto/update-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from '@prisma/client';
-
 
 // https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('images')
 export class ImagesController {
+
   constructor(private readonly imagesService: ImagesService) {}
+
   @Post('/add')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request, file, cb) => {
-        if (request.user == undefined)
+        if (request.user === undefined || request.user === null)
           return "You shall not pass";
-        var fs = require('fs');
+        const fs = require('fs');
         const directory  = `/app/images/${request.user}`
         if (!fs.existsSync(directory)){
             fs.mkdirSync(directory);
@@ -32,6 +30,7 @@ export class ImagesController {
       }
     })
   }))
+
   AddImage(@Req() request: any, @UploadedFile() file: Express.Multer.File) {
     return this.imagesService.AddImage(request.user.id, file);
   }

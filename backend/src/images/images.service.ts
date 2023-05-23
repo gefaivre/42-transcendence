@@ -5,7 +5,6 @@ import { PathLike, promises as fs } from "fs";
 import { createReadStream } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-
 @Injectable()
 export class ImagesService {
 
@@ -52,7 +51,7 @@ export class ImagesService {
 
   async getImage(userId: string) {
     const user = await this.usersService.findById(+userId)
-    if (user == null)
+    if (user === null)
       return null;
     const image = await this.PrismaService.image.findMany({
       take: 1,
@@ -75,7 +74,7 @@ export class ImagesService {
         id: Id
       }
     })
-    if (image == null)
+    if (image === null)
       return null;
     else
     {
