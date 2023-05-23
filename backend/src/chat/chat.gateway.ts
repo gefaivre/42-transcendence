@@ -113,12 +113,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const channelId: number = (await this.channelService.findByName(post.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.prismaId })
+    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.prismaId, date: new Date() })
 
     this.server.to(post.channelName).emit('post', {
       channelName: post.channelName,
       content: post.content,
-      author: user.username
+      author: user.username,
+      date: new Date()
     } as PostEmitDto)
 
     return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)

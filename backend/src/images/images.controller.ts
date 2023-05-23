@@ -3,6 +3,7 @@ import { ImagesService } from './images.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
+import * as fs from 'fs'
 
 // https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg
 
@@ -12,17 +13,15 @@ export class ImagesController {
 
   constructor(private readonly imagesService: ImagesService) {}
 
-  @Post('/add')
+  @Post('add')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request, file, cb) => {
         if (request.user === undefined || request.user === null)
           return "You shall not pass";
-        const fs = require('fs');
         const directory  = `/app/images/${request.user}`
-        if (!fs.existsSync(directory)){
-            fs.mkdirSync(directory);
-        }
+        if (!fs.existsSync(directory))
+          fs.mkdirSync(directory);
         cb(null, directory);
       },
       filename: (request, file, cb) => {
@@ -30,32 +29,31 @@ export class ImagesController {
       }
     })
   }))
-
-  AddImage(@Req() request: any, @UploadedFile() file: Express.Multer.File) {
-    return this.imagesService.AddImage(request.user.id, file);
+  addImage(@Req() request: any, @UploadedFile() file: Express.Multer.File) {
+    return this.imagesService.addImage(request.user.id, file);
   }
 
-  @Get('/set/:Id')
-  setImage(@Req() request: any, @Param('Id', ParseIntPipe) ImageId: number) {
-    return this.imagesService.setImage(request.user.id, ImageId);
+  @Get('set/:id')
+  setImage(@Req() request: any, @Param('id', ParseIntPipe) imageId: number) {
+    return this.imagesService.setImage(request.user.id, imageId);
   }
 
-  @Get('/actual/:userId')
-  getImage(@Param('userId') userId: string) {
+  @Get('actual/:userId')
+  getImage(@Param('userId', ParseIntPipe) userId: number) {
     return this.imagesService.getImage(userId);
   }
 
-  @Get('/all')
+  @Get('all')
   findUserAll(@Req() request: any) {
     return this.imagesService.findAll(request.user.id);
   }
 
-  @Get(':Id')
-  findUserOne(@Req() request: any, @Param('Id', ParseIntPipe) Id: number) {
-    return this.imagesService.findOne(request.user.id, Id);
+  @Get(':id')
+  findUserOne(@Req() request: any, @Param('id', ParseIntPipe) id: number) {
+    return this.imagesService.findOne(request.user.id, id);
   }
 
-  @Delete('/delete/:id')
+  @Delete(':id')
   removeOne(@Param('id', ParseIntPipe) id: number) {
     return this.imagesService.remove(id);
   }
