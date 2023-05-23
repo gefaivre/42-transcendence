@@ -185,8 +185,6 @@
         {/if}
       {/if}
 
-
-
     </div>
 
     <div class="second-panel">
@@ -276,7 +274,7 @@
     .second-panel {
       grid-column: 2 / 3;
       background-color: var(--grey);
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
   </style>
