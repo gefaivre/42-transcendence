@@ -68,40 +68,11 @@
       } catch (e) {
         console.log(e);
       }
-
-    }
-
-
-    async function requestFriendship() {
-      try {
-        await axios.post(`http://localhost:3000/users/friendship/request/${pageUser.id}`, null, { withCredentials: true })
-        reload()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    async function acceptFriendshipRequestById() {
-      try {
-        await axios.post(`http://localhost:3000/users/friendship/acceptById/${$user.id}`, null, { withCredentials: true })
-        reload()
-      } catch (error) {
-        console.log(error)
-      }
     }
 
     async function acceptFriendshipRequestByName(name: string) {
       try {
         await axios.post(`http://localhost:3000/users/friendship/acceptByName/${name}`, null, { withCredentials: true })
-        reload()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    async function dismissFriendshipRequestById() {
-      try {
-        await axios.post(`http://localhost:3000/users/friendship/dismissById/${$user.id}`, null, { withCredentials: true })
         reload()
       } catch (error) {
         console.log(error)
@@ -117,29 +88,9 @@
       }
     }
 
-    async function cancelFriendshipRequestById() {
-      try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelById/${$user.id}`, null, { withCredentials: true })
-        console.log(cancel)
-        reload()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
     async function cancelFriendshipRequestByName(name: string) {
       try {
         const cancel = await axios.post(`http://localhost:3000/users/friendship/cancelByName/${name}`, null, { withCredentials: true })
-        console.log(cancel)
-        reload()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    async function removeFriendById() {
-      try {
-        const cancel = await axios.post(`http://localhost:3000/users/friendship/removeById/${$user.id}`, null, { withCredentials: true })
         console.log(cancel)
         reload()
       } catch (error) {
@@ -162,137 +113,139 @@
 	<div class="info-container">
 
     <div class="box-info friends">
-      <div class="nav">
-        {#if friendspage == 'Friends'}
-          <button class="activeButton" on:click={() => friendspage = 'Friends'}>friends</button>
-        {:else}
-          <button on:click={() => friendspage = 'Friends'}>friends</button>
-        {/if}
+      {#if $id === pageUser.id.toString()}
+        <div class="nav">
+          {#if friendspage == 'Friends'}
+            <button class="activeButton" on:click={() => friendspage = 'Friends'}>friends</button>
+          {:else}
+            <button on:click={() => friendspage = 'Friends'}>friends</button>
+          {/if}
 
-        {#if friendspage == 'Request'}
-          <button class="activeButton" on:click={() => friendspage = 'Request'}>request</button>
-        {:else}
-        <button on:click={() => friendspage = 'Request'}>request</button>
-        {/if}
+          {#if friendspage == 'Request'}
+            <button class="activeButton" on:click={() => friendspage = 'Request'}>request</button>
+          {:else}
+          <button on:click={() => friendspage = 'Request'}>request</button>
+          {/if}
 
-        {#if friendspage == 'Pending'}
-          <button class="activeButton" on:click={() => friendspage = 'Pending'}>pending</button>
-        {:else}
-          <button on:click={() => friendspage = 'Pending'}>pending</button>
-        {/if}
-      </div>
+          {#if friendspage == 'Pending'}
+            <button class="activeButton" on:click={() => friendspage = 'Pending'}>pending</button>
+          {:else}
+            <button on:click={() => friendspage = 'Pending'}>pending</button>
+          {/if}
+        </div>
+      {:else}
+        <h1>Friends</h1>
+      {/if}
 
       {#if friendspage == 'Friends'}
+        <div class="overflow">
+          <ul>
+            {#each pageUser.friends as friend}
+            <li>
+              <div class="user">
+                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+                <a class="name" href="#/users/{friend.username}">{friend.username}</a>
+              </div>
+              {#if $id === pageUser.id.toString()}
+              <div class="actions">
+                <button class="actionsButton" on:click={() => removeFriendByName(friend.username)}>
+                  <img class="btnImage" src={deleteIcon} alt="deleteicon">
+                </button>
+              </div>
+              {/if}
+            </li>
+            {/each}
+          </ul>
+        </div>
 
-    <div class="overflow">
-      <ul>
-        {#each pageUser.friends as friend}
-        <li>
-          <div class="user">
-            <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
-            <a class="name" href="#/users/{friend.username}">{friend.username}</a>
-          </div>
-          {#if $id === pageUser.id.toString()}
-          <div class="actions">
-            <button class="actionsButton" on:click={() => removeFriendByName(friend.username)}>
-              <img class="btnImage" src={deleteIcon} alt="deleteicon">
-            </button>
-          </div>
-          {/if}
-        </li>
-        {/each}
-      </ul>
+      {:else if friendspage == 'Request' && $id === pageUser.id.toString()}
+      <div class="overflow">
+        <ul>
+          {#each pageUser.requestFriends as requestFriends}
+          <li>
+            <div class="user">
+              <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
+              <a class="name" href="#/users/{requestFriends?.username}">{requestFriends?.username}</a>
+            </div>
+            <div class="actions">
+              <button class="actionsButton" on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
+                <img class="btnImage" src={acceptIcon} alt="accept">
+              </button>
+              <button class="actionsButton" on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
+                <img class="btnImage" src={deleteIcon} alt="delete">
+              </button>
+            </div>
+          </li>
+          {/each}
+        </ul>
+      </div>
+
+      {:else if friendspage == 'Pending' && $id === pageUser.id.toString()}
+        <div class="overflow">
+          <ul>
+            {#each pageUser.pendingFriends as pendingFriends}
+              <li>
+                <div class="user">
+                  <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
+                  <a class="name" href="#/users/{pendingFriends?.username}">{pendingFriends?.username}</a>
+                </div>
+                <div class="actions">
+                  <button class="actionsButton" on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
+                    <img class="btnImage" src={deleteIcon} alt="delete">
+                  </button>
+                </div>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+	  </div>
+
+    <div class="box-info games">
+      <h1>Game history</h1>
+      <div class="overflow">
+        <ul>
+          {#each matchHistory as match}
+            {#if match.winnerId == pageUser.id}
+            <li class="lineFriends" id="win">
+              <span> <span class="greenDot"></span></span>
+              <span>{match.winnerScore}</span>
+              <span>-</span>
+              <span>{match.loserScore}</span>
+              <span><img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/></span>
+              <span id="flexStart"> {#await opponent = getUsernameById(match.loserId)} ... {:then opponent} <a href="#/users/{opponent}">{opponent}</a> {/await} </span>
+              {#if match.ranked}
+                <span>R</span>
+              {:else}
+                <span></span>
+              {/if}
+            </li>
+            {:else}
+            <li class="lineFriends" id="lose">
+              <span> <span class="redDot"></span></span>
+              <span>{match.loserScore} </span>
+              <span>-</span>
+              <span>{match.winnerScore}</span>
+              <span><img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/> </span>
+              <span id="flexStart"> {#await opponent = getUsernameById(match.winnerId)} ... {:then opponent} <a href="#/users/{opponent}">{opponent}</a> {/await} </span>
+              {#if match.ranked}
+                <span>R</span>
+              {:else}
+                <span></span>
+              {/if}
+            </li>
+            {/if}
+          {/each}
+        </ul>
+      </div>
     </div>
 
-    {:else if friendspage == 'Request' && $id === pageUser.id.toString()}
-    <div class="overflow">
-      <ul>
-        {#each pageUser.requestFriends as requestFriends}
-        <li>
-          <div class="user">
-            <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
-            <a class="name" href="#/users/{requestFriends?.username}">{requestFriends?.username}</a>
-          </div>
-          <div class="actions">
-            <button class="actionsButton" on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
-              <img class="btnImage" src={acceptIcon} alt="accept">
-            </button>
-            <button class="actionsButton" on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
-              <img class="btnImage" src={deleteIcon} alt="delete">
-            </button>
-          </div>
-        </li>
-        {/each}
-      </ul>
+    <div class="box-info statistics">
+      <h1>Statistics</h1>
+      <div class="overflow">
+        <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
+      </div>
     </div>
-
-
-    {:else if friendspage == 'Pending' && $id === pageUser.id.toString()}
-    <div class="overflow">
-
-
-      <ul>
-        {#each pageUser.pendingFriends as pendingFriends}
-        <li>
-          <div class="user">
-            <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
-            <a class="name" href="#/users/{pendingFriends?.username}">{pendingFriends?.username}</a>
-          </div>
-          <div class="actions">
-            <button class="actionsButton" on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
-              <img class="btnImage" src={deleteIcon} alt="delete">
-            </button>
-          </div>
-        </li>
-        {/each}
-      </ul>
-    </div>
-
-    {/if}
-
-	</div>
-
-  <div class="box-info games">
-    <h1>Game history</h1>
-    <div class="overflow">
-      <ul>
-        {#each matchHistory as match}
-        {#if match.winnerId == pageUser.id}
-        <li class="lineFriends" id="win">
-          <span >-</span>
-          <span id="flexEnd"> {pageUser.username} </span>
-          <span> <img class="pp" src="http://localhost:3000/images/actual/{pageUser.id}" alt="pp"/> </span>
-          <span>{match.winnerScore}</span>
-          <span>-</span>
-          <span>{match.loserScore}</span>
-          <span><img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/></span>
-          <span id="flexStart"> {#await opponent = getUsernameById(match.loserId)} ... {:then opponent} {opponent} {/await} </span>
-          <span>{match.ranked}</span>
-        </li>
-        {:else}
-        <li class="lineFriends" id="lose">
-          <span class="redDot">-</span>
-          <span id="flexEnd"> {#await opponent = getUsernameById(match.winnerId)} ... {:then opponent} {opponent} {/await} </span>
-          <span><img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/> </span>
-          <span>{match.loserScore} </span>
-          <span>-</span>
-          <span>{match.winnerScore}</span>
-          <span ><img class="pp" src="http://localhost:3000/images/actual/{pageUser.id}" alt="pp"/>  </span>
-          <span id="flexStart">{pageUser.username} </span>
-          <span>{match.ranked}</span>
-        </li>
-          {/if}
-        {/each}
-      </ul>
-    </div>
-  </div>
-
-  <div class="box-info statistics">
-    <h1>Statistics</h1>
-    <div class="overflow">
-
-    </div>
-  </div>
 </div>
 
 
@@ -319,6 +272,7 @@
     display: flex;
     flex-direction: column;
 	}
+
   .box-info h1{
 		height: 40px;
     border-bottom: solid 1px black;
@@ -416,16 +370,13 @@
     flex: 1;
     overflow:auto;
     border-radius: 0 0 30px 30px;
-
-
   }
 
   .games .lineFriends {
     display: grid;
-    grid-template-columns: 1fr 3fr 1fr 0.5fr 0.5fr 0.5fr 1fr 3fr 1fr;
-
-
+    grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr 1fr 3fr 1fr;
   }
+
   .games .lineFriends span{
     display: flex;
     align-items: center;
@@ -436,31 +387,21 @@
     justify-content: flex-start;
   }
 
-  .games .lineFriends #flexEnd {
-    justify-content: flex-end;
-  }
-
   .games .lineFriends .redDot{
     height: 25px;
     width: 25px;
-    background-color: #ff0000;
+    background-color: #f93729;
     border-radius: 50%;
-    display:contents;
+    border: solid 1px black;
   }
 
-  /* .games .lineFriends .greenDot{
+  .games .lineFriends .greenDot{
     height: 25px;
     width: 25px;
-    background-color: #15ff00;
+    background-color: #15db36;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-  } */
-
-
-
+    border: solid 1px black;
+  }
 
 
   @media screen and (max-width: 1150px) {
@@ -485,29 +426,8 @@
     }
 }
 
-/* ===== Scrollbar CSS ===== */
-  /* Firefox */
-  * {
-    scrollbar-width: 7px;
-    scrollbar-color: var(--pink) ;
-  }
-
-  /* Chrome, Edge, and Safari */
-  *::-webkit-scrollbar {
-    width: 7px;
-    display: none;
-
-
-  }
-
-  *::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: var(--pink);
-    border-radius: 10px;
-  }
-
+*::-webkit-scrollbar {
+  display: none;
+}
 
 </style>
