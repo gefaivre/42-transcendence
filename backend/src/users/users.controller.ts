@@ -31,72 +31,49 @@ export class UsersController {
     return this.usersService.findByUsername(username);
   }
 
-  @Patch(':username')
-  update(@Param('username') username: string, @Body() body: UpdateUserDto, @Req() req: any) {
-
-    // check that user updates itself
-    if (req.user.username !== username)
-      throw new UnauthorizedException('Unauthorized to update other player')
-
-    return this.usersService.update(username, body);
+  @Patch()
+  update(@Body() body: UpdateUserDto, @Req() req: any) {
+    return this.usersService.update(req.user.username, body);
   }
 
-  // We might use guards someway to handle those verifications
-  @Patch('username/:username')
-  async updateUsername(@Param('username') username: string, @Body() body: UpdateUsernameDto, @Req() req: any) {
+  @Patch('username')
+  async updateUsername(@Body() body: UpdateUsernameDto, @Req() req: any) {
 
-    // check that user updates its own username
-    if (req.user.username !== body.username)
-      throw new UnauthorizedException('Unauthorized to update other player username')
-
-    // check that new username is not already used
     try {
-      await this.usersService.updateUsername(username, body.username);
+      await this.usersService.updateUsername(req.user.username, body.username);
     } catch (e) {
       throw new ConflictException('This username is already used')
     }
   }
 
-  // We might use guards someway to handle those verifications
-  @Patch('password/:username')
-  async updatePassword(@Param('username') username: string, @Body() body: UpdatePasswordDto, @Req() req: any) {
-
-    // check that user updates its own password
-    if (req.user.username !== username)
-      throw new UnauthorizedException('Unauthorized to update other player password')
+  @Patch('password')
+  async updatePassword(@Body() body: UpdatePasswordDto, @Req() req: any) {
 
     let hash
-
-    // hash password
     try {
       hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
     } catch (e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 
-    // update password
     try {
-      await this.usersService.updatePassword(username, hash);
+      await this.usersService.updatePassword(req.user.username, hash);
     } catch (e) {
       throw new ConflictException('Error while updating your password')
     }
   }
 
-  @Delete(':username')
-  async remove(@Param('username') username: string, @Req() req: any) {
-
-    // check that user deletes itself
-    if (req.user.username !== username)
-      throw new UnauthorizedException('Unauthorized to delete other player')
-
+  @Delete()
+  async remove(@Req() req: any) {
     try {
-      await this.usersService.remove(username)
+      await this.usersService.remove(req.user.username)
     } catch(e) {
       throw new NotFoundException('User not found')
     }
   }
 
-  @Delete()
+  // TODO: remove this endpoint
+  @Delete('all')
   removeAllUsers() {
     return this.usersService.removeAllUsers();
   }
