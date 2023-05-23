@@ -16,7 +16,7 @@
 
   let update_child: (state: GameState) => void;
 
-  let unique = {} //use to restart Game component
+  let unique = {} //used to restart Game component
 
   let inGame: boolean = false;
   let gameRequest: boolean = false;
@@ -33,29 +33,33 @@
       console.log("game started");
     });
     
-    socket.on('watchGame', () => {
-      watch = true;
-      console.log('watcherMode on');
+    socket.on('watchGame', (res) => {
+      if (res.response === true) {
+        watch = true;
+        console.log('watcherMode on');
+      } else {
+        alert('This match is no longer played, refresh the page');
+      }
     });
 
     socket.on('win', () => {
-      alert('you win! refresh page to play another game');
       restart();
+      alert('you win!');
       inGame = false;
     });
     
     socket.on('lose', () => {
-      alert('you lose! refresh page to play another game');
       restart();
+      alert('you lose!');
       inGame = false;
     });
 
-    socket.on('opponentLeft', () => {
-      if (watch)
-        alert('A player has left the game. Refresh page to watch another game');
-      else
-        alert('your opponent has left the game, you win! refresh page to play another game');
+    socket.on('opponentLeft', (player) => {
       restart();
+      if (watch)
+        alert(player.username + ' has left the game');
+      else
+        alert(player.username + ' has left the game, you win!');
       inGame = false;
     });
 
@@ -66,6 +70,10 @@
       if (state.stop)
         inGame = false
     });
+
+    return ()=> {
+      socket.close();
+    };
   });
 
   function update(state: GameState) {
@@ -113,6 +121,11 @@
     gameRequest = true;
   }
 
+  function cancelRequest() {
+    socket.emit('cancelRequest', {});
+    gameRequest = false;
+  }
+
   function joinFriendly(event: any) {
     const formData = new FormData(event.target);
 
@@ -120,6 +133,7 @@
       const [key, value] = field;
       if (key === 'friend' && value) {
         socket.emit('requestGame', { friend: value });
+        gameRequest = true;
       }
     }
   }
@@ -139,10 +153,9 @@
 <h2 id="title"> Pong </h2>
 
 {#if gameList}
-  <ul>
+  <ul id="gameList">
     {#each gameList as game}
-      <li>{game.player1 + ' vs ' + game.player2} game</li>
-      <button on:click={() => watchGame(game.player1)}>watch</button>
+      <li>{game.player1 + ' vs ' + game.player2} <button on:click={() => watchGame(game.player1)}>watch</button></li>
     {/each}
   </ul>
 {/if}
@@ -169,7 +182,8 @@
 {/if}
 
 {#if gameRequest}
-<h2>Game requested !</h2>
+<h2>Game requested ! Waiting for your opponent ...</h2>
+<button on:click={cancelRequest}>Cancel</button>
 {/if}
 
 </div>
@@ -191,6 +205,12 @@
   margin-bottom:2em;
 }
 
+#gameList {
+  font-weight: bold;
+  font-size: 1.25em;
+  color: var(--pink);
+}
+
 #randomGame {
   margin-bottom: 2em;
 }
@@ -201,6 +221,7 @@ button {
   border: 1px solid #1d4ed8;
   border-radius:4px;
   padding:0.5em;
+  color: var(--white);
 }
 button:hover {
   background-color:#1d4ed8
@@ -212,4 +233,5 @@ input {
   margin:0.5em;
   color: black;
 }
+
 </style>

@@ -78,6 +78,19 @@ export class PongService {
     return undefined;
   }
 
+  cancelRequest(clientId: string) {
+    const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
+    
+    if (user) {
+      const room: Room | undefined = this.rooms.find(room => room.player1 === user);
+      if (room) {
+          const toDelete: number = this.rooms.indexOf(room);
+          this.rooms.splice(toDelete, 1);
+      }
+    }
+
+  }
+
   handleWatchGame(clientId: string, game: GameDto) : string | undefined {
     const user: PongUser | undefined = this.users.find(user => user.clientId === clientId);
     const room: Room | undefined = this.rooms.find(room => room.id === game.gameName);
