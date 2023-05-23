@@ -5,7 +5,7 @@ import { PostDto, PostEmitDto } from './dto/post.dto';
 import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ChannelDto } from 'src/channel/dto/channel.dto';
 import { ChatGuard } from './chat.guard';
-import { WsActionSuccess, WsActionFailure, WsFailureReason, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
+import { WsActionSuccess, WsActionFailure, WsFailureCause, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
 import { BadRequestTransformationFilter } from './chat.filter';
 import { ChannelService } from 'src/channel/channel.service';
 import { ChatUser } from './class/ChatUser';
@@ -76,7 +76,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     try {
       await this.channelService.addUserToChannel(channel.channelName, user.prismaId)
     } catch(e) {
-      return this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureReason.InternalError)
+      return this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.InternalError)
     }
 
     this.server.to(channel.channelName).emit('channelEvent', { user: user.username, event: 'join' })
@@ -93,7 +93,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     try {
       await this.channelService.leave(channel, user.prismaId)
     } catch(e) {
-      return this.eventHandlerFailure(user, channel, WsActionFailure.LeaveChannel, WsFailureReason.InternalError)
+      return this.eventHandlerFailure(user, channel, WsActionFailure.LeaveChannel, WsFailureCause.InternalError)
     }
 
     client.leave(channel)
@@ -113,12 +113,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const channelId: number = (await this.channelService.findByName(post.channelName))?.id as number
 
     // TODO (?): try/catch
-    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.prismaId })
+    await this.postsService.create({ content: post.content, channelId: channelId, authorId: user.prismaId, date: new Date() })
 
     this.server.to(post.channelName).emit('post', {
       channelName: post.channelName,
       content: post.content,
-      author: user.username
+      author: user.username,
+      date: new Date()
     } as PostEmitDto)
 
     return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
@@ -163,13 +164,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const authHeader: string | undefined = client.request.headers.cookie
 
     if (!authHeader)
-      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.AuthCookieNotFound)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.AuthCookieNotFound)
 
     const tokenData: any = await this.chatService.validateUser(authHeader)
     const user: ChatUser | undefined = await this.chatService.addUser(client.id, tokenData)
 
-    if (user == undefined)
-      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureReason.UserNotFound)
+    if (user === undefined)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Connect)
   }
@@ -181,7 +182,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user: ChatUser | undefined = this.chatService.getUserBySocketId(client.id)
 
     if (user === undefined)
-      return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureReason.UserNotFound)
+      return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
 
     this.chatService.removeUser(user.username)
 
@@ -193,14 +194,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return `${action} ${recipient}` as WsHandlerSuccessClientLog
   }
 
-  eventHandlerFailure(sender: ChatUser, recipient: string, action: WsActionFailure, reason: WsFailureReason) {
-    this.logger.warn(`client ${sender.socketId} (user ${sender.username}) ${action} ${recipient}: ${reason}` as WsHandlerFailureServerLog)
-    throw new WsException(`${action} ${recipient}: ${reason}` as WsHandlerFailureClientLog)
+  eventHandlerFailure(sender: ChatUser, recipient: string, action: WsActionFailure, cause: WsFailureCause) {
+    this.logger.warn(`client ${sender.socketId} (user ${sender.username}) ${action} ${recipient}: ${cause}` as WsHandlerFailureServerLog)
+    throw new WsException(`${action} ${recipient}: ${cause}` as WsHandlerFailureClientLog)
   }
 
-  lifecycleHookFailure(id: string, action: WsActionFailure, reason: WsFailureReason) {
-    this.logger.warn(`client ${id} ${action}: ${reason}` as WsLifecycleHookFailureServerLog)
-    throw new WsException(`${action}: ${reason}` as WsLifecycleHookFailureClientLog)
+  lifecycleHookFailure(id: string, action: WsActionFailure, cause: WsFailureCause) {
+    this.logger.warn(`client ${id} ${action}: ${cause}` as WsLifecycleHookFailureServerLog)
+    throw new WsException(`${action}: ${cause}` as WsLifecycleHookFailureClientLog)
   }
 
   lifecycleHookSuccess(user: ChatUser, action: WsActionSuccess) {

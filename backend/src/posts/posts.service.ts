@@ -5,6 +5,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createPostDto: CreatePostDto) {
@@ -12,7 +13,8 @@ export class PostsService {
       data: {
         content: createPostDto.content,
         authorId: createPostDto.authorId,
-        channelId: createPostDto.channelId
+        channelId: createPostDto.channelId,
+        date: createPostDto.date
       }
     });
   }

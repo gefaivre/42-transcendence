@@ -1,7 +1,7 @@
-import { Injectable , Inject, HttpException, HttpStatus, forwardRef} from '@nestjs/common';
+import { Injectable, Inject, forwardRef} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class UsersService {
     private readonly images: ImagesService
   ) {}
 
-  // START CRUD
   async create(createUserDto: CreateUserDto) {
+
     if (await this.findByUsername(createUserDto.username) != null)
       return null
 
@@ -40,8 +40,8 @@ export class UsersService {
     {
       let internlink;
       //create dir app/images/userId/image_name
-      var fs = require('fs');
-      var dir = `/app/images/${user.id}`
+      const fs = require('fs');
+      const dir = `/app/images/${user.id}`
       if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
       internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
       this.images.downloadImage(new URL(createUserDto.image),  internlink)
@@ -53,7 +53,7 @@ export class UsersService {
         }
       })
     }
-    return user
+    return this.prisma.exclude(user, ['password'])
   }
 
   async findAll() {
@@ -61,7 +61,7 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: id,
       },
@@ -92,21 +92,22 @@ export class UsersService {
         },
       }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async findByFortyTwoLogin(login: string) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         ft_login: login
       }
     })
-
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async findByUsername(name: string) {
-    return await this.prisma.user.findUnique({
+  async findByUsername(username: string) {
+    const user = await this.prisma.user.findUnique({
       where: {
-        username: name,
+        username: username,
       },
       include: {
         pendingFriends: {
@@ -136,49 +137,52 @@ export class UsersService {
         channels: true,
         wins: true,
         loses:true
-
       }
     })
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async findOneById(userid: number) {
-    return await this.prisma.user.findUnique({
+  async findOneById(id: number) {
+    const user = await this.prisma.user.findUnique({
       where: {
-        id: +userid,
+        id: id,
       }
     })
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async update(name: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
-      where: { username: name },
+  async update(username: string, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.update({
+      where: { username: username },
       data: updateUserDto,
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async updateUsername(name: string, updateUsernameDto: UpdateUsernameDto) {
-    return this.prisma.user.update({
-      where: { username: name },
-      data: { username: updateUsernameDto.username }
+  async updateUsername(username: string, newName: string) {
+    const user = await this.prisma.user.update({
+      where: { username: username },
+      data: { username: newName }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async updatePassword(name: string, updatePasswordDto: UpdatePasswordDto) {
-    return this.prisma.user.update({
-      where: { username: name },
-      data: { password: updatePasswordDto.password }
+  async updatePassword(username: string, newPassword: string) {
+    const user = await this.prisma.user.update({
+      where: { username: username },
+      data: { password: newPassword }
     });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async remove(name: string) {
-    return this.prisma.user.delete({ where: { username: name } });
+  async remove(username: string) {
+    const user = await this.prisma.user.delete({ where: { username: username } });
+    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async removeAllUsers() {
     return this.prisma.user.deleteMany();
   }
-
-  // END CRUD
 
   async getTopMmr(){
     return await this.prisma.user.findMany({
@@ -228,7 +232,7 @@ export class UsersService {
     });
   }
 
- async cancelFriendshipRequestByName(id: number, name: string) {
+  async cancelFriendshipRequestByName(id: number, username: string) {
     console.log('service cancel friendship request by name')
     return this.prisma.user.update({
       where: {
@@ -236,7 +240,7 @@ export class UsersService {
       },
       data: {
         pendingFriends: {
-          disconnect: [{ username: name }]
+          disconnect: [{ username: username }]
         }
       },
     });
@@ -262,21 +266,21 @@ export class UsersService {
     });
   }
 
-  async acceptFriendshipRequestByName(id: number, name: string) {
-    console.log('service accept friendship request by name  ',id, ' to ', name)
+  async acceptFriendshipRequestByName(id: number, username: string) {
+    console.log('service accept friendship request by name  ',id, ' to ', username)
     return this.prisma.user.update({
       where: {
         id: id
       },
       data: {
         requestFriends: {
-          disconnect: [{ username: name }]
+          disconnect: [{ username: username }]
         },
         friends: {
-          connect: [{ username: name }]
+          connect: [{ username: username }]
         },
         friendOf: {
-          connect: [{ username: name }]
+          connect: [{ username: username }]
         },
       },
     });
@@ -296,7 +300,7 @@ export class UsersService {
     });
   }
 
-  async dismissFriendshipRequestByName(id: number, name: string) {
+  async dismissFriendshipRequestByName(id: number, username: string) {
     console.log('service dismiss friendship request by name')
     return this.prisma.user.update({
       where: {
@@ -304,7 +308,7 @@ export class UsersService {
       },
       data: {
         requestFriends: {
-          disconnect: [{ username: name }]
+          disconnect: [{ username: username }]
         }
       },
     });
@@ -327,7 +331,7 @@ export class UsersService {
     });
   }
 
-  async removeFriendByName(id: number, name: string) {
+  async removeFriendByName(id: number, username: string) {
     console.log('service remove friend by name')
     return this.prisma.user.update({
       where: {
@@ -335,10 +339,10 @@ export class UsersService {
       },
       data: {
         friends: {
-          disconnect: [{ username: name }]
+          disconnect: [{ username: username }]
         },
         friendOf: {
-          disconnect: [{ username: name }]
+          disconnect: [{ username: username }]
         },
       },
     });

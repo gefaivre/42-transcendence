@@ -90,7 +90,8 @@ async function main() {
       data: {
         content: randomString(),
         authorId: user.id,
-        channelId: channel.id
+        channelId: channel.id,
+        date: new Date()
       }
     })
   }

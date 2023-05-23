@@ -1,29 +1,22 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import  ioClient  from 'socket.io-client';
-  import { Ball, Frame, Paddle } from './Objects'
   import axios  from "axios";
+  import Game from "./Game.svelte";
+  import type { GameState } from "./Class";
 
-  let canvas: HTMLCanvasElement;
-  let ctx: CanvasRenderingContext2D;
-  let animationId: number;
-
-  const frame: Frame =  new Frame(600, 400);
-  const ball: Ball =  new Ball(frame); 
-  const leftPaddle: Paddle = new Paddle(true, frame); 
-  const rightPaddle: Paddle = new Paddle(false, frame); 
-  
-
-  class Game { 
+  class Match { 
     player1: string;
     player2: string;
   }
 
-  let gameList: Game[] = [];
+  let gameList: Match[] = [];
 
-  let leftScore: number = 0;
-  let rightScore: number = 0;
-  let stop: boolean = true;
+  let currentMatch: Match = { player1: '', player2: '' }
+
+  let update_child: (state: GameState) => void;
+
+  let unique = {} //use to restart Game component
 
   let inGame: boolean = false;
   let gameRequest: boolean = false;
@@ -35,10 +28,9 @@
     });
 
   onMount(() => {
-    ctx = canvas.getContext("2d");
-
-    socket.on('newPlayer', () => {
-      console.log("new player connected");
+    socket.on('gameStart', (match) => {
+      currentMatch = match;
+      console.log("game started");
     });
     
     socket.on('watchGame', () => {
@@ -48,64 +40,55 @@
 
     socket.on('win', () => {
       alert('you win! refresh page to play another game');
+      restart();
+      inGame = false;
     });
     
     socket.on('lose', () => {
       alert('you lose! refresh page to play another game');
+      restart();
+      inGame = false;
     });
 
     socket.on('opponentLeft', () => {
       if (watch)
         alert('A player has left the game. Refresh page to watch another game');
-      alert('your opponent has left the game, you win! refresh page to play another game');
+      else
+        alert('your opponent has left the game, you win! refresh page to play another game');
+      restart();
+      inGame = false;
     });
 
     socket.on('gameState', (state) => {
-      if (!inGame)
-        game_loop();
       inGame = true;
+      update(state);
       gameRequest = false;
-      stop = state.stop;
-      if (stop)
+      if (state.stop)
         inGame = false
-
-      leftScore = state.score.leftScore;
-      rightScore = state.score.rightScore;
-
-      leftPaddle.posx = state.leftPaddle.posx;
-      leftPaddle.posy = state.leftPaddle.posy;
-
-      rightPaddle.posx = state.rightPaddle.posx;
-      rightPaddle.posy = state.rightPaddle.posy;
-
-      ball.posx = state.ball.posx;
-      ball.posy = state.ball.posy;
     });
-    
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
   });
+
+  function update(state: GameState) {
+    update_child(state);
+  }
+
+  function restart() { 
+    unique = {};
+  }
 
   getGames();
   console.log('gameList', gameList);
 
   async function getGames() {
-    let games = (await axios.get('http://localhost:3000/pong', {withCredentials: true})).data;
+    let games = (await axios.get('/pong')).data;
     for (const game of games) {
       gameList.push(game);
     }
     gameList = gameList;
   }
-    
   
-  function game_loop() {
-    requestAnimationFrame(game_loop);
-    draw();
-  }
-
   function handleKeyup(e: KeyboardEvent) {
-    if (stop) 
+    if (!inGame)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -115,7 +98,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (stop) 
+    if (!inGame)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -124,26 +107,6 @@
     socket.emit('control', { press: true, key: e.key });
   }
   
-  function drawPaddles() {
-    ctx.fillStyle = "green";
-    ctx.fillRect(leftPaddle.posx, leftPaddle.posy,
-      leftPaddle.width, leftPaddle.height);
-    ctx.fillRect(rightPaddle.posx, rightPaddle.posy,
-      rightPaddle.width, rightPaddle.height);
-  }
-  
-  function drawBall() {
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(ball.posx, ball.posy, ball.radius, 0, Math.PI * 2, false);
-    ctx.fill();
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, frame.width, frame.height);
-    drawPaddles();
-    drawBall();
-  };
 
   function requestGame() {
     socket.emit('requestGame', {});
@@ -169,7 +132,11 @@
 
 <svelte:body on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
+<div id="all">
+
 {#if !inGame}
+
+<h2 id="title"> Pong </h2>
 
 {#if gameList}
   <ul>
@@ -182,31 +149,67 @@
 
 
   {#if !gameRequest}
+  <div id="randomGame">
   <button on:click={requestGame}>request random game</button>
+  </div>
+
+  <div id="friendlyGame">
   <form on:submit|preventDefault={(event) => joinFriendly(event)}>
       <input id="friend" name="friend" type="text" placeholder="type friend username">
       <button type="submit">play a friendly match</button>
   </form>
+  </div>
   {/if}
 {/if}
 
 {#if inGame}
-<p>{leftScore} - {rightScore}</p>
+{#key unique}
+<Game bind:players={currentMatch} bind:update_state={update_child}></Game>
+{/key}
 {/if}
-
-<div class:inGame={inGame}>
-<canvas bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
-</div>
 
 {#if gameRequest}
 <h2>Game requested !</h2>
 {/if}
 
+</div>
+
 <style>
 
-.inGame {
-  border: 1px solid;
-  display: inline-block;
+#all {
+  color: var(--white);
+  height: 100vh;
+  background-color: var(--grey);
+  border-left: 1px solid grey;
+  text-align: center;
 }
 
+#title {
+  color: rgb(158, 39, 217);
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom:2em;
+}
+
+#randomGame {
+  margin-bottom: 2em;
+}
+
+button {
+  background-color:#3b82f6;
+  font-weight: bold;
+  border: 1px solid #1d4ed8;
+  border-radius:4px;
+  padding:0.5em;
+}
+button:hover {
+  background-color:#1d4ed8
+}
+
+input {
+  border-radius: 2px;
+  padding:0.2em;
+  margin:0.5em;
+  color: black;
+}
 </style>

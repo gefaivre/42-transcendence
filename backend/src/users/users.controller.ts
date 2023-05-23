@@ -1,21 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from 'src/auth/auth.service';
-import { Request} from 'express';
 import * as bcrypt from 'bcrypt';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly authService: AuthService
-  ) {}
 
-  // START CRUD
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -32,39 +26,44 @@ export class UsersController {
     return this.usersService.findOneById(id);
   }
 
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.usersService.findByUsername(name);
+  @Get(':username')
+  findOne(@Param('username') username: string) {
+    return this.usersService.findByUsername(username);
   }
 
-  @Patch(':name')
-  update(@Param('name') name: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(name, updateUserDto);
+  @Patch(':username')
+  update(@Param('username') username: string, @Body() body: UpdateUserDto, @Req() req: any) {
+
+    // check that user updates itself
+    if (req.user.username !== username)
+      throw new UnauthorizedException('Unauthorized to update other player')
+
+    return this.usersService.update(username, body);
   }
 
   // We might use guards someway to handle those verifications
-  @Patch('username/:name')
-  async updateUsername(@Param('name') name: string, @Body() body: any, @Req() req: Request) {
+  @Patch('username/:username')
+  async updateUsername(@Param('username') username: string, @Body() body: UpdateUsernameDto, @Req() req: any) {
 
-    // check that user is changing its own username
-    if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
-      throw new UnauthorizedException('Unauthorized to change other player username.')
+    // check that user updates its own username
+    if (req.user.username !== body.username)
+      throw new UnauthorizedException('Unauthorized to update other player username')
 
     // check that new username is not already used
     try {
-      await this.usersService.updateUsername(name, { username: body.username } as UpdateUsernameDto);
+      await this.usersService.updateUsername(username, body.username);
     } catch (e) {
-      throw new ConflictException('This username is already used.')
+      throw new ConflictException('This username is already used')
     }
   }
 
   // We might use guards someway to handle those verifications
-  @Patch('password/:name')
-  async updatePassword(@Param('name') name: string, @Body() body: any, @Req() req: Request) {
+  @Patch('password/:username')
+  async updatePassword(@Param('username') username: string, @Body() body: UpdatePasswordDto, @Req() req: any) {
 
-    // check that user is changing its own password
-    if (this.authService.decode(req.cookies.jwt)?.sub != body.id)
-      throw new UnauthorizedException('Unauthorized to change other player password.')
+    // check that user updates its own password
+    if (req.user.username !== username)
+      throw new UnauthorizedException('Unauthorized to update other player password')
 
     let hash
 
@@ -77,23 +76,30 @@ export class UsersController {
 
     // update password
     try {
-      await this.usersService.updatePassword(name, { password: hash } as UpdatePasswordDto);
+      await this.usersService.updatePassword(username, hash);
     } catch (e) {
       throw new ConflictException('Error while updating your password')
     }
   }
 
-  @Delete(':name')
-  remove(@Param('name') name: string) {
-    return this.usersService.remove(name);
+  @Delete(':username')
+  async remove(@Param('username') username: string, @Req() req: any) {
+
+    // check that user deletes itself
+    if (req.user.username !== username)
+      throw new UnauthorizedException('Unauthorized to delete other player')
+
+    try {
+      await this.usersService.remove(username)
+    } catch(e) {
+      throw new NotFoundException('User not found')
+    }
   }
 
   @Delete()
   removeAllUsers() {
     return this.usersService.removeAllUsers();
   }
-
-  // END CRUD
 
   @Post('friendship/request/:id')
   requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
@@ -107,10 +113,10 @@ export class UsersController {
     return this.usersService.cancelFriendshipRequestById(req.user.id, id)
   }
 
-  @Post('friendship/cancelByName/:name')
-  cancelFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
+  @Post('friendship/cancelByName/:username')
+  cancelFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
     console.log('controller cancel friendship request by name')
-    return this.usersService.cancelFriendshipRequestByName(req.user.id, name)
+    return this.usersService.cancelFriendshipRequestByName(req.user.id, username)
   }
 
   @Post('friendship/acceptById/:id')
@@ -119,10 +125,10 @@ export class UsersController {
     return this.usersService.acceptFriendshipRequestById(req.user.id, id)
   }
 
-  @Post('friendship/acceptByName/:name')
-  acceptFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
-    console.log('controller accept friendship request by name(', req.user.id, 'accept', name, ')')
-    return this.usersService.acceptFriendshipRequestByName(req.user.id, name)
+  @Post('friendship/acceptByName/:username')
+  acceptFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
+    console.log('controller accept friendship request by name(', req.user.id, 'accept', username, ')')
+    return this.usersService.acceptFriendshipRequestByName(req.user.id, username)
   }
 
   @Post('friendship/dismissById/:id')
@@ -131,10 +137,10 @@ export class UsersController {
     return this.usersService.dismissFriendshipRequestById(req.user.id, id)
   }
 
-  @Post('friendship/dismissByName/:name')
-  dismissFriendshipRequestByName(@Param('name') name: string, @Req() req: any) {
+  @Post('friendship/dismissByName/:username')
+  dismissFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
     console.log('controller dismiss friendship request by name')
-    return this.usersService.dismissFriendshipRequestByName(req.user.id, name)
+    return this.usersService.dismissFriendshipRequestByName(req.user.id, username)
   }
 
   @Post('friendship/removeById/:id')
@@ -143,10 +149,10 @@ export class UsersController {
     return this.usersService.removeFriendById(req.user.id, id)
   }
 
-  @Post('friendship/removeByName/:name')
-  removeFriendByName(@Param('name') name: string, @Req() req: any) {
+  @Post('friendship/removeByName/:username')
+  removeFriendByName(@Param('username') username: string, @Req() req: any) {
     console.log('controller remove friend by name')
-    return this.usersService.removeFriendByName(req.user.id, name)
+    return this.usersService.removeFriendByName(req.user.id, username)
   }
 
 }

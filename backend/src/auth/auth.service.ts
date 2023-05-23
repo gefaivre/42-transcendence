@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios'
-import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from './constants';
 import * as qrcode from 'qrcode';
 import * as OTPAuth from "otpauth";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly userService: UsersService
-  ) {}
+
+  constructor(private readonly jwtService: JwtService) {}
 
   // TODO: rename and typedef argument
   login(user: any) {

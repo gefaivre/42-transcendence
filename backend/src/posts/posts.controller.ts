@@ -9,6 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 @UseGuards(AuthGuard('jwt'))
 @Controller('posts')
 export class PostsController {
+
   constructor(
     private readonly postsService: PostsService,
     private readonly dmService: DirectMessageService

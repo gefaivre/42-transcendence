@@ -4,6 +4,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { Request } from "express";
 import { UsersService } from 'src/users/users.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,16 +19,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // TODO (?): typedef the payload
-  async validate(payload: any) {
+  async validate(payload: any): Promise<Omit<User, 'password'>> {
 
-    const user = await this.userService.findById(payload.sub)
+    const user: Omit<User, 'password'> | null = await this.userService.findById(payload.sub)
 
     if (user === null)
       throw new BadRequestException('User not found')
 
-    const { password, ...result } = user
-
-    return result
+    return user
   }
 }
 

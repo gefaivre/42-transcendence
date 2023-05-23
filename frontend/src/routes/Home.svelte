@@ -1,5 +1,5 @@
 <script lang="ts">
-    import axios from "axios";
+    import axios from "../axios.config";
     import { onMount } from "svelte";
     import { id, logged } from "../stores";
     import type { User } from '../types'
@@ -22,11 +22,11 @@
 
     async function getProfile() {
       try {
-        let response = await axios.get('http://localhost:3000/auth/profile', { withCredentials: true })
+        let response = await axios.get('/auth/profile')
         user = response.data
         logged.set('true')
         id.set(response.data.id.toString())
-        response = await axios.get(`http://localhost:3000/users/id/${user.id}`, { withCredentials: true })
+        response = await axios.get(`/users/id/${user.id}`)
         user = response.data
       } catch (e) {
         logged.set('false')
@@ -36,7 +36,7 @@
 
     async function logout() {
       try {
-        await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
+        await axios.get('/auth/logout')
         logged.set('false')
         id.set('0')
       } catch (e) {

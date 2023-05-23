@@ -1,6 +1,6 @@
 <script lang=ts>
   import Layout from "./Layout.svelte";
-  import axios from "axios";
+  import axios from "../axios.config";
   import { onMount, onDestroy, afterUpdate} from "svelte";
   import ChanMenu from "./chanLayouts.svelte";
   import settingsImage from "../assets/settings.png";
@@ -23,6 +23,7 @@
   let showsettings: boolean = false;
   let usersettings: boolean = false;
   let users: User[] = [];
+  let username = null // the user settings are about to operate upon
 
 // $: foo = posts
 afterUpdate(() => {
@@ -110,7 +111,7 @@ const newscrollToBottom = async (node) => {
 // TODO: what if we manually change `id` store value ?
 onMount(async () => {
 
-  channel = (await axios.get(`http://localhost:3000/channel/${params.name}`, { withCredentials: true })).data
+  channel = (await axios.get(`/channel/${params.name}`)).data
 
   socket = ioClient('http://localhost:3000', {
     path: '/chat',
@@ -138,8 +139,8 @@ onMount(async () => {
     console.log('Connected')
   })
 
-  socket.on('disconnect', (reason) => {
-    console.log('Disconnected:', reason)
+  socket.on('disconnect', (cause) => {
+    console.log('Disconnected:', cause)
   })
 
   socket.on('post', (post: newPostEmitDto) => {
@@ -180,13 +181,14 @@ function testlink()
   usersettings = false;
   console.log(showsettings);
 }
-function openUserSettings()
+function openUserSettings(_username: string)
 {
   if (!usersettings)
     usersettings = true;
   else
     usersettings = false;
   console.log(usersettings);
+  username = _username;
 }
 </script>
 {#if channel}
@@ -212,7 +214,7 @@ function openUserSettings()
             </span>
           </div>
           <div class="btnSettingsUser">
-            <img class="rounded-full" src={moreImg} style="height: 30px; width: 30px;" alt="three dots" on:click={openUserSettings}>
+            <img class="rounded-full" src={moreImg} style="height: 30px; width: 30px;" alt="three dots" on:click={openUserSettings(user.username)}>
           </div>
         </div>
 
@@ -227,7 +229,7 @@ function openUserSettings()
             <a href="sqd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Send a DM</a>
           </li>
           <li>
-            <span class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">See profil</span>
+            <a href={'#/users/' + username} class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">See profile</a>
           </li>
           <li>
             <a href="qsd" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Block</a>
@@ -264,9 +266,12 @@ function openUserSettings()
       <div class="postContent">
         <span style="color: #FFFFFF; font-family: Arial;">
           {post.content}
-
         </span>
-
+      </div>
+      <div class="postDate">
+        <span style="color: #FFFFFF; font-family: Arial;">
+          {post.date}
+        </span>
       </div>
       <br>
     </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import axios from 'axios'
+    import axios from '../../axios.config'
 
     let user = {
         username: '',
@@ -8,9 +8,7 @@
     }
 
     function signUp() {
-        axios.post('http://localhost:3000/users', user, {
-            withCredentials: true
-        })
+        axios.post('/users', user)
         .then((res) => { console.log(res.data) })
         .catch((err) => { console.log(err) });
     };

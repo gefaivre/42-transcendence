@@ -1,5 +1,5 @@
 <script lang="ts">
-  import axios from 'axios'
+  import axios from '../../axios.config'
   import ioClient from 'socket.io-client';
   import { onMount } from "svelte";
   import { logged, id } from '../../stores';
@@ -16,7 +16,7 @@
 
   // TODO: what if we manually change `id` store value ?
   async function getAll() {
-    channels = (await axios.get('http://localhost:3000/channel', { withCredentials: true })).data
+    channels = (await axios.get('/channel')).data
     for (const channel of channels) {
       channel.posts = [];
       if (channel.users.find((user: any) => user.id.toString() === $id))
@@ -108,8 +108,9 @@
     if (formData.has('channelStatus') === false)
       return alert('Empty status')
 
+    let pass: string
     if (formData.get('channelStatus') === 'Protected') {
-      var pass: string = window.prompt('Enter password');
+      pass = window.prompt('Enter password');
       if (pass === '')
         return alert('Empty password')
       if (!pass)
@@ -125,7 +126,7 @@
     }
 
     try {
-      await axios.post('http://localhost:3000/channel', channel, { withCredentials: true })
+      await axios.post('/channel', channel)
       console.log(`Channel ${channel.channelName} successfully created.`)
       getAll()
     } catch (e) {

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import axios from "axios";
+  import axios from "../axios.config";
   import { push } from "svelte-spa-router";
 
   // cf. /backend/src/users/dto/create-user.dto.ts
@@ -18,11 +18,11 @@
 
   async function signup() {
 
-    if (createUserDto.username == null || createUserDto.password == null)
+    if (createUserDto.username === null || createUserDto.password === null)
       return alert('error')
 
     try {
-      await axios.post('http://localhost:3000/auth/signup', createUserDto, { withCredentials: true })
+      await axios.post('/auth/signup', createUserDto)
       alert('Signup success. Now you can login.')
       createUserDto.username = null
       createUserDto.password = null
