@@ -1,6 +1,4 @@
-import { Inject, Injectable, StreamableFile, forwardRef } from '@nestjs/common';
-import { UpdateImageDto } from './dto/update-image.dto';
-import { UsersService } from 'src/users/users.service';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { PathLike, promises as fs } from "fs";
 import { createReadStream } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,13 +6,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ImagesService {
 
-  constructor(
-    @Inject(forwardRef(() => UsersService))
-    private readonly usersService: UsersService,
-    private readonly PrismaService: PrismaService
-  ) {}
+  constructor(private readonly PrismaService: PrismaService) {}
 
-  async AddImage(userId: number, file: Express.Multer.File)
+  async addImage(userId: number, file: Express.Multer.File)
   {
     const image = await this.PrismaService.image.create({
       data: {
@@ -22,14 +16,13 @@ export class ImagesService {
         link: `${file.destination}/${file.filename}`,
         userId: userId
       }
-
     })
     return "Image created"
   }
 
-  async setImage(UserId: number, imageId:number) {
+  async setImage(userId: number, imageId: number) {
     const result = await this.PrismaService.image.update({
-      where: { id: +imageId },
+      where: { id: imageId },
       data: {lastuse: new Date()}
     })
     return "update OK";
@@ -49,29 +42,28 @@ export class ImagesService {
     return images;
   }
 
-  async getImage(userId: string) {
-    const user = await this.usersService.findById(+userId)
-    if (user === null)
-      return null;
+  async getImage(userId: number) {
     const image = await this.PrismaService.image.findMany({
       take: 1,
       where: {
         User: {
-          id: +userId
+          id: userId
         },
       },
       orderBy: {
         lastuse: 'desc',
-    }
+      }
     })
-    const file = createReadStream(image[0].link);
-    return new StreamableFile(file);
+    if (image[0] !== undefined) {
+      const file = createReadStream(image[0].link);
+      return new StreamableFile(file);
+    }
   }
 
-  async findOne(userId: number, Id: number) {
+  async findOne(userId: number, id: number) {
     const image = await this.PrismaService.image.findUnique({
       where: {
-        id: Id
+        id: id
       }
     })
     if (image === null)
@@ -81,14 +73,6 @@ export class ImagesService {
       const file = createReadStream(image.link);
       return new StreamableFile(file)
     }
-  }
-
-  AddOne(UserId: number, updateImageDto: UpdateImageDto) {
-    return `This action updates a #${UserId} image`;
-  }
-
-  update(id: number, updateImageDto: UpdateImageDto) {
-    return `This action updates a #${id} image`;
   }
 
   remove(id: number) {
