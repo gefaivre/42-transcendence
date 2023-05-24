@@ -60,7 +60,7 @@ export class PongService {
           room.start = true;
           return room.id;
         }
-        else 
+        else
           this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: false  });
         return undefined;
       } else {
@@ -78,7 +78,6 @@ export class PongService {
     return undefined;
   }
 
-    
   cancelRequest(socketId: string) {
     const user: PongUser | undefined = this.users.find(user => user.socketId === socketId);
 
@@ -175,12 +174,12 @@ export class PongService {
     if (room) {
       if (key === 'w' || key === 'ArrowUp') {
         if (room.player1 === user) {
-          if (pressed) 
+          if (pressed)
             room.game.leftPaddle.moveUp();
           else
             room.game.leftPaddle.stop();
         } else {
-          if (pressed) 
+          if (pressed)
             room.game.rightPaddle.moveUp();
           else
             room.game.rightPaddle.stop();
@@ -188,12 +187,12 @@ export class PongService {
       }
       if (key === 's' || key === 'ArrowDown') {
         if (room.player1 === user) {
-          if (pressed) 
+          if (pressed)
             room.game.leftPaddle.moveDown();
           else
             room.game.leftPaddle.stop();
         } else {
-          if (pressed) 
+          if (pressed)
             room.game.rightPaddle.moveDown();
           else
             room.game.rightPaddle.stop();
@@ -251,8 +250,8 @@ export class PongService {
       const loserMmr = Math.round(loser.mmr + 32 * (0 - E1));
       const winnerMmr = Math.round(winner.mmr + 32 * (1 - E2));
 
-      await this.usersService.update(loser.username, {games: loser.games + 1, mmr: loserMmr}); 
-      await this.usersService.update(winner.username, {games: winner.games + 1, mmr: winnerMmr}); 
+      await this.usersService.update(loser.username, {games: loser.games + 1, mmr: loserMmr});
+      await this.usersService.update(winner.username, {games: winner.games + 1, mmr: winnerMmr});
     }
   }
 

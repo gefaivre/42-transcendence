@@ -11,7 +11,7 @@
   import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto, User } from "../types";
   import defaultAvatar from '../assets/008-utilisateur.png';
   import moreImg from '../assets/more.png';
-  
+
   export let params: any = {}
   let socket: Socket = null
   let message: string = ''
@@ -30,7 +30,7 @@ afterUpdate(() => {
   const adminButton = document.getElementById('admin-button');
   const memberButton = document.getElementById('member-button');
   console.log("afterUpdate");
-  if(posts) 
+  if(posts)
     newscrollToBottom(element);
   if (channel && params && params.name != channel.name)
     location.reload();
@@ -106,7 +106,7 @@ function scrollToBottom() {
 const newscrollToBottom = async (node) => {
   if (node)
       node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
-}; 
+};
 
 // TODO: what if we manually change `id` store value ?
 onMount(async () => {
@@ -210,7 +210,7 @@ function openUserSettings(_username: string)
           </div>
           <div class="username">
             <span style="color: grey; font-size: 20px; position: relative; top:30%; position: relative; font-family: Arial; left:20%;">
-              {user.username}  
+              {user.username}
             </span>
           </div>
           <div class="btnSettingsUser">
@@ -285,7 +285,7 @@ function openUserSettings(_username: string)
             <svg aria-hidden="true" class="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
             <span class="sr-only">Send message</span>
           </button>
-        </form> 
+        </form>
 
 </div>
 

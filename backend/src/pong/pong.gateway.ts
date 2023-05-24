@@ -83,7 +83,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       const tokenData = await this.pongService.validateUser(authHeader);
       const username: string | undefined = await this.pongService.addUser(client.id, tokenData);
-      
+
       if (username === undefined) {
         this.server.to(client.id).emit('unauthorized', { user: client.id });
         console.log(`pongWebsocket: client ${client.id} is unauthorized`);

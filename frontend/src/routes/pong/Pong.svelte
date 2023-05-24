@@ -5,7 +5,7 @@
   import Game from "./Game.svelte";
   import type { GameState } from "./Class";
 
-  class Match { 
+  class Match {
     player1: string;
     player2: string;
   }
@@ -32,7 +32,7 @@
       currentMatch = match;
       console.log("game started");
     });
-    
+
     socket.on('watchGame', (res) => {
       if (res.response === true) {
         currentMatch = res.players;
@@ -49,7 +49,7 @@
       alert('you win!');
       inGame = false;
     });
-    
+
     socket.on('lose', () => {
       restart();
       alert('you lose!');
@@ -91,7 +91,7 @@
     update_child(state);
   }
 
-  function restart() { 
+  function restart() {
     unique = {};
   }
 
@@ -105,7 +105,7 @@
     }
     gameList = gameList;
   }
-  
+
   function handleKeyup(e: KeyboardEvent) {
     if (inGame === false)
       return ;
@@ -125,7 +125,6 @@
 
     socket.emit('control', { press: true, key: e.key });
   }
-  
 
   function requestGame() {
     socket.emit('requestGame', {});
