@@ -5,7 +5,7 @@
   import Game from "./Game.svelte";
   import type { GameState } from "./Class";
 
-  class Match { 
+  class Match {
     player1: string;
     player2: string;
   }
@@ -32,9 +32,11 @@
       currentMatch = match;
       console.log("game started");
     });
-    
+
     socket.on('watchGame', (res) => {
       if (res.response === true) {
+        currentMatch = res.players;
+        console.log(res);
         watch = true;
         console.log('watcherMode on');
       } else {
@@ -47,11 +49,20 @@
       alert('you win!');
       inGame = false;
     });
-    
+
     socket.on('lose', () => {
       restart();
       alert('you lose!');
       inGame = false;
+    });
+
+    socket.on('endWatch', (player) => {
+      console.log('test');
+      if (watch) {
+        restart();
+        alert(player.username + ' has won the game');
+        watch = false;
+      }
     });
 
     socket.on('opponentLeft', (player) => {
@@ -80,7 +91,7 @@
     update_child(state);
   }
 
-  function restart() { 
+  function restart() {
     unique = {};
   }
 
@@ -94,9 +105,9 @@
     }
     gameList = gameList;
   }
-  
+
   function handleKeyup(e: KeyboardEvent) {
-    if (!inGame)
+    if (inGame === false)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -106,7 +117,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (!inGame)
+    if (inGame === false)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -114,7 +125,6 @@
 
     socket.emit('control', { press: true, key: e.key });
   }
-  
 
   function requestGame() {
     socket.emit('requestGame', {});

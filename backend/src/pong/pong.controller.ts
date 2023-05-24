@@ -4,11 +4,11 @@ import { PongService } from './pong.service';
 
 @Controller('pong')
 export class PongController {
-  constructor(private readonly pongService: PongService) {}
+  constructor(private readonly pong: PongService) {}
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
   getGames() {
-    return this.pongService.getRoomList()
+    return this.pong.getRoomList()
   }
 }
