@@ -62,11 +62,11 @@ export class Game {
   }
 
   handleCollision() {
-    if (this.checkCollision(this.rightPaddle)) {
+    if (this.checkCollision(this.rightPaddle) === true) {
       this.ball.bouncePaddle(this.rightPaddle)
     }
 
-    if (this.checkCollision(this.leftPaddle)) {
+    if (this.checkCollision(this.leftPaddle) === true) {
       this.ball.bouncePaddle(this.leftPaddle)
     }
   }
