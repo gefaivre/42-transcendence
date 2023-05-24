@@ -70,3 +70,13 @@ export type DirectMessage = {
   sender: string
   recipient: string
 }
+
+export type Match = {
+  id:         number
+  winnerId:   number
+  winnerScore:number
+  loserId:    number
+  loserScore: number
+  date:       Date
+  ranked:     Boolean
+}

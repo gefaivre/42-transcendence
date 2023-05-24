@@ -63,7 +63,6 @@
         alert(player.username + ' has won the game');
         watch = false;
       }
-
     });
 
     socket.on('opponentLeft', (player) => {

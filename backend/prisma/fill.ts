@@ -1,7 +1,26 @@
-import { PrismaClient, User } from '@prisma/client'
+import { PrismaClient} from '@prisma/client'
 
-const n = 5
-let tab: User[];
+const numberOfUsers = 10 // How many user do you want to add ?
+const yourUsername = "test" // Your username
+
+  type User = {
+  id: number
+  username: string
+  password: string
+  mmr: number
+  games: number
+  ft_login: string | null
+  friends: { id: number, username: string }[]
+  friendOf: { id: number, username: string }[]
+  pendingFriends: { id: number, username: string }[]
+  requestFriends: { id: number, username: string }[]
+  wins: { id: number, winnerScore: number, loserScore: number}[]
+  loses: { id: number, winnerScore: number, loserScore: number}[]
+  TwoFA: boolean
+}
+
+
+let tab = new Array<User>();
 const prisma = new PrismaClient()
 
 
@@ -27,56 +46,291 @@ function randomNumber(): number {
   return Math.floor(Math.random() * (150 - 0) + 0)
 }
 
-function createpending(user: User) {
-  prisma.user.update({
-    where: {
-      id: user.id
-    },
-    data: {
-      pendingFriends: {
-        connect: { id: user.id }
+
+async function createrelation(user1: number, user2: number) {
+  let random = Math.floor(Math.random() * (3 - 0) + 0)
+  if (random == 0)
+    await createFriends(user1,  user2)
+  if (random == 1)
+    createRequest(user1, user2)
+  if (random == 2)
+    createpending(user1, user2)
+
+}
+
+async function createpending(user1: number, user2: number) {
+  try {
+      await prisma.user.update({
+        where: {
+        id: tab[user2].id
+      },
+      data: {
+        pendingFriends: {
+          connect: { id: tab[user1].id }
+        }
       }
+    })
+    let user;
+    if ((user = await getUser(tab[user1].username)) != null)
+      tab[user1] = user;
+    if ((user = await getUser(tab[user2].username)) != null)
+      tab[user2] = user;
+  } catch (error) {
+    console.log("createpending Failed")
+  }
+}
+
+
+async function createRequest(user1: number, user2: number) {
+  try {
+    await prisma.user.update({
+      where: {
+        id: tab[user1].id
+      },
+      data: {
+        pendingFriends: {
+          connect: { id: tab[user2].id }
+        }
+      }
+    });
+    let user;
+    if ((user = await getUser(tab[user1].username)) != null)
+      tab[user1] = user;
+    if ((user = await getUser(tab[user2].username)) != null)
+      tab[user2] = user;
+  } catch (error) {
+    console.log("createrequest Failed")
+  }
+}
+
+async function createFriends(user1: number, user2: number) {
+    try {
+      await prisma.user.update({
+      where: {
+        id: tab[user1].id
+      },
+      data: {
+        friends: {
+          connect: [{ id: tab[user2].id }]
+        },
+        friendOf: {
+          connect: [{ id: tab[user2].id }]
+        },
+      },
+    });
+    let user;
+    if ((user = await getUser(tab[user1].username)) != null)
+      tab[user1] = user;
+    if ((user = await getUser(tab[user2].username)) != null)
+      tab[user2] = user;
+  } catch (error) {
+    console.log("createrfriends Failed")
+  }
+
+}
+
+function getNumberOfConnection(user: User): number
+{
+  let ret: number = 0
+  if (user.friends != null)
+    ret += user.friends.length
+  if (user.requestFriends != null)
+    ret += user.requestFriends.length
+  if (user.pendingFriends != null)
+    ret += user.pendingFriends.length
+
+  return ret
+}
+
+function RelationBetween(user1: User, user2:number):boolean
+{
+  if (user1.friends != null && user1.friends.find(({id}) => id == tab[user2].id) )
+    return true
+  if (user1.requestFriends != null && user1.requestFriends.find(({id}) => id == tab[user2].id) )
+    return true
+  if (user1.pendingFriends != null && user1.pendingFriends.find(({id}) => id == tab[user2].id) )
+    return true
+  return false
+}
+
+function RelationMatchBetween(user1: User, user2:number):boolean
+{
+  if (user1.wins != null && user1.wins.find(({id}) => id == tab[user2].id) )
+    return true
+  if (user1.loses != null && user1.loses.find(({id}) => id == tab[user2].id) )
+    return true
+  return false
+}
+
+async function createMatchrelation(user1: number, user2: number) {
+
+    let winnerCoin = Math.random() < 0.5
+    let rankedCoin = Math.random() < 0.9
+    let loserScore = Math.floor(Math.random() * (10 - 0) + 0)
+
+    let winner: number;
+    let loser: number;
+
+    if (winnerCoin)
+    {
+      winner = user1;
+      loser = user2;
+    }
+    else
+    {
+      winner = user2;
+      loser = user1;
+    }
+
+
+  await prisma.match.create({
+    data: {
+      winnerId: tab[winner].id,
+      winnerScore: 10,
+      loserId: tab[loser].id,
+      loserScore: loserScore,
+      date: new Date(),
+      ranked: rankedCoin,
+    },
+  })
+  let user;
+    if ((user = await getUser(tab[user1].username)) != null)
+      tab[user1] = user;
+    if ((user = await getUser(tab[user2].username)) != null)
+      tab[user2] = user;
+}
+
+async function getUser(name: string) {
+  return await prisma.user.findUnique({
+    where: {
+      username: name,
+    },
+    include: {
+      pendingFriends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      requestFriends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      friends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      friendOf: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      channels: true,
+      wins: true,
+      loses:true
     }
   })
 }
 
+async function createUser() {
+  let user: User;
+  user = await prisma.user.create({
+    data: {
+      username: randomUsername(),
+      password: '',
+      games: randomNumber(),
+      mmr: randomNumber(),
+      images: {
+        create: {
+          name: "default",
+          link: "/app/images/basic_pp.jpg",
+        }
+      }
+    },
+    include: {
+      pendingFriends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      requestFriends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      friends: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      friendOf: {
+        select: {
+          id: true,
+          username: true
+        }
+      },
+      channels: true,
+      wins: true,
+      loses:true
 
-function createRequest(user: User) {
-
-}
-
-function createFriends(user: User) {
-
+    }
+  })
+  tab.push(user)
+  return user;
 }
 
 
 async function main() {
-  // User creation
-  for (let i = 0; i < n; i++) {
-    let user: User;
-    try {
-      user = await prisma.user.create({
-        data: {
-          username: randomUsername(),
-          password: '',
-          games: randomNumber(),
-          mmr: randomNumber(),
-					images: {
-						create: {
-              name: "default",
-              link: "/app/images/basic_pp.jpg",
-            }
-					}
-        }
-      })
-      tab.push(user)
-    } catch (error) {
-    }
-  }
-  //Connecct friends
-  for (let i = 0; i < tab.length - 1; i + 2) {
 
+  // Adding your user to the list
+  console.log("Adding your user to the list")
+  let user = await getUser(yourUsername)
+  if (user)
+    tab.push(user)
+  else
+  {
+    console.log("Please set yourUsername variable")
+    return
   }
+
+  // Users creation
+  console.log("Users creation")
+  for (let i = 0; i < numberOfUsers; i++) {
+    await createUser()
+  }
+
+  //Connect friends
+  console.log("Connect friends")
+  for (let user1 = 0; user1 < tab.length; user1++)
+    for ( let user2 = 0; user2 < tab.length; user2++)
+    {
+      if (user1 != user2 && !(RelationBetween(tab[user1], user2)))
+      {
+        await createrelation(user1, user2);
+      }
+    }
+
+  //Connect Match
+  console.log("Connect Match")
+  for (let user1 = 0; user1 < tab.length; user1++)
+    for ( let user2 = 0; user2 < tab.length; user2++)
+    {
+      if (user1 != user2 && !(RelationMatchBetween(tab[user1], user2)))
+      {
+        await createMatchrelation(user1, user2);
+      }
+    }
+
+console.log(tab[0])
+
 }
 
 main()

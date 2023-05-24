@@ -52,7 +52,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (room) {
       client.join(room);
       const players = this.pongService.getRoomPlayers(room);
-      console.log('players = ', players);
       this.server.to(client.id).emit('watchGame', { response: true , players: players});
     } else {
       this.server.to(client.id).emit('watchGame', { response: false });

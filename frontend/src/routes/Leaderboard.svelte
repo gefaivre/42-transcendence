@@ -4,26 +4,29 @@
     import { onMount } from "svelte";
     import { logged } from "../stores";
 
-    let tab = [];
+    // TODO: get rid of unused `User` fields
+    let users = []
 
-    onMount(() => getMmr());
+    onMount(() => getUsers())
 
-    async function getMmr() {
+    async function getUsers () {
       try {
-        tab = (await axios.get(`/leaderboard/mmr`)).data
-        console.log(tab)
-      } catch (e) {
-        console.log(e)
+        users = (await axios.get('/users')).data
+        console.log(users)
+        sortByMMR()
+      } catch (error) {
+        console.log(error.response.data.messsage)
       }
-    };
+    }
 
-    async function getGames() {
-      try {
-        tab = (await axios.get(`/leaderboard/games`)).data
-        console.log(tab)
-      } catch (e) {
-        console.log(e)
-      }
+    function sortByMMR () {
+      users.sort((a,b) => b.mmr - a.mmr)
+      users = users // svelte reload
+    }
+
+    function sortByGames () {
+      users.sort((a,b) => b.games - a.games)
+      users = users // svelte relaod
     }
 
 </script>
@@ -33,29 +36,29 @@
 		<table class="leaderboard">
 				<thead>
 					<tr>
-								<th colspan="4">The big leaderboard</th>
+							<th colspan="4">The big leaderboard</th>
 						</tr>
 						<tr>
-								<th>Rank</th>
-								<th>User</th>
-								<th><a class="clickable" href="/#/leaderboard" on:click={() => getMmr()}>Mmr</a></th>
-								<th><a class="clickable" href="/#/leaderboard" on:click={() => getGames()}>Games</a></th>
+							<th>Rank</th>
+							<th>User</th>
+							<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
+							<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
 						</tr>
 				</thead>
 				<tbody>
-						{#each tab as i, y}
+            {#each users as user, i}
 						<tr>
-								<td>{y + 1}</td>
+								<td>{i + 1}</td>
 								<td >
-										<a href="#/users/{i.username}">
+										<a href="#/users/{user.username}">
 												<span class="user">
-														<img class="pp" src="http://localhost:3000/images/actual/{i.id}" alt="pp"/>
-														<p class="username">{i.username}</p>
+														<img class="pp" src="http://localhost:3000/images/actual/{user.id}" alt="pp"/>
+														<p class="username">{user.username}</p>
 												</span>
 										</a>
 								</td>
-								<td>{i.mmr}</td>
-								<td>{i.games}</td>
+								<td>{user.mmr}</td>
+								<td>{user.games}</td>
 						</tr>
 						{/each}
 				</tbody>
