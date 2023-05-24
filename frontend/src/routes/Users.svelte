@@ -19,6 +19,8 @@
 
     let settings: boolean = false;
 
+    let isBlocked: boolean = false;
+
     let pageUser: User = {
         id: 0,
         username: null,
@@ -141,7 +143,7 @@
 
 
     async function blockUser() {
-      console.log("Nice try, but this user will continue to bully you.");
+      isBlocked = ! isBlocked;
     }
 
 
@@ -168,13 +170,20 @@
         <div class="ctn-action">
           <ul>
             <li>
+              <span>settings</span>
+              <div class="actions">
+                <button class="actionButton" on:click={() => settings = !settings}>
+                  <img class="btnImage" src={acceptIcon} alt="delete">
+                </button>
+              </div>
             </li>
             <li>
-              <span> </span>
-            </li>
-            <li>
-              <button class="parameter" on:click={() => settings = !settings}>settings</button>
-              <button class="logout" on:click={() => logout()}>logout</button>
+              <span>logout</span>
+              <div class="actions">
+                <button class="actionButton" on:click={() => logout()}>
+                  <img class="btnImage" src={deleteIcon} alt="delete">
+                </button>
+              </div>
             </li>
           </ul>
         </div>
@@ -183,22 +192,23 @@
 
         <div class="ctn-action">
           <ul>
-
-
             {#if pageUser.friends.some(user => user.id.toString() === $id)}
             <li>
               <span>This user is your friend !</span>
-              <button class="actionButton" on:click={removeFriendById}>
-                <img class="btnImage" src={deleteIcon} alt="delete">
-              </button>
+              <div class="actions">
+                <button class="actionButton" on:click={removeFriendById}>
+                  <img class="btnImage" src={deleteIcon} alt="delete">
+                </button>
+              </div>
             </li>
             {:else if pageUser.requestFriends.some(user => user.id.toString() === $id)}
             <li>
               <span>Pending friend invitation...</span>
-
-              <button class="actionButton" on:click={cancelFriendshipRequestById}>
-                <img class="btnImage" src={deleteIcon} alt="delete">
-              </button>
+              <div class="actions">
+                <button class="actionButton" on:click={cancelFriendshipRequestById}>
+                  <img class="btnImage" src={deleteIcon} alt="delete">
+                </button>
+              </div>
             </li>
             {:else if pageUser.pendingFriends.some(user => user.id.toString() === $id)}
             <li>
@@ -214,17 +224,26 @@
             </li>
             {:else}
             <li>
-              <button class="actionButton" on:click={requestFriendship}>
-                <img class="btnImage" src={acceptIcon} alt="delete">
-              </button>
+              <span>Request friends</span>
+              <div class="actions">
+                <button class="actionButton" on:click={requestFriendship}>
+                  <img class="btnImage" src={acceptIcon} alt="delete">
+                </button>
+              </div>
             </li>
             {/if}
 
             <li>
-              <span>Block this user: </span>
-              <button class="actionButton" on:click={blockUser}>
-                <img class="btnImage" src={deleteIcon} alt="delete">
-              </button>
+              {#if isBlocked}
+                <span>This user is blocked </span>
+              {:else}
+                <span>This user is not blocked </span>
+              {/if}
+              <div class="actions">
+                <button class="actionButton" on:click={blockUser}>
+                  <img class="btnImage" src={deleteIcon} alt="delete">
+                </button>
+              </div>
             </li>
 
           </ul>
@@ -312,7 +331,7 @@
   .ctn-action li{
     height: 40px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
     background-color: var(--lite-lite-grey);
   }
 
@@ -320,8 +339,9 @@
     background-color: var(--lite-grey);
   }
 
-  .ctn-action li :first-child{
+  .ctn-action span {
     display: flex;
+    align-items: center;
   }
 
   .actions {
@@ -343,11 +363,6 @@
     align-items: center;
     justify-content: center;
     flex-direction: row;
-  }
-
-
-  .user-panel .logout, .user-panel .parameter {
-    color: var(--white);
   }
 
 
