@@ -35,6 +35,8 @@
     
     socket.on('watchGame', (res) => {
       if (res.response === true) {
+        currentMatch = res.players;
+        console.log(res);
         watch = true;
         console.log('watcherMode on');
       } else {
@@ -52,6 +54,15 @@
       restart();
       alert('you lose!');
       inGame = false;
+    });
+
+    socket.on('endWatch', (player) => {
+      console.log('test');
+      if (watch) {
+        restart();
+        alert(player.username + ' has won the game');
+        watch = false;
+      }
     });
 
     socket.on('opponentLeft', (player) => {

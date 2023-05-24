@@ -116,6 +116,7 @@ export class PongService {
   }
 
   async registerMatch(room: Room, loser: PongUser) {
+    await this.updateMmr(room, loser);
     if (loser === room.player1) {
       await this.matchsService.create({ winnerId: room.player2!.id,
                                       winnerScore: room.game.rightScore, 
@@ -232,6 +233,25 @@ export class PongService {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
     if (room && room.player2) {
       return { player1: room.player1.username, player2: room.player2.username }
+    }
+  }
+
+  async updateMmr(room: Room, loserPongUser: PongUser) {
+    const loser: Omit<User, 'password'> | null = await this.usersService.findById(loserPongUser.id);
+    const winner: Omit<User, 'password'> | null  = await this.usersService.findById(room.player2!.id);
+
+    if (loser && winner) {
+      const R1: number = 10 ** (loser.mmr / 400);
+      const R2: number = 10 ** (winner.mmr / 400);
+
+      const E1: number = R1 / (R1 + R2);
+      const E2: number = R2/ (R1 + R2);
+
+      const loserMmr = Math.round(loser.mmr + 32 * (0 - E1));
+      const winnerMmr = Math.round(winner.mmr + 32 * (1 - E2));
+
+      await this.usersService.update(loser.username, {games: loser.games + 1, mmr: loserMmr}); 
+      await this.usersService.update(winner.username, {games: winner.games + 1, mmr: winnerMmr}); 
     }
   }
 

@@ -24,8 +24,8 @@ export class UsersService {
           username: createUserDto.username,
           password: createUserDto.password,
           ft_login: createUserDto.ft_login,
-          games:  Math.floor(Math.random() * (150 - 0) + 0),
-          mmr: Math.floor(Math.random() * (1500 - 0) + 0),
+          games:  0,
+          mmr: 800,
           images: {
             create: {
               name: "default",
