@@ -59,7 +59,8 @@
     socket.on('endWatch', (player) => {
       console.log('test');
       if (watch) {
-        alert(player.username + 'has won the game');
+        restart();
+        alert(player.username + ' has won the game');
         watch = false;
       }
 
