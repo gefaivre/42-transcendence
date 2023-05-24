@@ -8,41 +8,41 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('matchs')
 export class MatchsController {
 
-  constructor(private readonly matchsService: MatchsService) {}
+  constructor(private readonly matchs: MatchsService) {}
 
   @Post()
   create(@Body() createMatchDto: CreateMatchDto) {
-    return this.matchsService.create(createMatchDto);
+    return this.matchs.create(createMatchDto);
   }
 
   @Get()
   findAll() {
-    return this.matchsService.findAll();
+    return this.matchs.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.matchsService.findOne(id);
+    return this.matchs.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
-    return this.matchsService.update(id, updateMatchDto);
+    return this.matchs.update(id, updateMatchDto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.matchsService.remove(id);
+    return this.matchs.remove(id);
   }
 
   @Get('history/:userId')
   findHistory(@Param('userId', ParseIntPipe) userId: number) {
-    return this.matchsService.findHistory(userId);
+    return this.matchs.findHistory(userId);
   }
 
   @Delete('history/:userId')
   removeHistory(@Param('userId', ParseIntPipe) userId: number) {
-    return this.matchsService.removeHistory(userId);
+    return this.matchs.removeHistory(userId);
   }
 
 

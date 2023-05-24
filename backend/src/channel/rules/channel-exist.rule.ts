@@ -6,11 +6,11 @@ ValidatorConstraint({ async: true })
 @Injectable()
 export class ChannelExist implements ValidatorConstraintInterface {
 
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(private readonly channel: ChannelService) {}
 
   async validate(channelName: string): Promise<boolean> {
     console.log('validate channel exist')
-    const channel = await this.channelService.findByName(channelName)
+    const channel = await this.channel.findByName(channelName)
     return channel !== null
   }
 

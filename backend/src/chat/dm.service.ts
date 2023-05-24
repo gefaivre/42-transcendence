@@ -5,10 +5,10 @@ import { CreateDirectMessage } from "./class/CreateDirectMessage";
 @Injectable()
 export class DirectMessageService {
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismavice: PrismaService) {}
 
   create(message: CreateDirectMessage) {
-    return this.prismaService.directMessage.create({
+    return this.prismavice.directMessage.create({
       data: {
         content: message.content,
         senderId: message.senderId,
@@ -18,7 +18,7 @@ export class DirectMessageService {
   }
 
   async findAllMesagesBetweenTwoUsers(id: number, _id: number) {
-    const messages = await this.prismaService.directMessage.findMany({
+    const messages = await this.prismavice.directMessage.findMany({
       where: {
         OR: [
           {
@@ -54,17 +54,17 @@ export class DirectMessageService {
 
   async findAllDirectMessagePenpalsById(userId: number) {
 
-    console.log(await this.prismaService.directMessage.findMany({}))
+    console.log(await this.prismavice.directMessage.findMany({}))
 
-    console.log(await this.prismaService.directMessage.groupBy({
+    console.log(await this.prismavice.directMessage.groupBy({
       by: ['senderId', 'receiverId']
     }))
 
-    console.log(await this.prismaService.directMessage.findMany({
+    console.log(await this.prismavice.directMessage.findMany({
       distinct: ['senderId', 'receiverId']
     }))
 
-    console.log(await this.prismaService.directMessage.findMany({
+    console.log(await this.prismavice.directMessage.findMany({
       distinct: ['senderId', 'receiverId'],
       select: {
         sender: {
@@ -82,7 +82,7 @@ export class DirectMessageService {
 
     return
 
-    console.log(await this.prismaService.directMessage.groupBy({
+    console.log(await this.prismavice.directMessage.groupBy({
       by: ['senderId', 'receiverId'],
       where: {
         OR: [
@@ -97,7 +97,7 @@ export class DirectMessageService {
     }))
 
     // select only chats where `userId` is involved
-    const chats = await this.prismaService.directMessage.groupBy({
+    const chats = await this.prismavice.directMessage.groupBy({
       by: ['senderId', 'receiverId'],
       where: {
         OR: [

@@ -11,7 +11,7 @@ import * as fs from 'fs'
 @Controller('images')
 export class ImagesController {
 
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(private readonly images: ImagesService) {}
 
   @Post('add')
   @UseInterceptors(FileInterceptor('file', {
@@ -30,31 +30,31 @@ export class ImagesController {
     })
   }))
   addImage(@Req() request: any, @UploadedFile() file: Express.Multer.File) {
-    return this.imagesService.addImage(request.user.id, file);
+    return this.images.addImage(request.user.id, file);
   }
 
   @Get('set/:id')
   setImage(@Req() request: any, @Param('id', ParseIntPipe) imageId: number) {
-    return this.imagesService.setImage(request.user.id, imageId);
+    return this.images.setImage(request.user.id, imageId);
   }
 
   @Get('actual/:userId')
   getImage(@Param('userId', ParseIntPipe) userId: number) {
-    return this.imagesService.getImage(userId);
+    return this.images.getImage(userId);
   }
 
   @Get('all')
   findUserAll(@Req() request: any) {
-    return this.imagesService.findAll(request.user.id);
+    return this.images.findAll(request.user.id);
   }
 
   @Get(':id')
   findUserOne(@Req() request: any, @Param('id', ParseIntPipe) id: number) {
-    return this.imagesService.findOne(request.user.id, id);
+    return this.images.findOne(request.user.id, id);
   }
 
   @Delete(':id')
   removeOne(@Param('id', ParseIntPipe) id: number) {
-    return this.imagesService.remove(id);
+    return this.images.remove(id);
   }
 }
