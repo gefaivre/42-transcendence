@@ -10,7 +10,6 @@
     import NotFound from "./NotFound.svelte";
     import deleteIcon        from '../assets/redLose.png';
     import acceptIcon        from '../assets/greenWin.png';
-    import { update_keyed_each } from "svelte/internal";
 
 
     export let params;
