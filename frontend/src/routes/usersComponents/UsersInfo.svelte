@@ -132,6 +132,12 @@
           {:else}
             <button on:click={() => friendspage = 'Pending'}>pending</button>
           {/if}
+
+          {#if friendspage == 'Blocked'}
+            <button class="activeButton" on:click={() => friendspage = 'Blocked'}>blocked</button>
+          {:else}
+            <button on:click={() => friendspage = 'Blocked'}>blocked</button>
+          {/if}
         </div>
       {:else}
         <h1>Friends</h1>
@@ -198,8 +204,14 @@
             {/each}
           </ul>
         </div>
+
+      {:else if friendspage == 'Blocked' && $id === pageUser.id.toString()}
+        <div class="overflow">
+          <p>Blocked user will be displayed here</p>
+        </div>
       {/if}
-	  </div>
+    </div>
+
 
     <div class="box-info games">
       <h1>Game history</h1>
@@ -333,8 +345,7 @@
     border-bottom: none;
   }
 
-  .friends .nav button:nth-child(2) {
-    border-left: solid 1px var(--black);
+  .friends .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
 

@@ -8,6 +8,9 @@
     import UsersInfo from "./usersComponents/UsersInfo.svelte";
     import UsersSettings from "./usersComponents/UsersSettings.svelte";
     import NotFound from "./NotFound.svelte";
+    import deleteIcon        from '../assets/redLose.png';
+    import acceptIcon        from '../assets/greenWin.png';
+    import { update_keyed_each } from "svelte/internal";
 
 
     export let params;
@@ -137,52 +140,95 @@
 
 
 
+    async function blockUser() {
+      console.log("Nice try, but this user will continue to bully you.");
+    }
+
+
+
   </script>
 
   {#if pageUser.username != null}
 
   <div class="component">
+
     <div class="user-panel">
 
-      <h1 class="title">Profile</h1>
+      <div class="ctn-title">
+        <h1 class="title">{pageUser.username}</h1>
+      </div>
 
-      <!-- toggle edditing button (class after) -->
+      <div class="ctn-image">
+        <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
+      </div>
+
+
       {#if pageUser.id.toString() === $id}
-        <button class="image-button">
-          <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
-        </button>
 
-        <button class="username-button">
-          <span class="username">{pageUser.username}</span>
-        </button>
-
-
-        <div>
-          <button class="parameter" on:click={() => settings = !settings}>settings</button>
-          <button class="logout" on:click={() => logout()}>logout</button>
+        <div class="ctn-action">
+          <ul>
+            <li>
+            </li>
+            <li>
+              <span> </span>
+            </li>
+            <li>
+              <button class="parameter" on:click={() => settings = !settings}>settings</button>
+              <button class="logout" on:click={() => logout()}>logout</button>
+            </li>
+          </ul>
         </div>
+
       {:else}
-        <button class="image-button">
-          <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" alt="profil">
-        </button>
 
-        <button class="username-button">
-          <span class="username">{pageUser.username}</span>
-        </button>
+        <div class="ctn-action">
+          <ul>
 
-        {#if pageUser.friends.some(user => user.id.toString() === $id)}
-          <span style="color: white">This user is your friend !</span>
-          <button on:click={removeFriendById}>Remove</button>
-        {:else if pageUser.requestFriends.some(user => user.id.toString() === $id)}
-        <span style="color: white">Pending friend invitation...</span>
-          <button on:click={cancelFriendshipRequestById}>Cancel</button>
-        {:else if pageUser.pendingFriends.some(user => user.id.toString() === $id)}
-        <span style="color: white">This user requested you as friend</span>
-          <button on:click={acceptFriendshipRequestById}>Accept</button>
-          <button on:click={dismissFriendshipRequestById}>Dismiss</button>
-        {:else}
-          <button on:click={requestFriendship}>Request friendship</button>
-        {/if}
+
+            {#if pageUser.friends.some(user => user.id.toString() === $id)}
+            <li>
+              <span>This user is your friend !</span>
+              <button class="actionButton" on:click={removeFriendById}>
+                <img class="btnImage" src={deleteIcon} alt="delete">
+              </button>
+            </li>
+            {:else if pageUser.requestFriends.some(user => user.id.toString() === $id)}
+            <li>
+              <span>Pending friend invitation...</span>
+
+              <button class="actionButton" on:click={cancelFriendshipRequestById}>
+                <img class="btnImage" src={deleteIcon} alt="delete">
+              </button>
+            </li>
+            {:else if pageUser.pendingFriends.some(user => user.id.toString() === $id)}
+            <li>
+              <span>Accept invitation</span>
+              <div class="actions">
+                <button class="actionButton" on:click={acceptFriendshipRequestById}>
+                  <img class="btnImage" src={acceptIcon} alt="delete">
+                </button>
+                <button class="actionButton" on:click={dismissFriendshipRequestById}>
+                  <img class="btnImage" src={deleteIcon} alt="delete">
+                </button>
+              </div>
+            </li>
+            {:else}
+            <li>
+              <button class="actionButton" on:click={requestFriendship}>
+                <img class="btnImage" src={acceptIcon} alt="delete">
+              </button>
+            </li>
+            {/if}
+
+            <li>
+              <span>Block this user: </span>
+              <button class="actionButton" on:click={blockUser}>
+                <img class="btnImage" src={deleteIcon} alt="delete">
+              </button>
+            </li>
+
+          </ul>
+        </div>
       {/if}
 
     </div>
@@ -206,75 +252,111 @@
 
 
 
-  <style>
+<style>
+
+  .component {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    background-color: var(--black);
+  }
+
+  .user-panel {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 2fr 3fr;
+    background-color: var(--grey);
+    border-left: solid 1px var(--lite-grey);
+    border-right: solid 1px var(--lite-grey);
+  }
 
 
-    button {
-      color: aliceblue;
-    }
+  .ctn-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .component {
-      height: 100vh;
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      background-color: var(--black);
-    }
+  .title {
+    font-size: 50px;
+    text-shadow: 0 0 20px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.5px;
+    color: var(--pink);
+  }
 
-    .user-panel {
-      height: 100%;
-      display: flex;
-      justify-content: space-around;
-      flex-direction: column;
-      align-items: center;
-      background-color: var(--grey);
-      border: solid 1px var(--lite-grey);
-      border-top-width: 0;
-      border-bottom-width: 0;
+  .ctn-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    }
+  .image {
+    position: relative;
+    pointer-events: none;
+    background-color: var(--grey);
+    border-radius: var(--imageRadius);
+    height: 200px;
+    width: 200px;
+    position: relative;
+    pointer-events: none;
+    border: solid 6px var(--lite-grey);
+  }
 
-    .user-panel .title {
-      font-size: 50px;
-      text-shadow: 0 0 20px;
-      font-family: 'Courier New', Courier, monospace;
-      letter-spacing: 0.5px;
-      color: var(--pink);
-    }
+  .ctn-action {
+    display: grid;
+    align-items: end;
+  }
 
-    .user-panel .image-button {
-      position: relative;
-      pointer-events: none;
-      background-color: var(--grey);
-      border: none;
-    }
-    .user-panel .image-button .image {
-      border-radius: var(--imageRadius);
-      height: 200px;
-      width: 200px;
-      position: relative;
-      pointer-events: none;
-      border: solid 6px var(--lite-grey);
-    }
 
-    .user-panel .username-button {
-      position: relative;
-      pointer-events: none;
-    }
+  .ctn-action li{
+    height: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--lite-lite-grey);
+  }
 
-    .user-panel .username-button .username {
-      font-size: 50px;
-      color: var(--white);
+  .ctn-action li:nth-child(2n + 1){
+    background-color: var(--lite-grey);
+  }
 
-    }
+  .ctn-action li :first-child{
+    display: flex;
+  }
 
-    .user-panel .logout, .user-panel .parameter {
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 5%;
+    gap: 5px;
+  }
+
+  .actionButton {
+    background-color: var(--white);
+    border: solid 2px black;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+
+  .user-panel .logout, .user-panel .parameter {
     color: var(--white);
-    }
+  }
 
-    .second-panel {
-      grid-column: 2 / 3;
-      background-color: var(--grey);
-      overflow-y: auto;
-    }
 
-  </style>
+
+
+  .second-panel {
+    grid-column: 2 / 3;
+    background-color: var(--grey);
+    overflow-y: auto;
+  }
+
+</style>

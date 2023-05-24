@@ -16,8 +16,8 @@
     import Login from "./routes/Login.svelte";
 
     const menuItems = [
-      { label: 'Home', icon: homeIcon, link: '#/Menu'},
-      { label: 'Channel', icon: channelIcon, link: '#/Channel'},
+      // { label: 'Home', icon: homeIcon, link: '#/Menu'},
+      // { label: 'Channel', icon: channelIcon, link: '#/Channel'},
       { label: 'Messages', icon: messageIcon, link: '#/Message' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
       { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
@@ -28,7 +28,6 @@
     async function getProfile() {
       try {
         let response = await axios.get('/auth/whoami');
-        // let response = await axios.get('/users/gefaivre');
         user.set(response.data)
         console.log($user)
         logged.set('true')
