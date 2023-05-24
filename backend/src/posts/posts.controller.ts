@@ -40,7 +40,7 @@ export class PostsController {
     return this.postsService.remove(id);
   }
 
-  @Get('/channel/:id')
+  @Get('channel/:id')
   findByChannel(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.findByChannel(id)
   }
