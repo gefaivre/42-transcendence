@@ -56,7 +56,7 @@
       this.posx = this.posx + this.dirx * this.speed;
       this.posy = this.posy + this.diry * this.speed;
 
-      if (this.posy - this.radius <= 0 || 
+      if (this.posy - this.radius <= 0 ||
           this.posy + this.radius >= this.frame.height)
         this.diry = -this.diry;
     }
@@ -95,7 +95,7 @@
       this.width = frame.width / 50;
       this.speed = PADDLE_SPEED;
 
-      if (left) {
+      if (left === true) {
         this.posx = 0.01 * frame.width;
       } else {
         this.posx = frame.width - this.width - 0.01 * frame.width;

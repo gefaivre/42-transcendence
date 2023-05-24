@@ -292,8 +292,8 @@ async function main() {
 
   // Adding your user to the list
   console.log("Adding your user to the list")
-  let user = await getUser(yourUsername)
-  if (user)
+  const user = await getUser(yourUsername)
+  if (user !== null)
     tab.push(user)
   else
   {

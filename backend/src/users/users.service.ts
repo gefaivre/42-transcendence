@@ -16,7 +16,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
 
-    if (await this.findByUsername(createUserDto.username) != null)
+    if (await this.findByUsername(createUserDto.username) !== null)
       return null
 
       // Create User

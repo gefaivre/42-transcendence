@@ -33,7 +33,7 @@ export class PongService {
   async addUser(socketId: string, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
-    if (user) {
+    if (user !== null) {
       this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId })
       return user.username;
     }
@@ -42,7 +42,7 @@ export class PongService {
   async removeUser(socketId: string) : Promise<string | undefined> {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
 
-    if (user) {
+    if (user !== undefined) {
       const room : string | undefined = await this.removeUserFromRoom(user);
       return room;
     }
@@ -52,10 +52,10 @@ export class PongService {
   handleRequestGame(socketId: string, friend: string | undefined): string | undefined {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
 
-    if (user) {
-      if (friend) {
+    if (user !== undefined) {
+      if (friend !== undefined) {
         const room : Room | undefined = this.rooms.find(room => room.player1.username === friend);
-        if (room) {
+        if (room !== undefined) {
           room.player2 = user;
           room.start = true;
           return room.id;
@@ -65,7 +65,7 @@ export class PongService {
         return undefined;
       } else {
         const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true);
-        if (room) {
+        if (room !== undefined) {
           room.player2 = user;
           room.start = true;
           return room.id;
@@ -81,9 +81,9 @@ export class PongService {
   cancelRequest(socketId: string) {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
 
-    if (user) {
+    if (user !== undefined) {
       const room: Room | undefined = this.rooms.find(room => room.player1 === user);
-      if (room) {
+      if (room !== undefined) {
           const toDelete: number = this.rooms.indexOf(room);
           this.rooms.splice(toDelete, 1);
       }
@@ -95,7 +95,7 @@ export class PongService {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
     const room: Room | undefined = this.rooms.find(room => room.id === game.gameName);
 
-    if (room && user) {
+    if (room !== undefined && user !== undefined) {
       room.watchers.push(user);
       return room.id;
     }
@@ -104,8 +104,8 @@ export class PongService {
 
   async removeUserFromRoom(user: PongUser) : Promise<string | undefined> {
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
-    if (room) {
-      if (room.start) {
+    if (room !== undefined) {
+      if (room.start === true) {
         await this.registerMatch(room, user);
         const toDelete: number = this.rooms.indexOf(room)
         this.rooms.splice(toDelete, 1);
@@ -137,7 +137,7 @@ export class PongService {
   getGamesState(): GameStateDto[] {
     const gamesStateDto: GameStateDto[] = [];
     this.rooms.forEach(room => {
-      if (room.start) {
+      if (room.start === true) {
         let result = room.game.loop();
         gamesStateDto.push({ id: room.id, state: room.game.getState() });
         if (JSON.stringify(result) !== '{}')
@@ -151,7 +151,7 @@ export class PongService {
     let roomList: RoomDto[] = [];
 
     this.rooms.forEach(room => {
-      if (room.start)
+      if (room.start === true)
         roomList.push({roomId: room.id, player1: room.player1.username, player2: room.player2!.username});
     });
     return roomList;
@@ -171,15 +171,15 @@ export class PongService {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
 
-    if (room) {
+    if (room !== undefined) {
       if (key === 'w' || key === 'ArrowUp') {
         if (room.player1 === user) {
-          if (pressed)
+          if (pressed === true)
             room.game.leftPaddle.moveUp();
           else
             room.game.leftPaddle.stop();
         } else {
-          if (pressed)
+          if (pressed === true)
             room.game.rightPaddle.moveUp();
           else
             room.game.rightPaddle.stop();
@@ -187,12 +187,12 @@ export class PongService {
       }
       if (key === 's' || key === 'ArrowDown') {
         if (room.player1 === user) {
-          if (pressed)
+          if (pressed === true)
             room.game.leftPaddle.moveDown();
           else
             room.game.leftPaddle.stop();
         } else {
-          if (pressed)
+          if (pressed === true)
             room.game.rightPaddle.moveDown();
           else
             room.game.rightPaddle.stop();
@@ -203,7 +203,7 @@ export class PongService {
 
   getWinner(roomId: string) : string {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
-    if (room) {
+    if (room !== undefined) {
       if (room.game.leftScore === 10)
         return room.player1.socketId;
       else
@@ -214,7 +214,7 @@ export class PongService {
 
   getLoser(roomId: string) : string {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
-    if (room) {
+    if (room !== undefined) {
       if (room.game.leftScore === 10)
         return room.player2!.socketId;
       else
@@ -225,13 +225,13 @@ export class PongService {
 
   getUsername(socketId: string) : string  | undefined {
     const user: PongUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
-    if (user)
+    if (user !== undefined)
       return user.username;
   }
 
   getRoomPlayers(roomId: string) : { player1: string; player2: string } | undefined {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
-    if (room && room.player2) {
+    if (room !== undefined && room.player2 !== undefined) {
       return { player1: room.player1.username, player2: room.player2.username }
     }
   }
@@ -240,7 +240,7 @@ export class PongService {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserPongUser.prismaId);
     const winner: Omit<User, 'password'> | null  = await this.users.findById(room.player2!.prismaId);
 
-    if (loser && winner) {
+    if (loser !== null && winner !== null) {
       const R1: number = 10 ** (loser.mmr / 400);
       const R2: number = 10 ** (winner.mmr / 400);
 
