@@ -8,12 +8,12 @@ import * as OTPAuth from "otpauth";
 @Injectable()
 export class AuthService {
 
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwt: JwtService) {}
 
   // TODO: rename and typedef argument
   login(user: any) {
     const payload = { sub: user.id };
-    return this.jwtService.sign(payload)
+    return this.jwt.sign(payload)
   }
 
   async getFortyTwoAccessToken(code: string) {
@@ -41,11 +41,11 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    return this.jwtService.verify(token, {secret:  jwtConstants.secret, ignoreExpiration: true });
+    return this.jwt.verify(token, {secret:  jwtConstants.secret, ignoreExpiration: true });
   }
 
   decode(jwt: string) {
-    return this.jwtService.decode(jwt)
+    return this.jwt.decode(jwt)
   }
 
   // Step 1/2 to enable 2FA

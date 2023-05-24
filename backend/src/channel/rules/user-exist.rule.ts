@@ -7,16 +7,18 @@ import { ChannelService } from "../channel.service";
 @Injectable()
 export class UserExist implements ValidatorConstraintInterface {
 
-  constructor(private readonly usersService: UsersService,
-    private readonly channelService: ChannelService) {}
+  constructor(
+    private readonly users: UsersService,
+    private readonly channel: ChannelService
+  ) {}
 
   async validate(userId: number): Promise<boolean> {
 
-    const channel = await this.channelService.findByName('aaaaaa')
+    const channel = await this.channel.findByName('aaaaaa')
     console.log('channel', channel)
 
     console.log('validate user exist')
-    const user = await this.usersService.findById(userId)
+    const user = await this.users.findById(userId)
     return user !== null
   }
 

@@ -1,5 +1,5 @@
 export class PongUser {
-  clientId: string;
-  id: number;
+  prismaId: number;
+  socketId: string;
   username: string;
 }

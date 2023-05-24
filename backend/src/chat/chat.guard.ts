@@ -16,9 +16,9 @@ export class ChatGuard implements CanActivate {
   private readonly logger: Logger = new Logger(ChatGuard.name, { timestamp: true })
 
   constructor(
-    private readonly chatService: ChatService,
-    private readonly channelService: ChannelService,
-    private readonly usersService: UsersService
+    private readonly chat: ChatService,
+    private readonly channel: ChannelService,
+    private readonly users: UsersService
   ) {}
 
   // yes, the exact same function is also defined into `chat.gateway.ts`
@@ -31,7 +31,7 @@ export class ChatGuard implements CanActivate {
 
     const handler: string = context.getHandler().name
     const client: Socket = context.switchToWs().getClient<Socket>()
-    const user: ChatUser | undefined = this.chatService.getUserBySocketId(client.id)
+    const user: ChatUser | undefined = this.chat.getUserBySocketId(client.id)
 
     // yes, this is a `lifecycleHookFailure()` doppelganger even if we not into a lifecycle hook
     if (user === undefined) {
@@ -43,24 +43,24 @@ export class ChatGuard implements CanActivate {
 
       // verify channel existence
       const channel: ChannelDto = context.getArgByIndex(1)
-      if (await this.channelService.findByName(channel.channelName) === null)
+      if (await this.channel.findByName(channel.channelName) === null)
         this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(channel.channelName, user.prismaId)
+      const isInChannel: boolean = await this.channel.isInChannel(channel.channelName, user.prismaId)
       if (isInChannel === true)
         this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.UserAlreadyJoined)
 
       // verify channel password
       else if (channel.status === 'Protected') {
-        if (await this.chatService.verifyPassword(channel.channelName, channel.password) === false) {
+        if (await this.chat.verifyPassword(channel.channelName, channel.password) === false) {
           this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.WrongChannelPassword)
         }
       }
 
       // TODO
       else if (channel.status === 'Private') {
-        if (await this.channelService.isOwner(channel.channelName, user.prismaId) === false) {
+        if (await this.channel.isOwner(channel.channelName, user.prismaId) === false) {
           this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.PrivateChannel)
         }
       }
@@ -70,11 +70,11 @@ export class ChatGuard implements CanActivate {
 
       // verify channel existence
       const room: string = context.getArgByIndex(1)
-      if (await this.channelService.findByName(room) === null)
+      if (await this.channel.findByName(room) === null)
         this.eventHandlerFailure(user, room, WsActionFailure.JoinRoom, WsFailureCause.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(room, user.prismaId)
+      const isInChannel: boolean = await this.channel.isInChannel(room, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(user, room, WsActionFailure.JoinRoom, WsFailureCause.UserNotInChannel)
     }
@@ -83,11 +83,11 @@ export class ChatGuard implements CanActivate {
 
       // verify channel existence
       const channel: string = context.getArgByIndex(1)
-      if (await this.channelService.findByName(channel) === null)
+      if (await this.channel.findByName(channel) === null)
         this.eventHandlerFailure(user, channel, WsActionFailure.LeaveChannel, WsFailureCause.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(channel, user.prismaId)
+      const isInChannel: boolean = await this.channel.isInChannel(channel, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(user, channel, WsActionFailure.LeaveChannel, WsFailureCause.UserNotInChannel)
     }
@@ -96,11 +96,11 @@ export class ChatGuard implements CanActivate {
 
       // verify channel existence
       const post: PostDto = context.getArgByIndex(1)
-      if (await this.channelService.findByName(post.channelName) === null)
+      if (await this.channel.findByName(post.channelName) === null)
         this.eventHandlerFailure(user, post.channelName, WsActionFailure.Post, WsFailureCause.ChannelNotFound)
 
       // verify channel membership
-      const isInChannel: boolean = await this.channelService.isInChannel(post.channelName, user.prismaId)
+      const isInChannel: boolean = await this.channel.isInChannel(post.channelName, user.prismaId)
       if (isInChannel === false)
         this.eventHandlerFailure(user, post.channelName, WsActionFailure.Post, WsFailureCause.UserNotInChannel)
     }
@@ -109,7 +109,7 @@ export class ChatGuard implements CanActivate {
 
       // verify recipient user existence
       const message: SendDirectMessageDto = context.getArgByIndex(1)
-      if (await this.usersService.findByUsername(message.recipient) === null)
+      if (await this.users.findByUsername(message.recipient) === null)
         this.eventHandlerFailure(user, message.recipient, WsActionFailure.DirectMessage, WsFailureCause.UserNotFound)
     }
 
