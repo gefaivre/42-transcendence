@@ -8,9 +8,9 @@ import { PongUser } from './class/PongUser';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { MatchsService } from 'src/matchs/matchs.service';
-import { GameStateDto } from './dto/game-state-dto';
-import { GameDto } from './dto/game-dto';
-import { RoomDto } from './dto/room-dto';
+import { GameStateDto } from './dto/game-state.dto';
+import { GameDto } from './dto/game.dto';
+import { RoomDto } from './dto/room.dto';
 
 @Injectable()
 export class PongService {

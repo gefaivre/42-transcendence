@@ -2,11 +2,11 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, WebSocketGat
 import { PongService } from './pong.service';
 import { Socket, Server } from 'socket.io'
 import { Interval } from '@nestjs/schedule';
-import { KeyEventDto } from './dto/key-event-dto';
-import { RequestGameDto } from './dto/request-game-dto';
-import { GameStateDto } from './dto/game-state-dto';
-import { GameDto } from './dto/game-dto';
-import { RoomDto } from './dto/room-dto';
+import { KeyEventDto } from './dto/key-event.dto';
+import { RequestGameDto } from './dto/request-game.dto';
+import { GameStateDto } from './dto/game-state.dto';
+import { GameDto } from './dto/game.dto';
+import { RoomDto } from './dto/room.dto';
 
 @WebSocketGateway({
     path: '/pong',
