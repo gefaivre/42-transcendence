@@ -107,7 +107,7 @@
   }
   
   function handleKeyup(e: KeyboardEvent) {
-    if (!inGame)
+    if (inGame === false)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -117,7 +117,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (!inGame)
+    if (inGame === false)
       return ;
     if (e.key === 'w' || e.key === 's'
       || e.key === 'ArrowUp' || e.key === 'ArrowDown')

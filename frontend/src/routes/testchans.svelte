@@ -105,13 +105,13 @@ const newscrollToBottom = async (node) => {
     if (channel && channel.users && channel.users.find(user => user.id.toString() === $id))
       joinRoom()
     else {
-      if (!confirm('Join this channel ?'))
+      if (confirm('Join this channel ?') == false)
         return await pop()
       if (channel.status === 'Protected') {
         password = prompt('Enter password')
         if (password === '')
           console.error(`Unable to join channel ${channel.name}: Empty password.`)
-        if (!password)
+        if (password === null)
           return await pop()
       }
       joinChannel()

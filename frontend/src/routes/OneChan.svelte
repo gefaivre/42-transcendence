@@ -121,13 +121,13 @@ onMount(async () => {
   if (channel && channel.users && channel.users.find(user => user.id.toString() === $id))
     joinRoom()
   else {
-    if (!confirm('Join this channel ?'))
+    if (confirm('Join this channel ?') === false)
       return await pop()
     if (channel.status === 'Protected') {
       password = prompt('Enter password')
       if (password === '')
         console.error(`Unable to join channel ${channel.name}: Empty password.`)
-      if (!password)
+      if (password === null)
         return await pop()
     }
     joinChannel()
@@ -174,7 +174,7 @@ onMount(async () => {
 onDestroy(() => socket.disconnect())
 function testlink()
 {
-  if (!showsettings)
+  if (showsettings === false)
     showsettings = true;
   else
     showsettings = false;
@@ -183,7 +183,7 @@ function testlink()
 }
 function openUserSettings(_username: string)
 {
-  if (!usersettings)
+  if (usersettings === false)
     usersettings = true;
   else
     usersettings = false;

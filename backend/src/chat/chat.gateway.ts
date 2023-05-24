@@ -163,7 +163,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     const authHeader: string | undefined = client.request.headers.cookie
 
-    if (!authHeader)
+    if (authHeader === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.AuthCookieNotFound)
 
     const tokenData: any = await this.chatService.validateUser(authHeader)

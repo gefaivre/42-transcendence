@@ -17,11 +17,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     // we use prisma service instead of user service cause we want the user's password field
     const user: User | null = await this.prisma.user.findUnique({ where: { username: username }})
 
-    if (!user)
+    if (user === null)
       throw new BadRequestException("Username doesn't exist")
 
     // TODO: remove `as string`
-    if (!await bcrypt.compare(_password, user.password as string))
+    if (await bcrypt.compare(_password, user.password as string) === false)
       throw new ForbiddenException('Wrong password')
 
     // TODO: select only id field

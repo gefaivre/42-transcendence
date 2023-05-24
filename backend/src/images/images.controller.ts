@@ -20,7 +20,7 @@ export class ImagesController {
         if (request.user === undefined || request.user === null)
           return "You shall not pass";
         const directory  = `/app/images/${request.user}`
-        if (!fs.existsSync(directory))
+        if (fs.existsSync(directory) === false)
           fs.mkdirSync(directory);
         cb(null, directory);
       },

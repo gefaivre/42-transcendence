@@ -25,7 +25,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     const room: string | undefined = this.pongService.handleRequestGame(client.id, requestGameDto.friend);
-    if (!room) {
+    if (room === undefined) {
       const username: string | undefined = this.pongService.getUsername(client.id);
       if (username)
         client.join(username);
@@ -75,16 +75,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    const authHeader = client.request.headers.cookie;
+    const authHeader: string | undefined = client.request.headers.cookie;
 
-    if (!authHeader) {
+    if (authHeader === undefined) {
       this.server.to(client.id).emit('unauthorized', { user: client.id });
       console.log(`pongWebsocket: client ${client.id} is unauthorized`);
     } else {
       const tokenData = await this.pongService.validateUser(authHeader);
       const username: string | undefined = await this.pongService.addUser(client.id, tokenData);
       
-      if (!username) {
+      if (username === undefined) {
         this.server.to(client.id).emit('unauthorized', { user: client.id });
         console.log(`pongWebsocket: client ${client.id} is unauthorized`);
       } else {

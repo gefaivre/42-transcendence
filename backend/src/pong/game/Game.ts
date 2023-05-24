@@ -33,7 +33,7 @@ export class Game {
       this.leftPaddle.updatePos();
       this.rightPaddle.updatePos();
       this.handleCollision();
-      if (!(this.stop)) {
+      if (this.stop === false) {
         this.ball.updatePos();
       }
 

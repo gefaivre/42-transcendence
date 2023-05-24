@@ -12,7 +12,7 @@
   let channel: ChannelDto = {
     channelName: null,
     status: null,
-    password: ''
+    password: null
   }
 
   onMount(() => getAll())
@@ -28,7 +28,7 @@
 
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function remove(name: string) {
-    if (!window.confirm("Are you sure ?"))
+    if (window.confirm("Are you sure ?") === false)
       return
     try {
       await axios.delete(`/channel/${name}`)
@@ -40,7 +40,7 @@
 
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function removeAll() {
-    if (!window.confirm("Are you sure ?"))
+    if (window.confirm("Are you sure ?") === false)
       return
     try {
       await axios.delete(`/channel`)
@@ -51,9 +51,9 @@
   }
 
   async function create() {
-    if (!channel.channelName)
+    if (channel.channelName === null)
       return alert('Empty channel name')
-    if (!channel.status)
+    if (channel.status === null)
       return alert('Please select a status')
     if (channel.status === ChannelStatus.Protected && channel.password === '')
       return alert('Empty channel password')
@@ -66,7 +66,7 @@
     }
     channel.channelName = null
     channel.status = null
-    channel.password = ''
+    channel.password = null
   }
 
 </script>

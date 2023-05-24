@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
+import * as fs from 'fs'
 
 @Injectable()
 export class UsersService {
@@ -40,9 +41,9 @@ export class UsersService {
     {
       let internlink;
       //create dir app/images/userId/image_name
-      const fs = require('fs');
       const dir = `/app/images/${user.id}`
-      if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
+      if (fs.existsSync(dir) === false)
+        fs.mkdirSync(dir);
       internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
       this.images.downloadImage(new URL(createUserDto.image),  internlink)
       await this.prisma.image.create({

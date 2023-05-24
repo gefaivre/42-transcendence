@@ -64,7 +64,7 @@ export class ChatService {
 
   async verifyPassword(channelName: string, password: string): Promise<boolean> {
     const channel = await this.channelService.findByName(channelName)
-    if (!channel)
+    if (channel === null)
       return false
     return bcrypt.compare(password, channel.password)
   }

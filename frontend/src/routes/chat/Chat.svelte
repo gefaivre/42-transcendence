@@ -49,7 +49,7 @@
       password = prompt('Enter password')
       if (password === '')
         return console.error(`Unable to join channel ${channel.name}: Empty password.`)
-      if (!password)
+      if (password === null)
         return console.error(`Unable to join channel ${channel.name}: No password provided.`)
     }
     socket.emit('joinChannel', {
@@ -113,7 +113,7 @@
       pass = window.prompt('Enter password');
       if (pass === '')
         return alert('Empty password')
-      if (!pass)
+      if (pass === null)
         return
     } else {
       pass = ''
