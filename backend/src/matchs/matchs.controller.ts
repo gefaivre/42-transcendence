@@ -35,12 +35,12 @@ export class MatchsController {
     return this.matchsService.remove(id);
   }
 
-  @Get('/history/:userId')
+  @Get('history/:userId')
   findHistory(@Param('userId', ParseIntPipe) userId: number) {
     return this.matchsService.findHistory(userId);
   }
 
-  @Delete('/history/:userId')
+  @Delete('history/:userId')
   removeHistory(@Param('userId', ParseIntPipe) userId: number) {
     return this.matchsService.removeHistory(userId);
   }
