@@ -5,11 +5,11 @@
     import acceptIcon        from '../../assets/greenWin.png';
     import { onMount } from "svelte";
     import type { Match, User } from "../../types";
+    import { element } from "svelte/internal";
 
 
     export let pageUser;
     export let params;
-
 
     let friendspage: String = 'Friends';
 
@@ -17,9 +17,31 @@
 
     let opponent;
 
+    type Stat = {
+      lostGames: number
+      wonGames: number
+      totalGames: number
+      ratioGames: number
+      mmr: {mmr: number, date: Date}[] | null
+      averageWin: {score: number, opponentScore: number}
+      averageLose: {score: number, opponentScore: number}
+      nbrOfFriends: number
+    }
+
+    let statistics: Stat = {
+      lostGames: 0,
+      wonGames: 0,
+      totalGames: 0,
+      ratioGames: 0,
+      mmr: null,
+      averageWin:   {score: 0 , opponentScore: 0},
+      averageLose: {score: 0, opponentScore: 0},
+      nbrOfFriends: 0,
+    };
+
+
 
     $: onMount(() => reload())
-
 
     async function reload() {
       getUser();
@@ -44,21 +66,43 @@
       return (await axios.get(`/users/${params.name}`)).data
     }
 
-    async function getMatch(){
-      matchHistory = (await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`, { withCredentials: true })).data
-      console.log(matchHistory)
+    async function selectprofile() {
+      if (params.name != $user.username)
+      {
+        console.log("changement de uesr")
+        pageUser = await getprofile();
+        console.log(pageUser)
+      }
+      else
+      pageUser = $user;
     }
 
-    async function selectprofile() {
-    if (params.name != $user.username)
-    {
-    console.log("changement de uesr")
-    pageUser = await getprofile();
-    console.log(pageUser)
+    async function getMatch(){
+      try {
+        let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`, { withCredentials: true })
+        matchHistory = response.data;
+        calculStatistics()
+
+      } catch (e) {
+        console.log(e);
+      }
     }
-    else
-    pageUser = $user;
+
+    async function calculStatistics() {
+      let rankedMatch = matchHistory.filter(match => match.ranked === true)
+
+      statistics.wonGames = rankedMatch.filter(match => match.winnerId == pageUser.id).length;
+      statistics.lostGames = rankedMatch.filter(match => match.winnerId != pageUser.id).length;
+      statistics.totalGames = rankedMatch.length;
+      statistics.ratioGames = +(statistics.wonGames / statistics.totalGames * 100).toFixed(2);
+      statistics.averageWin.score = +(rankedMatch.filter(match => match.winnerId === pageUser.id).reduce((sum, match) => sum + match.winnerScore, 0) / statistics.wonGames).toFixed(2);
+      statistics.averageWin.opponentScore = +(rankedMatch.filter(match => match.winnerId === pageUser.id).reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+      statistics.averageLose.score = +(rankedMatch.filter(match => match.winnerId != pageUser.id).reduce((sum, match) => sum + match.loserScore, 0) / statistics.lostGames).toFixed(2);
+      statistics.averageLose.opponentScore = +(rankedMatch.filter(match => match.winnerId != pageUser.id).reduce((sum, match) => sum + match.winnerScore, 0) / statistics.lostGames).toFixed(2);
+
+      console.log(statistics);
     }
+    // <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATIO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
 
     async function getUsernameById(id: number) {
       try {
@@ -254,7 +298,34 @@
 
     <div class="box-info statistics">
       <h1>Statistics</h1>
-      <div class="overflow">
+      <div class="stat-grid">
+
+        <div class="tiles">
+          <h2>Total games</h2>
+           <span>{statistics.totalGames}</span>
+        </div>
+        <div class="tiles lite">
+          <h2>Won games</h2>
+          <span>{statistics.wonGames}</span>
+        </div>
+        <div class="tiles lite">
+          <h2>Lost games</h2>
+          <span>{statistics.lostGames}</span>
+        </div>
+        <div class="tiles">
+          <h2>Ratio</h2>
+          <span>{statistics.ratioGames}</span>
+        </div>
+        <div class="tiles">
+          <h2>Average win</h2>
+          <span>{statistics.averageWin.score} - {statistics.averageWin.opponentScore}</span>
+        </div>
+        <div class="tiles lite">
+          <h2>Average lose</h2>
+          <span>{statistics.averageLose.score} - {statistics.averageLose.opponentScore}</span>
+        </div>
+
+
         <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
       </div>
     </div>
@@ -412,6 +483,21 @@
     background-color: #15db36;
     border-radius: 50%;
     border: solid 1px black;
+  }
+
+  .stat-grid {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+  }
+
+  .stat-grid .lite {
+    background-color: var(--lite-lite-grey);
+  }
+
+  .stat-grid .tiles h2 {
+    text-align: center;
   }
 
 
