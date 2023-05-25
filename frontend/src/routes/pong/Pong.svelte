@@ -4,6 +4,7 @@
   import axios  from "axios";
   import Game from "./Game.svelte";
   import type { GameState } from "./Class";
+  import type { WsException } from "../../types";
 
   class Match {
     player1: string;
@@ -82,6 +83,10 @@
         inGame = false
     });
 
+    socket.on('exception', (e: WsException) => {
+      alert(e.message)
+    })
+
     return ()=> {
       socket.close();
     };
@@ -142,8 +147,9 @@
     for (let field of formData) {
       const [key, value] = field;
       if (key === 'friend' && value) {
-        socket.emit('requestGame', { friend: value });
-        gameRequest = true;
+        socket.emit('requestGame', { friend: value }, (response: string) => {
+          gameRequest = true
+        });
       }
     }
   }

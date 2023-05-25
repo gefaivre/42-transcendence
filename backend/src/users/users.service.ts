@@ -399,4 +399,38 @@ export class UsersService {
     })
   }
 
+  async isBlocked(id: number, username: string) {
+    const blocked = await this.prisma.user.findFirst({
+      where: {
+        id: id
+      },
+      select: {
+        blocked: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    const usernames: string[] = blocked!.blocked.map((blocked: any) => blocked.username)
+    return usernames.some((_username: string) => _username === username)
+  }
+
+  async isBlockedBy(id: number, username: string) {
+    const blockedBy = await this.prisma.user.findFirst({
+      where: {
+        id: id
+      },
+      select: {
+        blockedBy: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    const usernames: string[] = blockedBy!.blockedBy.map((blocked: any) => blocked.username)
+    return usernames.some((_username: string) => _username === username)
+  }
+
 }

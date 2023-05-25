@@ -229,6 +229,10 @@ export class PongService {
       return user.username;
   }
 
+  getUserBySocketId(id: string) {
+    return this.pongUsers.find(user => user.socketId === id)
+  }
+
   getRoomPlayers(roomId: string) : { player1: string; player2: string } | undefined {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
     if (room !== undefined && room.player2 !== undefined) {
