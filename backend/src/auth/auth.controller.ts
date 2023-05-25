@@ -122,13 +122,11 @@ export class AuthController {
     return request.user;
   }
 
+  // TODO: move into user controller
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
-  async getUser(@Req() request: any) { // Set to async for the console.log(user) (await)
-    const whoami = request.user;
-    let user = await  this.users.findById(whoami?.id)
-    console.log(user);
-    return user;
+  async whoami(@Req() request: any) {
+    return await this.users.findById(request.user.id)
   }
 
   // Step 1/2 to enable 2FA

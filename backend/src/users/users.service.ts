@@ -91,6 +91,18 @@ export class UsersService {
             username: true
           }
         },
+        blocked: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blockedBy: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
       }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
@@ -130,6 +142,18 @@ export class UsersService {
           }
         },
         friendOf: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blocked: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blockedBy: {
           select: {
             id: true,
             username: true
@@ -347,6 +371,32 @@ export class UsersService {
         },
       },
     });
+  }
+
+  async blockByUsername(id: number, username: string) {
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        blocked: {
+          connect: [{ username: username }]
+        }
+      }
+    })
+  }
+
+  async unblockByUsername(id: number, username: string) {
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        blocked: {
+          disconnect: [{ username: username }]
+        }
+      }
+    })
   }
 
 }
