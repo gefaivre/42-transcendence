@@ -14,7 +14,6 @@ export class PostsService {
         content: createPostDto.content,
         authorId: createPostDto.authorId,
         channelId: createPostDto.channelId,
-        date: createPostDto.date
       }
     });
   }

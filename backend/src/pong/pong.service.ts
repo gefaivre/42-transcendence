@@ -119,14 +119,12 @@ export class PongService {
                                       winnerScore: room.game.rightScore,
                                       loserId: loser.prismaId,
                                       loserScore: room.game.leftScore,
-                                      date: new Date(),
                                       ranked: room.ranked })
     } else {
       await this.matchs.create({ winnerId: room.player1.prismaId,
                                       winnerScore: room.game.leftScore,
                                       loserId: loser.prismaId,
                                       loserScore: room.game.rightScore,
-                                      date: new Date(),
                                       ranked: room.ranked })
     }
   }
