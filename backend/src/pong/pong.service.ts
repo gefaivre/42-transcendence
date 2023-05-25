@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './game/Game';
 import { User } from '@prisma/client';
-import { Server } from 'socket.io';
-import { WebSocketServer } from '@nestjs/websockets';
 import { Room } from './class/Room';
 import { PongUser } from './class/PongUser';
 import { AuthService } from 'src/auth/auth.service';
@@ -15,15 +13,14 @@ import { RoomDto } from './dto/room.dto';
 @Injectable()
 export class PongService {
 
-  constructor(private readonly auth: AuthService,
-              private readonly users: UsersService,
-              private readonly matchs: MatchsService) {}
-
-  @WebSocketServer() server: Server;
+  constructor(
+    private readonly auth: AuthService,
+    private readonly users: UsersService,
+    private readonly matchs: MatchsService
+  ) {}
 
   rooms: Room[] = [];
   pongUsers: PongUser[] = [];
-
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];

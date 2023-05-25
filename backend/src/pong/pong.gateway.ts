@@ -12,20 +12,19 @@ import { PongGuard } from './pong.guard';
 import { BadRequestTransformationFilter } from './pong.filter';
 
 @WebSocketGateway({
-    path: '/pong',
-    cors: {
-        origin: 'http://localhost:8080',
-        credentials: true
-    },
+  path: '/pong',
+  cors: {
+    origin: 'http://localhost:8080',
+    credentials: true
+  },
 })
-
 @UseFilters(BadRequestTransformationFilter)
 @UseGuards(PongGuard)
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
   constructor(private readonly pong: PongService) {}
 
   @WebSocketServer() server: Server;
-
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
