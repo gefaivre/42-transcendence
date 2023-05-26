@@ -7,7 +7,10 @@
   import type { Match, Stat, User } from "../../types";
 
   export let pageUser;
+
   export let params;
+
+  const name2 = params.name;
 
   let friendspage: String = "Friends";
 
@@ -26,48 +29,30 @@
     nbrOfFriends: 0,
   };
 
-  $: onMount(() => selectprofile() && getMatch());
-
-  async function reload() {
-    getUser();
-    selectprofile();
-    getMatch();
-  }
-
-  async function getUser() {
-    try {
-      let response = await axios.get("http://localhost:3000/auth/whoami", {
-        withCredentials: true,
-      });
-      user.set(response.data);
-      console.log($user);
-      logged.set("true");
-      id.set(response.data.id.toString());
-    } catch (error) {
-      logged.set("false");
-      id.set("0");
+  $: {
+    const { newName } = params.name;
+    if (newName !== name) {
+      getMatch()
     }
   }
 
-  async function getprofile(): Promise<User> {
-    return (await axios.get(`/users/${params.name}`)).data;
-  }
+  // $: {
+  //   const { newName2 } = params.name;
+  //   if (newName2 !== name2) {
+  //     getMatch();
+  //   }
+  // }
 
-  async function selectprofile() {
-    if (params.name != $user.username) {
-      console.log("changement de uesr");
-      pageUser = await getprofile();
-      console.log(pageUser);
-    } else pageUser = $user;
-  }
 
   async function getMatch() {
+    console.log("TESSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTT")
     try {
       let response = await axios.get(
         `http://localhost:3000/matchs/history/${pageUser.id}`,
         { withCredentials: true }
       );
       matchHistory = response.data;
+      console.log(matchHistory);
       calculStatistics();
     } catch (e) {
       console.log(e);

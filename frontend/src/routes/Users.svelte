@@ -157,7 +157,7 @@
       <div class="ctn-title">
         <h1 class="title">{pageUser.username}</h1>
       </div>
-      
+
       <div class="ctn-image">
         <img
           class="image"
