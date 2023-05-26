@@ -1,33 +1,33 @@
 <script lang="ts">
 
-    import axios from "../axios.config";
-    import { onMount } from "svelte";
-    import { logged } from "../stores";
+		import axios from "../axios.config";
+		import { onMount } from "svelte";
+		import { logged } from "../stores";
 
-    // TODO: get rid of unused `User` fields
-    let users = []
+		// TODO: get rid of unused `User` fields
+		let users = []
 
-    onMount(() => getUsers())
+		onMount(() => getUsers())
 
-    async function getUsers () {
-      try {
-        users = (await axios.get('/users')).data
-        console.log(users)
-        sortByMMR()
-      } catch (error) {
-        console.log(error.response.data.messsage)
-      }
-    }
+		async function getUsers () {
+			try {
+				users = (await axios.get('/users')).data
+				console.log(users)
+				sortByMMR()
+			} catch (error) {
+				console.log(error.response.data.messsage)
+			}
+		}
 
-    function sortByMMR () {
-      users.sort((a,b) => b.mmr - a.mmr)
-      users = users // svelte reload
-    }
+		function sortByMMR () {
+			users.sort((a,b) => b.mmr - a.mmr)
+			users = users // svelte reload
+		}
 
-    function sortByGames () {
-      users.sort((a,b) => b.games - a.games)
-      users = users // svelte relaod
-    }
+		function sortByGames () {
+			users.sort((a,b) => b.games - a.games)
+			users = users // svelte relaod
+		}
 
 </script>
 
@@ -46,7 +46,7 @@
 						</tr>
 				</thead>
 				<tbody>
-            {#each users as user, i}
+						{#each users as user, i}
 						<tr>
 								<td>{i + 1}</td>
 								<td >
@@ -79,12 +79,12 @@
 	}
 
 	td, th {
-    border: 1px solid rgb(190, 190, 190);
+		border: 1px solid rgb(190, 190, 190);
 		padding: 10px;
 	}
 
 	tr:nth-child(even) {
-    background-color: #eee;
+		background-color: #eee;
 	}
 
 	.clickable {

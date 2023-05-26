@@ -4,8 +4,7 @@
     import deleteIcon        from '../../assets/redLose.png';
     import acceptIcon        from '../../assets/greenWin.png';
     import { onMount } from "svelte";
-    import type { Match, User } from "../../types";
-    import { element } from "svelte/internal";
+    import type { Match, Stat, User } from "../../types";
 
 
     export let pageUser;
@@ -17,17 +16,6 @@
 
     let opponent;
 
-    type Stat = {
-      lostGames: number
-      wonGames: number
-      totalGames: number
-      ratioGames: number
-      mmr: {mmr: number, date: Date}[] | null
-      averageWin: {score: number, opponentScore: number}
-      averageLose: {score: number, opponentScore: number}
-      nbrOfFriends: number
-    }
-
     let statistics: Stat = {
       lostGames: 0,
       wonGames: 0,
@@ -38,8 +26,6 @@
       averageLose: {score: 0, opponentScore: 0},
       nbrOfFriends: 0,
     };
-
-
 
     $: onMount(() => reload())
 

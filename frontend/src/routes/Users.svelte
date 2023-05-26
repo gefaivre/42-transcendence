@@ -34,6 +34,7 @@
         pendingFriends: [],
         requestFriends: [],
         TwoFA: false,
+        date: null,
       }
 
       $: {
@@ -104,8 +105,7 @@
     async function removeFriendById() {
       try {
         await axios.post(`/users/friendship/acceptByName/${name}`, null)
-        getUser()
-        reload()
+        reload();
       } catch (e) {
         console.log(e)
       }
@@ -114,8 +114,7 @@
     async function dismissFriendshipRequestById() {
       try {
         await axios.post(`/users/friendship/dismissById/${pageUser.id}`, null)
-        getUser()
-        reload()
+        reload();
       } catch (e) {
         console.log(e)
       }
@@ -125,8 +124,7 @@
       try {
         const cancel = await axios.post(`/users/friendship/cancelById/${pageUser.id}`, null)
         console.log(cancel)
-        getUser()
-        reload()
+        reload();
       } catch (e) {
         console.log(e)
       }
