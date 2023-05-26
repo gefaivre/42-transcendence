@@ -35,13 +35,11 @@
   };
 
   $: {
-    const { name: newName } = params.name;
+    const { newName } = params.name;
     if (newName !== name) {
       reload();
     }
   }
-
-  $: onMount(() => reload());
 
   async function reload() {
     getUser();
@@ -70,19 +68,9 @@
 
   async function selectprofile() {
     if (params.name != $user.username) {
-      console.log("changement de uesr");
       pageUser = await getprofile();
       console.log(pageUser);
     } else pageUser = $user;
-  }
-
-  async function requestFriendship() {
-    try {
-      await axios.post(`/users/friendship/request/${pageUser.id}`, null);
-      reload();
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   async function logout() {
@@ -90,6 +78,15 @@
       await axios.get("/auth/logout");
       logged.set("false");
       id.set("0");
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function requestFriendship() {
+    try {
+      await axios.post(`/users/friendship/request/${pageUser.id}`, null);
+      reload();
     } catch (e) {
       console.log(e);
     }
@@ -160,7 +157,7 @@
       <div class="ctn-title">
         <h1 class="title">{pageUser.username}</h1>
       </div>
-
+      
       <div class="ctn-image">
         <img
           class="image"
@@ -175,10 +172,7 @@
             <li>
               <span>settings</span>
               <div class="actions">
-                <button
-                  class="actionButton"
-                  on:click={() => (settings = !settings)}
-                >
+                <button class="actionButton" on:click={() => (settings = !settings)}>
                   <img class="btnImage" src={acceptIcon} alt="delete" />
                 </button>
               </div>
@@ -209,10 +203,7 @@
               <li>
                 <span>Pending friend invitation...</span>
                 <div class="actions">
-                  <button
-                    class="actionButton"
-                    on:click={cancelFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={cancelFriendshipRequestById}>
                     <img class="btnImage" src={deleteIcon} alt="delete" />
                   </button>
                 </div>
@@ -221,16 +212,10 @@
               <li>
                 <span>Accept invitation</span>
                 <div class="actions">
-                  <button
-                    class="actionButton"
-                    on:click={acceptFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={acceptFriendshipRequestById}>
                     <img class="btnImage" src={acceptIcon} alt="delete" />
                   </button>
-                  <button
-                    class="actionButton"
-                    on:click={dismissFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={dismissFriendshipRequestById}>
                     <img class="btnImage" src={deleteIcon} alt="delete" />
                   </button>
                 </div>

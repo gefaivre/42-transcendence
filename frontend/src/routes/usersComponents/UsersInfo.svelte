@@ -26,7 +26,7 @@
     nbrOfFriends: 0,
   };
 
-  $: onMount(() => reload());
+  $: onMount(() => selectprofile() && getMatch());
 
   async function reload() {
     getUser();
@@ -77,41 +77,18 @@
   async function calculStatistics() {
     let rankedMatch = matchHistory.filter((match) => match.ranked === true);
 
-    statistics.wonGames = rankedMatch.filter(
-      (match) => match.winnerId == pageUser.id
-    ).length;
-    statistics.lostGames = rankedMatch.filter(
-      (match) => match.winnerId != pageUser.id
-    ).length;
+    statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
+    statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
     statistics.totalGames = rankedMatch.length;
-    statistics.ratioGames = +(
-      (statistics.wonGames / statistics.totalGames) *
-      100
-    ).toFixed(2);
-    statistics.averageWin.score = +(
-      rankedMatch
-        .filter((match) => match.winnerId === pageUser.id)
-        .reduce((sum, match) => sum + match.winnerScore, 0) /
-      statistics.wonGames
-    ).toFixed(2);
-    statistics.averageWin.opponentScore = +(
-      rankedMatch
-        .filter((match) => match.winnerId === pageUser.id)
-        .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames
-    ).toFixed(2);
-    statistics.averageLose.score = +(
-      rankedMatch
-        .filter((match) => match.winnerId != pageUser.id)
-        .reduce((sum, match) => sum + match.loserScore, 0) /
-      statistics.lostGames
-    ).toFixed(2);
-    statistics.averageLose.opponentScore = +(
-      rankedMatch
-        .filter((match) => match.winnerId != pageUser.id)
-        .reduce((sum, match) => sum + match.winnerScore, 0) /
-      statistics.lostGames
-    ).toFixed(2);
-
+    statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
+    statistics.averageWin.score = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
+    statistics.averageWin.opponentScore = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+    statistics.averageLose.score = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
+    statistics.averageLose.opponentScore = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
     console.log(statistics);
   }
   // <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATIO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
@@ -121,7 +98,6 @@
       let response = await axios.get(`http://localhost:3000/users/id/${id}`, {
         withCredentials: true,
       });
-      console.log(response.data.username);
       return response.data.username;
     } catch (e) {
       console.log(e);
@@ -443,19 +419,13 @@
       <div class="tiles">
         <h2>Average win</h2>
         <div class="value">
-          <span
-            >{statistics.averageWin.score}-{statistics.averageWin
-              .opponentScore}</span
-          >
+          <span>{statistics.averageWin.score}-{statistics.averageWin.opponentScore}</span>
         </div>
       </div>
       <div class="tiles lite">
         <h2>Average lose</h2>
         <div class="value">
-          <span
-            >{statistics.averageLose.score}-{statistics.averageLose
-              .opponentScore}</span
-          >
+          <span>{statistics.averageLose.score}-{statistics.averageLose.opponentScore}</span>
         </div>
       </div>
       <div class="chart">
