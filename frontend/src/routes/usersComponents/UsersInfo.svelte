@@ -327,27 +327,42 @@
 
         <div class="tiles">
           <h2>Total games</h2>
-           <span>{statistics.totalGames}</span>
+          <div class="value">
+            <span>{statistics.totalGames}</span>
+          </div>
         </div>
         <div class="tiles lite">
           <h2>Won games</h2>
-          <span>{statistics.wonGames}</span>
+          <div class="value">
+            <span>{statistics.wonGames}</span>
+          </div>
         </div>
         <div class="tiles lite">
           <h2>Lost games</h2>
-          <span>{statistics.lostGames}</span>
+          <div class="value">
+            <span>{statistics.lostGames}</span>
+          </div>
         </div>
         <div class="tiles">
           <h2>Ratio</h2>
-          <span>{statistics.ratioGames}</span>
+          <div class="value">
+            <span>{statistics.ratioGames}</span>
+          </div>
         </div>
         <div class="tiles">
           <h2>Average win</h2>
-          <span>{statistics.averageWin.score} - {statistics.averageWin.opponentScore}</span>
+          <div class="value">
+            <span>{statistics.averageWin.score}-{statistics.averageWin.opponentScore}</span>
+          </div>
         </div>
         <div class="tiles lite">
           <h2>Average lose</h2>
-          <span>{statistics.averageLose.score} - {statistics.averageLose.opponentScore}</span>
+          <div class="value">
+            <span>{statistics.averageLose.score}-{statistics.averageLose.opponentScore}</span>
+          </div>
+        </div>
+        <div class="chart">
+          <span>chart</span>
         </div>
 
 
@@ -517,16 +532,47 @@
     grid-template-rows: 1fr 1fr 1fr;
   }
 
-  .stat-grid .lite {
+  .stat-grid .tiles:last-child {
+    border-radius: 0 0 30px 0;
+  }
+
+  .stat-grid  .lite {
     background-color: var(--lite-lite-grey);
   }
 
+  .stat-grid .tiles {
+    position: relative;
+  }
+
   .stat-grid .tiles h2 {
+    position: absolute;
     text-align: center;
+    color: var(--lite-lite-lite-grey);
+  }
+
+  .stat-grid .tiles .value {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stat-grid .tiles .value span {
+    font-size: 3em;
   }
 
 
-  @media screen and (max-width: 1150px) {
+
+
+
+
+
+
+
+
+
+
+  @media screen and (max-width: 1200px) {
     .info-container {
       grid-template-columns: 1fr;
       grid-template-rows: 1fr, 1fr, 1fr;
