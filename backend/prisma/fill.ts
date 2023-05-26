@@ -189,7 +189,6 @@ async function createMatchrelation(user1: number, user2: number) {
       winnerScore: 10,
       loserId: tab[loser].id,
       loserScore: loserScore,
-      date: new Date(),
       ranked: rankedCoin,
     },
   })
@@ -238,8 +237,7 @@ async function getUser(name: string) {
 }
 
 async function createUser() {
-  let user: User;
-  user = await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       username: randomUsername(),
       password: '',
@@ -250,7 +248,7 @@ async function createUser() {
           name: "default",
           link: "/app/images/basic_pp.jpg",
         }
-      }
+      },
     },
     include: {
       pendingFriends: {
