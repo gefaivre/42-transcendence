@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './game/Game';
 import { User } from '@prisma/client';
-import { Room } from './class/Room';
+import { Room } from './types/Room';
 import { WsUser } from 'src/types';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';

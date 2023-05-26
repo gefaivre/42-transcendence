@@ -13,7 +13,7 @@ import { PostsService } from 'src/posts/posts.service';
 import { SendDirectMessageDto } from './dto/send-direct-message.dto';
 import { DirectMessageService } from './dm.service';
 import { UsersService } from 'src/users/users.service';
-import { CreateDirectMessage } from './class/CreateDirectMessage';
+import { CreateDirectMessage } from './types/CreateDirectMessage';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
