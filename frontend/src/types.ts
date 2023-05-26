@@ -84,3 +84,14 @@ export type Match = {
   date:       Date
   ranked:     Boolean
 }
+
+export type Stat = {
+  lostGames: number
+  wonGames: number
+  totalGames: number
+  ratioGames: number
+  mmr: {mmr: number, date: Date}[] | null
+  averageWin: {score: number, opponentScore: number}
+  averageLose: {score: number, opponentScore: number}
+  nbrOfFriends: number
+}

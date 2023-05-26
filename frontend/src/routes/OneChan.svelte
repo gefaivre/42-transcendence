@@ -1,5 +1,4 @@
 <script lang=ts>
-  import Layout from "./Layout.svelte";
   import axios from "../axios.config";
   import { onMount, onDestroy, afterUpdate} from "svelte";
   import ChanMenu from "./chanLayouts.svelte";
