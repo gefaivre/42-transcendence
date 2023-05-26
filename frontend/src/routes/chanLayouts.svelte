@@ -4,20 +4,20 @@
     import axios from "../axios.config";
     import { onMount } from "svelte";
     import { logged } from "../stores";
-    
+
     let chans = [];
     function redirectTo() {
     window.location.href = '/#/message/create';
   }
   onMount(async () => {
-        try {
-          const response = await axios.get('channel');
-             chans = response.data;
-             console.log(chans);
-  } catch (error) {
-    console.error(error);
-  }
-});
+    try {
+      const response = await axios.get('channel');
+      chans = response.data;
+      console.log(chans);
+    } catch (error) {
+      console.error(error);
+    }
+  });
 
   </script>
 
