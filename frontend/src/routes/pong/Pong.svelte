@@ -3,13 +3,15 @@
   import  ioClient  from 'socket.io-client';
   import axios  from "axios";
   import Game from "./Game.svelte";
-  import type { GameState } from "./Class";
+  import type { GameState, Settings } from "./Class";
   import type { WsException } from "../../types";
 
   class Match {
     player1: string;
     player2: string;
   }
+
+  let settings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
 
   let gameList: Match[] = [];
 
@@ -37,6 +39,7 @@
     socket.on('watchGame', (res) => {
       if (res.response === true) {
         currentMatch = res.players;
+        settings = res.settings;
         console.log(res);
         watch = true;
         console.log('watcherMode on');
@@ -132,7 +135,8 @@
   }
 
   function requestGame() {
-    socket.emit('requestGame', {});
+    console.log('settings', settings);
+    socket.emit('requestGame', { settings: settings });
     gameRequest = true;
   }
 
@@ -147,7 +151,7 @@
     for (let field of formData) {
       const [key, value] = field;
       if (key === 'friend' && value) {
-        socket.emit('requestGame', { friend: value }, (response: string) => {
+        socket.emit('requestGame', { friend: value, settings: settings }, () => {
           gameRequest = true
         });
       }
@@ -166,7 +170,7 @@
 
 {#if !inGame}
 
-<h2 id="title"> Pong </h2>
+<h1 id="title"> Pong </h1>
 
 {#if gameList}
   <ul id="gameList">
@@ -178,6 +182,34 @@
 
 
   {#if !gameRequest}
+  <div id="settings">
+    <h2 id="settingsTitle">Settings</h2>
+
+    <table id="settingsTable">
+
+    <tr>
+    <td align="left"><label for="ballSpeed">ball speed</label></td>
+    <td align="right"><input name="ballSpeed" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
+    </tr>
+
+    <tr>
+    <td align="left"><label for="ballSize">ball size</label></td>
+    <td align="right"><input name="ballSize" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
+    
+    <tr>
+    <td align="left"><label for="paddleSpeed">paddle speed</label></td>
+    <td align="right"><input name="paddleSpeed" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
+
+    <tr>
+    <td align="left"><label for="paddleSize">paddle size</label></td>
+    <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
+    </table>
+
+  </div>
+
   <div id="randomGame">
   <button on:click={requestGame}>request random game</button>
   </div>
@@ -193,7 +225,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:players={currentMatch} bind:update_state={update_child}></Game>
+<Game bind:gameSettings={settings} bind:players={currentMatch} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 
@@ -225,6 +257,22 @@
   font-weight: bold;
   font-size: 1.25em;
   color: var(--pink);
+}
+
+#settings {
+  margin-bottom:1em;
+}
+
+#settingsTitle {
+  font-weight:bold;
+  font-size:1.3em;
+  color:var(--pink);
+}
+
+#settingsTable {
+  font-weight:bold;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 #randomGame {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { GameState } from './Class';
+  import type { GameState, Settings } from './Class';
   import { Ball, Frame, Paddle } from './Objects'
   import { fade } from 'svelte/transition';
 
@@ -28,6 +28,7 @@
   };
 
   export let players = {player1: '', player2: ''};
+  export let gameSettings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -36,9 +37,9 @@
   let countdown: number = 3;
 
   const frame: Frame =  new Frame(600, 400);
-  const ball: Ball =  new Ball(frame); 
-  const leftPaddle: Paddle = new Paddle(true, frame); 
-  const rightPaddle: Paddle = new Paddle(false, frame); 
+  const ball: Ball =  new Ball(frame, gameSettings); 
+  const leftPaddle: Paddle = new Paddle(true, frame, gameSettings); 
+  const rightPaddle: Paddle = new Paddle(false, frame, gameSettings); 
 
   let leftScore: number = 0;
   let rightScore: number = 0;

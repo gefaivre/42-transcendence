@@ -1,3 +1,5 @@
+import { Settings } from "../types/Settings";
+
   const BALL_SPEED: number = 1.5;
   const PADDLE_SPEED: number = 2.5;
 
@@ -14,6 +16,7 @@
 
   export class Ball {
     frame: Frame;
+    settings: Settings;
     posx: number;
     posy: number;
     dirx: number;
@@ -22,15 +25,16 @@
     radius: number;
     lastCollision: any;
 
-    constructor(frame: Frame) {
+    constructor(frame: Frame, settings: Settings) {
       this.frame = frame;
-      this.speed = BALL_SPEED;
+      this.settings = settings;
+      this.speed = BALL_SPEED * settings.ballSpeed;
       this.posx = frame.width / 2;
       this.posy = frame.height / 2 ;
       this.diry = 1;
       this.dirx = 0;
       this.initDir();
-      this.radius = frame.width / 50;
+      this.radius = frame.width  * settings.ballSize / 50;
       this.lastCollision = null;
     }
 
@@ -41,7 +45,7 @@
       this.dirx = 0;
       this.initDir();
       this.lastCollision = null;
-      this.speed = BALL_SPEED
+      this.speed = BALL_SPEED * this.settings.ballSpeed;
     }
 
     initDir() {
@@ -74,7 +78,7 @@
         this.dirx = Math.cos(newAngle);
       else
         this.dirx = -Math.cos(newAngle);
-      this.speed = this.speed + BALL_SPEED / 10;
+      this.speed = this.speed + BALL_SPEED * this.settings.ballSpeed / 10;
     }
   };
 
@@ -88,12 +92,12 @@
     width: number;
     speed: number;
 
-    constructor(left: boolean, frame: Frame) {
+    constructor(left: boolean, frame: Frame, settings: Settings) {
       this.left = left
       this.frame = frame;
-      this.height = frame.height / 5;
+      this.height = frame.height * settings.paddleSize / 5;
       this.width = frame.width / 50;
-      this.speed = PADDLE_SPEED;
+      this.speed = PADDLE_SPEED * settings.paddleSpeed;
 
       if (left === true) {
         this.posx = 0.01 * frame.width;

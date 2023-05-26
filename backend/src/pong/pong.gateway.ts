@@ -10,6 +10,7 @@ import { RoomDto } from './dto/room.dto';
 import { UseFilters, UseGuards } from '@nestjs/common';
 import { PongGuard } from './pong.guard';
 import { BadRequestTransformationFilter } from './pong.filter';
+import { Settings } from './types/Settings';
 
 @WebSocketGateway({
   path: '/pong',
@@ -28,7 +29,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
-    const room: string | undefined = this.pong.handleRequestGame(client.id, requestGameDto.friend);
+    const room: string | undefined = this.pong.handleRequestGame(client.id, requestGameDto.friend, requestGameDto.settings);
     if (room === undefined) {
       const username: string | undefined = this.pong.getUsername(client.id);
       if (username !== undefined) {
@@ -58,7 +59,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (room !== undefined) {
       client.join(room);
       const players = this.pong.getRoomPlayers(room);
-      this.server.to(client.id).emit('watchGame', { response: true , players: players});
+      const settings = this.pong.getRoomSettings(room);
+      this.server.to(client.id).emit('watchGame', { response: true , players: players, settings: settings});
     } else {
       this.server.to(client.id).emit('watchGame', { response: false });
     }

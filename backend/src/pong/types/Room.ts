@@ -1,5 +1,6 @@
 import { Game } from '../game/Game';
 import { WsUser } from 'src/types';
+import { Settings } from './Settings';
 
 export type Room = {
   id: string;
@@ -9,4 +10,5 @@ export type Room = {
   watchers: WsUser[];
   start: boolean;
   ranked: boolean;
+  settings: Settings;
 }
