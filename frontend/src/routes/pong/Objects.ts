@@ -1,3 +1,5 @@
+import type { Settings } from "./Class";
+
   export class Frame {
     width: number;
     height: number;
@@ -15,11 +17,11 @@
     posy: number;
     radius: number;
 
-    constructor(frame: Frame) {
+    constructor(frame: Frame, settings: Settings) {
       this.frame = frame;
       this.posx = frame.width / 2;
       this.posy = frame.height / 2 ;
-      this.radius = frame.width / 50;
+      this.radius = frame.width * settings.ballSize / 50;
     }
   }
 
@@ -32,9 +34,9 @@
     height: number;
     width: number;
 
-    constructor(left: boolean, frame: Frame) {
+    constructor(left: boolean, frame: Frame, settings: Settings) {
       this.frame = frame;
-      this.height = frame.height / 5;
+      this.height = frame.height * settings.paddleSize / 5;
       this.width = frame.width / 50;
       if (left) {
         this.posx = 0.01 * frame.width;

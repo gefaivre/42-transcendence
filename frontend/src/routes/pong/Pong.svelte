@@ -3,13 +3,15 @@
   import  ioClient  from 'socket.io-client';
   import axios  from "axios";
   import Game from "./Game.svelte";
-  import type { GameState } from "./Class";
+  import type { GameState, Settings } from "./Class";
   import type { WsException } from "../../types";
 
   class Match {
     player1: string;
     player2: string;
   }
+
+  let settings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
 
   let gameList: Match[] = [];
 
@@ -132,7 +134,7 @@
   }
 
   function requestGame() {
-    socket.emit('requestGame', {});
+    socket.emit('requestGame', { settings: settings });
     gameRequest = true;
   }
 
@@ -147,7 +149,7 @@
     for (let field of formData) {
       const [key, value] = field;
       if (key === 'friend' && value) {
-        socket.emit('requestGame', { friend: value }, (response: string) => {
+        socket.emit('requestGame', { friend: value, settings: settings }, () => {
           gameRequest = true
         });
       }
@@ -178,6 +180,41 @@
 
 
   {#if !gameRequest}
+  <div id="settings">
+
+    <label for="ballSpeed-select">Choose the ball speed</label>
+    <select name="ballSpeed" id="ballSpeed-select" bind:value={settings.ballSpeed}>
+      <option selected value=1>default</option>
+      <option value=0.7>slow</option>
+      <option value=1.5>fast</option>
+      <option value=2>very fast</option>
+    </select>
+
+    <label for="ballSize-select">Choose the ball size</label>
+    <select name="ballSize" id="ballSize-select" bind:value={settings.ballSize}>
+      <option selected value=1>default</option>
+      <option value=0.7>small</option>
+      <option value=1.5>big</option>
+      <option value=2>very big</option>
+    </select>
+
+    <label for="paddleSpeed-select">Choose the paddle speed</label>
+    <select name="paddleSpeed" id="paddleSpeed-select" bind:value={settings.paddleSize}>
+      <option selected value=1>default</option>
+      <option value=0.7>slow</option>
+      <option value=1.5>fast</option>
+      <option value=2>very fast</option>
+    </select>
+
+    <label for="paddleSize-select">Choose the paddle speed</label>
+    <select name="paddleSize" id="paddleSize-select" bind:value={settings.paddleSize}>
+      <option selected value=1>default</option>
+      <option value=0.7>small</option>
+      <option value=1.5>big</option>
+      <option value=2>very big</option>
+    </select>
+  </div>
+
   <div id="randomGame">
   <button on:click={requestGame}>request random game</button>
   </div>
@@ -193,7 +230,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:players={currentMatch} bind:update_state={update_child}></Game>
+<Game bind:gameSettings={settings} bind:players={currentMatch} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 

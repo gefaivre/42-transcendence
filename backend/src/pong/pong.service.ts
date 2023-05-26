@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Game } from './game/Game';
 import { User } from '@prisma/client';
 import { Room } from './types/Room';
+import { Settings } from './types/Settings';
 import { WsUser } from 'src/types';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -46,7 +47,7 @@ export class PongService {
     return undefined;
   }
 
-  handleRequestGame(socketId: string, friend: string | undefined): string | undefined {
+  handleRequestGame(socketId: string, friend: string | undefined, settings: Settings): string | undefined {
     const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
 
     if (user !== undefined) {
@@ -58,17 +59,17 @@ export class PongService {
           return room.id;
         }
         else
-          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: false  });
+          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400, settings), watchers: [], start: false, ranked: false, settings: settings  });
         return undefined;
       } else {
-        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true);
+        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true && room.settings === settings);
         if (room !== undefined) {
           room.player2 = user;
           room.start = true;
           return room.id;
         }
         else
-          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: true });
+          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400, settings), watchers: [], start: false, ranked: true, settings: settings});
         return undefined;
       }
     }

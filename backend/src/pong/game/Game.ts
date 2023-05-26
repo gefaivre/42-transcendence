@@ -1,7 +1,9 @@
+import { Settings } from '../types/Settings';
 import { Paddle, Ball, Frame } from './Objects'
 
 export class Game {
   frame: Frame;
+  settings: Settings;
   ball: Ball;
   leftPaddle: Paddle;
   rightPaddle: Paddle;
@@ -10,12 +12,14 @@ export class Game {
   rightScore: number;
   countdown: number;
 
-  constructor (width: number, height: number){
+  constructor (width: number, height: number, settings: Settings){
     this.frame = new Frame(width, height);
-    this.leftPaddle = new Paddle(true, this.frame);
-    this.rightPaddle = new Paddle(false, this.frame);
+    this.settings = settings;
 
-    this.ball = new Ball(this.frame);
+    this.leftPaddle = new Paddle(true, this.frame, this.settings);
+    this.rightPaddle = new Paddle(false, this.frame, this.settings);
+
+    this.ball = new Ball(this.frame, this.settings);
 
     this.stop = false;
     this.leftScore = 0;
