@@ -11,13 +11,13 @@ import { User } from '@prisma/client';
 export class AuthController {
 
   constructor(
-    private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly auth: AuthService,
+    private readonly users: UsersService,
   ) {}
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)
   private async generateUsername(login: string) {
-    while (await this.usersService.findByUsername(login))
+    while (await this.users.findByUsername(login))
       login = login + '_'
     return login
   }
@@ -26,7 +26,7 @@ export class AuthController {
   async auth42(@Query('code') code: string, @Res() response: Response) {
 
     // exchange code for access token
-    const access_token = await this.authService.getFortyTwoAccessToken(code);
+    const access_token = await this.auth.getFortyTwoAccessToken(code);
 
     // TODO (?): throw http exception
     // code we sent could have been wrong
@@ -34,10 +34,10 @@ export class AuthController {
       return response.redirect('http://localhost:8080')
 
     // exchange access token for user data
-    const ft_user = await this.authService.getFortyTwoUser(access_token);
+    const ft_user = await this.auth.getFortyTwoUser(access_token);
 
     // see if this 42 user already in db
-    let user: Omit<User, 'password'> | null = await this.usersService.findByFortyTwoLogin(ft_user.login)
+    let user: Omit<User, 'password'> | null = await this.users.findByFortyTwoLogin(ft_user.login)
 
     // first conection: register in db
     if (user === null) {
@@ -49,7 +49,7 @@ export class AuthController {
         image: new URL(ft_user.image.versions.small)
       }
 
-      user = await this.usersService.create(newUser)
+      user = await this.users.create(newUser)
 
       // TODO
       if (user === null)
@@ -60,7 +60,7 @@ export class AuthController {
     const jwtKey = user.TwoFA === true ? 'jwt2fa' : 'jwt'
 
     // bind a jwt to the authenticated user
-    const jwtValue = this.authService.login(user)
+    const jwtValue = this.auth.login(user)
 
     // return the jwt as a cookie into frontend
     response.cookie(jwtKey, jwtValue, { httpOnly: true })
@@ -84,7 +84,7 @@ export class AuthController {
 
     // create user
     body.password = hash
-    const user: Omit<User, 'password'> | null = await this.usersService.create(body)
+    const user: Omit<User, 'password'> | null = await this.users.create(body)
     if (user === null)
       throw new ConflictException('This username already exists')
 
@@ -100,7 +100,7 @@ export class AuthController {
     const jwtKey = req.user.TwoFA === true ? 'jwt2fa' : 'jwt'
 
     // bind a jwt to the authenticated user
-    const jwtValue = this.authService.login(req.user)
+    const jwtValue = this.auth.login(req.user)
 
     // return the jwt as a cookie into frontend
     response.cookie(jwtKey, jwtValue, { httpOnly: true })
@@ -122,20 +122,18 @@ export class AuthController {
     return request.user;
   }
 
+  // TODO: move into user controller
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
-  async getUser(@Req() request: any) { // Set to async for the console.log(user) (await)
-    const whoami = request.user;
-    let user = await  this.usersService.findById(whoami?.id)
-    console.log(user);
-    return user;
+  async whoami(@Req() request: any) {
+    return await this.users.findById(request.user.id)
   }
 
   // Step 1/2 to enable 2FA
   @UseGuards(AuthGuard('jwt'))
   @Patch('2FA/enable')
   enable2FA(@Req() request: any) {
-    return this.authService.enable2FA(+request.user.id)
+    return this.auth.enable2FA(+request.user.id)
   }
 
   // Step 2/2 to enable 2FA
@@ -143,12 +141,12 @@ export class AuthController {
   @Post('2FA/validate')
   async validate2FA(@Req() request: any, @Body() body: any) {
 
-    const isValid: boolean = this.authService.validate2FA(body.token, request.user.id)
+    const isValid: boolean = this.auth.validate2FA(body.token, request.user.id)
 
     // register in db
     if (isValid === true) {
       try {
-        await this.usersService.update2FA(request.user.id, true)
+        await this.users.update2FA(request.user.id, true)
       } catch(e) {
         throw new ConflictException()
       }
@@ -159,7 +157,7 @@ export class AuthController {
   @Patch('2FA/disable')
   async disable2FA(@Req() request: any) {
     try {
-      await this.usersService.update2FA(+request.user.id, false)
+      await this.users.update2FA(+request.user.id, false)
     } catch(e) {
       throw new ConflictException()
     }
@@ -169,12 +167,12 @@ export class AuthController {
   @Post('2FA/login')
   async login2FA(@Req() request: any, @Body() body: any, @Res({ passthrough: true }) response: Response) {
 
-    const isValid: boolean = this.authService.validate2FA(body.token, request.user.id)
+    const isValid: boolean = this.auth.validate2FA(body.token, request.user.id)
 
     if (isValid === true) {
 
       // bind the 'definitive' jwt to the authenticated user
-      const jwt = this.authService.login(request.user)
+      const jwt = this.auth.login(request.user)
 
       // return the jwt as a cookie into frontend
       response.cookie('jwt', jwt, { httpOnly: true })

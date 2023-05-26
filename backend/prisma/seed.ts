@@ -91,7 +91,6 @@ async function main() {
         content: randomString(),
         authorId: user.id,
         channelId: channel.id,
-        date: new Date()
       }
     })
   }

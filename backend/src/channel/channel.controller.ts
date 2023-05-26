@@ -5,8 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { ChannelExceptionsFilter } from './channel.filter';
-import { UserByIdPipe } from './pipes/user-by-id.pipe';
-import { ChannelByNamePipe } from './pipes/channel-by-name.pipe';
+import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
 
 @Controller('channel')
 @UseFilters(ChannelExceptionsFilter)
@@ -15,7 +14,7 @@ export class ChannelController {
 
   private readonly logger: Logger = new Logger(ChannelController.name, { timestamp: true })
 
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(private readonly channel: ChannelService) {}
 
   @Post()
   async create(@Req() request: any, @Body() channelDto: ChannelDto) {
@@ -36,7 +35,7 @@ export class ChannelController {
     }
 
     try {
-      await this.channelService.create(channel)
+      await this.channel.create(channel)
     } catch(e) {
       throw new ConflictException('channel already exist')
     }
@@ -65,7 +64,7 @@ export class ChannelController {
     // Between those 'verification steps' channel could have been deleted, user could have been deleted too, etc.
     // None of the above pipes act as unconditionnal guarantees.
     try {
-      await this.channelService.removeUser(channel.name, user.id)
+      await this.channel.removeUser(channel.name, user.id)
       this.logger.log(`user ${request.user.id} banned user ${user.id} from channel ${channel.name}`)
       return `user ${request.user.id} banned user ${user.id} from channel ${channel.name}`
     } catch(e) {
@@ -92,7 +91,7 @@ export class ChannelController {
       throw new UnauthorizedException('need to be the channel owner')
 
     try {
-      await this.channelService.promoteAdmin(channel.name, user.id)
+      await this.channel.promoteAdmin(channel.name, user.id)
       this.logger.log(`user ${request.user.id} has promoted user ${user.id} admin of channel ${channel.name}`)
       return `user ${request.user.id} has promoted user ${user.id} admin of channel ${channel.name}`
     } catch(e) {
@@ -119,7 +118,7 @@ export class ChannelController {
       throw new UnauthorizedException('need to be the channel owner')
 
     try {
-      await this.channelService.revokeAdmin(channel.name, user.id)
+      await this.channel.revokeAdmin(channel.name, user.id)
       this.logger.log(`user ${request.user.id} has revoked user ${user.id} as admin of channel ${channel.name}`)
       return `user ${request.user.id} has revoked user ${user.id} as admin of channel ${channel.name}`
     } catch(e) {
@@ -129,7 +128,7 @@ export class ChannelController {
 
   @Get()
   findAll() {
-    return this.channelService.findAll();
+    return this.channel.findAll();
   }
   @Get(':name')
   async findOne(@Param('name', ChannelByNamePipe) channel: any) {
@@ -143,7 +142,7 @@ export class ChannelController {
       throw new UnauthorizedException('channel can only be delete by its owner')
 
     try {
-      await this.channelService.deleteByName(channel.name)
+      await this.channel.deleteByName(channel.name)
     } catch(e) {
       throw new NotFoundException('channel not found')
     }
@@ -151,7 +150,7 @@ export class ChannelController {
 
   @Delete()
   deleteAll() {
-    return this.channelService.deleteAll();
+    return this.channel.deleteAll();
   }
 
 }

@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
+import * as fs from 'fs'
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
 
-    if (await this.findByUsername(createUserDto.username) != null)
+    if (await this.findByUsername(createUserDto.username) !== null)
       return null
 
       // Create User
@@ -40,9 +41,9 @@ export class UsersService {
     {
       let internlink;
       //create dir app/images/userId/image_name
-      const fs = require('fs');
       const dir = `/app/images/${user.id}`
-      if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
+      if (fs.existsSync(dir) === false)
+        fs.mkdirSync(dir);
       internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
       this.images.downloadImage(new URL(createUserDto.image),  internlink)
       await this.prisma.image.create({
@@ -90,6 +91,18 @@ export class UsersService {
             username: true
           }
         },
+        blocked: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blockedBy: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
       }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
@@ -129,6 +142,18 @@ export class UsersService {
           }
         },
         friendOf: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blocked: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        blockedBy: {
           select: {
             id: true,
             username: true
@@ -346,6 +371,66 @@ export class UsersService {
         },
       },
     });
+  }
+
+  async blockByUsername(id: number, username: string) {
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        blocked: {
+          connect: [{ username: username }]
+        }
+      }
+    })
+  }
+
+  async unblockByUsername(id: number, username: string) {
+    return this.prisma.user.update({
+      where: {
+        id: id
+      },
+      data: {
+        blocked: {
+          disconnect: [{ username: username }]
+        }
+      }
+    })
+  }
+
+  async isBlocked(id: number, username: string) {
+    const blocked = await this.prisma.user.findFirst({
+      where: {
+        id: id
+      },
+      select: {
+        blocked: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    const usernames: string[] = blocked!.blocked.map((blocked: any) => blocked.username)
+    return usernames.some((_username: string) => _username === username)
+  }
+
+  async isBlockedBy(id: number, username: string) {
+    const blockedBy = await this.prisma.user.findFirst({
+      where: {
+        id: id
+      },
+      select: {
+        blockedBy: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    const usernames: string[] = blockedBy!.blockedBy.map((blocked: any) => blocked.username)
+    return usernames.some((_username: string) => _username === username)
   }
 
 }

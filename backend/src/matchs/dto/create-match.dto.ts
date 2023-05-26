@@ -2,7 +2,6 @@ import {
   IsNotEmpty,
   IsInt,
   IsBoolean,
-  IsDate,
   Min,
   Max,
 } from 'class-validator';
@@ -27,10 +26,6 @@ export class CreateMatchDto {
   @Min(0)
   @Max(9)
   loserScore: number;
-
-  @IsNotEmpty()
-  @IsDate()
-  date: Date;
 
   @IsBoolean()
   ranked: boolean;

@@ -108,6 +108,15 @@
       }
     }
 
+    async function unblockByUsername(username: string) {
+      try {
+        await axios.patch(`/users/unblock/${username}`, null)
+        reload()
+      } catch(e) {
+        console.log(e)
+      }
+    }
+
 </script>
 
 	<div class="info-container">
@@ -131,6 +140,12 @@
             <button class="activeButton" on:click={() => friendspage = 'Pending'}>pending</button>
           {:else}
             <button on:click={() => friendspage = 'Pending'}>pending</button>
+          {/if}
+
+          {#if friendspage == 'Blocked'}
+            <button class="activeButton" on:click={() => friendspage = 'Blocked'}>blocked</button>
+          {:else}
+            <button on:click={() => friendspage = 'Blocked'}>blocked</button>
           {/if}
         </div>
       {:else}
@@ -198,8 +213,30 @@
             {/each}
           </ul>
         </div>
+
+      {:else if friendspage == 'Blocked' && $id === pageUser.id.toString()}
+        <div class="overflow">
+          <ul>
+            {#each pageUser.blocked as blocked}
+            <li>
+              <div class="user">
+                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}" alt="pp"/>
+                <a class="name" href="#/users/{blocked.username}">{blocked.username}</a>
+              </div>
+              {#if $id === pageUser.id.toString()}
+              <div class="actions">
+                <button class="actionsButton" on:click={() => unblockByUsername(blocked.username)}>
+                  <img class="btnImage" src={deleteIcon} alt="deleteicon">
+                </button>
+              </div>
+              {/if}
+            </li>
+            {/each}
+          </ul>
+        </div>
       {/if}
-	  </div>
+    </div>
+
 
     <div class="box-info games">
       <h1>Game history</h1>
@@ -333,8 +370,7 @@
     border-bottom: none;
   }
 
-  .friends .nav button:nth-child(2) {
-    border-left: solid 1px var(--black);
+  .friends .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
 

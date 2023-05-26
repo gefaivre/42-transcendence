@@ -11,7 +11,7 @@
   import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto, User } from "../types";
   import defaultAvatar from '../assets/008-utilisateur.png';
   import moreImg from '../assets/more.png';
-  
+
   export let params: any = {}
   let socket: Socket = null
   let message: string = ''
@@ -25,156 +25,155 @@
   let users: User[] = [];
   let username = null // the user settings are about to operate upon
 
-// $: foo = posts
-afterUpdate(() => {
-  const adminButton = document.getElementById('admin-button');
-  const memberButton = document.getElementById('member-button');
-  console.log("afterUpdate");
-  if(posts) 
-    newscrollToBottom(element);
-  if (channel && params && params.name != channel.name)
-    location.reload();
-  if (adminButton && channel && memberButton)
-  {
+  afterUpdate(() => {
 
-    adminButton.addEventListener('click', () => {
-      adminButton.classList.add('active');
-      memberButton.classList.remove('active');
-      users = channel.admins;
-    });
-  }
-  if (memberButton && channel)
-  {
+    const adminButton = document.getElementById('admin-button');
+    const memberButton = document.getElementById('member-button');
 
-    memberButton.addEventListener('click', () => {
-      memberButton.classList.add('active');
-      adminButton.classList.remove('active');
-      users = channel.users;
-    });
-  }
+    if(posts)
+      newscrollToBottom(element);
+
+    if (channel && params && params.name != channel.name)
+      location.reload();
+
+    if (adminButton && channel && memberButton) {
+      adminButton.addEventListener('click', () => {
+        adminButton.classList.add('active');
+        memberButton.classList.remove('active');
+        users = channel.admins;
+      });
+    }
+
+    if (memberButton && channel) {
+      memberButton.addEventListener('click', () => {
+        memberButton.classList.add('active');
+        adminButton.classList.remove('active');
+        users = channel.users;
+      });
+    }
   });
 
-$: if(posts && element) {
-  console.log("tick");
-  newscrollToBottom(element);
-}
-
-function post() {
-  socket.emit('sendPost', {
-    content: message,
-    channelName: channel.name,
-  }, (response: string) => {
-    console.log(response)
-    message = ''
-  })
-}
-
-function joinRoom() {
-  socket.emit('joinRoom', channel.name, (response: string) => {
-    console.log(response)
-  })
-}
-
-function joinChannel() {
-    socket.emit('joinChannel', {
-      channelName: channel.name,
-      status: channel.status,
-      password: password
-    } as ChannelDto, (response: string) => {
-      console.log(response)
-      joinRoom()
-    })
-}
-
-function leaveChannel() {
-  socket.emit('leaveChannel', channel.name, (response: string) => {
-    console.log(response)
-    return pop()
-  })
-}
-function getAvatar(username) {
-  let user = channel.users.find(user => user.username === username);
-  if (user)
-    return "http://localhost:3000/images/actual/" + user.id;
-    else
-     return defaultAvatar;
-}
-function scrollToBottom() {
-  const el = document.getElementById('Wall');
-  el.scrollTop = el.scrollHeight;
-}
-const newscrollToBottom = async (node) => {
-  if (node)
-      node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
-}; 
-
-// TODO: what if we manually change `id` store value ?
-onMount(async () => {
-
-  channel = (await axios.get(`/channel/${params.name}`)).data
-
-  socket = ioClient('http://localhost:3000', {
-    path: '/chat',
-    withCredentials: true
-  })
-
-  if (channel && channel.users && channel.users.find(user => user.id.toString() === $id))
-    joinRoom()
-  else {
-    if (!confirm('Join this channel ?'))
-      return await pop()
-    if (channel.status === 'Protected') {
-      password = prompt('Enter password')
-      if (password === '')
-        console.error(`Unable to join channel ${channel.name}: Empty password.`)
-      if (!password)
-        return await pop()
-    }
-    joinChannel()
+  $: if(posts && element) {
+    console.log("tick");
+    newscrollToBottom(element);
   }
 
-  isMember = true
+  function post() {
+    socket.emit('sendPost', {
+      content: message,
+      channelName: channel.name,
+    }, (response: string) => {
+      console.log(response)
+      message = ''
+    })
+  }
 
-  socket.on('connect', () => {
-    console.log('Connected')
+  function joinRoom() {
+    socket.emit('joinRoom', channel.name, (response: string) => {
+      console.log(response)
+    })
+  }
+
+  function joinChannel() {
+      socket.emit('joinChannel', {
+        channelName: channel.name,
+        status: channel.status,
+        password: password
+      } as ChannelDto, (response: string) => {
+        console.log(response)
+        joinRoom()
+      })
+  }
+
+  function leaveChannel() {
+    socket.emit('leaveChannel', channel.name, (response: string) => {
+      console.log(response)
+      return pop()
+    })
+  }
+  function getAvatar(username) {
+    let user = channel.users.find(user => user.username === username);
+    if (user)
+      return "http://localhost:3000/images/actual/" + user.id;
+      else
+       return defaultAvatar;
+  }
+  function scrollToBottom() {
+    const el = document.getElementById('Wall');
+    el.scrollTop = el.scrollHeight;
+  }
+  const newscrollToBottom = async (node) => {
+    if (node)
+        node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+  };
+
+// TODO: what if we manually change `id` store value ?
+  onMount(async () => {
+
+    channel = (await axios.get(`/channel/${params.name}`)).data
+
+    socket = ioClient('http://localhost:3000', {
+      path: '/chat',
+      withCredentials: true
+    })
+
+    if (channel && channel.users && channel.users.find(user => user.id.toString() === $id))
+      joinRoom()
+    else {
+      if (confirm('Join this channel ?') === false)
+        return await pop()
+      if (channel.status === 'Protected') {
+        password = prompt('Enter password')
+        if (password === '')
+          console.error(`Unable to join channel ${channel.name}: Empty password.`)
+        if (password === null)
+          return await pop()
+      }
+      joinChannel()
+    }
+
+    isMember = true
+
+    socket.on('connect', () => {
+      console.log('Connected')
+    })
+
+    socket.on('disconnect', (cause) => {
+      console.log('Disconnected:', cause)
+    })
+
+    socket.on('post', (post: newPostEmitDto) => {
+      console.log('receive post')
+      posts.push(post)
+      posts = posts
+    })
+
+    // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
+    socket.on('exception', (e: WsException) => {
+      console.error(e)
+      return pop()
+    })
+
+    // TODO: is it used ?
+    socket.on('error', (e) => {
+      console.error(e)
+      return pop()
+    })
+
+    socket.on('channelEvent', (event: any) => {
+      if (event.event === 'join')
+        console.log(event.user, 'joined the chanel')
+      else if (event.event === 'leave')
+        console.log(event.user, 'left the chanel')
+    })
+    console.log(channel.users)
+
   })
-
-  socket.on('disconnect', (cause) => {
-    console.log('Disconnected:', cause)
-  })
-
-  socket.on('post', (post: newPostEmitDto) => {
-    console.log('receive post')
-    posts.push(post)
-    posts = posts
-  })
-
-  // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
-  socket.on('exception', (e: WsException) => {
-    console.error(e)
-    return pop()
-  })
-
-  // TODO: is it used ?
-  socket.on('error', (e) => {
-    console.error(e)
-    return pop()
-  })
-
-  socket.on('channelEvent', (event: any) => {
-    if (event.event === 'join')
-      console.log(event.user, 'joined the chanel')
-    else if (event.event === 'leave')
-      console.log(event.user, 'left the chanel')
-  })
-  console.log(channel.users)
-
-})//fin
 
 onDestroy(() => socket.disconnect())
 function testlink()
 {
-  if (!showsettings)
+  if (showsettings === false)
     showsettings = true;
   else
     showsettings = false;
@@ -183,7 +182,7 @@ function testlink()
 }
 function openUserSettings(_username: string)
 {
-  if (!usersettings)
+  if (usersettings === false)
     usersettings = true;
   else
     usersettings = false;
@@ -210,7 +209,7 @@ function openUserSettings(_username: string)
           </div>
           <div class="username">
             <span style="color: grey; font-size: 20px; position: relative; top:30%; position: relative; font-family: Arial; left:20%;">
-              {user.username}  
+              {user.username}
             </span>
           </div>
           <div class="btnSettingsUser">
@@ -285,7 +284,7 @@ function openUserSettings(_username: string)
             <svg aria-hidden="true" class="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
             <span class="sr-only">Send message</span>
           </button>
-        </form> 
+        </form>
 
 </div>
 

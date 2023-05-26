@@ -24,7 +24,7 @@ export class Game {
     this.countdown = 300;
   }
 
-  
+
   loop() {
     if (this.countdown != 0) {
       this.countdown -= 1;
@@ -33,18 +33,18 @@ export class Game {
       this.leftPaddle.updatePos();
       this.rightPaddle.updatePos();
       this.handleCollision();
-      if (!(this.stop)) {
+      if (this.stop === false) {
         this.ball.updatePos();
       }
 
-      if (this.ball.posx - this.ball.radius <= 0 
+      if (this.ball.posx - this.ball.radius <= 0
         || this.ball.posx + this.ball.radius >= this.frame.width) {
         this.updateScore();
         this.ball.reset();
         this.countdown = 300;
       }
       if (this.leftScore === 10 || this.rightScore === 10) {
-        return ({ 
+        return ({
           leftScore: this.leftScore,
           rightScore: this.rightScore
         });
@@ -62,17 +62,17 @@ export class Game {
   }
 
   handleCollision() {
-    if (this.checkCollision(this.rightPaddle)) {
+    if (this.checkCollision(this.rightPaddle) === true) {
       this.ball.bouncePaddle(this.rightPaddle)
     }
 
-    if (this.checkCollision(this.leftPaddle)) {
+    if (this.checkCollision(this.leftPaddle) === true) {
       this.ball.bouncePaddle(this.leftPaddle)
     }
   }
 
   checkCollision(paddle: Paddle): boolean {
-    if (this.ball.posx + this.ball.radius < paddle.posx 
+    if (this.ball.posx + this.ball.radius < paddle.posx
       || this.ball.posx - this.ball.radius > paddle.posx + paddle.width
       || this.ball.posy + this.ball.radius < paddle.posy
       || this.ball.posy - this.ball.radius > paddle.posy + paddle.height) {

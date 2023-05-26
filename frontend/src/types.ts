@@ -5,6 +5,9 @@ export type User = {
   mmr: number
   games: number
   ft_login: string
+  date: Date
+  blocked: { id: number, username: string }[]
+  blockedBy: { id: number, username: string }[]
   friends: { id: number, username: string }[]
   friendOf: { id: number, username: string }[]
   pendingFriends: { id: number, username: string }[]
@@ -28,6 +31,7 @@ export type Channel = {
   admins: User[]
   posts: PostEmitDto[]
   status: ChannelStatus
+  date: Date
 }
 
 export type ChannelBis = Channel & {
