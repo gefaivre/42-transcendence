@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Socket } from 'socket.io'
 import { PongService } from "./pong.service";
-import { PongUser } from './class/PongUser';
+import { WsUser } from "src/types";
 import { UsersService } from "src/users/users.service";
 import { WsException } from "@nestjs/websockets";
 
@@ -17,7 +17,7 @@ export class PongGuard implements CanActivate {
 
     const handler: string = context.getHandler().name
     const client: Socket = context.switchToWs().getClient<Socket>()
-    const user: PongUser | undefined = this.pong.getUserBySocketId(client.id)
+    const user: WsUser | undefined = this.pong.getUserBySocketId(client.id)
 
     if (user === undefined) { return false }
 

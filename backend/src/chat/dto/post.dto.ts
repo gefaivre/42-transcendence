@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString, IsDate } from 'class-validator'
-import { User } from 'src/users/entities/user.entity';
 
 export class PostDto {
   @IsNotEmpty()
@@ -24,5 +23,5 @@ export class PostEmitDto extends PostDto {
 export class newPostEmitDto extends PostDto {
   @IsNotEmpty()
   @IsString()
-  author: User;
+  author: any;
 }

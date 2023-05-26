@@ -6,7 +6,7 @@ import { PostDto } from "./dto/post.dto";
 import { WsException } from "@nestjs/websockets";
 import { WsActionFailure, WsFailureCause, WsHandlerFailureServerLog, WsHandlerFailureClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog } from "./types/types"
 import { ChannelService } from "src/channel/channel.service";
-import { ChatUser } from "./class/ChatUser";
+import { WsUser } from 'src/types';
 import { SendDirectMessageDto } from "./dto/send-direct-message.dto";
 import { UsersService } from "src/users/users.service";
 
@@ -22,7 +22,7 @@ export class ChatGuard implements CanActivate {
   ) {}
 
   // yes, the exact same function is also defined into `chat.gateway.ts`
-  eventHandlerFailure(user: ChatUser, channel: string, action: WsActionFailure, cause: WsFailureCause) {
+  eventHandlerFailure(user: WsUser, channel: string, action: WsActionFailure, cause: WsFailureCause) {
     this.logger.warn(`client ${user.socketId} (user ${user.username}) ${action} ${channel}: ${cause}` as WsHandlerFailureServerLog)
     throw new WsException(`${action} ${channel}: ${cause}` as WsHandlerFailureClientLog)
   }
@@ -31,7 +31,7 @@ export class ChatGuard implements CanActivate {
 
     const handler: string = context.getHandler().name
     const client: Socket = context.switchToWs().getClient<Socket>()
-    const user: ChatUser | undefined = this.chat.getUserBySocketId(client.id)
+    const user: WsUser | undefined = this.chat.getUserBySocketId(client.id)
 
     // yes, this is a `lifecycleHookFailure()` doppelganger even if we not into a lifecycle hook
     if (user === undefined) {

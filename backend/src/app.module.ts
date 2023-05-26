@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { PrismaService } from './prisma/prisma.service';
-import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { MatchsModule } from './matchs/matchs.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,8 +11,7 @@ import { PostsModule } from './posts/posts.module';
 import { ImagesService } from './images/images.service';
 
 @Module({
-  imports: [PrismaModule, UsersModule, MatchsModule,AuthModule, ChannelModule, ChatModule, PostsModule, ImagesModule, PongModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService, ImagesService]
+  imports: [UsersModule, MatchsModule,AuthModule, ChannelModule, ChatModule, PostsModule, ImagesModule, PongModule],
+  providers: [PrismaService, ImagesService]
 })
 export class AppModule {}
