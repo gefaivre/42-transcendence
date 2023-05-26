@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, Validate } from "class-validator"
-import { UserExist } from "../rules/user-exist.rule"
-import { ChannelExist } from "../rules/channel-exist.rule"
+import { UserExist, ChannelExist } from "src/rules"
 
 export class UpdateChannelMemberDto {
 

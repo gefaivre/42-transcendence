@@ -8,12 +8,12 @@ import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureCause, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
 import { BadRequestTransformationFilter } from './chat.filter';
 import { ChannelService } from 'src/channel/channel.service';
-import { ChatUser } from './class/ChatUser';
+import { WsUser } from 'src/types';
 import { PostsService } from 'src/posts/posts.service';
 import { SendDirectMessageDto } from './dto/send-direct-message.dto';
 import { DirectMessageService } from './dm.service';
 import { UsersService } from 'src/users/users.service';
-import { CreateDirectMessage } from './class/CreateDirectMessage';
+import { CreateDirectMessage } from './types/CreateDirectMessage';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -56,7 +56,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chat.chatUsers.find(user => user.socketId === client.id) as ChatUser
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     client.join(room)
 
@@ -71,7 +71,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chat.chatUsers.find(user => user.socketId === client.id) as ChatUser
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     try {
       await this.channel.addUserToChannel(channel.channelName, user.prismaId)
@@ -88,7 +88,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chat.chatUsers.find(user => user.socketId === client.id) as ChatUser
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     try {
       await this.channel.leave(channel, user.prismaId)
@@ -107,7 +107,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handlePost(@ConnectedSocket() client: Socket, @MessageBody() post: PostDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: ChatUser = this.chat.chatUsers.find(user => user.socketId === client.id) as ChatUser
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     // Since `ChatGuard` has been applied we assume the channel exists
     const channelId: number = (await this.channel.findByName(post.channelName))?.id as number
@@ -129,7 +129,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleSendDirectMessage(@ConnectedSocket() client: Socket, @MessageBody() message: SendDirectMessageDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const sender: ChatUser = this.chat.chatUsers.find(user => user.socketId === client.id) as ChatUser
+    const sender: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     // TODO: add `UserByNamePipe` into to `DirectMessageDto` (would lead to delete `this.userService`)
     const recipient: any = await this.users.findByUsername(message.recipient)
@@ -142,7 +142,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     } as CreateDirectMessage)
 
     // emit to recipient if connected
-    const _recipient: ChatUser | undefined = this.chat.chatUsers.find(user => user.username === message.recipient)
+    const _recipient: WsUser | undefined = this.chat.chatUsers.find(user => user.username === message.recipient)
     if (_recipient !== undefined)
       this.server.to(_recipient.socketId).emit('dm', message.content)
 
@@ -167,7 +167,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.AuthCookieNotFound)
 
     const tokenData: any = await this.chat.validateUser(authHeader)
-    const user: ChatUser | undefined = await this.chat.addUser(client.id, tokenData)
+    const user: WsUser | undefined = await this.chat.addUser(client.id, tokenData)
 
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
@@ -179,7 +179,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // see https://github.com/nestjs/nest/issues/882
   async handleDisconnect(@ConnectedSocket() client: Socket) {
 
-    const user: ChatUser | undefined = this.chat.getUserBySocketId(client.id)
+    const user: WsUser | undefined = this.chat.getUserBySocketId(client.id)
 
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
@@ -189,12 +189,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)
   }
 
-  eventHandlerSuccess(sender: ChatUser, recipient: string, action: WsActionSuccess) {
+  eventHandlerSuccess(sender: WsUser, recipient: string, action: WsActionSuccess) {
     this.logger.log(`client ${sender.socketId} (user ${sender.username}) ${action} ${recipient}` as WsHandlerSuccessServerLog)
     return `${action} ${recipient}` as WsHandlerSuccessClientLog
   }
 
-  eventHandlerFailure(sender: ChatUser, recipient: string, action: WsActionFailure, cause: WsFailureCause) {
+  eventHandlerFailure(sender: WsUser, recipient: string, action: WsActionFailure, cause: WsFailureCause) {
     this.logger.warn(`client ${sender.socketId} (user ${sender.username}) ${action} ${recipient}: ${cause}` as WsHandlerFailureServerLog)
     throw new WsException(`${action} ${recipient}: ${cause}` as WsHandlerFailureClientLog)
   }
@@ -204,7 +204,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     throw new WsException(`${action}: ${cause}` as WsLifecycleHookFailureClientLog)
   }
 
-  lifecycleHookSuccess(user: ChatUser, action: WsActionSuccess) {
+  lifecycleHookSuccess(user: WsUser, action: WsActionSuccess) {
     this.logger.log(`client ${user.socketId} (user ${user.username}) ${action}` as WsLifecycleHookSuccessServerLog)
     return action as WsLifecycleHookSuccessClientLog
   }

@@ -1,6 +1,23 @@
 import { Injectable } from "@nestjs/common";
 import { ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { ChannelService } from "src/channel/channel.service";
+import { UsersService } from "./users/users.service";
+import { ChannelService } from "./channel/channel.service";
+
+@ValidatorConstraint({ async: true })
+@Injectable()
+export class UserExist implements ValidatorConstraintInterface {
+
+  constructor(private readonly users: UsersService) {}
+
+  async validate(userId: number): Promise<boolean> {
+    const user = await this.users.findById(userId)
+    return user !== null
+  }
+
+  defaultMessage(): string {
+    return 'user not found'
+  }
+}
 
 ValidatorConstraint({ async: true })
 @Injectable()
@@ -9,7 +26,6 @@ export class ChannelExist implements ValidatorConstraintInterface {
   constructor(private readonly channel: ChannelService) {}
 
   async validate(channelName: string): Promise<boolean> {
-    console.log('validate channel exist')
     const channel = await this.channel.findByName(channelName)
     return channel !== null
   }
@@ -17,5 +33,4 @@ export class ChannelExist implements ValidatorConstraintInterface {
   defaultMessage(): string {
     return 'channel not found'
   }
-
 }
