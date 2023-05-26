@@ -15,7 +15,6 @@ export class MatchsService {
         winnerScore: createMatchDto.winnerScore,
         loserId: createMatchDto.loserId,
         loserScore: createMatchDto.loserScore,
-        date: createMatchDto.date,
         ranked: createMatchDto.ranked,
       },
     })

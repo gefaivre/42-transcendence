@@ -27,6 +27,8 @@
         mmr: null,
         games: null,
         ft_login: null,
+        blocked: [],
+        blockedBy: [],
         friends: [],
         friendOf: [],
         pendingFriends: [],
@@ -53,11 +55,11 @@
       async function getUser() {
         try {
           let response = await axios.get('/auth/whoami');
-          // let response = await axios.get('/users/gefaivre');
           user.set(response.data)
           console.log($user)
           logged.set('true')
           id.set(response.data.id.toString())
+          isBlocked = pageUser.blockedBy.some((blocked: any) => blocked.id.toString() === $id)
         } catch (e) {
           logged.set('false')
           id.set('0')
@@ -139,13 +141,23 @@
       }
     }
 
-
-
-    async function blockUser() {
-      isBlocked = ! isBlocked;
+    async function blockByUsername() {
+      try {
+        await axios.patch(`/users/block/${pageUser.username}`, null)
+        isBlocked = true;
+      } catch(e) {
+        console.log(e)
+      }
     }
 
-
+    async function unblockByUsername() {
+      try {
+        await axios.patch(`/users/unblock/${pageUser.username}`, null)
+        isBlocked = false;
+      } catch(e) {
+        console.log(e)
+      }
+    }
 
   </script>
 
@@ -233,16 +245,21 @@
             {/if}
 
             <li>
-              {#if isBlocked}
+              {#if isBlocked === true}
                 <span>This user is blocked </span>
+                <div class="actions">
+                  <button class="actionButton" on:click={unblockByUsername}>
+                    <img class="btnImage" src={deleteIcon} alt="delete">
+                  </button>
+                </div>
               {:else}
                 <span>This user is not blocked </span>
+                <div class="actions">
+                  <button class="actionButton" on:click={blockByUsername}>
+                    <img class="btnImage" src={deleteIcon} alt="delete">
+                  </button>
+                </div>
               {/if}
-              <div class="actions">
-                <button class="actionButton" on:click={blockUser}>
-                  <img class="btnImage" src={deleteIcon} alt="delete">
-                </button>
-              </div>
             </li>
 
           </ul>

@@ -1,25 +1,25 @@
 import {
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-  } from 'class-validator';
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto {
-    @IsString()
-    @IsNotEmpty()
-    username: string;
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    image: URL;
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  image: URL;
 
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    ft_login: string;
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  ft_login: string;
 }

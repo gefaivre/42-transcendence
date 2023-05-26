@@ -7,28 +7,34 @@ import { RequestGameDto } from './dto/request-game.dto';
 import { GameStateDto } from './dto/game-state.dto';
 import { GameDto } from './dto/game.dto';
 import { RoomDto } from './dto/room.dto';
+import { UseFilters, UseGuards } from '@nestjs/common';
+import { PongGuard } from './pong.guard';
+import { BadRequestTransformationFilter } from './pong.filter';
 
 @WebSocketGateway({
-    path: '/pong',
-    cors: {
-        origin: 'http://localhost:8080',
-        credentials: true
-    },
+  path: '/pong',
+  cors: {
+    origin: 'http://localhost:8080',
+    credentials: true
+  },
 })
-
+@UseFilters(BadRequestTransformationFilter)
+@UseGuards(PongGuard)
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
   constructor(private readonly pong: PongService) {}
 
   @WebSocketServer() server: Server;
-
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     const room: string | undefined = this.pong.handleRequestGame(client.id, requestGameDto.friend);
     if (room === undefined) {
       const username: string | undefined = this.pong.getUsername(client.id);
-      if (username !== undefined)
+      if (username !== undefined) {
         client.join(username);
+        return 'foo' // this is temporary (hopefully...)
+      }
     } else {
       client.join(room);
       const players = this.pong.getRoomPlayers(room);

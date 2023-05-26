@@ -132,4 +132,14 @@ export class UsersController {
     return this.users.removeFriendByName(req.user.id, username)
   }
 
+  @Patch('block/:username')
+  blockByUsername(@Param('username') username: string, @Req() req: any) {
+    return this.users.blockByUsername(req.user.id, username)
+  }
+
+  @Patch('unblock/:username')
+  unblockByUsername(@Param('username') username: string, @Req() req: any) {
+    return this.users.unblockByUsername(req.user.id, username)
+  }
+
 }
