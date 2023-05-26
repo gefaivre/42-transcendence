@@ -62,7 +62,7 @@ export class PongService {
           this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400, settings), watchers: [], start: false, ranked: false, settings: settings  });
         return undefined;
       } else {
-        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true && room.settings === settings);
+        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true && JSON.stringify(room.settings) === JSON.stringify(settings));
         if (room !== undefined) {
           room.player2 = user;
           room.start = true;
@@ -234,6 +234,12 @@ export class PongService {
     if (room !== undefined && room.player2 !== undefined) {
       return { player1: room.player1.username, player2: room.player2.username }
     }
+  }
+
+  getRoomSettings(roomId: string): Settings | undefined {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId);
+    if (room !== undefined)
+      return (room.settings);
   }
 
   async updateMmr(room: Room, loserWsUser: WsUser) {

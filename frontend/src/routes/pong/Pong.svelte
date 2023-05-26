@@ -39,6 +39,7 @@
     socket.on('watchGame', (res) => {
       if (res.response === true) {
         currentMatch = res.players;
+        settings = res.settings;
         console.log(res);
         watch = true;
         console.log('watcherMode on');
@@ -134,6 +135,7 @@
   }
 
   function requestGame() {
+    console.log('settings', settings);
     socket.emit('requestGame', { settings: settings });
     gameRequest = true;
   }
@@ -168,7 +170,7 @@
 
 {#if !inGame}
 
-<h2 id="title"> Pong </h2>
+<h1 id="title"> Pong </h1>
 
 {#if gameList}
   <ul id="gameList">
@@ -181,38 +183,31 @@
 
   {#if !gameRequest}
   <div id="settings">
+    <h2 id="settingsTitle">Settings</h2>
 
-    <label for="ballSpeed-select">Choose the ball speed</label>
-    <select name="ballSpeed" id="ballSpeed-select" bind:value={settings.ballSpeed}>
-      <option selected value=1>default</option>
-      <option value=0.7>slow</option>
-      <option value=1.5>fast</option>
-      <option value=2>very fast</option>
-    </select>
+    <table id="settingsTable">
 
-    <label for="ballSize-select">Choose the ball size</label>
-    <select name="ballSize" id="ballSize-select" bind:value={settings.ballSize}>
-      <option selected value=1>default</option>
-      <option value=0.7>small</option>
-      <option value=1.5>big</option>
-      <option value=2>very big</option>
-    </select>
+    <tr>
+    <td align="left"><label for="ballSpeed">ball speed</label></td>
+    <td align="right"><input name="ballSpeed" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
+    </tr>
 
-    <label for="paddleSpeed-select">Choose the paddle speed</label>
-    <select name="paddleSpeed" id="paddleSpeed-select" bind:value={settings.paddleSize}>
-      <option selected value=1>default</option>
-      <option value=0.7>slow</option>
-      <option value=1.5>fast</option>
-      <option value=2>very fast</option>
-    </select>
+    <tr>
+    <td align="left"><label for="ballSize">ball size</label></td>
+    <td align="right"><input name="ballSize" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
+    
+    <tr>
+    <td align="left"><label for="paddleSpeed">paddle speed</label></td>
+    <td align="right"><input name="paddleSpeed" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
 
-    <label for="paddleSize-select">Choose the paddle speed</label>
-    <select name="paddleSize" id="paddleSize-select" bind:value={settings.paddleSize}>
-      <option selected value=1>default</option>
-      <option value=0.7>small</option>
-      <option value=1.5>big</option>
-      <option value=2>very big</option>
-    </select>
+    <tr>
+    <td align="left"><label for="paddleSize">paddle size</label></td>
+    <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
+    </tr>
+    </table>
+
   </div>
 
   <div id="randomGame">
@@ -262,6 +257,22 @@
   font-weight: bold;
   font-size: 1.25em;
   color: var(--pink);
+}
+
+#settings {
+  margin-bottom:1em;
+}
+
+#settingsTitle {
+  font-weight:bold;
+  font-size:1.3em;
+  color:var(--pink);
+}
+
+#settingsTable {
+  font-weight:bold;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 #randomGame {
