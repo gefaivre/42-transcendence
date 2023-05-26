@@ -3,7 +3,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { DirectMessageService } from 'src/chat/dm.service';
-import { UserByUsernamePipe } from './pipes/user-by-username.pipe';
+import { UserByUsernamePipe } from 'src/pipes';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'))

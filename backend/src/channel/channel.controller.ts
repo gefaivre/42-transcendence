@@ -5,8 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { ChannelExceptionsFilter } from './channel.filter';
-import { UserByIdPipe } from './pipes/user-by-id.pipe';
-import { ChannelByNamePipe } from './pipes/channel-by-name.pipe';
+import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
 
 @Controller('channel')
 @UseFilters(ChannelExceptionsFilter)
