@@ -6,7 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
-import { ChatUser } from './class/ChatUser';
+import { WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -20,19 +20,19 @@ export class ChatService {
     private readonly posts: PostsService,
   ) {}
 
-  chatUsers: ChatUser[] = [];
+  chatUsers: WsUser[] = [];
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];
     return this.auth.validateToken(token)
   }
 
-  async addUser(socketId: string, tokenData: any): Promise<ChatUser | undefined> {
+  async addUser(socketId: string, tokenData: any): Promise<WsUser | undefined> {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
       this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
-      const chatUser: ChatUser = { username: user.username, prismaId: user.id, socketId: socketId }
+      const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId }
       this.chatUsers.push(chatUser)
       return chatUser
     }
@@ -58,7 +58,7 @@ export class ChatService {
     return ret;
   }
 
-  getUserBySocketId(id: string): ChatUser | undefined {
+  getUserBySocketId(id: string): WsUser | undefined {
     return this.chatUsers.find(user => user.socketId === id)
   }
 

@@ -1,12 +1,12 @@
 import { Game } from '../game/Game';
-import { PongUser } from './PongUser';
+import { WsUser } from 'src/types';
 
 export class Room {
   id: string;
   game: Game;
-  player1: PongUser;
-  player2: PongUser | undefined;
-  watchers: PongUser[];
+  player1: WsUser;
+  player2: WsUser | undefined;
+  watchers: WsUser[];
   start: boolean;
   ranked: boolean;
 }
