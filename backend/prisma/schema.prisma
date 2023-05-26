@@ -24,6 +24,7 @@ model User {
   mmr            Int
   images         Image[]
   ft_login       String?   @unique
+  date           DateTime  @default(now())
   wins           Match[]   @relation("winner")
   loses          Match[]   @relation("loser")
   channels       Channel[] @relation("channel_users")
@@ -46,7 +47,7 @@ model Image {
   id             Int     @id @default(autoincrement())
   name           String?
   link           String
-  createdAt      DateTime   @default(now())
+  date           DateTime   @default(now())
   lastuse        DateTime   @default(now())
   User   User?   @relation(fields: [userId], references: [id])
   userId Int?
@@ -56,6 +57,7 @@ model Channel {
   id          Int    @id @default(autoincrement())
   name        String @unique
   ownerId     Int
+  date        DateTime @default(now())
   owner       User   @relation("channel_owner", fields: [ownerId], references: [id], onDelete: Cascade)
   banned      User[] @relation("channel_banned")
   admins      User[] @relation("channel_admins")
@@ -73,14 +75,14 @@ model Match {
   loser       User     @relation(name: "loser", fields: [loserId], references: [id], onDelete: Cascade)
   loserId     Int
   loserScore  Int
-  date        DateTime
+  date        DateTime @default(now())
   ranked      Boolean
 }
 
 model Post {
   id        Int     @id @default(autoincrement())
   content   String
-  date      DateTime
+  date      DateTime @default(now())
   author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
