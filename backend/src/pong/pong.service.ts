@@ -100,7 +100,7 @@ export class PongService {
     return undefined;
   }
 
-  async removeUserFromRoom(user: WsUser) : Promise<string | undefined> {
+  private async removeUserFromRoom(user: WsUser) : Promise<string | undefined> {
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
     if (room !== undefined) {
       if (room.start === true) {
@@ -113,7 +113,7 @@ export class PongService {
     return undefined;
   }
 
-  async registerMatch(room: Room, loser: WsUser) {
+  private async registerMatch(room: Room, loser: WsUser) {
     await this.updateMmr(room, loser);
     if (loser === room.player1) {
       await this.matchs.create({ winnerId: room.player2!.prismaId,
@@ -242,7 +242,7 @@ export class PongService {
       return (room.settings);
   }
 
-  async updateMmr(room: Room, loserWsUser: WsUser) {
+  private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
     const winner: Omit<User, 'password'> | null  = await this.users.findById(room.player2!.prismaId);
 
