@@ -208,15 +208,6 @@ export class UsersService {
     return this.prisma.user.deleteMany();
   }
 
-  async getTopMmr(){
-    return await this.prisma.user.findMany({
-      take: 10,
-      orderBy: {
-          mmr: 'desc',
-      }
-    })
-  }
-
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({
         where: {
