@@ -251,13 +251,13 @@ export class PongService {
       const R2: number = 10 ** (winner.mmr / 400);
 
       const E1: number = R1 / (R1 + R2);
-      const E2: number = R2/ (R1 + R2);
+      const E2: number = R2 / (R1 + R2);
 
       const loserMmr = Math.round(loser.mmr + 32 * (0 - E1));
       const winnerMmr = Math.round(winner.mmr + 32 * (1 - E2));
 
-      await this.users.update(loser.username, {games: loser.games + 1, mmr: loserMmr});
-      await this.users.update(winner.username, {games: winner.games + 1, mmr: winnerMmr});
+      await this.users.updateGameStats(loser.username, loser.games + 1, loserMmr);
+      await this.users.updateGameStats(winner.username, winner.games + 1, winnerMmr);
     }
   }
 
