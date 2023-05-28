@@ -2,7 +2,7 @@ import { Catch, ArgumentsHost, Logger, HttpException } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
-export class ChannelExceptionsFilter extends BaseExceptionFilter {
+export class TranscendenceExceptionsFilter extends BaseExceptionFilter {
 
   private readonly logger: Logger = new Logger('ChannelController', { timestamp: true })
 
