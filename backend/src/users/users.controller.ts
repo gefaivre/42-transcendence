@@ -102,7 +102,7 @@ export class UsersController {
   @Post('friendship/acceptByName/:username')
   acceptFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
     console.log('controller accept friendship request by name(', req.user.id, 'accept', username, ')')
-    return this.users.acceptFriendshipRequestByName(req.user.id, username)
+    return this.users.acceptFriendshipRequestByName(req.user.id, username);
   }
 
   @Post('friendship/dismissById/:id')

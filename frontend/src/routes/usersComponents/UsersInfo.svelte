@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import type { Match, Stat, User } from "../../types";
 
-  export let pageUser;
+  export let pageUser: User;
 
   export let params;
 
@@ -35,14 +35,6 @@
       getMatch()
     }
   }
-
-  // $: {
-  //   const { newName2 } = params.name;
-  //   if (newName2 !== name2) {
-  //     getMatch();
-  //   }
-  // }
-
 
   async function getMatch() {
     console.log("TESSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTT")
@@ -91,8 +83,16 @@
 
   async function acceptFriendshipRequestByName(name: string) {
     try {
-      await axios.post(`/users/friendship/acceptByName/${name}`, null);
-      reload();
+      let response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
+
+      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      pageUser.requestFriends.splice(index, 1)
+
+      const friend = response.data.friends.find((friend: any) => friend.username === name)
+      pageUser.friends.unshift({ id: friend.id, username: name })
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -101,7 +101,12 @@
   async function dismissFriendshipRequestByName(name: string) {
     try {
       await axios.post(`/users/friendship/dismissByName/${name}`, null);
-      reload();
+
+      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      pageUser.requestFriends.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -109,12 +114,13 @@
 
   async function cancelFriendshipRequestByName(name: string) {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/cancelByName/${name}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      await axios.post(`/users/friendship/cancelByName/${name}`,null);
+
+      const index = pageUser.pendingFriends.findIndex(friend => friend.username === name)
+      pageUser.pendingFriends.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -122,12 +128,16 @@
 
   async function removeFriendByName(name: string) {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/removeByName/${name}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      const cancel = await axios.post(`/users/friendship/removeByName/${name}`,null);
+
+      let index = pageUser.friends.findIndex(friend => friend.username === name)
+      pageUser.friends.splice(index, 1)
+
+      index = pageUser.friendOf.findIndex(friend => friend.username === name)
+      pageUser.friendOf.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -136,7 +146,7 @@
   async function unblockByUsername(username: string) {
     try {
       await axios.patch(`/users/unblock/${username}`, null);
-      reload();
+      // reload();
     } catch (e) {
       console.log(e);
     }
@@ -227,23 +237,18 @@
                   src="http://localhost:3000/images/actual/{requestFriends?.id}"
                   alt="pp"
                 />
-                <a class="name" href="#/users/{requestFriends?.username}"
-                  >{requestFriends?.username}</a
-                >
+                <a class="name" href="#/users/{requestFriends?.username}">
+                  {requestFriends?.username}
+                </a>
               </div>
               <div class="actions">
-                <button
-                  class="actionsButton"
-                  on:click={() =>
-                    acceptFriendshipRequestByName(requestFriends.username)}
-                >
+                <button class="actionsButton"
+                  on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={acceptIcon} alt="accept" />
                 </button>
                 <button
                   class="actionsButton"
-                  on:click={() =>
-                    dismissFriendshipRequestByName(requestFriends.username)}
-                >
+                  on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
               </div>
