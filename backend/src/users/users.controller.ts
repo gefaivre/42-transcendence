@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
+import { UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
+import { TranscendenceExceptionsFilter } from 'src/filters';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('users')
+@UseGuards(AuthGuard('jwt'))
+@UseFilters(TranscendenceExceptionsFilter)
 export class UsersController {
 
   constructor(private readonly users: UsersService) {}
@@ -29,11 +31,6 @@ export class UsersController {
   @Get(':username')
   findOneByUsername(@Param('username') username: string) {
     return this.users.findByUsername(username);
-  }
-
-  @Patch()
-  update(@Body() body: UpdateUserDto, @Req() req: any) {
-    return this.users.update(req.user.username, body);
   }
 
   @Patch('username')
