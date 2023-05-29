@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Game } from './game/Game';
 import { User } from '@prisma/client';
 import { Room } from './types/Room';
+import { Settings } from './types/Settings';
 import { WsUser } from 'src/types';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -46,7 +47,7 @@ export class PongService {
     return undefined;
   }
 
-  handleRequestGame(socketId: string, friend: string | undefined): string | undefined {
+  handleRequestGame(socketId: string, friend: string | undefined, settings: Settings): string | undefined {
     const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
 
     if (user !== undefined) {
@@ -58,17 +59,17 @@ export class PongService {
           return room.id;
         }
         else
-          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: false  });
+          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400, settings), watchers: [], start: false, ranked: false, settings: settings  });
         return undefined;
       } else {
-        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true);
+        const room : Room | undefined = this.rooms.find(room => room.player2 === undefined && room.ranked === true && JSON.stringify(room.settings) === JSON.stringify(settings));
         if (room !== undefined) {
           room.player2 = user;
           room.start = true;
           return room.id;
         }
         else
-          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400), watchers: [], start: false, ranked: true });
+          this.rooms.push({ id: user.username, player1: user, player2: undefined, game: new Game(600, 400, settings), watchers: [], start: false, ranked: true, settings: settings});
         return undefined;
       }
     }
@@ -99,7 +100,7 @@ export class PongService {
     return undefined;
   }
 
-  async removeUserFromRoom(user: WsUser) : Promise<string | undefined> {
+  private async removeUserFromRoom(user: WsUser) : Promise<string | undefined> {
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
     if (room !== undefined) {
       if (room.start === true) {
@@ -112,7 +113,7 @@ export class PongService {
     return undefined;
   }
 
-  async registerMatch(room: Room, loser: WsUser) {
+  private async registerMatch(room: Room, loser: WsUser) {
     await this.updateMmr(room, loser);
     if (loser === room.player1) {
       await this.matchs.create({ winnerId: room.player2!.prismaId,
@@ -235,7 +236,13 @@ export class PongService {
     }
   }
 
-  async updateMmr(room: Room, loserWsUser: WsUser) {
+  getRoomSettings(roomId: string): Settings | undefined {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId);
+    if (room !== undefined)
+      return (room.settings);
+  }
+
+  private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
     const winner: Omit<User, 'password'> | null  = await this.users.findById(room.player2!.prismaId);
 
@@ -244,13 +251,13 @@ export class PongService {
       const R2: number = 10 ** (winner.mmr / 400);
 
       const E1: number = R1 / (R1 + R2);
-      const E2: number = R2/ (R1 + R2);
+      const E2: number = R2 / (R1 + R2);
 
       const loserMmr = Math.round(loser.mmr + 32 * (0 - E1));
       const winnerMmr = Math.round(winner.mmr + 32 * (1 - E2));
 
-      await this.users.update(loser.username, {games: loser.games + 1, mmr: loserMmr});
-      await this.users.update(winner.username, {games: winner.games + 1, mmr: winnerMmr});
+      await this.users.updateGameStats(loser.username, loser.games + 1, loserMmr);
+      await this.users.updateGameStats(winner.username, winner.games + 1, winnerMmr);
     }
   }
 

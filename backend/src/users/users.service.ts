@@ -1,7 +1,6 @@
 import { Injectable, Inject, forwardRef} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ImagesService } from 'src/images/images.service';
 import * as fs from 'fs'
 
@@ -176,10 +175,10 @@ export class UsersService {
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async update(username: string, updateUserDto: UpdateUserDto) {
+  async updateGameStats(username: string, games: number, mmr: number) {
     const user = await this.prisma.user.update({
       where: { username: username },
-      data: updateUserDto,
+      data: { games: games, mmr: mmr },
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
@@ -207,15 +206,6 @@ export class UsersService {
 
   async removeAllUsers() {
     return this.prisma.user.deleteMany();
-  }
-
-  async getTopMmr(){
-    return await this.prisma.user.findMany({
-      take: 10,
-      orderBy: {
-          mmr: 'desc',
-      }
-    })
   }
 
   update2FA(id: number, twofa: boolean) {

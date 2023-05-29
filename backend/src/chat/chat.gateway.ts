@@ -6,7 +6,7 @@ import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs
 import { ChannelDto } from 'src/channel/dto/channel.dto';
 import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureCause, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
-import { BadRequestTransformationFilter } from './chat.filter';
+import { BadRequestTransformationFilter } from 'src/filters';
 import { ChannelService } from 'src/channel/channel.service';
 import { WsUser } from 'src/types';
 import { PostsService } from 'src/posts/posts.service';

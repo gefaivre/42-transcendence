@@ -4,12 +4,12 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
-import { ChannelExceptionsFilter } from './channel.filter';
+import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
 
 @Controller('channel')
-@UseFilters(ChannelExceptionsFilter)
 @UseGuards(AuthGuard('jwt'))
+@UseFilters(TranscendenceExceptionsFilter)
 export class ChannelController {
 
   private readonly logger: Logger = new Logger(ChannelController.name, { timestamp: true })
