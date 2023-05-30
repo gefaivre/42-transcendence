@@ -246,8 +246,7 @@
                   on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={acceptIcon} alt="accept" />
                 </button>
-                <button
-                  class="actionsButton"
+                <button class="actionsButton"
                   on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
@@ -265,18 +264,14 @@
                 <img
                   class="pp"
                   src="http://localhost:3000/images/actual/{pendingFriends?.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{pendingFriends?.username}"
-                  >{pendingFriends?.username}</a
-                >
+                  alt="pp"/>
+                <a class="name" href="#/users/{pendingFriends?.username}">
+                  {pendingFriends?.username}</a>
               </div>
               <div class="actions">
                 <button
                   class="actionsButton"
-                  on:click={() =>
-                    cancelFriendshipRequestByName(pendingFriends.username)}
-                >
+                  on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
               </div>
@@ -290,22 +285,14 @@
           {#each pageUser.blocked as blocked}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{blocked.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{blocked.username}"
-                  >{blocked.username}</a
-                >
+                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}"alt="pp"/>
+                <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
                 <div class="actions">
-                  <button
-                    class="actionsButton"
-                    on:click={() => unblockByUsername(blocked.username)}
-                  >
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon" />
+                  <button class="actionsButton"
+                    on:click={() => unblockByUsername(blocked.username)}>
+                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
                   </button>
                 </div>
               {/if}
@@ -327,13 +314,9 @@
               <span>{match.winnerScore}</span>
               <span>-</span>
               <span>{match.loserScore}</span>
-              <span
-                ><img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{match.loserId}"
-                  alt="pp"
-                /></span
-              >
+              <span>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/>
+              </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.loserId))}
                   ...
@@ -353,12 +336,8 @@
               <span>{match.loserScore} </span>
               <span>-</span>
               <span>{match.winnerScore}</span>
-              <span
-                ><img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{match.winnerId}"
-                  alt="pp"
-                />
+              <span>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/>
               </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.winnerId))}
