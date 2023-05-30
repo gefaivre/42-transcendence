@@ -9,8 +9,7 @@ import { GameDto } from './dto/game.dto';
 import { RoomDto } from './dto/room.dto';
 import { UseFilters, UseGuards } from '@nestjs/common';
 import { PongGuard } from './pong.guard';
-import { BadRequestTransformationFilter } from './pong.filter';
-import { Settings } from './types/Settings';
+import { BadRequestTransformationFilter } from 'src/filters';
 
 @WebSocketGateway({
   path: '/pong',
