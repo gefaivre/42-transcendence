@@ -240,9 +240,9 @@
 
 #all {
   color: var(--white);
-  height: 100vh;
   background-color: var(--grey);
   border-left: 1px solid grey;
+  padding-bottom: 2em;
   text-align: center;
 }
 
@@ -256,7 +256,6 @@
 #gameList {
   font-weight: bold;
   font-size: 1.25em;
-  color: var(--pink);
 }
 
 #settings {
