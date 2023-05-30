@@ -131,7 +131,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const sender: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
-    // TODO: add `UserByNamePipe` into to `DirectMessageDto` (would lead to delete `this.userService`)
+    // TODO: add `UserByNamePipe` into `DirectMessageDto` (would lead to delete `this.userService`)
     const recipient: any = await this.users.findByUsername(message.recipient)
 
     // db
