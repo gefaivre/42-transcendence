@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ImagesService } from 'src/images/images.service';
@@ -9,7 +9,6 @@ export class UsersService {
 
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ImagesService))
     private readonly images: ImagesService
   ) {}
 
