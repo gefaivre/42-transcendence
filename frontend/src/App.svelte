@@ -11,7 +11,8 @@
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
     import Signup from "./routes/Signup.svelte";
-    import Login from "./routes/Login.svelte";
+    import Login from "./routes/Connection.svelte";
+    import Connection from './routes/Connection.svelte';
 
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
@@ -42,7 +43,7 @@
   <div class="screen">
     <div class="profileLink">
     {#if $user}
-      <a  use:link href="/users/{$user.username}">
+      <a use:link href="/users/{$user.username}">
         <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' alt="profile">
       </a>
     {/if}
@@ -65,10 +66,7 @@
   </div>
 
   {:else}
-    <a href={FT_AUTHORIZE}>Signin with 42</a>
-    <br>
-    <Signup/>
-    <Login/>
+    <Connection/>
   {/if}
 
   <style>
