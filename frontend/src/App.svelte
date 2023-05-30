@@ -3,36 +3,39 @@
     export const title = 'Mon titre';
 
     import axios from './axios.config'
-    import { onMount} from "svelte";
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
     import leaderIcon     from './assets/podium.png'
-    import { id, logged, user, reloadImage} from "./stores";
+    import { id, logged, user, reloadImage, socket } from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
     import Signup from "./routes/Signup.svelte";
     import Login from "./routes/Login.svelte";
+    import ioClient from 'socket.io-client';
 
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
       // { label: 'Channel', icon: channelIcon, link: '#/Channel'},
-      { label: 'Messages', icon: messageIcon, link: '#/Message' },
+      { label: 'Messages', icon: messageIcon, link: '#/message' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
       { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
     ];
 
-    onMount(() => getProfile())
+    $: if ($logged === 'true') {
+      getProfile()
+    }
 
     async function getProfile() {
       try {
-        let response = await axios.get('/auth/whoami');
+        const response = await axios.get('/auth/whoami');
         user.set(response.data)
-        console.log($user)
-        logged.set('true')
         id.set(response.data.id.toString())
-      } catch (error) {
-        logged.set('false')
-        id.set('0')
+        $socket = ioClient('http://localhost:3000', {
+          path: '/user',
+          withCredentials: true,
+          query: { id: $user.id, username: $user.username }
+        })
+      } catch (e) {
       }
     }
 

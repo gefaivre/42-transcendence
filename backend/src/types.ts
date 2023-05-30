@@ -3,3 +3,13 @@ export type WsUser = {
   socketId: string;
   username: string;
 }
+
+export const enum Status {
+  offline,
+  online,
+  ingame,
+}
+
+export type UserStatus = WsUser & {
+  status: Status
+}
