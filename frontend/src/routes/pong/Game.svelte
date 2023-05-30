@@ -8,14 +8,14 @@
     leftScore = state.score.leftScore;
     rightScore = state.score.rightScore;
 
-    leftPaddle.posx = state.leftPaddle.posx;
-    leftPaddle.posy = state.leftPaddle.posy;
+    leftPaddle.posx = state.leftPaddle.posx * frameWidth / 600;
+    leftPaddle.posy = state.leftPaddle.posy * frameHeight / 400;
 
-    rightPaddle.posx = state.rightPaddle.posx;
-    rightPaddle.posy = state.rightPaddle.posy;
+    rightPaddle.posx = state.rightPaddle.posx * frameWidth / 600;
+    rightPaddle.posy = state.rightPaddle.posy * frameHeight / 400;
 
-    ball.posx = state.ball.posx;
-    ball.posy = state.ball.posy;
+    ball.posx = state.ball.posx * frameWidth / 600;
+    ball.posy = state.ball.posy * frameHeight / 400;
     
     if (state.countdown === 0)
       countdown = 0;
@@ -36,7 +36,22 @@
 
   let countdown: number = 3;
 
-  const frame: Frame =  new Frame(600, 400);
+  let winHeight: number = window.innerHeight;
+  let winWidth: number = window.innerWidth - Math.round(0.25 * window.innerWidth);
+  let frameHeight: number;
+  let frameWidth: number;
+
+  if (winWidth / winHeight < 1.5) {
+    frameWidth = winWidth;
+    frameHeight = Math.round(winWidth / 1.5);
+  } else {
+    frameHeight = winHeight;
+    frameWidth = Math.round(winHeight * 1.5);
+  }
+
+  console.log('win width = ', winWidth)
+  console.log('frame width = ', frameWidth)
+  const frame: Frame =  new Frame(frameWidth, frameHeight);
   const ball: Ball =  new Ball(frame, gameSettings); 
   const leftPaddle: Paddle = new Paddle(true, frame, gameSettings); 
   const rightPaddle: Paddle = new Paddle(false, frame, gameSettings); 
@@ -113,7 +128,7 @@
 }
 
 #game {
-  min-width: 600px;
+  position: relative;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: auto;
@@ -128,11 +143,9 @@
 
 #countdown {
   position: absolute;
-  margin-left:0.5em;
-  left: 50%;
-  top:200px;
-
-  font-size: 4em;
+  top: 62%;
+  left: 48.5%;
+  font-size: 3.5em;
   font-weight: bold;
   color: var(--lite-lite-lite-grey);
 
