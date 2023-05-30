@@ -1,8 +1,8 @@
 <script lang="ts">
   import axios from "../axios.config";
   import { onMount } from "svelte";
-  import { id, reloadImage, user, logged } from "../stores";
-  import type { User } from "../types";
+  import { id, reloadImage, user, logged, socket } from "../stores";
+  import { Status, type User } from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
   import NotFound from "./NotFound.svelte";
@@ -16,6 +16,7 @@
   let settings: boolean = false;
 
   let isBlocked: boolean = false;
+  let onlineStatus: Status = null;
 
   let pageUser: User = {
     id: 0,
@@ -70,6 +71,9 @@
     if (params.name != $user.username) {
       pageUser = await getprofile();
       console.log(pageUser);
+      $socket.emit('getOnlineStatus', pageUser.username, (response: Status) => {
+        onlineStatus = response
+      })
     } else pageUser = $user;
   }
 
@@ -78,6 +82,8 @@
       await axios.get("/auth/logout");
       logged.set("false");
       id.set("0");
+      if ($socket !== null && $socket !== undefined)
+        $socket.disconnect()
     } catch (e) {
       console.log(e);
     }
@@ -291,6 +297,16 @@
                     <img class="btnImage" src={deleteIcon} alt="delete" />
                   </button>
                 </div>
+              {/if}
+            </li>
+
+            <li>
+              {#if onlineStatus === Status.offline}
+                <span>This user is offline</span>
+              {:else if onlineStatus === Status.online}
+                <span>This user is online</span>
+              {:else if onlineStatus === Status.ingame}
+                <span>This user is ingame</span>
               {/if}
             </li>
           </ul>

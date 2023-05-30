@@ -38,20 +38,18 @@
 			<tr>
 				<th>Rank</th>
 				<th>User</th>
-				<th
-					><a
-						class="clickable"
-						href="/#/leaderboard"
+				<th>
+          <a
+						class="clickable" href="/#/leaderboard"
 						on:click={() => sortByMMR()}>Mmr</a
-					></th
-				>
-				<th
-					><a
-						class="clickable"
-						href="/#/leaderboard"
+					>
+        </th>
+				<th>
+					<a
+						class="clickable" href="/#/leaderboard"
 						on:click={() => sortByGames()}>Games</a
-					></th
-				>
+					>
+        </th>
 			</tr>
 		</thead>
 		<tbody>

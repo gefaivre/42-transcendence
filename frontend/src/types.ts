@@ -95,3 +95,10 @@ export type Stat = {
   averageLose: {score: number, opponentScore: number}
   nbrOfFriends: number
 }
+
+// mirrors backend
+export const enum Status {
+  offline,
+  online,
+  ingame,
+}
