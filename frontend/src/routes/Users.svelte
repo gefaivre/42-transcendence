@@ -35,13 +35,11 @@
   };
 
   $: {
-    const { name: newName } = params.name;
+    const { newName } = params.name;
     if (newName !== name) {
       reload();
     }
   }
-
-  $: onMount(() => reload());
 
   async function reload() {
     getUser();
@@ -70,19 +68,9 @@
 
   async function selectprofile() {
     if (params.name != $user.username) {
-      console.log("changement de uesr");
       pageUser = await getprofile();
       console.log(pageUser);
     } else pageUser = $user;
-  }
-
-  async function requestFriendship() {
-    try {
-      await axios.post(`/users/friendship/request/${pageUser.id}`, null);
-      reload();
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   async function logout() {
@@ -95,10 +83,33 @@
     }
   }
 
+  async function requestFriendship() {
+    try {
+      await axios.post(`/users/friendship/request/${pageUser.id}`, null);
+
+      pageUser.requestFriends.unshift({ id: $user.id, username: $user.username })
+      $user.pendingFriends.unshift({ id: pageUser.id, username: pageUser.username })
+
+      pageUser = pageUser
+      $user = $user
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async function removeFriendById() {
     try {
-      await axios.post(`/users/friendship/acceptByName/${name}`, null);
-      reload();
+      await axios.post(`/users/friendship/removeById/${pageUser.id}`, null);
+
+      let index = $user.friends.findIndex(friend => friend.username === pageUser.username)
+      $user.friends.splice(index, 1);
+
+      index = pageUser.friends.findIndex(friend => friend.username === $user.username)
+      pageUser.friends.splice(index, 1);
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -107,7 +118,16 @@
   async function dismissFriendshipRequestById() {
     try {
       await axios.post(`/users/friendship/dismissById/${pageUser.id}`, null);
-      reload();
+
+      let index = $user.requestFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.requestFriends.splice(index, 1);
+
+      index = pageUser.pendingFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.pendingFriends.splice(index, 1);
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -115,12 +135,19 @@
 
   async function cancelFriendshipRequestById() {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/cancelById/${pageUser.id}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      await axios.post(`/users/friendship/cancelById/${pageUser.id}`,null);
+
+      let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.pendingFriends.splice(index, 1);
+
+      index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.requestFriends.splice(index, 1);
+
+      console.log($user.friends)
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -129,7 +156,22 @@
   async function acceptFriendshipRequestById() {
     try {
       await axios.post(`/users/friendship/acceptById/${pageUser.id}`, null);
-      reload();
+
+
+      //delete request
+      let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.pendingFriends.splice(index, 1);
+
+      index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.requestFriends.splice(index, 1);
+
+      //add friendship
+      pageUser.friends.unshift({ id: $user.id, username: $user.username })
+      $user.friends.unshift({ id: pageUser.id, username: pageUser.username })
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -175,10 +217,7 @@
             <li>
               <span>settings</span>
               <div class="actions">
-                <button
-                  class="actionButton"
-                  on:click={() => (settings = !settings)}
-                >
+                <button class="actionButton" on:click={() => (settings = !settings)}>
                   <img class="btnImage" src={acceptIcon} alt="delete" />
                 </button>
               </div>
@@ -209,10 +248,7 @@
               <li>
                 <span>Pending friend invitation...</span>
                 <div class="actions">
-                  <button
-                    class="actionButton"
-                    on:click={cancelFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={cancelFriendshipRequestById}>
                     <img class="btnImage" src={deleteIcon} alt="delete" />
                   </button>
                 </div>
@@ -221,16 +257,10 @@
               <li>
                 <span>Accept invitation</span>
                 <div class="actions">
-                  <button
-                    class="actionButton"
-                    on:click={acceptFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={acceptFriendshipRequestById}>
                     <img class="btnImage" src={acceptIcon} alt="delete" />
                   </button>
-                  <button
-                    class="actionButton"
-                    on:click={dismissFriendshipRequestById}
-                  >
+                  <button class="actionButton" on:click={dismissFriendshipRequestById}>
                     <img class="btnImage" src={deleteIcon} alt="delete" />
                   </button>
                 </div>

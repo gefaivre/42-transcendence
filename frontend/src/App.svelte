@@ -3,9 +3,7 @@
     export const title = 'Mon titre';
 
     import axios from './axios.config'
-    import { onMount, setContext } from "svelte";
-    import channelIcon  from './assets/whiteChannel.png';
-    import homeIcon     from './assets/whiteHome.png'
+    import { onMount} from "svelte";
     import messageIcon  from './assets/whiteChat.png'
     import gameIcon     from './assets/whiteGame.png'
     import leaderIcon     from './assets/podium.png'
@@ -143,7 +141,7 @@
 
   .routes {
     grid-column: 2 / 3;
-    grid-row: 1 /4;
+    grid-row: 1 / 4;
   }
 
 </style>

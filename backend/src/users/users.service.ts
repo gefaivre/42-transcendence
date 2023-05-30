@@ -298,6 +298,14 @@ export class UsersService {
           connect: [{ username: username }]
         },
       },
+      include: {
+        friends: {
+          select: {
+            id: true,
+            username: true,
+          }
+        }
+      }
     });
   }
 

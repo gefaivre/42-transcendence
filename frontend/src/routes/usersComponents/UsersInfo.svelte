@@ -6,8 +6,11 @@
   import { onMount } from "svelte";
   import type { Match, Stat, User } from "../../types";
 
-  export let pageUser;
+  export let pageUser: User;
+
   export let params;
+
+  const name = params.name;
 
   let friendspage: String = "Friends";
 
@@ -26,48 +29,22 @@
     nbrOfFriends: 0,
   };
 
-  $: onMount(() => reload());
-
-  async function reload() {
-    getUser();
-    selectprofile();
-    getMatch();
-  }
-
-  async function getUser() {
-    try {
-      let response = await axios.get("http://localhost:3000/auth/whoami", {
-        withCredentials: true,
-      });
-      user.set(response.data);
-      console.log($user);
-      logged.set("true");
-      id.set(response.data.id.toString());
-    } catch (error) {
-      logged.set("false");
-      id.set("0");
+  $: {
+    const { newName } = params.name;
+    if (newName !== name) {
+      getMatch()
     }
   }
 
-  async function getprofile(): Promise<User> {
-    return (await axios.get(`/users/${params.name}`)).data;
-  }
-
-  async function selectprofile() {
-    if (params.name != $user.username) {
-      console.log("changement de uesr");
-      pageUser = await getprofile();
-      console.log(pageUser);
-    } else pageUser = $user;
-  }
-
   async function getMatch() {
+    console.log("TESSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTT")
     try {
       let response = await axios.get(
         `http://localhost:3000/matchs/history/${pageUser.id}`,
         { withCredentials: true }
       );
       matchHistory = response.data;
+      console.log(matchHistory);
       calculStatistics();
     } catch (e) {
       console.log(e);
@@ -77,41 +54,18 @@
   async function calculStatistics() {
     let rankedMatch = matchHistory.filter((match) => match.ranked === true);
 
-    statistics.wonGames = rankedMatch.filter(
-      (match) => match.winnerId == pageUser.id
-    ).length;
-    statistics.lostGames = rankedMatch.filter(
-      (match) => match.winnerId != pageUser.id
-    ).length;
+    statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
+    statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
     statistics.totalGames = rankedMatch.length;
-    statistics.ratioGames = +(
-      (statistics.wonGames / statistics.totalGames) *
-      100
-    ).toFixed(2);
-    statistics.averageWin.score = +(
-      rankedMatch
-        .filter((match) => match.winnerId === pageUser.id)
-        .reduce((sum, match) => sum + match.winnerScore, 0) /
-      statistics.wonGames
-    ).toFixed(2);
-    statistics.averageWin.opponentScore = +(
-      rankedMatch
-        .filter((match) => match.winnerId === pageUser.id)
-        .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames
-    ).toFixed(2);
-    statistics.averageLose.score = +(
-      rankedMatch
-        .filter((match) => match.winnerId != pageUser.id)
-        .reduce((sum, match) => sum + match.loserScore, 0) /
-      statistics.lostGames
-    ).toFixed(2);
-    statistics.averageLose.opponentScore = +(
-      rankedMatch
-        .filter((match) => match.winnerId != pageUser.id)
-        .reduce((sum, match) => sum + match.winnerScore, 0) /
-      statistics.lostGames
-    ).toFixed(2);
-
+    statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
+    statistics.averageWin.score = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
+    statistics.averageWin.opponentScore = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+    statistics.averageLose.score = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
+    statistics.averageLose.opponentScore = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
     console.log(statistics);
   }
   // <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATIO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
@@ -121,7 +75,6 @@
       let response = await axios.get(`http://localhost:3000/users/id/${id}`, {
         withCredentials: true,
       });
-      console.log(response.data.username);
       return response.data.username;
     } catch (e) {
       console.log(e);
@@ -130,8 +83,17 @@
 
   async function acceptFriendshipRequestByName(name: string) {
     try {
-      await axios.post(`/users/friendship/acceptByName/${name}`, null);
-      reload();
+      let response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
+
+      //update pageUser
+      let index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      pageUser.requestFriends.splice(index, 1)
+
+      let friend = response.data.friends.find((friend: any) => friend.username === name)
+      pageUser.friends.unshift({ id: friend.id, username: name })
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -140,7 +102,12 @@
   async function dismissFriendshipRequestByName(name: string) {
     try {
       await axios.post(`/users/friendship/dismissByName/${name}`, null);
-      reload();
+
+      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      pageUser.requestFriends.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -148,12 +115,13 @@
 
   async function cancelFriendshipRequestByName(name: string) {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/cancelByName/${name}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      await axios.post(`/users/friendship/cancelByName/${name}`,null);
+
+      const index = pageUser.pendingFriends.findIndex(friend => friend.username === name)
+      pageUser.pendingFriends.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -161,12 +129,16 @@
 
   async function removeFriendByName(name: string) {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/removeByName/${name}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      const cancel = await axios.post(`/users/friendship/removeByName/${name}`,null);
+
+      let index = pageUser.friends.findIndex(friend => friend.username === name)
+      pageUser.friends.splice(index, 1)
+
+      index = pageUser.friendOf.findIndex(friend => friend.username === name)
+      pageUser.friendOf.splice(index, 1)
+
+      pageUser = pageUser
+
     } catch (error) {
       console.log(error);
     }
@@ -175,7 +147,7 @@
   async function unblockByUsername(username: string) {
     try {
       await axios.patch(`/users/unblock/${username}`, null);
-      reload();
+      // reload();
     } catch (e) {
       console.log(e);
     }
@@ -264,25 +236,19 @@
                 <img
                   class="pp"
                   src="http://localhost:3000/images/actual/{requestFriends?.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{requestFriends?.username}"
-                  >{requestFriends?.username}</a
-                >
+                  alt="pp"/>
+                <a class="name" href="#/users/{requestFriends?.username}">
+                  {requestFriends?.username}
+                </a>
               </div>
               <div class="actions">
-                <button
-                  class="actionsButton"
-                  on:click={() =>
-                    acceptFriendshipRequestByName(requestFriends.username)}
-                >
+                <button class="actionsButton"
+                  on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={acceptIcon} alt="accept" />
                 </button>
                 <button
                   class="actionsButton"
-                  on:click={() =>
-                    dismissFriendshipRequestByName(requestFriends.username)}
-                >
+                  on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
               </div>
@@ -443,19 +409,13 @@
       <div class="tiles">
         <h2>Average win</h2>
         <div class="value">
-          <span
-            >{statistics.averageWin.score}-{statistics.averageWin
-              .opponentScore}</span
-          >
+          <span>{statistics.averageWin.score}-{statistics.averageWin.opponentScore}</span>
         </div>
       </div>
       <div class="tiles lite">
         <h2>Average lose</h2>
         <div class="value">
-          <span
-            >{statistics.averageLose.score}-{statistics.averageLose
-              .opponentScore}</span
-          >
+          <span>{statistics.averageLose.score}-{statistics.averageLose.opponentScore}</span>
         </div>
       </div>
       <div class="chart">
