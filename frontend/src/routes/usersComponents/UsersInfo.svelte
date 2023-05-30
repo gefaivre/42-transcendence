@@ -1,9 +1,8 @@
 <script lang="ts">
   import axios from "../../axios.config";
-  import { id, logged, user } from "../../stores";
+  import { id } from "../../stores";
   import deleteIcon from "../../assets/redLose.png";
   import acceptIcon from "../../assets/greenWin.png";
-  import { onMount } from "svelte";
   import type { Match, Stat, User } from "../../types";
 
   export let pageUser: User;
@@ -29,20 +28,15 @@
     nbrOfFriends: 0,
   };
 
-  $: {
-    const { newName } = params.name;
-    if (newName !== name) {
-      getMatch()
-    }
+  $:{
+    pageUser && getMatch()
   }
 
   async function getMatch() {
-    console.log("TESSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTT")
     try {
-      let response = await axios.get(
-        `http://localhost:3000/matchs/history/${pageUser.id}`,
-        { withCredentials: true }
-      );
+      console.log(pageUser.username)
+      let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`,
+        { withCredentials: true });
       matchHistory = response.data;
       console.log(matchHistory);
       calculStatistics();
@@ -68,7 +62,6 @@
     .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
     console.log(statistics);
   }
-  // <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATIO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
 
   async function getUsernameById(id: number) {
     try {
@@ -204,22 +197,14 @@
           {#each pageUser.friends as friend}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{friend.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{friend.username}"
-                  >{friend.username}</a
-                >
+                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+                <a class="name" href="#/users/{friend.username}">{friend.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
                 <div class="actions">
-                  <button
-                    class="actionsButton"
-                    on:click={() => removeFriendByName(friend.username)}
-                  >
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon" />
+                  <button class="actionsButton"
+                    on:click={() => removeFriendByName(friend.username)}>
+                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
                   </button>
                 </div>
               {/if}
@@ -233,10 +218,7 @@
           {#each pageUser.requestFriends as requestFriends}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{requestFriends?.id}"
-                  alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>
@@ -246,8 +228,7 @@
                   on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={acceptIcon} alt="accept" />
                 </button>
-                <button
-                  class="actionsButton"
+                <button class="actionsButton"
                   on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
@@ -262,21 +243,14 @@
           {#each pageUser.pendingFriends as pendingFriends}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{pendingFriends?.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{pendingFriends?.username}"
-                  >{pendingFriends?.username}</a
-                >
+                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
+                <a class="name" href="#/users/{pendingFriends?.username}">
+                  {pendingFriends?.username}</a>
               </div>
               <div class="actions">
                 <button
                   class="actionsButton"
-                  on:click={() =>
-                    cancelFriendshipRequestByName(pendingFriends.username)}
-                >
+                  on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
                   <img class="btnImage" src={deleteIcon} alt="delete" />
                 </button>
               </div>
@@ -290,22 +264,14 @@
           {#each pageUser.blocked as blocked}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{blocked.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{blocked.username}"
-                  >{blocked.username}</a
-                >
+                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}"alt="pp"/>
+                <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
                 <div class="actions">
-                  <button
-                    class="actionsButton"
-                    on:click={() => unblockByUsername(blocked.username)}
-                  >
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon" />
+                  <button class="actionsButton"
+                    on:click={() => unblockByUsername(blocked.username)}>
+                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
                   </button>
                 </div>
               {/if}
@@ -327,13 +293,9 @@
               <span>{match.winnerScore}</span>
               <span>-</span>
               <span>{match.loserScore}</span>
-              <span
-                ><img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{match.loserId}"
-                  alt="pp"
-                /></span
-              >
+              <span>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/>
+              </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.loserId))}
                   ...
@@ -353,12 +315,8 @@
               <span>{match.loserScore} </span>
               <span>-</span>
               <span>{match.winnerScore}</span>
-              <span
-                ><img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{match.winnerId}"
-                  alt="pp"
-                />
+              <span>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/>
               </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.winnerId))}
@@ -380,6 +338,8 @@
   </div>
 
   <div class="box-info statistics">
+    <!--lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO |
+    MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE-->
     <h1>Statistics</h1>
     <div class="stat-grid">
       <div class="tiles">
@@ -421,8 +381,6 @@
       <div class="chart">
         <span>chart</span>
       </div>
-
-      <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
     </div>
   </div>
 </div>
@@ -639,4 +597,5 @@
   *::-webkit-scrollbar {
     display: none;
   }
+
 </style>
