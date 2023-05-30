@@ -37,12 +37,9 @@
   }
 
   async function getMatch() {
-    console.log("TESSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTT")
     try {
-      let response = await axios.get(
-        `http://localhost:3000/matchs/history/${pageUser.id}`,
-        { withCredentials: true }
-      );
+      let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`,
+        { withCredentials: true });
       matchHistory = response.data;
       console.log(matchHistory);
       calculStatistics();
@@ -68,7 +65,6 @@
     .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
     console.log(statistics);
   }
-  // <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATIO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
 
   async function getUsernameById(id: number) {
     try {
@@ -359,6 +355,8 @@
   </div>
 
   <div class="box-info statistics">
+    <!--lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO |
+    MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE-->
     <h1>Statistics</h1>
     <div class="stat-grid">
       <div class="tiles">
@@ -400,8 +398,6 @@
       <div class="chart">
         <span>chart</span>
       </div>
-
-      <!-- lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO | MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE | FRIENDS-->
     </div>
   </div>
 </div>
@@ -618,4 +614,5 @@
   *::-webkit-scrollbar {
     display: none;
   }
+
 </style>
