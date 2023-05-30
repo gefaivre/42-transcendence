@@ -86,7 +86,12 @@
   async function requestFriendship() {
     try {
       await axios.post(`/users/friendship/request/${pageUser.id}`, null);
-      reload();
+
+      pageUser.requestFriends.unshift({ id: $user.id, username: $user.username })
+      $user.pendingFriends.unshift({ id: pageUser.id, username: pageUser.username })
+
+      pageUser = pageUser
+      $user = $user
     } catch (e) {
       console.log(e);
     }
@@ -94,8 +99,17 @@
 
   async function removeFriendById() {
     try {
-      await axios.post(`/users/friendship/acceptByName/${name}`, null);
-      reload();
+      await axios.post(`/users/friendship/removeById/${pageUser.id}`, null);
+
+      let index = $user.friends.findIndex(friend => friend.username === pageUser.username)
+      $user.friends.splice(index, 1);
+
+      index = pageUser.friends.findIndex(friend => friend.username === $user.username)
+      pageUser.friends.splice(index, 1);
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -104,7 +118,16 @@
   async function dismissFriendshipRequestById() {
     try {
       await axios.post(`/users/friendship/dismissById/${pageUser.id}`, null);
-      reload();
+
+      let index = $user.requestFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.requestFriends.splice(index, 1);
+
+      index = pageUser.pendingFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.pendingFriends.splice(index, 1);
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -112,12 +135,19 @@
 
   async function cancelFriendshipRequestById() {
     try {
-      const cancel = await axios.post(
-        `/users/friendship/cancelById/${pageUser.id}`,
-        null
-      );
-      console.log(cancel);
-      reload();
+      await axios.post(`/users/friendship/cancelById/${pageUser.id}`,null);
+
+      let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.pendingFriends.splice(index, 1);
+
+      index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.requestFriends.splice(index, 1);
+
+      console.log($user.friends)
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }
@@ -126,7 +156,22 @@
   async function acceptFriendshipRequestById() {
     try {
       await axios.post(`/users/friendship/acceptById/${pageUser.id}`, null);
-      reload();
+
+
+      //delete request
+      let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
+      $user.pendingFriends.splice(index, 1);
+
+      index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
+      pageUser.requestFriends.splice(index, 1);
+
+      //add friendship
+      pageUser.friends.unshift({ id: $user.id, username: $user.username })
+      $user.friends.unshift({ id: pageUser.id, username: pageUser.username })
+
+      pageUser = pageUser
+      $user = $user
+
     } catch (e) {
       console.log(e);
     }

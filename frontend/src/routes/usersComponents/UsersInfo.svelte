@@ -10,7 +10,7 @@
 
   export let params;
 
-  const name2 = params.name;
+  const name = params.name;
 
   let friendspage: String = "Friends";
 
@@ -85,10 +85,11 @@
     try {
       let response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
-      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      //update pageUser
+      let index = pageUser.requestFriends.findIndex(friend => friend.username === name)
       pageUser.requestFriends.splice(index, 1)
 
-      const friend = response.data.friends.find((friend: any) => friend.username === name)
+      let friend = response.data.friends.find((friend: any) => friend.username === name)
       pageUser.friends.unshift({ id: friend.id, username: name })
 
       pageUser = pageUser
@@ -235,8 +236,7 @@
                 <img
                   class="pp"
                   src="http://localhost:3000/images/actual/{requestFriends?.id}"
-                  alt="pp"
-                />
+                  alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>

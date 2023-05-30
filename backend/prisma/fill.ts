@@ -317,15 +317,15 @@ async function main() {
     }
 
   //Connect Match
-  console.log("Connect Match")
-  for (let user1 = 0; user1 < tab.length; user1++)
-    for ( let user2 = 0; user2 < tab.length; user2++)
-    {
-      if (user1 != user2 && !(RelationMatchBetween(tab[user1], user2)))
-      {
-        await createMatchrelation(user1, user2);
-      }
-    }
+  // console.log("Connect Match")
+  // for (let user1 = 0; user1 < tab.length; user1++)
+  //   for ( let user2 = 0; user2 < tab.length; user2++)
+  //   {
+  //     if (user1 != user2 && !(RelationMatchBetween(tab[user1], user2)))
+  //     {
+  //       await createMatchrelation(user1, user2);
+  //     }
+  //   }
 
 console.log(tab[0])
 
