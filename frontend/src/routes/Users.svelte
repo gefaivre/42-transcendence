@@ -2,7 +2,7 @@
   import axios from "../axios.config";
   import { onMount } from "svelte";
   import { id, reloadImage, user, logged, socket } from "../stores";
-  import type { Status, User } from "../types";
+  import { Status, type User } from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
   import NotFound from "./NotFound.svelte";
@@ -301,11 +301,11 @@
             </li>
 
             <li>
-              {#if onlineStatus === 0}
+              {#if onlineStatus === Status.offline}
                 <span>This user is offline</span>
-              {:else if onlineStatus === 1}
+              {:else if onlineStatus === Status.online}
                 <span>This user is online</span>
-              {:else if onlineStatus === 2}
+              {:else if onlineStatus === Status.ingame}
                 <span>This user is ingame</span>
               {/if}
             </li>
