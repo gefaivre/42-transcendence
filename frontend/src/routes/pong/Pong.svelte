@@ -21,6 +21,9 @@
 
   let unique = {} //used to restart Game component
 
+  let friendly = false;
+  let friendUsername = '';
+
   let inGame: boolean = false;
   let gameRequest: boolean = false;
   let watch = false;
@@ -136,7 +139,12 @@
 
   function requestGame() {
     console.log('settings', settings);
-    socket.emit('requestGame', { settings: settings });
+    if (friendly) {
+      socket.emit('requestGame', { friend: friendUsername, settings: settings });
+    } else {
+      socket.emit('requestGame', { settings: settings });
+    }
+
     gameRequest = true;
   }
 
@@ -145,18 +153,6 @@
     gameRequest = false;
   }
 
-  function joinFriendly(event: any) {
-    const formData = new FormData(event.target);
-
-    for (let field of formData) {
-      const [key, value] = field;
-      if (key === 'friend' && value) {
-        socket.emit('requestGame', { friend: value, settings: settings }, () => {
-          gameRequest = true
-        });
-      }
-    }
-  }
 
   function watchGame(game: string) {
     socket.emit('watchGame', {gameName: game});
@@ -172,18 +168,12 @@
 
 <h1 id="title"> Pong </h1>
 
-{#if gameList}
-  <ul id="gameList">
-    {#each gameList as game}
-      <li>{game.player1 + ' vs ' + game.player2} <button on:click={() => watchGame(game.player1)}>watch</button></li>
-    {/each}
-  </ul>
-{/if}
+<div id="body">
 
 
   {#if !gameRequest}
-  <div id="settings">
-    <h2 id="settingsTitle">Settings</h2>
+  <div id="requestGame">
+    <h2>Settings</h2>
 
     <table id="settingsTable">
 
@@ -206,21 +196,37 @@
     <td align="left"><label for="paddleSize">paddle size</label></td>
     <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
+
+    <tr>
+    <td align="left">
+    <input type="checkbox" name="friendly" bind:value={friendly}><label for="friendly">friendly</label>
+    </td>
+    <td align="right">
+    {#if friendly}
+      <input bind:value={friendUsername} type="text" placeholder="your friend username">
+    {/if}
+    </td>
+    </tr>
     </table>
 
+  <button id="requestButton" on:click={requestGame}>request game</button>
+
   </div>
 
-  <div id="randomGame">
-  <button on:click={requestGame}>request random game</button>
-  </div>
+ {#if gameList}
+ <div id="watchGame">
+ <h2>Games</h2>
+  <ul id="gameList">
+    {#each gameList as game}
+      <li>{game.player1 + ' vs ' + game.player2} <button id="watchButton" on:click={() => watchGame(game.player1)}>watch</button></li>
+    {/each}
+  </ul>
+</div>
+{/if}
 
-  <div id="friendlyGame">
-  <form on:submit|preventDefault={(event) => joinFriendly(event)}>
-      <input id="friend" name="friend" type="text" placeholder="type friend username">
-      <button type="submit">play a friendly match</button>
-  </form>
-  </div>
-  {/if}
+ {/if}
+  
+</div>
 {/if}
 
 {#if inGame}
@@ -236,14 +242,23 @@
 
 </div>
 
+
 <style>
 
 #all {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
   color: var(--white);
   background-color: var(--grey);
   border-left: 1px solid grey;
   padding-bottom: 2em;
   text-align: center;
+}
+
+#body {
+  display:flex;
+  align-content: center;
 }
 
 #title {
@@ -253,29 +268,22 @@
   margin-bottom:2em;
 }
 
-#gameList {
-  font-weight: bold;
-  font-size: 1.25em;
+#watchGame {
+  flex-grow: 1;
 }
 
-#settings {
-  margin-bottom:1em;
-}
-
-#settingsTitle {
-  font-weight:bold;
-  font-size:1.3em;
-  color:var(--pink);
+#requestGame {
+  flex-grow: 1;
 }
 
 #settingsTable {
-  font-weight:bold;
   margin-left:auto;
   margin-right:auto;
 }
 
-#randomGame {
-  margin-bottom: 2em;
+h2 {
+  font-size:1.3em;
+  color:var(--pink);
 }
 
 button {
@@ -285,7 +293,9 @@ button {
   border-radius:4px;
   padding:0.5em;
   color: var(--white);
+  margin:1em;
 }
+
 button:hover {
   background-color:#1d4ed8
 }
