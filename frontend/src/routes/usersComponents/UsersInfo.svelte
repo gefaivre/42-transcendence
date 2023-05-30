@@ -197,22 +197,14 @@
           {#each pageUser.friends as friend}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{friend.id}"
-                  alt="pp"
-                />
-                <a class="name" href="#/users/{friend.username}"
-                  >{friend.username}</a
-                >
+                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+                <a class="name" href="#/users/{friend.username}">{friend.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
                 <div class="actions">
-                  <button
-                    class="actionsButton"
-                    on:click={() => removeFriendByName(friend.username)}
-                  >
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon" />
+                  <button class="actionsButton"
+                    on:click={() => removeFriendByName(friend.username)}>
+                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
                   </button>
                 </div>
               {/if}
@@ -226,10 +218,7 @@
           {#each pageUser.requestFriends as requestFriends}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{requestFriends?.id}"
-                  alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>
@@ -254,10 +243,7 @@
           {#each pageUser.pendingFriends as pendingFriends}
             <li>
               <div class="user">
-                <img
-                  class="pp"
-                  src="http://localhost:3000/images/actual/{pendingFriends?.id}"
-                  alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
                 <a class="name" href="#/users/{pendingFriends?.username}">
                   {pendingFriends?.username}</a>
               </div>
