@@ -5,6 +5,8 @@
   import Game from "./Game.svelte";
   import type { GameState, Settings } from "./Class";
   import type { WsException } from "../../types";
+  import { Status } from "../../types";
+  import { socket as _socket } from "../../stores";
 
   class Match {
     player1: string;
@@ -37,6 +39,7 @@
     socket.on('gameStart', (match) => {
       currentMatch = match;
       console.log("game started");
+      $_socket.emit('setOnlineStatus', Status.offline)
     });
 
     socket.on('watchGame', (res) => {
