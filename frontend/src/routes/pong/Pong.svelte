@@ -202,7 +202,7 @@
 
     <tr>
     <td align="left">
-    <input type="checkbox" name="friendly" bind:value={friendly}><label for="friendly">friendly</label>
+    <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">friendly</label>
     </td>
     <td align="right">
     {#if friendly}
@@ -280,8 +280,13 @@
 }
 
 #settingsTable {
+  margin-top:1em;
   margin-left:auto;
   margin-right:auto;
+}
+
+#checkbox {
+  margin-left:0;
 }
 
 h2 {
@@ -295,8 +300,8 @@ button {
   border: 1px solid #1d4ed8;
   border-radius:4px;
   padding:0.5em;
+  margin: 1em;
   color: var(--white);
-  margin:1em;
 }
 
 button:hover {
@@ -305,7 +310,8 @@ button:hover {
 
 input {
   border-radius: 2px;
-  padding:0.2em;
+  font-weight:normal;
+  padding:0.5em;
   margin:0.5em;
   color: black;
 }
