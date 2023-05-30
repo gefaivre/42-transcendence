@@ -1,9 +1,8 @@
 <script lang="ts">
   import axios from "../../axios.config";
-  import { id, logged, user } from "../../stores";
+  import { id } from "../../stores";
   import deleteIcon from "../../assets/redLose.png";
   import acceptIcon from "../../assets/greenWin.png";
-  import { onMount } from "svelte";
   import type { Match, Stat, User } from "../../types";
 
   export let pageUser: User;
@@ -29,15 +28,13 @@
     nbrOfFriends: 0,
   };
 
-  $: {
-    const { newName } = params.name;
-    if (newName !== name) {
-      getMatch()
-    }
+  $:{
+    pageUser && getMatch()
   }
 
   async function getMatch() {
     try {
+      console.log(pageUser.username)
       let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`,
         { withCredentials: true });
       matchHistory = response.data;
