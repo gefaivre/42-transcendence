@@ -406,4 +406,10 @@
     background-color: var(--grey);
     overflow-y: auto;
   }
+
+  .btnImage {
+    height: 25px;
+    width: 25px;
+  }
+  
 </style>
