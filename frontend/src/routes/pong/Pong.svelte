@@ -239,7 +239,7 @@
 {/if}
 
 {#if gameRequest}
-<h2>Game requested ! Waiting for your opponent ...</h2>
+<h3>Game requested ! Waiting for your opponent ...</h3>
 <button on:click={cancelRequest}>Cancel</button>
 {/if}
 
