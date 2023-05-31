@@ -32,8 +32,8 @@ export class ImagesController {
     return this.images.addImage(request.user.id, file);
   }
 
-  @Patch(':id')
-  setImage(@Req() request: any, @Param('id', ParseIntPipe) imageId: number) {
+  @Patch(':imageId')
+  setImage(@Req() request: any, @Param('imageId', ParseIntPipe) imageId: number) {
     return this.images.setImage(request.user.id, imageId);
   }
 
@@ -47,13 +47,13 @@ export class ImagesController {
     return this.images.findAll(request.user.id);
   }
 
-  @Get(':id')
-  findUserOne(@Req() request: any, @Param('id', ParseIntPipe) id: number) {
-    return this.images.findOne(request.user.id, id);
+  @Get(':imageId')
+  findUserOne(@Req() request: any, @Param('imageId', ParseIntPipe) imageId: number) {
+    return this.images.findOne(request.user.id, imageId);
   }
 
-  @Delete(':id')
-  removeOne(@Param('id', ParseIntPipe) id: number) {
-    return this.images.remove(id);
+  @Delete(':imageId')
+  removeOne(@Param('imageId', ParseIntPipe) imageId: number) {
+    return this.images.remove(imageId);
   }
 }
