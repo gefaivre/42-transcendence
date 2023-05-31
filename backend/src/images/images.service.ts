@@ -75,8 +75,12 @@ export class ImagesService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} image`;
+  async remove(id: number) {
+    return await this.PrismaService.image.delete({
+      where: {
+        id: id
+      }
+    })
   }
 
   async downloadImage(link: URL, path: PathLike) {

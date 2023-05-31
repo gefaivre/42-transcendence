@@ -6,8 +6,6 @@ import { AuthGuard } from '@nestjs/passport';
 import * as fs from 'fs'
 import { FileSizeValidationPipe } from 'src/pipes';
 
-// https://cdn.intra.42.fr/users/db271b9343eac0fdebb3e9fb79b586cc/small_gefaivre.jpg
-
 @UseGuards(AuthGuard('jwt'))
 @Controller('images')
 export class ImagesController {

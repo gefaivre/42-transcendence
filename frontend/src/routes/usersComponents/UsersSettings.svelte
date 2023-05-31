@@ -6,7 +6,7 @@
 
   let fileInput: any = null;
 
-  let imagesTab = [];
+  let images = [];
 
   let username: string = null;
   let password: string = null;
@@ -15,54 +15,52 @@
   let code2FA: string = '';
   let steptwo: boolean = false;
 
-  onMount(() => downloadImages());
+  onMount(() => getPPs());
 
-  async function submitImage() {
-    console.log(fileInput.files[0]);
-
-    if (fileInput.files[0] === null || fileInput.files[0] === undefined)
-      return alert("empty file");
+  async function addPP() {
 
     const file = fileInput.files[0];
+    if (file === null || file === undefined)
+      return alert("empty file");
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await axios.post("/images", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      downloadImages();
+      await axios.post("/images", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      getPPs();
       $reloadImage++;
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   }
 
-  async function downloadImages() {
-    axios
-      .get("/images")
-      .then((res) => {
-        imagesTab = res.data;
-        downloadImages();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  async function getPPs() {
+    try {
+      const response = await axios.get('/images')
+      images = response.data
+      getPPs()
+    } catch(e) {
+      console.log(e);
+    }
   }
 
-  async function UpdatePP(id: number) {
-    console.log("Update PP");
-    await axios
-      .patch(`/images/${id}`)
-      .then((res) => {
-        console.log(res.data);
-        $reloadImage++;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  async function updatePP(id: number) {
+    try {
+      await axios.patch(`/images/${id}`)
+      $reloadImage++;
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  async function deletePP(id: number) {
+    try {
+      await axios.delete(`/images/${id}`)
+      images = images.filter((image: any) => image.id !== id)
+    }  catch(e) {
+      console.log(e)
+    }
   }
 
   async function updateUsername() {
@@ -154,29 +152,22 @@
   <div class="box-info image">
     <h1>Change your pp</h1>
     <div class="image-list">
-      {#each imagesTab as i}
-        <button
-          class="hidden-button"
-          on:click={() => {
-            UpdatePP(i.id);
-          }}
-        >
-          <img
-            class="pp"
-            src="http://localhost:3000/images/{i.id}"
-            alt={i.name}
-          />
-        </button>
+      {#each images as image}
+      <div class="imageContainer">
+        <div>
+          <button class="hidden-button" on:click={() => updatePP(image.id)}>
+            <img class="pp" src="http://localhost:3000/images/{image.id}" alt={image.name}/>
+          </button>
+        </div>
+        <div class="imageButton">
+          <button on:click={() => deletePP(image.id)}>delete</button>
+        </div>
+      </div>
       {/each}
-      <form class="form" on:change|preventDefault={submitImage}>
-        <label for="file-upload"
-          >Add Image
-          <input
-            bind:this={fileInput}
-            type="file"
-            style="visibility: hidden;"
-            id="file-upload"
-          />
+      <form class="form" on:change|preventDefault={addPP}>
+        <label for="file-upload">
+          Add Image
+          <input bind:this={fileInput} type="file" style="visibility: hidden;" id="file-upload"/>
         </label>
       </form>
     </div>
@@ -325,6 +316,15 @@
 
   .username .content input {
     border-radius: 10px;
+  }
+
+  .imageButton button {
+    border: solid 1px black;
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   /* ===== Scrollbar CSS ===== */
