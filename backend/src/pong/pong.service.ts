@@ -242,6 +242,14 @@ export class PongService {
       return (room.settings);
   }
 
+  removeRoom(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id === roomId);
+    if (room !== undefined) {
+      const toDelete: number = this.rooms.indexOf(room);
+      this.rooms.splice(toDelete, 1);
+    }
+  }
+
   private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
     const winner: Omit<User, 'password'> | null  = await this.users.findById(room.player2!.prismaId);
