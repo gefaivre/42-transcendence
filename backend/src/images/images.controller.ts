@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -14,7 +14,7 @@ export class ImagesController {
 
   constructor(private readonly images: ImagesService) {}
 
-  @Post('add')
+  @Post()
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request: any, file, cb) => {
@@ -32,7 +32,7 @@ export class ImagesController {
     return this.images.addImage(request.user.id, file);
   }
 
-  @Get('set/:id')
+  @Patch(':id')
   setImage(@Req() request: any, @Param('id', ParseIntPipe) imageId: number) {
     return this.images.setImage(request.user.id, imageId);
   }
@@ -42,7 +42,7 @@ export class ImagesController {
     return this.images.getImage(userId);
   }
 
-  @Get('all')
+  @Get()
   findUserAll(@Req() request: any) {
     return this.images.findAll(request.user.id);
   }

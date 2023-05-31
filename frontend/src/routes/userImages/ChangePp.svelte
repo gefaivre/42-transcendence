@@ -23,7 +23,7 @@
         formData.append('file', file)
 
         try {
-            const response = await axios.post('/images/add', formData, {
+            const response = await axios.post('/images', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             },
@@ -39,7 +39,7 @@
     }
 
     async function downloadImages() {
-      axios.get('/images/all')
+      axios.get('/images')
       .then(res => {
         imagesTab = res.data;
       })
@@ -50,7 +50,7 @@
 
     async function UpdatePP(id:number) {
         console.log("Update PP")
-        await axios.get(`/images/set/${id}`)
+        await axios.patch(`/images/${id}`)
         .then(res => {
             console.log(res.data)
             reloadImage++
