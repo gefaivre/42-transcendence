@@ -54,7 +54,7 @@ export class FileSizeValidationPipe implements PipeTransform<Express.Multer.File
       throw new BadRequestException('Wrong file format. Only jpg and png are supported.')
 
     if (value.size > 100000) // 100 kb
-      throw new BadRequestException('File too big. Limit is 10b.')
+      throw new BadRequestException('File too big. Limit is 100kb.')
 
     return value
   }
