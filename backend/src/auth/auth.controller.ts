@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException } from '@nestjs/common';
+import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
@@ -143,6 +143,8 @@ export class AuthController {
       } catch(e) {
         throw new ConflictException()
       }
+    } else {
+      throw new BadRequestException('wrong 2fa code')
     }
   }
 

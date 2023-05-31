@@ -5,8 +5,6 @@ import Users from './routes/Users.svelte'
 import Message from './routes/Message.svelte'
 import Test from './routes/test.svelte'
 import Channels from './routes/Channels.svelte'
-import Signup from './routes/Signup.svelte'
-import Login from './routes/Login.svelte'
 import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
 import ThomasChan from './routes/Chan.svelte'
@@ -16,8 +14,6 @@ import DirectMessage from './routes/DirectMessage.svelte'
 
 export default {
     '/': Leaderboard,
-    '/signup': Signup,
-    '/login': Login,
     '/chat': Chat,
     '/channel/:name': ThomasChan,
     '/Channels': Channels,

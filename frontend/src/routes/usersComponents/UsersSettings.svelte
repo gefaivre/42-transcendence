@@ -1,12 +1,19 @@
 <script lang="ts">
   import axios from "../../axios.config";
-  import { id, user, reloadImage } from "../../stores";
+  import { user, reloadImage } from "../../stores";
   import { replace } from "svelte-spa-router";
   import { onMount } from "svelte";
 
   let fileInput: any = null;
 
   let imagesTab = [];
+
+  let username: string = null;
+  let password: string = null;
+
+  let qrcode: string = '';
+  let code2FA: string = '';
+  let steptwo: boolean = false;
 
   onMount(() => downloadImages());
 
@@ -58,9 +65,6 @@
       });
   }
 
-  let username: string = null;
-  let password: string = null;
-
   async function updateUsername() {
     // guards
     if (username === null) {
@@ -85,6 +89,38 @@
       alert(error.response.data.message);
     }
   }
+
+  async function validate2FA() {
+        try {
+            await axios.post('http://localhost:3000/auth/2FA/validate', { token: code2FA }, { withCredentials: true })
+            qrcode = ''
+            code2FA = ''
+            // getUser()
+            $user.TwoFA = true;
+            steptwo = false;
+          } catch (error) {
+            alert('Bad 2fa code')
+            console.log(error.response.data.message)
+          }
+        }
+        async function enable2FA() {
+          try {
+            const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
+            qrcode = response.data
+            steptwo = true;
+        } catch (error) {
+            console.log(error.response.data.message)
+        }
+    }
+    async function disable2FA() {
+        try {
+            await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
+            // getUser()
+            $user.TwoFA = false;
+        } catch (error) {
+            console.log(error.response.data.message)
+        }
+    }
 
   // before update, password displayed in table is the hash
   // after update, password displayed in table is in clear
@@ -155,13 +191,15 @@
   </div>
 
   <div class="box-info twofa">
-    <h1>Toggle 2fa</h1>
-    <img
-      id="qrcode"
-      class="qrcode"
-      src="https://upload.wikimedia.org/wikipedia/commons/7/78/Qrcode_wikipedia_fr_v2clean.png?uselang=fr"
-      alt="qr code"
-    />
+      {#if $user.TwoFA === false && steptwo === false}
+        <button on:click={enable2FA}>Enable TWOFA</button>
+      {:else if qrcode !== ''}
+        <img alt='qrcode' src={qrcode}>
+        <input type="text" placeholder="code" bind:value={code2FA}>
+        <button on:click={validate2FA}>Validate</button>
+      {:else}
+        <button on:click={disable2FA}>Disable TWOFA</button>
+      {/if}
   </div>
 </div>
 
@@ -217,12 +255,21 @@
   }
 
   .twofa {
-    grid-row: 3 / 4;
-    grid-column: 2 / 3;
-    place-self: center;
+    display:flex ;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 250px;
-    height: 250px;
+    height: 280px;
+
+    margin: auto;
   }
+
+  .twofa img {
+    width: 210px;
+    height: 210px;
+  }
+
 
   .image-list {
     display: grid;
@@ -266,18 +313,6 @@
     border: none;
     outline: none;
     box-shadow: none;
-  }
-
-  .twofa .qrcode {
-    display: block;
-    height: 200px;
-    width: 200px;
-    margin: auto;
-    filter: blur(10px);
-  }
-
-  .twofa .qrcode:active {
-    filter: blur(0px);
   }
 
   .username .content {
