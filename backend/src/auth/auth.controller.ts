@@ -115,13 +115,6 @@ export class AuthController {
     response.cookie('jwt', '', { expires: new Date(0) });
   }
 
-  // TODO (?): move into users controller (would be a conflict with other get routes though)
-  @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  getProfile(@Req() request: any) {
-    return request.user;
-  }
-
   // TODO: move into user controller
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')

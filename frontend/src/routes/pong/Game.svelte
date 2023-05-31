@@ -38,8 +38,10 @@
 
   let winHeight: number = window.innerHeight;
   let winWidth: number = window.innerWidth - Math.round(0.25 * window.innerWidth);
+
   let frameHeight: number;
   let frameWidth: number;
+
 
   if (winWidth / winHeight < 1.5) {
     frameWidth = winWidth;
@@ -48,6 +50,8 @@
     frameHeight = winHeight;
     frameWidth = Math.round(winHeight * 1.5);
   }
+
+  let size = frameWidth / 30;
 
   console.log('win width = ', winWidth)
   console.log('frame width = ', frameWidth)
@@ -95,7 +99,7 @@
   };
 </script>
 
-<div id="all">
+<div id="all" style="font-size: {size + 'px'}">
 <p id="score">{leftScore}  -  {rightScore}</p>
 <div id="game">
   <canvas id="canvas" bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
@@ -143,8 +147,8 @@
 
 #countdown {
   position: absolute;
-  top: 62%;
-  left: 48.5%;
+  top: 60%;
+  left: 47%;
   font-size: 3.5em;
   font-weight: bold;
   color: var(--lite-lite-lite-grey);

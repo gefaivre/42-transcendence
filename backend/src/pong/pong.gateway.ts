@@ -109,6 +109,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const username = this.pong.getUsername(client.id);
       client.leave(room);
       this.server.to(room).emit('opponentLeft', {username: username});
+      this.pong.removeRoom(room);
     }
   }
 }
