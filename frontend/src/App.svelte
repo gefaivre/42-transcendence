@@ -10,8 +10,6 @@
     import { id, logged, user, reloadImage} from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
-    import Signup from "./routes/Signup.svelte";
-    import Login from "./routes/Connection.svelte";
     import Connection from './routes/Connection.svelte';
 
     const menuItems = [

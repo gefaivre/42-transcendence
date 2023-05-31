@@ -94,42 +94,46 @@
   <h1 class="title">ft_transcendence</h1>
 
   {#if action === ''}
-
-    <a href={FT_AUTHORIZE}>
-      <div class="connect-button">
-        <img src={Logo42} alt="logo 42">
-      </div>
-    </a>
-    <button on:click={ () => (action = 'signup')}>
-      <div class="connect-button">
-        signup
-      </div>
-    </button>
-    <button on:click={() => (action = 'signin')}>
-      <div class="connect-button">
-        signin
-      </div>
-    </button>
+    <div class="action">
+      <a href={FT_AUTHORIZE}>
+        <div class="connect-button">
+          <img src={Logo42} alt="logo 42">
+        </div>
+      </a>
+      <button on:click={ () => (action = 'signup')}>
+        <div class="connect-button">
+          signup
+        </div>
+      </button>
+      <button on:click={() => (action = 'signin')}>
+        <div class="connect-button">
+          signin
+        </div>
+      </button>
+    </div>
 
   {:else if action === 'signup'}
-
-    <input type="text" placeholder="username" bind:value={createUserDto.username}><br>
-    <input type="text" placeholder="password" bind:value={createUserDto.password}><br>
-    <button on:click={signup}>signup</button>
-    <button on:click={ () => (action = '')}>return</button>
+    <div class="action">
+      <input type="text" placeholder="username" bind:value={createUserDto.username}><br>
+      <input type="text" placeholder="password" bind:value={createUserDto.password}><br>
+      <button on:click={signup}>signup</button>
+      <button on:click={ () => (action = '')}>return</button>
+    </div>
 
   {:else if action === 'signin'}
-
-    <input type="text" placeholder="username" bind:value={createUserDto.username}><br>
-    <input type="text" placeholder="password" bind:value={createUserDto.password}><br>
-    <button on:click={login}>login</button>
-    <button on:click={ () => (action = '')}>return</button>
+    <div class="action">
+      <input type="text" placeholder="username" bind:value={createUserDto.username}><br>
+      <input type="text" placeholder="password" bind:value={createUserDto.password}><br>
+      <button on:click={login}>login</button>
+      <button on:click={ () => (action = '')}>return</button>
+    </div>
 
   {:else if action === 'qrcode'}
-
-    <input type="text" inputmode="numeric" bind:value={code}>
-    <button on:click={validate2FA}>2FA Validate</button>
-    <button on:click={ () => (action = '')}>return</button>
+    <div class="action">
+      <input type="text" inputmode="numeric" bind:value={code}>
+      <button on:click={validate2FA}>2FA Validate</button>
+      <button on:click={ () => (action = '')}>return</button>
+    </div>
 
   {/if}
 
@@ -138,9 +142,16 @@
   <style>
 
   .screen {
-    display: flex;
     height: 100vh;
-    background-color: var(--lite-grey);
+    display: grid;
+    grid-template-rows: 1fr 240px 1fr;
+    background-color: var(--grey);
+
+  }
+
+  .action {
+    grid-row: 2/3;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -148,9 +159,11 @@
   }
 
   .title {
-    position: absolute;
+    grid-row: 1/2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-family: monospace;
-    top: 250px;
     font-size: 4em;
     color: var(--pink);
     text-shadow:  0 0 10px ;
@@ -164,7 +177,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--lite-lite-grey);
+    background-color: var(--lite-grey);
+  }
+
+  .action button {
+    color: var(--white)
   }
 
   .connect-button img {
@@ -172,8 +189,6 @@
     width: 65px;
   }
 
-  /* input:focus::placeholder {
-      color: transparent;
-  } */
+
 
 </style>
