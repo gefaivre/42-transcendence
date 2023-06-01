@@ -6,26 +6,26 @@
     import greenWin from '../assets/greenWin.png';
     import redLose from "../assets/redLose.png";
     import MatchHistory from '../assets/match_history.json';
-  
+
     let user = null;
     let game = [];
     let username = window.location.hash.substr(2);
-  
+
     const getUser = async () => {
       try {
         const response = await axios.get(`/users/${username}`);
         user = response.data;
         console.log(user);
         game = MatchHistory;
-      } catch (error) {
+      } catch (e) {
         console.log("error getting user");
         // ici tu peux rediriger vers la page notfound en changeant la valeur de la variable username
         username = 'notfound';
       }
     }
-  
+
     const str = 'path/' + username;
-  
+
     onMount(() => {
       // ajoute un écouteur d'événement pour "popstate"
       window.addEventListener('popstate', async () => {
@@ -43,7 +43,7 @@
         </div>
         <div class="username">
             <div class="text-4xl text-white text-center font-inter">{user.username}</div>
-        </div>  
+        </div>
     </div>
     <div class="gameHistory">
         <h1 class="text-4xl font-inter" style="color: #9E27D9;">Game History</h1>
@@ -109,11 +109,11 @@
     <Layout>
         <div class="content">
             <span style="color: white; font-size: 50px; position: relative; top:30%; font-family: Arial;">404 page not found</span>
-            
+
         </div>
     </Layout>
     {/if}
-        
+
     <style>
         .content {
           width: 600px;
@@ -214,7 +214,7 @@
     .statistics{
         position: fixed;
        /* display: flex;
-        flex-direction: column; 
+        flex-direction: column;
         */
         bottom: 152px;
         right: 100px;
@@ -272,4 +272,3 @@
         width: 20%;
     }
     </style>
-  

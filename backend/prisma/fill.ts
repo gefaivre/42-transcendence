@@ -75,7 +75,7 @@ async function createpending(user1: number, user2: number) {
       tab[user1] = user;
     if ((user = await getUser(tab[user2].username)) != null)
       tab[user2] = user;
-  } catch (error) {
+  } catch (e) {
     console.log("createpending Failed")
   }
 }
@@ -98,7 +98,7 @@ async function createRequest(user1: number, user2: number) {
       tab[user1] = user;
     if ((user = await getUser(tab[user2].username)) != null)
       tab[user2] = user;
-  } catch (error) {
+  } catch (e) {
     console.log("createrequest Failed")
   }
 }
@@ -123,7 +123,7 @@ async function createFriends(user1: number, user2: number) {
       tab[user1] = user;
     if ((user = await getUser(tab[user2].username)) != null)
       tab[user2] = user;
-  } catch (error) {
+  } catch (e) {
     console.log("createrfriends Failed")
   }
 

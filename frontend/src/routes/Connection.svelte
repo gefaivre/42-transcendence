@@ -39,8 +39,8 @@
     try {
       const response = await axios.post('http://localhost:3000/auth/2FA/login', { token: code }, { withCredentials: true })
       return response.data === true ? success2FA() : failure2FA()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
     }
   }
 

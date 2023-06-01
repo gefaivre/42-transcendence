@@ -14,8 +14,8 @@
       const response = await axios.get('channel');
       chans = response.data;
       console.log(chans);
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   });
 

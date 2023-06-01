@@ -28,8 +28,8 @@
           user = response.data;
           console.log(user);
           console.log(user.id);
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   });
 

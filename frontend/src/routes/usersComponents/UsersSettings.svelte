@@ -83,8 +83,8 @@
 
       // redirect to your new user page
       replace(`/users/${$user.username}`);
-    } catch (error) {
-      alert(error.response.data.message);
+    } catch (e) {
+      alert(e.response.data.message);
     }
   }
 
@@ -96,9 +96,9 @@
             // getUser()
             $user.TwoFA = true;
             steptwo = false;
-          } catch (error) {
+          } catch (e) {
             alert('Bad 2fa code')
-            console.log(error.response.data.message)
+            console.log(e.response.data.message)
           }
         }
         async function enable2FA() {
@@ -106,8 +106,8 @@
             const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
             qrcode = response.data
             steptwo = true;
-        } catch (error) {
-            console.log(error.response.data.message)
+        } catch (e) {
+            console.log(e.response.data.message)
         }
     }
     async function disable2FA() {
@@ -115,8 +115,8 @@
             await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
             // getUser()
             $user.TwoFA = false;
-        } catch (error) {
-            console.log(error.response.data.message)
+        } catch (e) {
+            console.log(e.response.data.message)
         }
     }
 
@@ -140,8 +140,8 @@
 
       // redirect to your new user page
       replace(`/users/${$user.username}`);
-    } catch (error) {
-      alert(error.response.data.message);
+    } catch (e) {
+      alert(e.response.data.message);
     }
   }
 </script>

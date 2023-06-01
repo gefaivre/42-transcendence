@@ -87,8 +87,8 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -101,8 +101,8 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -115,8 +115,8 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -132,8 +132,8 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
