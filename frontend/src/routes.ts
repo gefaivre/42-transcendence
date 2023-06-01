@@ -9,7 +9,6 @@ import CreateChannel from './routes/CreateChannel.svelte';
 import Chan from './routes/OneChan.svelte'
 import ThomasChan from './routes/Chan.svelte'
 import Pong from './routes/pong/Pong.svelte'
-import TwoFA from './routes/2FA.svelte'
 import DirectMessage from './routes/DirectMessage.svelte'
 
 export default {
@@ -23,7 +22,6 @@ export default {
     '/test': Test,
     '/message/create': CreateChannel,
     '/message/:name': Chan,
-    '/2FA': TwoFA,
     '/pong': Pong,
     '/dm/:username': DirectMessage,
     '*': NotFound
