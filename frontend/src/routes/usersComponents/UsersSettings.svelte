@@ -90,7 +90,7 @@
 
   async function validate2FA() {
         try {
-            await axios.post('http://localhost:3000/auth/2FA/validate', { token: code2FA }, { withCredentials: true })
+            await axios.post('/auth/2FA/validate', { token: code2FA })
             qrcode = ''
             code2FA = ''
             // getUser()
@@ -103,7 +103,7 @@
         }
         async function enable2FA() {
           try {
-            const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
+            const response = await axios.patch(`/auth/2FA/enable`, null)
             qrcode = response.data
             steptwo = true;
         } catch (e) {
@@ -112,7 +112,7 @@
     }
     async function disable2FA() {
         try {
-            await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
+            await axios.patch(`/auth/2FA/disable`, null)
             // getUser()
             $user.TwoFA = false;
         } catch (e) {

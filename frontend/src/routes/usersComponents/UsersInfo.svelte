@@ -35,8 +35,7 @@
   async function getMatch() {
     try {
       console.log(pageUser.username)
-      let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`,
-        { withCredentials: true });
+      let response = await axios.get(`/matchs/history/${pageUser.id}`);
       matchHistory = response.data;
       console.log(matchHistory);
       calculStatistics();
@@ -65,9 +64,7 @@
 
   async function getUsernameById(id: number) {
     try {
-      let response = await axios.get(`http://localhost:3000/users/id/${id}`, {
-        withCredentials: true,
-      });
+      let response = await axios.get(`/users/id/${id}`)
       return response.data.username;
     } catch (e) {
       console.log(e);

@@ -37,7 +37,7 @@
 
   async function validate2FA() {
     try {
-      const response = await axios.post('http://localhost:3000/auth/2FA/login', { token: code }, { withCredentials: true })
+      const response = await axios.post('/auth/2FA/login', { token: code })
       return response.data === true ? success2FA() : failure2FA()
     } catch (e) {
       console.log(e)
