@@ -51,12 +51,14 @@ export type PostEmitDto = {
   content: string
   author: string
 }
+
 export type newPostEmitDto = {
   channelName: string
   content: string
   author: User
   date: Date
 }
+
 // mirros the object backend sends with `throw new WsException()`
 export type WsException = {
   status: string
@@ -101,4 +103,11 @@ export const enum Status {
   offline,
   online,
   ingame,
+}
+
+// mirrors backend
+export type CreateUserDto = {
+  username: string
+  password: string
+  ft_login: string
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import axios from "../axios.config";
 	import { onMount } from "svelte";
-	import { logged } from "../stores";
 
 	// TODO: get rid of unused `User` fields
 	let users = [];
@@ -10,7 +9,8 @@
 
 	async function getUsers() {
 		try {
-			users = (await axios.get("/users")).data;
+			const response = await axios.get("/users");
+      users = response.data;
 			console.log(users);
 			sortByMMR();
 		} catch (e) {
@@ -38,18 +38,8 @@
 			<tr>
 				<th>Rank</th>
 				<th>User</th>
-				<th>
-          <a
-						class="clickable" href="/#/leaderboard"
-						on:click={() => sortByMMR()}>Mmr</a
-					>
-        </th>
-				<th>
-					<a
-						class="clickable" href="/#/leaderboard"
-						on:click={() => sortByGames()}>Games</a
-					>
-        </th>
+				<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
+				<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -59,11 +49,7 @@
 					<td>
 						<a href="#/users/{user.username}">
 							<span class="user">
-								<img
-									class="pp"
-									src="http://localhost:3000/images/actual/{user.id}"
-									alt="pp"
-								/>
+								<img class="pp" src="http://localhost:3000/images/actual/{user.id}" alt="pp"/>
 								<p class="username">{user.username}</p>
 							</span>
 						</a>
