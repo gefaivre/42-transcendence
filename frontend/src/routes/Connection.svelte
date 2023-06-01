@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import axios from "../axios.config";
-  import { push, replace } from "svelte-spa-router";
+  import { push } from "svelte-spa-router";
   import { logged } from "../stores";
   import Logo42 from "../assets/42_Logo.png"
   import { toast } from '@zerodevx/svelte-toast/dist'
@@ -145,7 +145,7 @@
     <div class="action">
       <input type="text" inputmode="numeric" bind:value={code}>
       <button on:click={validate2FA}>2FA Validate</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {/if}

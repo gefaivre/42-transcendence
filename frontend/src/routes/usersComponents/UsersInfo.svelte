@@ -6,15 +6,11 @@
   import type { Match, Stat, User } from "../../types";
 
   export let pageUser: User;
-
   export let params;
 
   const name = params.name;
-
   let friendspage: String = "Friends";
-
   let matchHistory: Match[] = [];
-
   let opponent;
 
   let statistics: Stat = {
@@ -45,7 +41,7 @@
   }
 
   async function calculStatistics() {
-    let rankedMatch = matchHistory.filter((match) => match.ranked === true);
+    const rankedMatch = matchHistory.filter((match) => match.ranked === true);
 
     statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
     statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
@@ -64,7 +60,7 @@
 
   async function getUsernameById(id: number) {
     try {
-      let response = await axios.get(`/users/id/${id}`)
+      const response = await axios.get(`/users/id/${id}`)
       return response.data.username;
     } catch (e) {
       console.log(e);
@@ -119,7 +115,7 @@
 
   async function removeFriendByName(name: string) {
     try {
-      const cancel = await axios.post(`/users/friendship/removeByName/${name}`,null);
+      await axios.post(`/users/friendship/removeByName/${name}`,null);
 
       let index = pageUser.friends.findIndex(friend => friend.username === name)
       pageUser.friends.splice(index, 1)
@@ -137,7 +133,6 @@
   async function unblockByUsername(username: string) {
     try {
       await axios.patch(`/users/unblock/${username}`, null);
-      // reload();
     } catch (e) {
       console.log(e);
     }
@@ -149,37 +144,25 @@
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Friends")}>friends</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Friends")}>friends</button>
         {:else}
           <button on:click={() => (friendspage = "Friends")}>friends</button>
         {/if}
 
         {#if friendspage == "Request"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Request")}>request</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Request")}>request</button>
         {:else}
           <button on:click={() => (friendspage = "Request")}>request</button>
         {/if}
 
         {#if friendspage == "Pending"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Pending")}>pending</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Pending")}>pending</button>
         {:else}
           <button on:click={() => (friendspage = "Pending")}>pending</button>
         {/if}
 
         {#if friendspage == "Blocked"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Blocked")}>blocked</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Blocked")}>blocked</button>
         {:else}
           <button on:click={() => (friendspage = "Blocked")}>blocked</button>
         {/if}

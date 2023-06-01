@@ -12,17 +12,17 @@ import Pong from './routes/pong/Pong.svelte'
 import DirectMessage from './routes/DirectMessage.svelte'
 
 export default {
-    '/': Leaderboard,
-    '/chat': Chat,
-    '/channel/:name': ThomasChan,
-    '/Channels': Channels,
-    '/leaderboard': Leaderboard,
-    '/users/:name': Users,
-    '/message': Message,
-    '/test': Test,
-    '/message/create': CreateChannel,
-    '/message/:name': Chan,
-    '/pong': Pong,
-    '/dm/:username': DirectMessage,
-    '*': NotFound
+  '/': Leaderboard,
+  '/chat': Chat,
+  '/channel/:name': ThomasChan,
+  '/Channels': Channels,
+  '/leaderboard': Leaderboard,
+  '/users/:name': Users,
+  '/message': Message,
+  '/test': Test,
+  '/message/create': CreateChannel,
+  '/message/:name': Chan,
+  '/pong': Pong,
+  '/dm/:username': DirectMessage,
+  '*': NotFound
 };
