@@ -1,9 +1,10 @@
 <script lang="ts">
 
   import axios from "../axios.config";
-  import { push, replace } from "svelte-spa-router";
+  import { push } from "svelte-spa-router";
   import { logged } from "../stores";
   import Logo42 from "../assets/42_Logo.png"
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   // cf. /backend/src/users/dto/create-user.dto.ts
   type CreateUserDto = {
@@ -24,30 +25,37 @@
 
   function success2FA() {
     code = null
-    alert('Success ! Welcome !')
+    toast.push('Welcome! 👋', { classes: ['success'] })
     logged.set('true')
     push('/')
   }
 
   function failure2FA() {
     code = null
-    alert('Error')
+    toast.push('Error', { classes: ['failure'] })
     logged.set('false')
   }
 
   async function validate2FA() {
     try {
-      const response = await axios.post('http://localhost:3000/auth/2FA/login', { token: code }, { withCredentials: true })
+      const response = await axios.post('/auth/2FA/login', { token: code })
       return response.data === true ? success2FA() : failure2FA()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
     }
   }
 
   async function login() {
 
-    if (createUserDto.username === null || createUserDto.password === null)
-      return alert('error')
+    if (createUserDto.username === null) {
+      toast.push('Empty username', { classes: ['failure'] })
+      return
+    }
+
+    if (createUserDto.password === null) {
+      toast.push('Empty password', { classes: ['failure'] })
+      return
+    }
 
     try {
       const response = await axios.post('/auth/login', createUserDto)
@@ -55,15 +63,14 @@
       if (response.data === 'jwt2fa') {
         action = 'qrcode';
       } else {
-        alert('Success ! Welcome !')
+        toast.push('Welcome! 👋', { classes: ['success'] })
         createUserDto.username = null
         createUserDto.password = null
         logged.set('true')
         push('/')
       }
     } catch (e) {
-      console.log(e)
-      alert(e.response.data.message)
+      toast.push(e.response.data.message, { classes: ['failure'] })
       createUserDto.username = null
       createUserDto.password = null
     }
@@ -71,17 +78,23 @@
 
   async function signup() {
 
-    if (createUserDto.username === null || createUserDto.password === null)
-      return alert('error')
+    if (createUserDto.username === null) {
+      toast.push('Empty username', { classes: ['failure'] })
+      return
+    }
+    if (createUserDto.password === null) {
+      toast.push('Empty password', { classes: ['failure'] })
+      return
+    }
 
     try {
       await axios.post('/auth/signup', createUserDto)
-      alert('Signup success. Now you can login.')
+      toast.push('Signup success. Now you can login', { classes: ['success'] })
       createUserDto.username = null
       createUserDto.password = null
       action = '';
     } catch (e) {
-      alert(e.response.data.message)
+      toast.push(e.response.data.message, { classes: ['failure'] })
       createUserDto.username = null
       createUserDto.password = null
     }
@@ -132,7 +145,7 @@
     <div class="action">
       <input type="text" inputmode="numeric" bind:value={code}>
       <button on:click={validate2FA}>2FA Validate</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {/if}

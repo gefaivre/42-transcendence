@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { logged, id } from '../../stores';
   import type { ChannelStatus, ChannelDto, PostEmitDto, ChannelBis, WsException } from '../../types';
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   const socket = ioClient('http://localhost:3000', {
     path: '/chat',
@@ -102,17 +103,23 @@
 
     const formData = new FormData(event.target);
 
-    if (formData.get('channelName') === '')
-      return alert('Empty name')
+    if (formData.get('channelName') === '') {
+      toast.push('Empty name', { classes: ['failure'] })
+      return
+    }
 
-    if (formData.has('channelStatus') === false)
-      return alert('Empty status')
+    if (formData.has('channelStatus') === false) {
+      toast.push('Empty status', { classes: ['failure'] })
+      return
+    }
 
     let pass: string
     if (formData.get('channelStatus') === 'Protected') {
       pass = window.prompt('Enter password');
-      if (pass === '')
-        return alert('Empty password')
+      if (pass === '') {
+        toast.push('Empty password', { classes: ['failure'] })
+        return
+      }
       if (pass === null)
         return
     } else {

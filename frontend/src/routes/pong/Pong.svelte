@@ -6,7 +6,8 @@
   import type { GameState, Settings } from "./Class";
   import type { WsException } from "../../types";
   import { Status } from "../../types";
-  import { socket as _socket } from "../../stores";
+  import { socket as _socket } from "../../stores"
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   class Match {
     player1: string;
@@ -56,21 +57,20 @@
 
     socket.on('win', () => {
       restart();
-      alert('you win!');
+      toast.push('you win!', { classes: ['success'] });
       inGame = false;
     });
 
     socket.on('lose', () => {
       restart();
-      alert('you lose!');
+      toast.push('you lose!', { classes: ['failure'] })
       inGame = false;
     });
 
     socket.on('endWatch', (player) => {
-      console.log('test');
       if (watch) {
         restart();
-        alert(player.username + ' has won the game');
+        toast.push(player.username + ' has won the game');
         watch = false;
       }
     });
@@ -78,9 +78,9 @@
     socket.on('opponentLeft', (player) => {
       restart();
       if (watch)
-        alert(player.username + ' has left the game');
+        toast.push(player.username + ' has left the game');
       else
-        alert(player.username + ' has left the game, you win!');
+        toast.push(player.username + ' has left the game, you win!');
       inGame = false;
     });
 
@@ -189,7 +189,7 @@
     <td align="left"><label for="ballSize">ball size</label></td>
     <td align="right"><input name="ballSize" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
-    
+
     <tr>
     <td align="left"><label for="paddleSpeed">paddle speed</label></td>
     <td align="right"><input name="paddleSpeed" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
@@ -228,7 +228,7 @@
 {/if}
 
  {/if}
-  
+
 </div>
 {/if}
 

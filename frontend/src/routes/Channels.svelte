@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import type { Channel, ChannelDto } from "../types";
   import { ChannelStatus } from '../types';
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   const columns: string[] = ['id', 'name', 'owner', 'owner id', 'users', 'admins', 'status']
   let channels: Channel[] = []
@@ -51,12 +52,20 @@
   }
 
   async function create() {
-    if (channel.channelName === null)
-      return alert('Empty channel name')
-    if (channel.status === null)
-      return alert('Please select a status')
-    if (channel.status === ChannelStatus.Protected && channel.password === '')
-      return alert('Empty channel password')
+
+    if (channel.channelName === null) {
+      toast.push('Empty channel name', { classes: ['failure'] })
+      return
+    }
+    if (channel.status === null) {
+      toast.push('Please select a status', { classes: ['failure'] })
+      return
+    }
+    if (channel.status === ChannelStatus.Protected && channel.password === '') {
+      toast.push('Empty channel password', { classes: ['failure'] })
+      return
+    }
+
     try {
       console.log(channel);
       await axios.post('/channel', channel)

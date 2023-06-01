@@ -6,15 +6,11 @@
   import type { Match, Stat, User } from "../../types";
 
   export let pageUser: User;
-
   export let params;
 
   const name = params.name;
-
   let friendspage: String = "Friends";
-
   let matchHistory: Match[] = [];
-
   let opponent;
 
   let statistics: Stat = {
@@ -35,8 +31,7 @@
   async function getMatch() {
     try {
       console.log(pageUser.username)
-      let response = await axios.get(`http://localhost:3000/matchs/history/${pageUser.id}`,
-        { withCredentials: true });
+      const response = await axios.get(`/matchs/history/${pageUser.id}`);
       matchHistory = response.data;
       console.log(matchHistory);
       calculStatistics();
@@ -46,7 +41,7 @@
   }
 
   async function calculStatistics() {
-    let rankedMatch = matchHistory.filter((match) => match.ranked === true);
+    const rankedMatch = matchHistory.filter((match) => match.ranked === true);
 
     statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
     statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
@@ -65,9 +60,7 @@
 
   async function getUsernameById(id: number) {
     try {
-      let response = await axios.get(`http://localhost:3000/users/id/${id}`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(`/users/id/${id}`)
       return response.data.username;
     } catch (e) {
       console.log(e);
@@ -76,19 +69,19 @@
 
   async function acceptFriendshipRequestByName(name: string) {
     try {
-      let response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
+      const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
       //update pageUser
-      let index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
       pageUser.requestFriends.splice(index, 1)
 
-      let friend = response.data.friends.find((friend: any) => friend.username === name)
+      const friend = response.data.friends.find((friend: any) => friend.username === name)
       pageUser.friends.unshift({ id: friend.id, username: name })
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -101,8 +94,8 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -115,14 +108,14 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
   async function removeFriendByName(name: string) {
     try {
-      const cancel = await axios.post(`/users/friendship/removeByName/${name}`,null);
+      await axios.post(`/users/friendship/removeByName/${name}`,null);
 
       let index = pageUser.friends.findIndex(friend => friend.username === name)
       pageUser.friends.splice(index, 1)
@@ -132,15 +125,14 @@
 
       pageUser = pageUser
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   }
 
   async function unblockByUsername(username: string) {
     try {
       await axios.patch(`/users/unblock/${username}`, null);
-      // reload();
     } catch (e) {
       console.log(e);
     }
@@ -152,37 +144,25 @@
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Friends")}>friends</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Friends")}>friends</button>
         {:else}
           <button on:click={() => (friendspage = "Friends")}>friends</button>
         {/if}
 
         {#if friendspage == "Request"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Request")}>request</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Request")}>request</button>
         {:else}
           <button on:click={() => (friendspage = "Request")}>request</button>
         {/if}
 
         {#if friendspage == "Pending"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Pending")}>pending</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Pending")}>pending</button>
         {:else}
           <button on:click={() => (friendspage = "Pending")}>pending</button>
         {/if}
 
         {#if friendspage == "Blocked"}
-          <button
-            class="activeButton"
-            on:click={() => (friendspage = "Blocked")}>blocked</button
-          >
+          <button class="activeButton" on:click={() => (friendspage = "Blocked")}>blocked</button>
         {:else}
           <button on:click={() => (friendspage = "Blocked")}>blocked</button>
         {/if}

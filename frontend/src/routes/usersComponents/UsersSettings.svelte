@@ -3,6 +3,7 @@
   import { user, reloadImage } from "../../stores";
   import { replace } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let fileInput: any = null;
 
@@ -20,8 +21,10 @@
   async function addPP() {
 
     const file = fileInput.files[0];
-    if (file === null || file === undefined)
-      return alert("empty file");
+    if (file === null || file === undefined) {
+      toast.push('Empty file', { classes: ['failure'] })
+      return
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -64,84 +67,71 @@
   }
 
   async function updateUsername() {
-    // guards
     if (username === null) {
-      return alert("empty username");
+      toast.push('Empty password', { classes: ['failure'] })
+      return
     }
     if (username === $user.username) {
-      return alert("same username");
+      toast.push('Same username', { classes: ['failure'] })
+      return
     }
 
     try {
       await axios.patch("/users/username", { username: username });
-
-      alert("Username successfully updated!");
-
-      // update component state
+      toast.push('Username successfully updated!', { classes: ['success'] })
       $user.username = username;
       username = null;
-
-      // redirect to your new user page
       replace(`/users/${$user.username}`);
-    } catch (error) {
-      alert(error.response.data.message);
+    } catch (e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 
   async function validate2FA() {
-        try {
-            await axios.post('http://localhost:3000/auth/2FA/validate', { token: code2FA }, { withCredentials: true })
-            qrcode = ''
-            code2FA = ''
-            // getUser()
-            $user.TwoFA = true;
-            steptwo = false;
-          } catch (error) {
-            alert('Bad 2fa code')
-            console.log(error.response.data.message)
-          }
-        }
-        async function enable2FA() {
-          try {
-            const response = await axios.patch(`http://localhost:3000/auth/2FA/enable`, null, { withCredentials: true })
-            qrcode = response.data
-            steptwo = true;
-        } catch (error) {
-            console.log(error.response.data.message)
-        }
+    try {
+      await axios.post('/auth/2FA/validate', { token: code2FA })
+      qrcode = ''
+      code2FA = ''
+      $user.TwoFA = true;
+      steptwo = false;
+    } catch (e) {
+      toast.push('Bad 2FA code', { classes: ['failure'] })
+      console.log(e.response.data.message)
     }
-    async function disable2FA() {
-        try {
-            await axios.patch(`http://localhost:3000/auth/2FA/disable`, null, { withCredentials: true })
-            // getUser()
-            $user.TwoFA = false;
-        } catch (error) {
-            console.log(error.response.data.message)
-        }
-    }
+  }
 
-  // before update, password displayed in table is the hash
-  // after update, password displayed in table is in clear
-  // you'll need to refresh the page to see the new password in its hashed version
-  // this is not big deal since this table entry will be removed anyway
+  async function enable2FA() {
+    try {
+      const response = await axios.patch(`/auth/2FA/enable`, null)
+      qrcode = response.data
+      steptwo = true;
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
+
+  async function disable2FA() {
+    try {
+      await axios.patch(`/auth/2FA/disable`, null)
+      $user.TwoFA = false;
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
+
   async function updatePassword() {
-    // guards
     if (password === null) {
-      return alert("empty password");
+      toast.push('Empty password', { classes: ['failure'] })
+      return
     }
     try {
       await axios.patch("/users/password", { password: password });
-
-      alert("Password successfully updated!");
-
-      // update component state
+      toast.push('Password successfully updated!', { classes: ['success'] })
       $user.password = password;
       password = null;
-
-      // redirect to your new user page
       replace(`/users/${$user.username}`);
-    } catch (error) {
-      alert(error.response.data.message);
+    } catch (e) {
+      console.log(e.response.data.message);
     }
   }
 </script>
@@ -182,15 +172,15 @@
   </div>
 
   <div class="box-info twofa">
-      {#if $user.TwoFA === false && steptwo === false}
-        <button on:click={enable2FA}>Enable TWOFA</button>
-      {:else if qrcode !== ''}
-        <img alt='qrcode' src={qrcode}>
-        <input type="text" placeholder="code" bind:value={code2FA}>
-        <button on:click={validate2FA}>Validate</button>
-      {:else}
-        <button on:click={disable2FA}>Disable TWOFA</button>
-      {/if}
+    {#if $user.TwoFA === false && steptwo === false}
+      <button on:click={enable2FA}>Enable TWOFA</button>
+    {:else if qrcode !== ''}
+      <img alt='qrcode' src={qrcode}>
+      <input type="text" placeholder="code" bind:value={code2FA}>
+      <button on:click={validate2FA}>Validate</button>
+    {:else}
+      <button on:click={disable2FA}>Disable TWOFA</button>
+    {/if}
   </div>
 </div>
 
@@ -260,7 +250,6 @@
     width: 210px;
     height: 210px;
   }
-
 
   .image-list {
     display: grid;

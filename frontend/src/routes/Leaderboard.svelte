@@ -13,8 +13,8 @@
 			users = (await axios.get("/users")).data;
 			console.log(users);
 			sortByMMR();
-		} catch (error) {
-			console.log(error.response.data.messsage);
+		} catch (e) {
+			console.log(e.response.data.messsage);
 		}
 	}
 
