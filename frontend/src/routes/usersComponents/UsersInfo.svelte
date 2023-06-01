@@ -35,7 +35,7 @@
   async function getMatch() {
     try {
       console.log(pageUser.username)
-      let response = await axios.get(`/matchs/history/${pageUser.id}`);
+      const response = await axios.get(`/matchs/history/${pageUser.id}`);
       matchHistory = response.data;
       console.log(matchHistory);
       calculStatistics();
@@ -73,13 +73,13 @@
 
   async function acceptFriendshipRequestByName(name: string) {
     try {
-      let response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
+      const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
       //update pageUser
-      let index = pageUser.requestFriends.findIndex(friend => friend.username === name)
+      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
       pageUser.requestFriends.splice(index, 1)
 
-      let friend = response.data.friends.find((friend: any) => friend.username === name)
+      const friend = response.data.friends.find((friend: any) => friend.username === name)
       pageUser.friends.unshift({ id: friend.id, username: name })
 
       pageUser = pageUser
