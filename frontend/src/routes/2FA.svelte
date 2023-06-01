@@ -3,19 +3,20 @@
   import axios from "../axios.config";
   import { push } from "svelte-spa-router";
   import { logged } from "../stores";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let code: number = null
 
   function success2FA() {
     code = null
-    alert('Success ! Welcome !')
+    toast.push('Welcome! 👋', { classes: ['success'] })
     logged.set('true')
     push('/')
   }
 
   function failure2FA() {
     code = null
-    alert('Error')
+    toast.push('Error', { classes: ['failure'] })
     logged.set('false')
   }
 

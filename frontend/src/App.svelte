@@ -11,6 +11,15 @@
     import Router, { link } from "svelte-spa-router";
     import ioClient from 'socket.io-client';
     import Connection from './routes/Connection.svelte';
+    import { SvelteToast } from '@zerodevx/svelte-toast/dist';
+
+    const toastApp = new SvelteToast({
+      target: document.body,
+      props: {
+        options: {
+        }
+      }
+    })
 
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
@@ -72,16 +81,24 @@
 
   <style>
 
-   :root {
-    --lite-lite-lite-grey: #acacac;
-    --lite-lite-grey: #888888;
-    --lite-grey: #707070;
-    --grey: #222222;
-    --black: black;
-    --white: white;
-    --pink: rgb(255, 88, 171);
-    --imageRadius: 50%;
-   }
+  :global(.success) {
+    --toastBackground: green;
+  }
+
+  :global(.failure) {
+    --toastBackground: red;
+  }
+
+  :root {
+   --lite-lite-lite-grey: #acacac;
+   --lite-lite-grey: #888888;
+   --lite-grey: #707070;
+   --grey: #222222;
+   --black: black;
+   --white: white;
+   --pink: rgb(255, 88, 171);
+   --imageRadius: 50%;
+  }
 
   .screen {
     display: grid;
@@ -89,7 +106,6 @@
     grid-template-columns: 90px 1fr;
     grid-template-rows: 90px 1fr 90px;
   }
-
 
   .profileLink {
     grid-column: 1/2;

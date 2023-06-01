@@ -3,6 +3,7 @@
   import { user, reloadImage } from "../../stores";
   import { replace } from "svelte-spa-router";
   import { onMount } from "svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let fileInput: any = null;
 
@@ -20,8 +21,10 @@
   async function addPP() {
 
     const file = fileInput.files[0];
-    if (file === null || file === undefined)
-      return alert("empty file");
+    if (file === null || file === undefined) {
+      toast.push('Empty file', { classes: ['failure'] })
+      return
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -66,16 +69,18 @@
   async function updateUsername() {
     // guards
     if (username === null) {
-      return alert("empty username");
+      toast.push('Empty password', { classes: ['failure'] })
+      return
     }
     if (username === $user.username) {
-      return alert("same username");
+      toast.push('Same username', { classes: ['failure'] })
+      return
     }
 
     try {
       await axios.patch("/users/username", { username: username });
 
-      alert("Username successfully updated!");
+      toast.push('Username successfully updated!', { classes: ['success'] })
 
       // update component state
       $user.username = username;
@@ -84,7 +89,7 @@
       // redirect to your new user page
       replace(`/users/${$user.username}`);
     } catch (e) {
-      alert(e.response.data.message);
+      toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 
@@ -97,7 +102,7 @@
             $user.TwoFA = true;
             steptwo = false;
           } catch (e) {
-            alert('Bad 2fa code')
+            toast.push('Bad 2FA code', { classes: ['failure'] })
             console.log(e.response.data.message)
           }
         }
@@ -127,12 +132,13 @@
   async function updatePassword() {
     // guards
     if (password === null) {
-      return alert("empty password");
+      toast.push('Empty password', { classes: ['failure'] })
+      return
     }
     try {
       await axios.patch("/users/password", { password: password });
 
-      alert("Password successfully updated!");
+      toast.push('Password successfully updated!', { classes: ['success'] })
 
       // update component state
       $user.password = password;
@@ -141,7 +147,7 @@
       // redirect to your new user page
       replace(`/users/${$user.username}`);
     } catch (e) {
-      alert(e.response.data.message);
+      console.log(e.response.data.message);
     }
   }
 </script>

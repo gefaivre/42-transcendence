@@ -1,6 +1,6 @@
-
 <script lang="ts">
     import axios from '../../axios.config';
+    import { toast } from '@zerodevx/svelte-toast/dist'
 
     let fileInput: any = null
 
@@ -14,9 +14,10 @@
     async function submitImage() {
         console.log(fileInput.files[0])
 
-        if (fileInput.files[0] === null || fileInput.files[0] === undefined)
-          return alert('empty file')
-
+        if (fileInput.files[0] === null || fileInput.files[0] === undefined) {
+          toast.push('Empty file', { classes: ['failure'] })
+          return
+        }
 
         const file = fileInput.files[0]
         const formData = new FormData()
