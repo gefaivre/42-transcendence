@@ -15,10 +15,6 @@
 
     const toastApp = new SvelteToast({
       target: document.body,
-      props: {
-        options: {
-        }
-      }
     })
 
     const menuItems = [
