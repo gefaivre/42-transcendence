@@ -16,8 +16,8 @@ export class PostsController {
   ) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.posts.create(createPostDto);
+  create(@Body() post: CreatePostDto) {
+    return this.posts.create(post);
   }
 
   @Get()
@@ -31,8 +31,8 @@ export class PostsController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updatePostDto: UpdatePostDto) {
-    return this.posts.update(id, updatePostDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() post: UpdatePostDto) {
+    return this.posts.update(id, post);
   }
 
   @Delete(':id')

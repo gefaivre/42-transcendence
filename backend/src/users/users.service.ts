@@ -12,17 +12,17 @@ export class UsersService {
     private readonly images: ImagesService
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(user: CreateUserDto) {
 
-    if (await this.findByUsername(createUserDto.username) !== null)
+    if (await this.findByUsername(user.username) !== null)
       return null
 
       // Create User
-      const user = await this.prisma.user.create({
+      const _user = await this.prisma.user.create({
         data: {
-          username: createUserDto.username,
-          password: createUserDto.password,
-          ft_login: createUserDto.ft_login,
+          username: user.username,
+          password: user.password,
+          ft_login: user.ft_login,
           games:  0,
           mmr: 800,
           images: {
@@ -35,24 +35,24 @@ export class UsersService {
       })
 
     // Add image to user
-    if (createUserDto.image != null)
+    if (user.image != null)
     {
       let internlink;
       //create dir app/images/userId/image_name
-      const dir = `/app/images/${user.id}`
+      const dir = `/app/images/${_user.id}`
       if (fs.existsSync(dir) === false)
         fs.mkdirSync(dir);
-      internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
-      this.images.downloadImage(new URL(createUserDto.image),  internlink)
+      internlink = `/app/images/${_user.id}/` + "default42" + '.jpg'
+      this.images.downloadImage(new URL(user.image),  internlink)
       await this.prisma.image.create({
         data: {
           name: "default42",
           link: internlink,
-          userId: user.id,
+          userId: _user.id,
         }
       })
     }
-    return this.prisma.exclude(user, ['password'])
+    return this.prisma.exclude(_user, ['password'])
   }
 
   async findAll() {

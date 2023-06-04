@@ -18,25 +18,26 @@ export class ChannelController {
   constructor(private readonly channel: ChannelService) {}
 
   @Post()
-  async create(@Req() request: any, @Body() channelDto: ChannelDto) {
+  async create(@Req() request: any, @Body() channel: ChannelDto) {
 
     // we could also hash into the channel service
-    if (channelDto.status === 'Protected') {
+    if (channel.status === 'Protected') {
       try {
-        channelDto.password = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
+        channel.password = await bcrypt.hash(channel.password, 2) // bigger salt would take too long
       } catch (e) {
         throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
-    const channel: CreateChannelDto = {
-      channelName: channelDto.channelName,
+
+    const _channel: CreateChannelDto = {
+      channelName: channel.channelName,
       ownerId: request.user.id,
-      status: channelDto.status,
-      password: channelDto.password
+      status: channel.status,
+      password: channel.password
     }
 
     try {
-      await this.channel.create(channel)
+      await this.channel.create(_channel)
     } catch(e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
@@ -139,6 +140,7 @@ export class ChannelController {
   findAll() {
     return this.channel.findAll();
   }
+
   @Get(':name')
   async findOne(@Param('name', ChannelByNamePipe) channel: any) {
     return channel
