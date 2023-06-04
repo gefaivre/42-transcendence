@@ -45,17 +45,17 @@ export class ChannelController {
   async removeUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // banned user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // only admins can ban
-    const isAdmin = channel.admins.some((admin: any) => admin.id === request.user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === request.user.id)
     if (isAdmin === false)
       throw new BadRequestException('user not admin of channel')
 
     // owner cannot be banned
-    const isOwner = user.id === channel.ownerId
+    const isOwner: boolean = user.id === channel.ownerId
     if (isOwner === true)
       throw new BadRequestException('user is owner of the channel')
 
@@ -76,17 +76,17 @@ export class ChannelController {
   async promoteAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // promoted user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // admins cannot be promoted twice
-    const isAdmin = channel.admins.some((admin: any) => admin.id === user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === user.id)
     if (isAdmin === true)
       throw new BadRequestException('user not admin of channel')
 
     // only owner can promote to admin
-    const isOwner = request.user.id === channel.ownerId
+    const isOwner: boolean = request.user.id === channel.ownerId
     if (isOwner === false)
       throw new UnauthorizedException('need to be the channel owner')
 
@@ -103,17 +103,17 @@ export class ChannelController {
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // only admins can be revoked
-    const isAdmin = channel.admins.some((admin: any) => admin.id === user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === user.id)
     if (isAdmin === false)
       throw new BadRequestException('user not admin of channel')
 
     // only owner can revoke admins
-    const isOwner = request.user.id === channel.ownerId
+    const isOwner: boolean = request.user.id === channel.ownerId
     if (isOwner === false)
       throw new UnauthorizedException('need to be the channel owner')
 
