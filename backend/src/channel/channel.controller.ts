@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -6,6 +6,7 @@ import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
+import { Prisma } from '@prisma/client';
 
 @Controller('channel')
 @UseGuards(AuthGuard('jwt'))
@@ -37,7 +38,15 @@ export class ChannelController {
     try {
       await this.channel.create(channel)
     } catch(e) {
-      throw new ConflictException('channel already exist')
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new ConflictException('channel already exist')
+        } else if (e.code === 'P2003' || e.code === 'P2025') {
+          throw new ForbiddenException('channel owner cannot be set')
+        }
+      } else {
+        throw e
+      }
     }
   }
 
