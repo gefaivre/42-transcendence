@@ -67,10 +67,6 @@ export class ChannelService {
     })
   }
 
-  deleteAll() {
-    return this.prisma.channel.deleteMany();
-  }
-
   async isInChannel(channelName: string, userId: number): Promise<boolean> {
     const channel = await this.findByName(channelName)
     return channel !== null && channel.users.some(user => user.id === userId)

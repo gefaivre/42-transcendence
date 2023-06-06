@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -157,11 +157,6 @@ export class ChannelController {
     } catch(e) {
       throw new NotFoundException('channel not found')
     }
-  }
-
-  @Delete()
-  deleteAll() {
-    return this.channel.deleteAll();
   }
 
 }
