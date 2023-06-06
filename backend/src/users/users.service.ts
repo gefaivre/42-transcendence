@@ -27,7 +27,7 @@ export class UsersService {
           mmr: 800,
           images: {
             create: {
-              link: "/app/images/basic_pp.jpg",
+              path: "/app/images/basic_pp.jpg",
             }
           },
         }
@@ -45,7 +45,7 @@ export class UsersService {
       this.images.downloadImage(new URL(user.image),  internlink)
       await this.prisma.image.create({
         data: {
-          link: internlink,
+          path: path,
           userId: _user.id,
         }
       })

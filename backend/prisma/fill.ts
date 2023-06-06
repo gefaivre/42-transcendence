@@ -245,7 +245,7 @@ async function createUser() {
       mmr: randomNumber(),
       images: {
         create: {
-          link: "/app/images/basic_pp.jpg",
+          path: "/app/images/basic_pp.jpg",
         }
       },
     },

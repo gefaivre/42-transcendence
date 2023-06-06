@@ -12,7 +12,7 @@ export class ImagesService {
   {
     const image = await this.PrismaService.image.create({
       data: {
-        link: `${file.destination}/${file.filename}`,
+        path: `${file.destination}/${file.filename}`,
         userId: userId
       }
     })
