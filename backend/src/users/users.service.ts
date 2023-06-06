@@ -202,10 +202,6 @@ export class UsersService {
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async removeAllUsers() {
-    return this.prisma.user.deleteMany();
-  }
-
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({
         where: {

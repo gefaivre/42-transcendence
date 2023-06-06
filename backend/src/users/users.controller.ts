@@ -63,12 +63,6 @@ export class UsersController {
     }
   }
 
-  // TODO: remove this endpoint
-  @Delete('all')
-  removeAllUsers() {
-    return this.users.removeAllUsers();
-  }
-
   @Post('friendship/request/:id')
   requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     console.log('controller request friendship')
