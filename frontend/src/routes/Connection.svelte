@@ -106,12 +106,12 @@
           <img src={Logo42} alt="logo 42">
         </div>
       </a>
-      <button on:click={ () => (action = 'signup')}>
+      <button on:click={() => action = 'signup'}>
         <div class="connect-button">
           signup
         </div>
       </button>
-      <button on:click={() => (action = 'signin')}>
+      <button on:click={() => action = 'signin'}>
         <div class="connect-button">
           signin
         </div>
