@@ -123,7 +123,7 @@
       <input type="text" placeholder="username" bind:value={user.username}><br>
       <input type="text" placeholder="password" bind:value={user.password}><br>
       <button on:click={signup}>signup</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'signin'}
@@ -131,7 +131,7 @@
       <input type="text" placeholder="username" bind:value={user.username}><br>
       <input type="text" placeholder="password" bind:value={user.password}><br>
       <button on:click={login}>login</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'qrcode'}

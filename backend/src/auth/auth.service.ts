@@ -29,7 +29,7 @@ export class AuthService {
       })
       return res.data.access_token
     } catch (e) {
-        return null
+      return null
     }
   }
 
