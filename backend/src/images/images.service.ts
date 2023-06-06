@@ -1,34 +1,34 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { PathLike, promises as fs } from "fs";
-import { createReadStream } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fs from 'fs'
 
 @Injectable()
 export class ImagesService {
 
-  constructor(private readonly PrismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async addImage(userId: number, file: Express.Multer.File)
-  {
-    const image = await this.PrismaService.image.create({
+  async addImage(userId: number, file: Express.Multer.File) {
+    return this.prisma.image.create({
       data: {
         path: `${file.destination}/${file.filename}`,
         userId: userId
       }
     })
-    return "Image created"
   }
 
   async setImage(userId: number, imageId: number) {
-    const result = await this.PrismaService.image.update({
-      where: { id: imageId },
-      data: {lastuse: new Date()}
+    return this.prisma.image.update({
+      where: {
+        id: imageId
+      },
+      data: {
+        lastuse: new Date()
+      }
     })
-    return "update OK";
   }
 
   async findAll(userId: number) {
-    const images = await this.PrismaService.image.findMany({
+    return this.prisma.image.findMany({
       where: {
         User: {
           id: userId
@@ -38,11 +38,10 @@ export class ImagesService {
         lastuse: 'desc',
       }
     })
-    return images;
   }
 
   async getImage(userId: number) {
-    const image = await this.PrismaService.image.findMany({
+    const image = await this.prisma.image.findMany({
       take: 1,
       where: {
         User: {
@@ -54,13 +53,13 @@ export class ImagesService {
       }
     })
     if (image[0] !== undefined) {
-      const file = createReadStream(image[0].link);
+      const file = fs.createReadStream(image[0].path);
       return new StreamableFile(file);
     }
   }
 
   async findOne(userId: number, id: number) {
-    const image = await this.PrismaService.image.findUnique({
+    const image = await this.prisma.image.findUnique({
       where: {
         id: id
       }
@@ -69,28 +68,22 @@ export class ImagesService {
       return null;
     else
     {
-      const file = createReadStream(image.link);
+      const file = fs.createReadStream(image.path);
       return new StreamableFile(file)
     }
   }
 
   async remove(id: number) {
-    return await this.PrismaService.image.delete({
+
+    // remove from db
+    const image = await this.prisma.image.delete({
       where: {
         id: id
       }
     })
-  }
 
-  async downloadImage(link: URL, path: PathLike) {
-
-    const response = await fetch(link);
-    const blob = await response.blob();
-    const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    await fs.writeFile(path, buffer, {flag: 'wx'});
-    return path;
+    // remove from docker volume
+    fs.rmSync(`${image.path}`)
   }
 
 }
