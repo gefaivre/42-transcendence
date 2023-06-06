@@ -21,11 +21,11 @@ export class MatchsService {
   }
 
   async findAll() {
-    return await this.prisma.match.findMany();
+    return this.prisma.match.findMany();
   }
 
   async findOne(id: number) {
-    return await this.prisma.match.findUnique({
+    return this.prisma.match.findUnique({
       where: {
         id: id,
       }
@@ -51,7 +51,7 @@ export class MatchsService {
   }
 
   async findHistory(userId: number) {
-    return await this.prisma.match.findMany({
+    return this.prisma.match.findMany({
       where: {
         OR: [
           { winnerId: userId },

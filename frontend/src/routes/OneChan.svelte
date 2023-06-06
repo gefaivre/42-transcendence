@@ -120,13 +120,13 @@
       joinRoom()
     else {
       if (confirm('Join this channel ?') === false)
-        return await pop()
+        return pop()
       if (channel.status === 'Protected') {
         password = prompt('Enter password')
         if (password === '')
           console.error(`Unable to join channel ${channel.name}: Empty password.`)
         if (password === null)
-          return await pop()
+          return pop()
       }
       joinChannel()
     }

@@ -19,11 +19,11 @@ export class PostsService {
   }
 
   async findAll() {
-    return await this.prisma.post.findMany();
+    return this.prisma.post.findMany();
   }
 
   async findOne(id: number) {
-    return await this.prisma.post.findUnique({
+    return this.prisma.post.findUnique({
       where: {
         id: id,
       }
@@ -31,7 +31,7 @@ export class PostsService {
   }
 
   async findByChannel(channelId: number) {
-    return await this.prisma.post.findMany({
+    return this.prisma.post.findMany({
       where : {
         channelId: channelId
       }

@@ -12,13 +12,13 @@ function randomNumber(): number {
 }
 
 async function deleteUser(user: any) {
-  return await prisma.user.delete({
+  return prisma.user.delete({
     where: { id: user.id }
   })
 }
 
 async function deleteChannel(channel: any) {
-  return await prisma.channel.delete({
+  return prisma.channel.delete({
     where: { id: channel.id }
   })
 }

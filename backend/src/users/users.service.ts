@@ -55,7 +55,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany()
+    return this.prisma.user.findMany()
   }
 
   async findById(id: number) {
@@ -305,7 +305,7 @@ export class UsersService {
 
   async dismissFriendshipRequestById(id: number, friendId: number) {
     console.log('service dismiss friendship request by id')
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id: id
       },
