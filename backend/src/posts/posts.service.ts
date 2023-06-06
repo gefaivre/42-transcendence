@@ -32,7 +32,7 @@ export class PostsService {
 
   async findByChannel(channelId: number) {
     return this.prisma.post.findMany({
-      where : {
+      where: {
         channelId: channelId
       }
     });

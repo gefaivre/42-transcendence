@@ -204,12 +204,12 @@ export class UsersService {
 
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({
-        where: {
-            id: id
-        },
-        data: {
-            TwoFA: twofa
-        }
+      where: {
+          id: id
+      },
+      data: {
+          TwoFA: twofa
+      }
     })
   }
 

@@ -153,7 +153,7 @@ export class AuthController {
   @Patch('2FA/disable')
   async disable2FA(@Req() request: any) {
     try {
-      await this.users.update2FA(+request.user.id, false)
+      await this.users.update2FA(request.user.id, false)
     } catch(e) {
       throw new ConflictException()
     }
