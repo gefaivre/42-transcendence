@@ -45,7 +45,6 @@ model User {
 
 model Image {
   id             Int     @id @default(autoincrement())
-  name           String?
   link           String
   date           DateTime   @default(now())
   lastuse        DateTime   @default(now())
