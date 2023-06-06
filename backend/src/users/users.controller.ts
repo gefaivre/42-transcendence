@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnauthorizedException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
@@ -12,11 +11,6 @@ import { TranscendenceExceptionsFilter } from 'src/filters';
 export class UsersController {
 
   constructor(private readonly users: UsersService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.users.create(createUserDto);
-  }
 
   @Get()
   findAll() {
@@ -67,12 +61,6 @@ export class UsersController {
     } catch(e) {
       throw new NotFoundException('User not found')
     }
-  }
-
-  // TODO: remove this endpoint
-  @Delete('all')
-  removeAllUsers() {
-    return this.users.removeAllUsers();
   }
 
   @Post('friendship/request/:id')

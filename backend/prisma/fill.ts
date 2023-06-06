@@ -200,7 +200,7 @@ async function createMatchrelation(user1: number, user2: number) {
 }
 
 async function getUser(name: string) {
-  return await prisma.user.findUnique({
+  return prisma.user.findUnique({
     where: {
       username: name,
     },
@@ -245,8 +245,7 @@ async function createUser() {
       mmr: randomNumber(),
       images: {
         create: {
-          name: "default",
-          link: "/app/images/basic_pp.jpg",
+          path: "/app/images/basic_pp.jpg",
         }
       },
     },

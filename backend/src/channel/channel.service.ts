@@ -7,15 +7,15 @@ export class ChannelService {
 
   constructor(private readonly prisma: PrismaService){}
 
-  create(createChannelDto: CreateChannelDto) {
+  create(channel: CreateChannelDto) {
     return this.prisma.channel.create({
       data: {
-        name: createChannelDto.channelName, // P2002
-        ownerId: createChannelDto.ownerId, // P2003
-        admins: { connect: { id: createChannelDto.ownerId } }, // P2025
-        users: { connect: { id: createChannelDto.ownerId } }, // P2025
-        status: createChannelDto.status, // checked by ValidationPipe
-        password: createChannelDto.password // ??
+        name: channel.channelName, // P2002
+        ownerId: channel.ownerId, // P2003
+        admins: { connect: { id: channel.ownerId } }, // P2025
+        users: { connect: { id: channel.ownerId } }, // P2025
+        status: channel.status, // checked by ValidationPipe
+        password: channel.password // ??
       }
     })
   }
@@ -65,10 +65,6 @@ export class ChannelService {
         name: channelName
       }
     })
-  }
-
-  deleteAll() {
-    return this.prisma.channel.deleteMany();
   }
 
   async isInChannel(channelName: string, userId: number): Promise<boolean> {

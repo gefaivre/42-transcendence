@@ -8,40 +8,40 @@ export class MatchsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createMatchDto: CreateMatchDto) {
+  async create(match: CreateMatchDto) {
     return this.prisma.match.create({
       data: {
-        winnerId: createMatchDto.winnerId,
-        winnerScore: createMatchDto.winnerScore,
-        loserId: createMatchDto.loserId,
-        loserScore: createMatchDto.loserScore,
-        ranked: createMatchDto.ranked,
+        winnerId: match.winnerId,
+        winnerScore: match.winnerScore,
+        loserId: match.loserId,
+        loserScore: match.loserScore,
+        ranked: match.ranked,
       },
     })
   }
 
   async findAll() {
-    return await this.prisma.match.findMany();
+    return this.prisma.match.findMany();
   }
 
   async findOne(id: number) {
-    return await this.prisma.match.findUnique({
+    return this.prisma.match.findUnique({
       where: {
         id: id,
       }
     });
   }
 
-  async update(id: number, updateMatchDto: UpdateMatchDto) {
+  async update(id: number, match: UpdateMatchDto) {
     return this.prisma.match.update({
       where: { id: id },
       data: {
-        winnerId: updateMatchDto.winnerId,
-        winnerScore: updateMatchDto.winnerScore,
-        loserId: updateMatchDto.loserId,
-        loserScore: updateMatchDto.loserScore,
-        date: updateMatchDto.date,
-        ranked: updateMatchDto.ranked,
+        winnerId: match.winnerId,
+        winnerScore: match.winnerScore,
+        loserId: match.loserId,
+        loserScore: match.loserScore,
+        date: match.date,
+        ranked: match.ranked,
       },
     });
   }
@@ -51,7 +51,7 @@ export class MatchsService {
   }
 
   async findHistory(userId: number) {
-    return await this.prisma.match.findMany({
+    return this.prisma.match.findMany({
       where: {
         OR: [
           { winnerId: userId },

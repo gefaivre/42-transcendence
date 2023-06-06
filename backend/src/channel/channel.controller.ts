@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ConflictException, UnprocessableEntityException, UnauthorizedException, BadRequestException, Logger, UseFilters, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -6,6 +6,7 @@ import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
+import { Prisma } from '@prisma/client';
 
 @Controller('channel')
 @UseGuards(AuthGuard('jwt'))
@@ -17,27 +18,36 @@ export class ChannelController {
   constructor(private readonly channel: ChannelService) {}
 
   @Post()
-  async create(@Req() request: any, @Body() channelDto: ChannelDto) {
+  async create(@Req() request: any, @Body() channel: ChannelDto) {
 
     // we could also hash into the channel service
-    if (channelDto.status === 'Protected') {
+    if (channel.status === 'Protected') {
       try {
-        channelDto.password = await bcrypt.hash(channelDto.password, 2) // bigger salt would take too long
+        channel.password = await bcrypt.hash(channel.password, 2) // bigger salt would take too long
       } catch (e) {
         throw new UnprocessableEntityException('Error about the channel password encryption.')
       }
     }
-    const channel: CreateChannelDto = {
-      channelName: channelDto.channelName,
+
+    const _channel: CreateChannelDto = {
+      channelName: channel.channelName,
       ownerId: request.user.id,
-      status: channelDto.status,
-      password: channelDto.password
+      status: channel.status,
+      password: channel.password
     }
 
     try {
-      await this.channel.create(channel)
+      await this.channel.create(_channel)
     } catch(e) {
-      throw new ConflictException('channel already exist')
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new ConflictException('channel already exist')
+        } else if (e.code === 'P2003' || e.code === 'P2025') {
+          throw new ForbiddenException('channel owner cannot be set')
+        }
+      } else {
+        throw e
+      }
     }
   }
 
@@ -45,17 +55,17 @@ export class ChannelController {
   async removeUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // banned user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // only admins can ban
-    const isAdmin = channel.admins.some((admin: any) => admin.id === request.user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === request.user.id)
     if (isAdmin === false)
       throw new BadRequestException('user not admin of channel')
 
     // owner cannot be banned
-    const isOwner = user.id === channel.ownerId
+    const isOwner: boolean = user.id === channel.ownerId
     if (isOwner === true)
       throw new BadRequestException('user is owner of the channel')
 
@@ -76,17 +86,17 @@ export class ChannelController {
   async promoteAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // promoted user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // admins cannot be promoted twice
-    const isAdmin = channel.admins.some((admin: any) => admin.id === user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === user.id)
     if (isAdmin === true)
       throw new BadRequestException('user not admin of channel')
 
     // only owner can promote to admin
-    const isOwner = request.user.id === channel.ownerId
+    const isOwner: boolean = request.user.id === channel.ownerId
     if (isOwner === false)
       throw new UnauthorizedException('need to be the channel owner')
 
@@ -103,17 +113,17 @@ export class ChannelController {
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel
-    const isMember = channel.users.some((_user: any) => _user.id === user.id)
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
     // only admins can be revoked
-    const isAdmin = channel.admins.some((admin: any) => admin.id === user.id)
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === user.id)
     if (isAdmin === false)
       throw new BadRequestException('user not admin of channel')
 
     // only owner can revoke admins
-    const isOwner = request.user.id === channel.ownerId
+    const isOwner: boolean = request.user.id === channel.ownerId
     if (isOwner === false)
       throw new UnauthorizedException('need to be the channel owner')
 
@@ -130,6 +140,7 @@ export class ChannelController {
   findAll() {
     return this.channel.findAll();
   }
+
   @Get(':name')
   async findOne(@Param('name', ChannelByNamePipe) channel: any) {
     return channel
@@ -146,11 +157,6 @@ export class ChannelController {
     } catch(e) {
       throw new NotFoundException('channel not found')
     }
-  }
-
-  @Delete()
-  deleteAll() {
-    return this.channel.deleteAll();
   }
 
 }
