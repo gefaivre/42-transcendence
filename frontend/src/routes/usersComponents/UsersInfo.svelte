@@ -1,15 +1,10 @@
 <script lang="ts">
   import axios from "../../axios.config";
-  import { id } from "../../stores";
-  import deleteIcon from "../../assets/redLose.png";
-  import acceptIcon from "../../assets/greenWin.png";
   import type { Match, Stat, User } from "../../types";
+  import Friends from "./user-info/Friends.svelte";
 
   export let pageUser: User;
-  export let params;
 
-  const name = params.name;
-  let friendspage: String = "Friends";
   let matchHistory: Match[] = [];
   let opponent;
 
@@ -67,200 +62,12 @@
     }
   }
 
-  async function acceptFriendshipRequestByName(name: string) {
-    try {
-      const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
-
-      //update pageUser
-      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
-      pageUser.requestFriends.splice(index, 1)
-
-      const friend = response.data.friends.find((friend: any) => friend.username === name)
-      pageUser.friends.unshift({ id: friend.id, username: name })
-
-      pageUser = pageUser
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function dismissFriendshipRequestByName(name: string) {
-    try {
-      await axios.post(`/users/friendship/dismissByName/${name}`, null);
-
-      const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
-      pageUser.requestFriends.splice(index, 1)
-
-      pageUser = pageUser
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function cancelFriendshipRequestByName(name: string) {
-    try {
-      await axios.post(`/users/friendship/cancelByName/${name}`,null);
-
-      const index = pageUser.pendingFriends.findIndex(friend => friend.username === name)
-      pageUser.pendingFriends.splice(index, 1)
-
-      pageUser = pageUser
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function removeFriendByName(name: string) {
-    try {
-      await axios.post(`/users/friendship/removeByName/${name}`,null);
-
-      let index = pageUser.friends.findIndex(friend => friend.username === name)
-      pageUser.friends.splice(index, 1)
-
-      index = pageUser.friendOf.findIndex(friend => friend.username === name)
-      pageUser.friendOf.splice(index, 1)
-
-      pageUser = pageUser
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function unblockByUsername(username: string) {
-    try {
-      await axios.patch(`/users/unblock/${username}`, null);
-    } catch (e) {
-      console.log(e);
-    }
-  }
 </script>
 
 <div class="info-container">
-  <div class="box-info friends">
-    {#if $id === pageUser.id.toString()}
-      <div class="nav">
-        {#if friendspage == "Friends"}
-          <button class="activeButton" on:click={() => (friendspage = "Friends")}>friends</button>
-        {:else}
-          <button on:click={() => (friendspage = "Friends")}>friends</button>
-        {/if}
 
-        {#if friendspage == "Request"}
-          <button class="activeButton" on:click={() => (friendspage = "Request")}>request</button>
-        {:else}
-          <button on:click={() => (friendspage = "Request")}>request</button>
-        {/if}
+    <Friends bind:pageUser />
 
-        {#if friendspage == "Pending"}
-          <button class="activeButton" on:click={() => (friendspage = "Pending")}>pending</button>
-        {:else}
-          <button on:click={() => (friendspage = "Pending")}>pending</button>
-        {/if}
-
-        {#if friendspage == "Blocked"}
-          <button class="activeButton" on:click={() => (friendspage = "Blocked")}>blocked</button>
-        {:else}
-          <button on:click={() => (friendspage = "Blocked")}>blocked</button>
-        {/if}
-      </div>
-    {:else}
-      <h1>Friends</h1>
-    {/if}
-
-    {#if friendspage == "Friends"}
-      <div class="overflow">
-        <ul>
-          {#each pageUser.friends as friend}
-            <li>
-              <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
-                <a class="name" href="#/users/{friend.username}">{friend.username}</a>
-              </div>
-              {#if $id === pageUser.id.toString()}
-                <div class="actions">
-                  <button class="actionsButton"
-                    on:click={() => removeFriendByName(friend.username)}>
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
-                  </button>
-                </div>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {:else if friendspage == "Request" && $id === pageUser.id.toString()}
-      <div class="overflow">
-        <ul>
-          {#each pageUser.requestFriends as requestFriends}
-            <li>
-              <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
-                <a class="name" href="#/users/{requestFriends?.username}">
-                  {requestFriends?.username}
-                </a>
-              </div>
-              <div class="actions">
-                <button class="actionsButton"
-                  on:click={() => acceptFriendshipRequestByName(requestFriends.username)}>
-                  <img class="btnImage" src={acceptIcon} alt="accept" />
-                </button>
-                <button class="actionsButton"
-                  on:click={() => dismissFriendshipRequestByName(requestFriends.username)}>
-                  <img class="btnImage" src={deleteIcon} alt="delete" />
-                </button>
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {:else if friendspage == "Pending" && $id === pageUser.id.toString()}
-      <div class="overflow">
-        <ul>
-          {#each pageUser.pendingFriends as pendingFriends}
-            <li>
-              <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
-                <a class="name" href="#/users/{pendingFriends?.username}">
-                  {pendingFriends?.username}</a>
-              </div>
-              <div class="actions">
-                <button
-                  class="actionsButton"
-                  on:click={() => cancelFriendshipRequestByName(pendingFriends.username)}>
-                  <img class="btnImage" src={deleteIcon} alt="delete" />
-                </button>
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {:else if friendspage == "Blocked" && $id === pageUser.id.toString()}
-      <div class="overflow">
-        <ul>
-          {#each pageUser.blocked as blocked}
-            <li>
-              <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}"alt="pp"/>
-                <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
-              </div>
-              {#if $id === pageUser.id.toString()}
-                <div class="actions">
-                  <button class="actionsButton"
-                    on:click={() => unblockByUsername(blocked.username)}>
-                    <img class="btnImage" src={deleteIcon} alt="deleteicon"/>
-                  </button>
-                </div>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-  </div>
 
   <div class="box-info games">
     <h1>Game history</h1>
@@ -366,6 +173,7 @@
 </div>
 
 <style>
+
   .info-container {
     height: 100%;
     background-color: var(--grey);
@@ -376,17 +184,6 @@
     align-items: center;
   }
 
-  .box-info {
-    margin: 50px;
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-    height: 80%;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-  }
 
   .box-info h1 {
     height: 40px;
@@ -407,66 +204,6 @@
     background-color: var(--lite-lite-grey);
   }
 
-  .friends .user {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-left: 5%;
-  }
-
-  .friends .user .name {
-    margin-left: 5%;
-  }
-
-  .actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    margin-right: 5%;
-    gap: 5px;
-  }
-
-  .friends {
-    grid-column: 1 / 2;
-    grid-row: 1 / 3;
-  }
-
-  .friends .nav {
-    height: 40px;
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .friends .nav button {
-    border-bottom: solid 1px var(--black);
-    flex: auto;
-  }
-
-  .friends .nav .activeButton {
-    border-bottom: none;
-  }
-
-  .friends .nav button:not(:last-child) {
-    border-right: solid 1px var(--black);
-  }
-
-  .actionsButton {
-    background-color: var(--white);
-    border: solid 2px black;
-    border-radius: 50%;
-    height: 35px;
-    width: 35px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-  }
-
-  .btnImage {
-    height: 25px;
-    width: 25px;
-  }
 
   .box-info h1 {
     height: 40px;
@@ -483,6 +220,18 @@
     flex: 1;
     overflow: auto;
     border-radius: 0 0 30px 30px;
+  }
+
+  .games {
+    margin: 50px;
+    border: solid 2px var(--grey);
+    box-shadow: 0 0 10px var(--lite-grey);
+    background-color: var(--lite-grey);
+    border-radius: 30px;
+    height: 80%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
   }
 
   .games .lineFriends {
@@ -514,6 +263,18 @@
     background-color: #15db36;
     border-radius: 50%;
     border: solid 1px black;
+  }
+
+  .statistics {
+    margin: 50px;
+    border: solid 2px var(--grey);
+    box-shadow: 0 0 10px var(--lite-grey);
+    background-color: var(--lite-grey);
+    border-radius: 30px;
+    height: 80%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
   }
 
   .stat-grid {
@@ -558,7 +319,8 @@
       grid-template-rows: 1fr, 1fr, 1fr;
     }
 
-    .friends {
+
+    .info-container :nth-child(1){
       grid-column: 1 / 2;
       grid-row: 1 / 2;
     }

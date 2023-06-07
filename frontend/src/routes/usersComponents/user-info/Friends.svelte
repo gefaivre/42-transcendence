@@ -83,7 +83,7 @@
 
 </script>
 
-<div class="box-info friends">
+<div class="friends">
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
@@ -206,5 +206,105 @@
   </div>
 
 <style>
+    .friends {
+    margin: 50px;
+    border: solid 2px var(--grey);
+    box-shadow: 0 0 10px var(--lite-grey);
+    background-color: var(--lite-grey);
+    border-radius: 30px;
+    height: 80%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pp {
+    width: 35px;
+    height: 35px;
+    border: 1px solid rgb(78, 78, 78);
+    border-radius: 50%;
+  }
+
+  h1 {
+    height: 40px;
+    border-bottom: solid 1px black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  li {
+    height: 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    background-color: var(--lite-lite-lite-grey);
+  }
+  li:nth-child(2n + 1) {
+    background-color: var(--lite-lite-grey);
+  }
+
+  .friends .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 5%;
+  }
+  .friends .user .name {
+    margin-left: 5%;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 5%;
+    gap: 5px;
+  }
+
+  .friends .nav {
+    height: 40px;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .friends .nav button {
+    border-bottom: solid 1px var(--black);
+    flex: auto;
+  }
+
+  .friends .nav .activeButton {
+    border-bottom: none;
+  }
+
+  .friends .nav button:not(:last-child) {
+    border-right: solid 1px var(--black);
+  }
+
+  .actionsButton {
+    background-color: var(--white);
+    border: solid 2px black;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  .btnImage {
+    height: 25px;
+    width: 25px;
+  }
+
+  .overflow {
+    flex: 1;
+    overflow: auto;
+    border-radius: 0 0 30px 30px;
+  }
+  
+  *::-webkit-scrollbar {
+    display: none;
+  }
 
 </style>
