@@ -204,6 +204,7 @@
 
 {#if pageUser.username != null}
   <div class="component">
+	
     <div class="user-panel">
       <div class="ctn-title">
         <h1 class="title">{pageUser.username}</h1>
@@ -427,5 +428,5 @@
     height: 25px;
     width: 25px;
   }
-  
+
 </style>
