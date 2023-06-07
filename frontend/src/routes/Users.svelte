@@ -86,7 +86,7 @@
       {#if settings}
         <UsersSettings />
       {:else}
-        <UsersInfo bind:pageUser bind:params />
+        <UsersInfo bind:pageUser/>
       {/if}
     </div>
   </div>
