@@ -8,22 +8,22 @@ export class PostsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createPostDto: CreatePostDto) {
+  async create(post: CreatePostDto) {
     return this.prisma.post.create({
       data: {
-        content: createPostDto.content,
-        authorId: createPostDto.authorId,
-        channelId: createPostDto.channelId,
+        content: post.content,
+        authorId: post.authorId,
+        channelId: post.channelId,
       }
     });
   }
 
   async findAll() {
-    return await this.prisma.post.findMany();
+    return this.prisma.post.findMany();
   }
 
   async findOne(id: number) {
-    return await this.prisma.post.findUnique({
+    return this.prisma.post.findUnique({
       where: {
         id: id,
       }
@@ -31,20 +31,20 @@ export class PostsService {
   }
 
   async findByChannel(channelId: number) {
-    return await this.prisma.post.findMany({
-      where : {
+    return this.prisma.post.findMany({
+      where: {
         channelId: channelId
       }
     });
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
+  async update(id: number, post: UpdatePostDto) {
     return this.prisma.post.update({
       where: {
         id: id,
       },
       data: {
-        content: updatePostDto.content,
+        content: post.content,
       }
     });
   }

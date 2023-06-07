@@ -11,8 +11,8 @@ export class MatchsController {
   constructor(private readonly matchs: MatchsService) {}
 
   @Post()
-  create(@Body() createMatchDto: CreateMatchDto) {
-    return this.matchs.create(createMatchDto);
+  create(@Body() match: CreateMatchDto) {
+    return this.matchs.create(match);
   }
 
   @Get()
@@ -26,8 +26,8 @@ export class MatchsController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
-    return this.matchs.update(id, updateMatchDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() match: UpdateMatchDto) {
+    return this.matchs.update(id, match);
   }
 
   @Delete(':id')

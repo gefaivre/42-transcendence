@@ -1,4 +1,3 @@
-
 <script lang="ts">
     export const title = 'Mon titre';
 
@@ -25,15 +24,14 @@
       { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
     ];
 
-    $: if ($logged === 'true') {
-      getProfile()
-    }
+    $: getProfile()
 
     async function getProfile() {
       try {
         const response = await axios.get('/auth/whoami');
         user.set(response.data)
         id.set(response.data.id.toString())
+        logged.set('true')
         $socket = ioClient('http://localhost:3000', {
           path: '/user',
           withCredentials: true,

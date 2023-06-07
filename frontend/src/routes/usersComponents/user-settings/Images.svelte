@@ -34,7 +34,7 @@
       images = response.data
       getPPs()
     } catch(e) {
-      console.log(e);
+		toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 

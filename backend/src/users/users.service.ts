@@ -1,62 +1,61 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ImagesService } from 'src/images/images.service';
+import { User } from '@prisma/client';
 import * as fs from 'fs'
 
 @Injectable()
 export class UsersService {
 
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly images: ImagesService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(user: CreateUserDto) {
 
-    if (await this.findByUsername(createUserDto.username) !== null)
-      return null
-
-      // Create User
-      const user = await this.prisma.user.create({
-        data: {
-          username: createUserDto.username,
-          password: createUserDto.password,
-          ft_login: createUserDto.ft_login,
-          games:  0,
-          mmr: 800,
-          images: {
-            create: {
-              name: "default",
-              link: "/app/images/basic_pp.jpg",
-            }
-          },
+    // create user with the default profile picture
+    const _user: User = await this.prisma.user.create({
+      data: {
+        username: user.username,
+        password: user.password,
+        ft_login: user.ft_login,
+        games:  0,
+        mmr: 800,
+        images: {
+          create: {
+            path: "/app/images/basic_pp.jpg",
+          }
         }
-      })
+      }
+    })
 
-    // Add image to user
-    if (createUserDto.image != null)
-    {
-      let internlink;
-      //create dir app/images/userId/image_name
-      const dir = `/app/images/${user.id}`
-      if (fs.existsSync(dir) === false)
-        fs.mkdirSync(dir);
-      internlink = `/app/images/${user.id}/` + "default42" + '.jpg'
-      this.images.downloadImage(new URL(createUserDto.image),  internlink)
+    // each user with its own image directory
+    fs.mkdirSync(`/app/images/${_user.username}`)
+
+    // user created via 42 API: there is an image
+    if (user.image !== null && user.image !== undefined) {
+
+      // path for the the image
+      const path: string = `/app/images/${_user.username}/default42.jpg`
+
+      // download the image into the docker volume
+      const response = await fetch(user.image.href)
+      const blob = await response.blob()
+      const arrayBuffer = await blob.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      fs.writeFileSync(path, buffer, { flag: 'wx' }) // are those flags the right ones ?
+
+      // add image link to db
       await this.prisma.image.create({
         data: {
-          name: "default42",
-          link: internlink,
-          userId: user.id,
+          path: path,
+          userId: _user.id,
         }
       })
     }
-    return this.prisma.exclude(user, ['password'])
+    return this.prisma.exclude(_user, ['password'])
   }
 
   async findAll() {
-    return await this.prisma.user.findMany()
+    return this.prisma.user.findMany()
   }
 
   async findById(id: number) {
@@ -203,18 +202,14 @@ export class UsersService {
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async removeAllUsers() {
-    return this.prisma.user.deleteMany();
-  }
-
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({
-        where: {
-            id: id
-        },
-        data: {
-            TwoFA: twofa
-        }
+      where: {
+          id: id
+      },
+      data: {
+          TwoFA: twofa
+      }
     })
   }
 
@@ -310,7 +305,7 @@ export class UsersService {
 
   async dismissFriendshipRequestById(id: number, friendId: number) {
     console.log('service dismiss friendship request by id')
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id: id
       },

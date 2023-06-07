@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -73,23 +73,24 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() body: CreateUserDto) {
 
-    let hash
-
     // hash password
     try {
-      hash = await bcrypt.hash(body.password, 2) // bigger salt would take too long
+      body.password = await bcrypt.hash(body.password, 2) // bigger salt would take too long
     } catch (e) {
       throw new UnprocessableEntityException('Error about your password encryption')
     }
 
-    // create user
-    body.password = hash
-    const user: Omit<User, 'password'> | null = await this.users.create(body)
-    if (user === null)
-      throw new ConflictException('This username already exists')
-
-    // frontend need to login after
-    return user;
+    try {
+      await this.users.create(body);
+    } catch(e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new ConflictException('username already used')
+        }
+      } else {
+        throw e // other prisma exceptions will be transformed into 500
+      }
+    }
   }
 
   @UseGuards(AuthGuard('local'))
@@ -119,7 +120,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('whoami')
   async whoami(@Req() request: any) {
-    return await this.users.findById(request.user.id)
+    return this.users.findById(request.user.id)
   }
 
   // Step 1/2 to enable 2FA
@@ -152,7 +153,7 @@ export class AuthController {
   @Patch('2FA/disable')
   async disable2FA(@Req() request: any) {
     try {
-      await this.users.update2FA(+request.user.id, false)
+      await this.users.update2FA(request.user.id, false)
     } catch(e) {
       throw new ConflictException()
     }

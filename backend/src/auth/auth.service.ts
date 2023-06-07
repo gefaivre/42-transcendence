@@ -29,7 +29,7 @@ export class AuthService {
       })
       return res.data.access_token
     } catch (e) {
-        return null
+      return null
     }
   }
 
@@ -60,7 +60,7 @@ export class AuthService {
       secret: OTPAuth.Secret.fromUTF8(process.env.OTP_SECRET as string) // better to be custom for each client
     })
 
-    return await qrcode.toDataURL(totp.toString())
+    return qrcode.toDataURL(totp.toString())
   }
 
   // Step 2/2 to enable 2FA
