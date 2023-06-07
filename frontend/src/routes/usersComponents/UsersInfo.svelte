@@ -2,6 +2,7 @@
   import axios from "../../axios.config";
   import type { Match, Stat, User } from "../../types";
   import Friends from "./user-info/Friends.svelte";
+    import Games from "./user-info/Games.svelte";
 
   export let pageUser: User;
 
@@ -68,61 +69,7 @@
 
     <Friends bind:pageUser />
 
-
-  <div class="box-info games">
-    <h1>Game history</h1>
-    <div class="overflow">
-      <ul>
-        {#each matchHistory as match}
-          {#if match.winnerId == pageUser.id}
-            <li class="lineFriends" id="win">
-              <span> <span class="greenDot" /></span>
-              <span>{match.winnerScore}</span>
-              <span>-</span>
-              <span>{match.loserScore}</span>
-              <span>
-                <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/>
-              </span>
-              <span id="flexStart">
-                {#await (opponent = getUsernameById(match.loserId))}
-                  ...
-                {:then opponent}
-                  <a href="#/users/{opponent}">{opponent}</a>
-                {/await}
-              </span>
-              {#if match.ranked}
-                <span>R</span>
-              {:else}
-                <span />
-              {/if}
-            </li>
-          {:else}
-            <li class="lineFriends" id="lose">
-              <span> <span class="redDot" /></span>
-              <span>{match.loserScore} </span>
-              <span>-</span>
-              <span>{match.winnerScore}</span>
-              <span>
-                <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/>
-              </span>
-              <span id="flexStart">
-                {#await (opponent = getUsernameById(match.winnerId))}
-                  ...
-                {:then opponent}
-                  <a href="#/users/{opponent}">{opponent}</a>
-                {/await}
-              </span>
-              {#if match.ranked}
-                <span>R</span>
-              {:else}
-                <span />
-              {/if}
-            </li>
-          {/if}
-        {/each}
-      </ul>
-    </div>
-  </div>
+	<Games bind:pageUser bind:matchHistory/>
 
   <div class="box-info statistics">
     <!--lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO |
@@ -184,7 +131,6 @@
     align-items: center;
   }
 
-
   .box-info h1 {
     height: 40px;
     border-bottom: solid 1px black;
@@ -193,76 +139,8 @@
     justify-content: center;
   }
 
-  .info-container li {
-    height: 40px;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    background-color: var(--lite-lite-lite-grey);
-  }
-
-  .info-container li:nth-child(2n + 1) {
-    background-color: var(--lite-lite-grey);
-  }
-
-
   .box-info h1 {
     height: 40px;
-  }
-
-  .box-info .pp {
-    width: 35px;
-    height: 35px;
-    border: 1px solid rgb(78, 78, 78);
-    border-radius: 50%;
-  }
-
-  .box-info .overflow {
-    flex: 1;
-    overflow: auto;
-    border-radius: 0 0 30px 30px;
-  }
-
-  .games {
-    margin: 50px;
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-    height: 80%;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .games .lineFriends {
-    display: grid;
-    grid-template-columns: 1fr 0.3fr 0.3fr 0.3fr 1fr 3fr 1fr;
-  }
-
-  .games .lineFriends span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .games .lineFriends #flexStart {
-    justify-content: flex-start;
-  }
-
-  .games .lineFriends .redDot {
-    height: 25px;
-    width: 25px;
-    background-color: #f93729;
-    border-radius: 50%;
-    border: solid 1px black;
-  }
-
-  .games .lineFriends .greenDot {
-    height: 25px;
-    width: 25px;
-    background-color: #15db36;
-    border-radius: 50%;
-    border: solid 1px black;
   }
 
   .statistics {
@@ -319,13 +197,12 @@
       grid-template-rows: 1fr, 1fr, 1fr;
     }
 
-
     .info-container :nth-child(1){
       grid-column: 1 / 2;
       grid-row: 1 / 2;
     }
 
-    .games {
+    .info-container :nth-child(2){
       grid-column: 1 / 2;
       grid-row: 2 / 3;
     }
