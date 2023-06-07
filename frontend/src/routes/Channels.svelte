@@ -39,18 +39,6 @@
     }
   }
 
-  // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
-  async function removeAll() {
-    if (window.confirm("Are you sure ?") === false)
-      return
-    try {
-      await axios.delete(`/channel`)
-      getAll()
-    } catch (e) {
-      console.log(e.response.data.message)
-    }
-  }
-
   async function create() {
 
     if (channel.channelName === null) {
@@ -113,11 +101,6 @@
       {/each}
     </tbody>
   </table>
-
-  <br>
-  <br>
-
-  <button on:click={removeAll}>Delete all</button>
 
   <br>
   <br>

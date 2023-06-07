@@ -34,7 +34,7 @@
       getPPs();
       $reloadImage++;
     } catch (e) {
-      console.error(e);
+      toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 

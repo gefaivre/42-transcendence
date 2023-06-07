@@ -106,12 +106,12 @@
           <img src={Logo42} alt="logo 42">
         </div>
       </a>
-      <button on:click={ () => (action = 'signup')}>
+      <button on:click={() => action = 'signup'}>
         <div class="connect-button">
           signup
         </div>
       </button>
-      <button on:click={() => (action = 'signin')}>
+      <button on:click={() => action = 'signin'}>
         <div class="connect-button">
           signin
         </div>
@@ -123,7 +123,7 @@
       <input type="text" placeholder="username" bind:value={user.username}><br>
       <input type="text" placeholder="password" bind:value={user.password}><br>
       <button on:click={signup}>signup</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'signin'}
@@ -131,7 +131,7 @@
       <input type="text" placeholder="username" bind:value={user.username}><br>
       <input type="text" placeholder="password" bind:value={user.password}><br>
       <button on:click={login}>login</button>
-      <button on:click={ () => (action = '')}>return</button>
+      <button on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'qrcode'}
