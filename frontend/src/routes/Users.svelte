@@ -1,6 +1,6 @@
 <script lang="ts">
   import axios from "../axios.config";
-  import { id, reloadImage, user, logged, socket } from "../stores";
+  import { id, user, logged, socket } from "../stores";
   import { Status, type User } from "../types";
   import UsersInfo from "./usersComponents/UsersInfo.svelte";
   import UsersSettings from "./usersComponents/UsersSettings.svelte";
