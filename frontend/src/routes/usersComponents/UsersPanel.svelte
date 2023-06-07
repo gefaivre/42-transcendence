@@ -2,12 +2,12 @@
 import axios from "../../axios.config";
 import { id, user, reloadImage, logged, socket} from "../../stores";
 import { Status, type User } from "../../types";
-import deleteIcon from "../assets/redLose.png";
-import acceptIcon from "../assets/greenWin.png";
+import deleteIcon from "../../assets/redLose.png";
+import acceptIcon from "../../assets/greenWin.png";
 
 
 export let pageUser: User;
-let settings: boolean = false;
+export let settings: boolean;
 let isBlocked: boolean = false;
 let onlineStatus: Status = null;
 
@@ -251,6 +251,94 @@ async function logout() {
   </div>
 
 <style>
-	
+
+.user-panel {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 2fr 3fr;
+    background-color: var(--grey);
+    border-left: solid 1px var(--lite-grey);
+    border-right: solid 1px var(--lite-grey);
+  }
+
+	.ctn-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 50px;
+    text-shadow: 0 0 20px;
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 0.5px;
+    color: var(--pink);
+  }
+
+  .ctn-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image {
+    position: relative;
+    pointer-events: none;
+    background-color: var(--grey);
+    border-radius: var(--imageRadius);
+    height: 200px;
+    width: 200px;
+    position: relative;
+    pointer-events: none;
+    border: solid 6px var(--lite-grey);
+  }
+
+  .ctn-action {
+    display: grid;
+    align-items: end;
+  }
+
+  .ctn-action li {
+    height: 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    background-color: var(--lite-lite-grey);
+  }
+
+  .ctn-action li:nth-child(2n + 1) {
+    background-color: var(--lite-grey);
+  }
+
+  .ctn-action span {
+    display: flex;
+    align-items: center;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 5%;
+    gap: 5px;
+  }
+
+  .actionButton {
+    background-color: var(--white);
+    border: solid 2px black;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  .btnImage {
+    height: 25px;
+    width: 25px;
+  }
+
 </style>
 
