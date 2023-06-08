@@ -50,7 +50,8 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany()
+    const users: User[] = await this.prisma.user.findMany()
+    return users.map((user: User) => this.prisma.exclude<any,any>(user, ['password']))
   }
 
   async findById(id: number) {
