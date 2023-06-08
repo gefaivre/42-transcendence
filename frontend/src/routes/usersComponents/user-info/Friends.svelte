@@ -5,6 +5,7 @@
   import type { User } from "../../../types";
   import deleteIcon from "../../../assets/redLose.png";
   import acceptIcon from "../../../assets/greenWin.png";
+  import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
   let friendspage: String = "Friends";
@@ -118,7 +119,7 @@
           {#each pageUser.friends as friend}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{friend.username}">{friend.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
@@ -139,7 +140,7 @@
           {#each pageUser.requestFriends as requestFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>
@@ -164,7 +165,7 @@
           {#each pageUser.pendingFriends as pendingFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{pendingFriends?.username}">
                   {pendingFriends?.username}</a>
               </div>
@@ -185,7 +186,7 @@
           {#each pageUser.blocked as blocked}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}"alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
