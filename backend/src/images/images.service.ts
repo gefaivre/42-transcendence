@@ -30,7 +30,7 @@ export class ImagesService {
   async findAll(userId: number) {
     return this.prisma.image.findMany({
       where: {
-        User: {
+        user: {
           id: userId
         }
       },
@@ -44,7 +44,7 @@ export class ImagesService {
     const image = await this.prisma.image.findMany({
       take: 1,
       where: {
-        User: {
+        user: {
           id: userId
         },
       },

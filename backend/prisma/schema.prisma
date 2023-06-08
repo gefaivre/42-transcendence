@@ -48,7 +48,7 @@ model Image {
   path           String
   date           DateTime   @default(now())
   lastuse        DateTime   @default(now())
-  User           User   @relation(fields: [userId], references: [id])
+  user           User   @relation(fields: [userId], references: [id])
   userId         Int
 }
 
