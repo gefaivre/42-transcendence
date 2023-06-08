@@ -10,7 +10,7 @@
   import homeIcon     from '../assets/whiteHome.png'
   import messageIcon  from '../assets/whiteChat.png'
   import gameIcon     from '../assets/whiteGame.png'
-
+  import { handleImageError } from "../utils";
 
   let user: User;
   let groupeImage = "../assets/groupe.png"
@@ -33,13 +33,12 @@
     }
   });
 
-
 </script>
 
   <div class="menu">
     <a class= testLink href = "#/profil">
       {#if user}
-      <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{user.id}' alt="Rounded avatar">
+        <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{user.id}' on:error={handleImageError} alt="Rounded avatar">
       {/if}
     </a>
 

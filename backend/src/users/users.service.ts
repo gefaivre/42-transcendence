@@ -11,7 +11,7 @@ export class UsersService {
 
   async create(user: CreateUserDto) {
 
-    // create user with the default profile picture
+    // create user
     const _user: User = await this.prisma.user.create({
       data: {
         username: user.username,
@@ -19,11 +19,6 @@ export class UsersService {
         ft_login: user.ft_login,
         games:  0,
         mmr: 800,
-        images: {
-          create: {
-            path: "/app/images/basic_pp.jpg",
-          }
-        }
       }
     })
 

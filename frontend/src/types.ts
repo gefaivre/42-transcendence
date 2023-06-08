@@ -99,7 +99,7 @@ export type Stat = {
 }
 
 // mirrors backend
-export const enum Status {
+export enum Status {
   offline,
   online,
   ingame,

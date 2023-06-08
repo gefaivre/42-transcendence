@@ -1,9 +1,11 @@
 <script lang="ts">
 import axios from "../../axios.config";
 import { id, user, reloadImage, logged, socket} from "../../stores";
-import { Status, type User } from "../../types";
+import type { User } from "../../types";
+import { Status } from "../../types";
 import deleteIcon from "../../assets/redLose.png";
 import acceptIcon from "../../assets/greenWin.png";
+import { handleImageError } from "../../utils";
 
 
 export let pageUser: User;
@@ -149,6 +151,7 @@ async function logout() {
 	  <img
 		class="image"
 		src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}"
+    on:error={handleImageError}
 		alt="profil"
 	  />
 	</div>
