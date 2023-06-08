@@ -3,11 +3,11 @@
   import { onMount, onDestroy, afterUpdate} from "svelte";
   import ChanMenu from "./chanLayouts.svelte";
   import settingsImage from "../assets/settings.png";
-  import { logged, id } from "../stores";
+  import { id } from "../stores";
   import { pop } from "svelte-spa-router";
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
-  import type { Channel, PostEmitDto, ChannelDto, WsException, newPostEmitDto, User } from "../types";
+  import type { Channel, ChannelDto, WsException, newPostEmitDto, User } from "../types";
   import defaultAvatar from '../assets/008-utilisateur.png';
   import moreImg from '../assets/more.png';
 
@@ -90,23 +90,26 @@
       return pop()
     })
   }
+
   function getAvatar(username) {
-    let user = channel.users.find(user => user.username === username);
+    const user = channel.users.find(user => user.username === username);
     if (user)
       return "http://localhost:3000/images/actual/" + user.id;
-      else
-       return defaultAvatar;
+    else
+      return defaultAvatar;
   }
+
   function scrollToBottom() {
     const el = document.getElementById('Wall');
     el.scrollTop = el.scrollHeight;
   }
+
   const newscrollToBottom = async (node) => {
     if (node)
-        node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+      node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
   };
 
-// TODO: what if we manually change `id` store value ?
+  // TODO: what if we manually change `id` store value ?
   onMount(async () => {
 
     channel = (await axios.get(`/channel/${params.name}`)).data
@@ -169,26 +172,26 @@
 
   })
 
-onDestroy(() => socket.disconnect())
-function testlink()
-{
-  if (showsettings === false)
-    showsettings = true;
-  else
-    showsettings = false;
-  usersettings = false;
-  console.log(showsettings);
-}
-function openUserSettings(_username: string)
-{
-  if (usersettings === false)
-    usersettings = true;
-  else
+  onDestroy(() => socket.disconnect())
+  function testlink() {
+    if (showsettings === false)
+      showsettings = true;
+    else
+      showsettings = false;
     usersettings = false;
-  console.log(usersettings);
-  username = _username;
-}
+    console.log(showsettings);
+  }
+
+  function openUserSettings(_username: string) {
+    if (usersettings === false)
+      usersettings = true;
+    else
+      usersettings = false;
+    console.log(usersettings);
+    username = _username;
+  }
 </script>
+
 {#if channel}
   <ChanMenu>
   </ChanMenu>

@@ -6,7 +6,6 @@
   import deleteIcon from "../../../assets/redLose.png";
   import acceptIcon from "../../../assets/greenWin.png";
 
-
   export let pageUser: User;
   let friendspage: String = "Friends";
 
@@ -31,7 +30,6 @@
     try {
       const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
-      //update pageUser
       const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
       pageUser.requestFriends.splice(index, 1)
 
@@ -87,27 +85,27 @@
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
-          <button class="activeButton" on:click={() => (friendspage = "Friends")}>friends</button>
+          <button class="activeButton" on:click={() => friendspage = "Friends"}>friends</button>
         {:else}
-          <button on:click={() => (friendspage = "Friends")}>friends</button>
+          <button on:click={() => friendspage = "Friends"}>friends</button>
         {/if}
 
         {#if friendspage == "Request"}
-          <button class="activeButton" on:click={() => (friendspage = "Request")}>request</button>
+          <button class="activeButton" on:click={() => friendspage = "Request"}>request</button>
         {:else}
-          <button on:click={() => (friendspage = "Request")}>request</button>
+          <button on:click={() => friendspage = "Request"}>request</button>
         {/if}
 
         {#if friendspage == "Pending"}
-          <button class="activeButton" on:click={() => (friendspage = "Pending")}>pending</button>
+          <button class="activeButton" on:click={() => friendspage = "Pending"}>pending</button>
         {:else}
-          <button on:click={() => (friendspage = "Pending")}>pending</button>
+          <button on:click={() => friendspage = "Pending"}>pending</button>
         {/if}
 
         {#if friendspage == "Blocked"}
-          <button class="activeButton" on:click={() => (friendspage = "Blocked")}>blocked</button>
+          <button class="activeButton" on:click={() => friendspage = "Blocked"}>blocked</button>
         {:else}
-          <button on:click={() => (friendspage = "Blocked")}>blocked</button>
+          <button on:click={() => friendspage = "Blocked"}>blocked</button>
         {/if}
       </div>
     {:else}
@@ -302,7 +300,7 @@
     overflow: auto;
     border-radius: 0 0 30px 30px;
   }
-  
+
   *::-webkit-scrollbar {
     display: none;
   }

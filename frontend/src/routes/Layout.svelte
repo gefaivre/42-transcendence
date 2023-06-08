@@ -25,9 +25,9 @@
   onMount(async () => {
     try {
       const response = await axios.get('http://localhost:3000/auth/whoami');
-          user = response.data;
-          console.log(user);
-          console.log(user.id);
+      user = response.data;
+      console.log(user);
+      console.log(user.id);
     } catch (e) {
       console.error(e);
     }
@@ -41,15 +41,12 @@
         <img class="w-10 h-10 rounded-full" src='http://localhost:3000/images/actual/{user.id}' on:error={handleImageError} alt="Rounded avatar">
       {/if}
     </a>
-
     {#each menuItems as item, i}
     <a href={item.link}>
-
       <img class="menu-item-image" src={item.icon} alt={item.label} />
     </a>
     {/each}
   </div>
-
 
   <div class="container m-0">
     <slot></slot>

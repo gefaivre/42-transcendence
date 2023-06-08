@@ -4,8 +4,7 @@
   import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
-
-  export  let matchHistory: Match[];
+  export let matchHistory: Match[];
 
   let opponent: any;
 
@@ -17,7 +16,6 @@
       console.log(e);
     }
   }
-
 
 </script>
 
@@ -161,5 +159,5 @@
   *::-webkit-scrollbar {
     display: none;
   }
-  
+
 </style>
