@@ -102,7 +102,7 @@ export class UsersService {
   }
 
   async findByFortyTwoLogin(login: string) {
-    const user = await this.prisma.user.findUnique({
+    const user: User | null = await this.prisma.user.findUnique({
       where: {
         ft_login: login
       }
@@ -161,7 +161,7 @@ export class UsersService {
   }
 
   async findOneById(id: number) {
-    const user = await this.prisma.user.findUnique({
+    const user: User | null = await this.prisma.user.findUnique({
       where: {
         id: id,
       }
@@ -170,7 +170,7 @@ export class UsersService {
   }
 
   async updateGameStats(username: string, games: number, mmr: number) {
-    const user = await this.prisma.user.update({
+    const user: User = await this.prisma.user.update({
       where: {
         username: username // P2025
       },
@@ -183,7 +183,7 @@ export class UsersService {
   }
 
   async updateUsername(username: string, newName: string) {
-    const user = await this.prisma.user.update({
+    const user: User = await this.prisma.user.update({
       where: {
         username: username // P2025
       },
@@ -195,7 +195,7 @@ export class UsersService {
   }
 
   async updatePassword(username: string, newPassword: string) {
-    const user = await this.prisma.user.update({
+    const user: User = await this.prisma.user.update({
       where: {
         username: username // P2025
       },
@@ -207,7 +207,7 @@ export class UsersService {
   }
 
   async remove(username: string) {
-    const user = await this.prisma.user.delete({
+    const user: User = await this.prisma.user.delete({
       where: {
         username: username // P2025
       }
