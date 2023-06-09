@@ -179,7 +179,7 @@ export class UsersService {
         mmr: mmr
       },
     });
-    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
+    return this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updateUsername(username: string, newName: string) {
@@ -191,7 +191,7 @@ export class UsersService {
         username: newName
       }
     });
-    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
+    return this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updatePassword(username: string, newPassword: string) {
@@ -203,7 +203,7 @@ export class UsersService {
         password: newPassword
       }
     });
-    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
+    return this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async remove(username: string) {
@@ -212,7 +212,7 @@ export class UsersService {
         username: username // P2025
       }
     });
-    return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
+    return this.prisma.exclude<any,any>(user, ['password'])
   }
 
   update2FA(id: number, twofa: boolean) {
