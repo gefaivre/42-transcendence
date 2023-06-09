@@ -64,13 +64,11 @@ export class ImagesService {
         id: id
       }
     })
-    if (image === null)
-      return null;
-    else
-    {
+    if (image !== null) {
       const file = fs.createReadStream(image.path);
       return new StreamableFile(file)
     }
+    return null
   }
 
   async remove(id: number) {

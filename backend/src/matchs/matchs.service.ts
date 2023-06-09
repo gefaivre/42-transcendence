@@ -64,7 +64,9 @@ export class MatchsService {
           { loserId: userId },
         ]
       },
-      orderBy: { date: 'desc' }
+      orderBy: {
+        date: 'desc'
+      }
     })
   }
 
@@ -78,7 +80,5 @@ export class MatchsService {
       },
     });
   }
-
-
 
 }
