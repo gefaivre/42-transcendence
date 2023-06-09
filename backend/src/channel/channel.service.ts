@@ -46,7 +46,7 @@ export class ChannelService {
   }
 
   findByName(channelName: string) {
-    return this.prisma.channel.findFirst({
+    return this.prisma.channel.findUnique({
       where: {
         name: channelName
       },
@@ -62,7 +62,7 @@ export class ChannelService {
   deleteByName(channelName: string) {
     return this.prisma.channel.delete({
       where: {
-        name: channelName
+        name: channelName // P2025
       }
     })
   }
@@ -85,12 +85,12 @@ export class ChannelService {
   addUserToChannel(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
-        name: channelName
+        name: channelName // P2016
       },
       data: {
         users: {
           connect: {
-            id: userId
+            id: userId // P2025
           }
         }
       }
@@ -122,10 +122,10 @@ export class ChannelService {
       try {
         await this.prisma.channel.update({
           where: {
-            name: channelName
+            name: channelName // P2025
           },
           data: {
-            ownerId: newOwner?.id
+            ownerId: newOwner?.id // P2003 (unless undefined)
           }
         })
       } catch(e) {
@@ -141,17 +141,17 @@ export class ChannelService {
   removeUser(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
-        name: channelName
+        name: channelName // P2025
       },
       data: {
         users: {
           disconnect: {
-            id: userId
+            id: userId // doesn't throw anything
           }
         },
         admins: {
           disconnect: {
-            id: userId
+            id: userId // doesn't throw anything
           }
         }
       }
@@ -161,12 +161,12 @@ export class ChannelService {
   promoteAdmin(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
-        name: channelName
+        name: channelName // P2016
       },
       data: {
         admins: {
           connect: {
-            id: userId
+            id: userId // P2025
           }
         }
       }
@@ -176,12 +176,12 @@ export class ChannelService {
   revokeAdmin(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
-        name: channelName
+        name: channelName // P2025
       },
       data: {
         admins: {
           disconnect: {
-            id: userId
+            id: userId // doesn't throw anything
           }
         }
       }

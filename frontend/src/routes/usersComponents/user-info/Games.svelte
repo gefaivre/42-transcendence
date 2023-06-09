@@ -1,13 +1,12 @@
 <script lang="ts">
   import axios from "../../../axios.config";
   import type { Match, User } from "../../../types";
+  import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
-
-  export  let matchHistory: Match[];
+  export let matchHistory: Match[];
 
   let opponent: any;
-
 
   async function getUsernameById(id: number) {
     try {
@@ -17,7 +16,6 @@
       console.log(e);
     }
   }
-
 
 </script>
 
@@ -33,7 +31,7 @@
               <span>-</span>
               <span>{match.loserScore}</span>
               <span>
-                <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" on:error={handleImageError} alt="pp"/>
               </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.loserId))}
@@ -55,7 +53,7 @@
               <span>-</span>
               <span>{match.winnerScore}</span>
               <span>
-                <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" on:error={handleImageError} alt="pp"/>
               </span>
               <span id="flexStart">
                 {#await (opponent = getUsernameById(match.winnerId))}
@@ -161,5 +159,5 @@
   *::-webkit-scrollbar {
     display: none;
   }
-  
+
 </style>

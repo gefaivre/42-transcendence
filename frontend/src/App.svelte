@@ -11,6 +11,7 @@
     import ioClient from 'socket.io-client';
     import Connection from './routes/Connection.svelte';
     import { SvelteToast } from '@zerodevx/svelte-toast/dist';
+    import { handleImageError } from './utils'
 
     const toastApp = new SvelteToast({
       target: document.body,
@@ -41,6 +42,7 @@
       }
     }
 
+
 </script>
 
   {#if $logged === 'true'}
@@ -48,7 +50,7 @@
     <div class="profileLink">
     {#if $user}
       <a use:link href="/users/{$user.username}">
-        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' alt="profile">
+        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
       </a>
     {/if}
     </div>

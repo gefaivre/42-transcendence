@@ -11,7 +11,7 @@ export class ImagesService {
     return this.prisma.image.create({
       data: {
         path: `${file.destination}/${file.filename}`,
-        userId: userId
+        userId: userId // P2003
       }
     })
   }
@@ -19,7 +19,7 @@ export class ImagesService {
   async setImage(userId: number, imageId: number) {
     return this.prisma.image.update({
       where: {
-        id: imageId
+        id: imageId // P2025
       },
       data: {
         lastuse: new Date()
@@ -30,7 +30,7 @@ export class ImagesService {
   async findAll(userId: number) {
     return this.prisma.image.findMany({
       where: {
-        User: {
+        user: {
           id: userId
         }
       },
@@ -44,7 +44,7 @@ export class ImagesService {
     const image = await this.prisma.image.findMany({
       take: 1,
       where: {
-        User: {
+        user: {
           id: userId
         },
       },
@@ -64,13 +64,11 @@ export class ImagesService {
         id: id
       }
     })
-    if (image === null)
-      return null;
-    else
-    {
+    if (image !== null) {
       const file = fs.createReadStream(image.path);
       return new StreamableFile(file)
     }
+    return null
   }
 
   async remove(id: number) {
@@ -78,7 +76,7 @@ export class ImagesService {
     // remove from db
     const image = await this.prisma.image.delete({
       where: {
-        id: id
+        id: id // P2025
       }
     })
 

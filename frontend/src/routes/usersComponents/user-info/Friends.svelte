@@ -5,7 +5,7 @@
   import type { User } from "../../../types";
   import deleteIcon from "../../../assets/redLose.png";
   import acceptIcon from "../../../assets/greenWin.png";
-
+  import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
   let friendspage: String = "Friends";
@@ -31,7 +31,6 @@
     try {
       const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
-      //update pageUser
       const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
       pageUser.requestFriends.splice(index, 1)
 
@@ -87,27 +86,27 @@
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
-          <button class="activeButton" on:click={() => (friendspage = "Friends")}>friends</button>
+          <button class="activeButton" on:click={() => friendspage = "Friends"}>friends</button>
         {:else}
-          <button on:click={() => (friendspage = "Friends")}>friends</button>
+          <button on:click={() => friendspage = "Friends"}>friends</button>
         {/if}
 
         {#if friendspage == "Request"}
-          <button class="activeButton" on:click={() => (friendspage = "Request")}>request</button>
+          <button class="activeButton" on:click={() => friendspage = "Request"}>request</button>
         {:else}
-          <button on:click={() => (friendspage = "Request")}>request</button>
+          <button on:click={() => friendspage = "Request"}>request</button>
         {/if}
 
         {#if friendspage == "Pending"}
-          <button class="activeButton" on:click={() => (friendspage = "Pending")}>pending</button>
+          <button class="activeButton" on:click={() => friendspage = "Pending"}>pending</button>
         {:else}
-          <button on:click={() => (friendspage = "Pending")}>pending</button>
+          <button on:click={() => friendspage = "Pending"}>pending</button>
         {/if}
 
         {#if friendspage == "Blocked"}
-          <button class="activeButton" on:click={() => (friendspage = "Blocked")}>blocked</button>
+          <button class="activeButton" on:click={() => friendspage = "Blocked"}>blocked</button>
         {:else}
-          <button on:click={() => (friendspage = "Blocked")}>blocked</button>
+          <button on:click={() => friendspage = "Blocked"}>blocked</button>
         {/if}
       </div>
     {:else}
@@ -120,7 +119,7 @@
           {#each pageUser.friends as friend}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{friend.username}">{friend.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
@@ -141,7 +140,7 @@
           {#each pageUser.requestFriends as requestFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>
@@ -166,7 +165,7 @@
           {#each pageUser.pendingFriends as pendingFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{pendingFriends?.username}">
                   {pendingFriends?.username}</a>
               </div>
@@ -187,7 +186,7 @@
           {#each pageUser.blocked as blocked}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}"alt="pp"/>
+                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
@@ -302,7 +301,7 @@
     overflow: auto;
     border-radius: 0 0 30px 30px;
   }
-  
+
   *::-webkit-scrollbar {
     display: none;
   }

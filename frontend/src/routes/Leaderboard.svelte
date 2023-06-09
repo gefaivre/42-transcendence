@@ -1,6 +1,7 @@
 <script lang="ts">
 	import axios from "../axios.config";
 	import { onMount } from "svelte";
+  import { handleImageError } from "../utils";
 
 	// TODO: get rid of unused `User` fields
 	let users = [];
@@ -27,6 +28,7 @@
 		users.sort((a, b) => b.games - a.games);
 		users = users; // svelte relaod
 	}
+
 </script>
 
 <div class="screen">
@@ -49,7 +51,7 @@
 					<td>
 						<a href="#/users/{user.username}">
 							<span class="user">
-								<img class="pp" src="http://localhost:3000/images/actual/{user.id}" alt="pp"/>
+								<img class="pp" src="http://localhost:3000/images/actual/{user.id}" on:error={handleImageError} alt="pp"/>
 								<p class="username">{user.username}</p>
 							</span>
 						</a>
