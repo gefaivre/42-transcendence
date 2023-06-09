@@ -419,7 +419,9 @@ export class UsersService {
         }
       }
     })
-    const usernames: string[] = blocked!.blocked.map((blocked: any) => blocked.username)
+    if (blocked === null)
+      return false
+    const usernames: string[] = blocked.blocked.map((blocked: any) => blocked.username)
     return usernames.some((_username: string) => _username === username)
   }
 
@@ -436,7 +438,9 @@ export class UsersService {
         }
       }
     })
-    const usernames: string[] = blockedBy!.blockedBy.map((blocked: any) => blocked.username)
+    if (blockedBy === null)
+      return false
+    const usernames: string[] = blockedBy.blockedBy.map((blocked: any) => blocked.username)
     return usernames.some((_username: string) => _username === username)
   }
 
