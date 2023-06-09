@@ -96,6 +96,11 @@
       alert(e.message)
     })
 
+    socket.on('alreadyRequested', () => {
+      toast.push('Game already requested!');
+      gameRequest = false; 
+    });
+
     return ()=> {
       socket.close();
     };
@@ -107,6 +112,8 @@
 
   function restart() {
     unique = {};
+    gameList = [];
+    getGames();
   }
 
   getGames();
@@ -176,8 +183,12 @@
 
   {#if !gameRequest}
   <div id="requestGame">
-    <h2>Settings</h2>
+    <h2>Play game</h2>
+    <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">play friendly game</label>
+    {#if friendly}
+    <input bind:value={friendUsername} type="text" placeholder="your friend username">
 
+    <h3>Settings</h3>
     <table id="settingsTable">
 
     <tr>
@@ -199,33 +210,32 @@
     <td align="left"><label for="paddleSize">paddle size</label></td>
     <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
-
-    <tr>
-    <td align="left">
-    <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">friendly</label>
-    </td>
-    <td align="right">
-    {#if friendly}
-      <input bind:value={friendUsername} type="text" placeholder="your friend username">
-    {/if}
-    </td>
-    </tr>
     </table>
+    {/if}
 
-  <button id="requestButton" on:click={requestGame}>request game</button>
+
+  <br>
+  {#if friendly}
+  <button id="requestButton" on:click={requestGame}>request friendly game</button>
+  {:else}
+  <button id="requestButton" on:click={requestGame}>request random game</button>
+  {/if}
+
 
   </div>
 
- {#if gameList}
  <div id="watchGame">
- <h2>Games</h2>
+ <h2>Watch Game</h2>
+ {#if gameList.length}
   <ul id="gameList">
     {#each gameList as game}
       <li>{game.player1 + ' vs ' + game.player2} <button id="watchButton" on:click={() => watchGame(game.player1)}>watch</button></li>
     {/each}
   </ul>
-</div>
+{:else}
+  <p>No games to watch at the moment !</p>
 {/if}
+</div>
 
  {/if}
 
@@ -292,6 +302,13 @@
 h2 {
   font-size:1.3em;
   color:var(--pink);
+  margin-bottom:1em;
+}
+
+h3 {
+  font-size:1.1em;
+  color: rgb(158, 39, 217);
+  margin-top:1.2em;
 }
 
 button {
