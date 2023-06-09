@@ -407,7 +407,7 @@ export class UsersService {
   }
 
   async isBlocked(id: number, username: string) {
-    const blocked = await this.prisma.user.findFirst({
+    const blocked = await this.prisma.user.findUnique({
       where: {
         id: id
       },
@@ -424,7 +424,7 @@ export class UsersService {
   }
 
   async isBlockedBy(id: number, username: string) {
-    const blockedBy = await this.prisma.user.findFirst({
+    const blockedBy = await this.prisma.user.findUnique({
       where: {
         id: id
       },

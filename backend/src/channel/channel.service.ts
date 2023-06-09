@@ -46,7 +46,7 @@ export class ChannelService {
   }
 
   findByName(channelName: string) {
-    return this.prisma.channel.findFirst({
+    return this.prisma.channel.findUnique({
       where: {
         name: channelName
       },
