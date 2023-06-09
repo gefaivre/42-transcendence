@@ -28,6 +28,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
+    if (this.pong.gameAlreadyRequested(client.id)) {
+      this.server.emit('alreadyRequested', {});
+      return ;
+    }
+      
     const room: string | undefined = this.pong.handleRequestGame(client.id, requestGameDto.friend, requestGameDto.settings);
     if (room === undefined) {
       const username: string | undefined = this.pong.getUsername(client.id);

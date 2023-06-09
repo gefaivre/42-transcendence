@@ -86,7 +86,18 @@ export class PongService {
           this.rooms.splice(toDelete, 1);
       }
     }
+  }
 
+  gameAlreadyRequested(socketId: string) {
+    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+
+    if (user !== undefined) {
+      const room: Room | undefined = this.rooms.find(room => room.player1.prismaId === user.prismaId);
+      if (room !== undefined) {
+        return true;
+      }
+    }
+    return false;
   }
 
   handleWatchGame(socketId: string, game: GameDto) : string | undefined {
