@@ -11,9 +11,9 @@ export class MatchsService {
   async create(match: CreateMatchDto) {
     return this.prisma.match.create({
       data: {
-        winnerId: match.winnerId,
+        winnerId: match.winnerId, // P2023
         winnerScore: match.winnerScore,
-        loserId: match.loserId,
+        loserId: match.loserId, // P2023
         loserScore: match.loserScore,
         ranked: match.ranked,
       },
@@ -34,20 +34,26 @@ export class MatchsService {
 
   async update(id: number, match: UpdateMatchDto) {
     return this.prisma.match.update({
-      where: { id: id },
+      where: {
+        id: id // P2025
+      },
       data: {
-        winnerId: match.winnerId,
+        winnerId: match.winnerId, // P2003
         winnerScore: match.winnerScore,
-        loserId: match.loserId,
+        loserId: match.loserId, // P2003
         loserScore: match.loserScore,
-        date: match.date,
+        date: match.date, // ??
         ranked: match.ranked,
       },
     });
   }
 
   async remove(id: number) {
-    return this.prisma.match.delete({ where: { id: id }});
+    return this.prisma.match.delete({
+      where: {
+        id: id // P2025
+      }
+    })
   }
 
   async findHistory(userId: number) {

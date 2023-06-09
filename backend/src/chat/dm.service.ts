@@ -11,8 +11,8 @@ export class DirectMessageService {
     return this.prisma.directMessage.create({
       data: {
         content: message.content,
-        senderId: message.senderId,
-        receiverId: message.receiverId
+        senderId: message.senderId, // P2023
+        receiverId: message.receiverId // P2023
       }
     })
   }

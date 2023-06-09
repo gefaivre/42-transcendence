@@ -12,8 +12,8 @@ export class PostsService {
     return this.prisma.post.create({
       data: {
         content: post.content,
-        authorId: post.authorId,
-        channelId: post.channelId,
+        authorId: post.authorId, // P2003
+        channelId: post.channelId, // P2003
       }
     });
   }
@@ -41,7 +41,7 @@ export class PostsService {
   async update(id: number, post: UpdatePostDto) {
     return this.prisma.post.update({
       where: {
-        id: id,
+        id: id, // P2025
       },
       data: {
         content: post.content,
@@ -50,6 +50,10 @@ export class PostsService {
   }
 
   async remove(id: number) {
-    return this.prisma.post.delete({ where: { id: id }});
+    return this.prisma.post.delete({
+      where: {
+        id: id // P2025
+      }
+    })
   }
 }

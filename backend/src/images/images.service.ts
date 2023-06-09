@@ -11,7 +11,7 @@ export class ImagesService {
     return this.prisma.image.create({
       data: {
         path: `${file.destination}/${file.filename}`,
-        userId: userId
+        userId: userId // P2003
       }
     })
   }
@@ -19,7 +19,7 @@ export class ImagesService {
   async setImage(userId: number, imageId: number) {
     return this.prisma.image.update({
       where: {
-        id: imageId
+        id: imageId // P2025
       },
       data: {
         lastuse: new Date()
@@ -78,7 +78,7 @@ export class ImagesService {
     // remove from db
     const image = await this.prisma.image.delete({
       where: {
-        id: id
+        id: id // P2025
       }
     })
 

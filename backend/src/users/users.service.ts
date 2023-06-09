@@ -14,7 +14,7 @@ export class UsersService {
     // create user
     const _user: User = await this.prisma.user.create({
       data: {
-        username: user.username,
+        username: user.username, // P2002
         password: user.password,
         ft_login: user.ft_login,
         games:  0,
@@ -42,7 +42,7 @@ export class UsersService {
       await this.prisma.image.create({
         data: {
           path: path,
-          userId: _user.id,
+          userId: _user.id, // P2003
         }
       })
     }
@@ -171,40 +171,57 @@ export class UsersService {
 
   async updateGameStats(username: string, games: number, mmr: number) {
     const user = await this.prisma.user.update({
-      where: { username: username },
-      data: { games: games, mmr: mmr },
+      where: {
+        username: username // P2025
+      },
+      data: {
+        games: games,
+        mmr: mmr
+      },
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updateUsername(username: string, newName: string) {
     const user = await this.prisma.user.update({
-      where: { username: username },
-      data: { username: newName }
+      where: {
+        username: username // P2025
+      },
+      data: {
+        username: newName
+      }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async updatePassword(username: string, newPassword: string) {
     const user = await this.prisma.user.update({
-      where: { username: username },
-      data: { password: newPassword }
+      where: {
+        username: username // P2025
+      },
+      data: {
+        password: newPassword
+      }
     });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   async remove(username: string) {
-    const user = await this.prisma.user.delete({ where: { username: username } });
+    const user = await this.prisma.user.delete({
+      where: {
+        username: username // P2025
+      }
+    });
     return user === null ? user : this.prisma.exclude<any,any>(user, ['password'])
   }
 
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({
       where: {
-          id: id
+        id: id // P2025
       },
       data: {
-          TwoFA: twofa
+        TwoFA: twofa
       }
     })
   }
@@ -213,11 +230,13 @@ export class UsersService {
     console.log('service request friendship')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2016
       },
       data: {
         pendingFriends: {
-          connect: { id: friendId }
+          connect: {
+            id: friendId // P2025
+          }
         }
       }
     });
@@ -227,11 +246,11 @@ export class UsersService {
     console.log('service cancel friendship request by id')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         pendingFriends: {
-          disconnect: [{ id: friendId }]
+          disconnect: [{ id: friendId }] // doesn't throw anything
         }
       },
     });
@@ -241,11 +260,11 @@ export class UsersService {
     console.log('service cancel friendship request by name')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         pendingFriends: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         }
       },
     });
@@ -255,17 +274,17 @@ export class UsersService {
     console.log('service accept friendship request by id')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         requestFriends: {
-          disconnect: [{ id: friendId }]
+          disconnect: [{ id: friendId }] // doesn't throw anything
         },
         friends: {
-          connect: [{ id: friendId }]
+          connect: [{ id: friendId }] // P2025
         },
         friendOf: {
-          connect: [{ id: friendId }]
+          connect: [{ id: friendId }] // P2025
         },
       },
     });
@@ -275,17 +294,17 @@ export class UsersService {
     console.log('service accept friendship request by name  ',id, ' to ', username)
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         requestFriends: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         },
         friends: {
-          connect: [{ username: username }]
+          connect: [{ username: username }] // P2025
         },
         friendOf: {
-          connect: [{ username: username }]
+          connect: [{ username: username }] // P2025
         },
       },
       include: {
@@ -303,11 +322,11 @@ export class UsersService {
     console.log('service dismiss friendship request by id')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         requestFriends: {
-          disconnect: [{ id: friendId }]
+          disconnect: [{ id: friendId }] // doesn't throw anything
         }
       },
     });
@@ -317,11 +336,11 @@ export class UsersService {
     console.log('service dismiss friendship request by name')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         requestFriends: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         }
       },
     });
@@ -331,14 +350,14 @@ export class UsersService {
     console.log('service remove friend by id')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         friends: {
-          disconnect: [{ id: friendId }]
+          disconnect: [{ id: friendId }] // doesn't throw anything
         },
         friendOf: {
-          disconnect: [{ id: friendId }]
+          disconnect: [{ id: friendId }] // doesn't throw anything
         },
       },
     });
@@ -348,14 +367,14 @@ export class UsersService {
     console.log('service remove friend by name')
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         friends: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         },
         friendOf: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         },
       },
     });
@@ -364,11 +383,11 @@ export class UsersService {
   async blockByUsername(id: number, username: string) {
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2016
       },
       data: {
         blocked: {
-          connect: [{ username: username }]
+          connect: [{ username: username }] // P2025
         }
       }
     })
@@ -377,11 +396,11 @@ export class UsersService {
   async unblockByUsername(id: number, username: string) {
     return this.prisma.user.update({
       where: {
-        id: id
+        id: id // P2025
       },
       data: {
         blocked: {
-          disconnect: [{ username: username }]
+          disconnect: [{ username: username }] // doesn't throw anything
         }
       }
     })
