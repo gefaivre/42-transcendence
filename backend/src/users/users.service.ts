@@ -188,7 +188,7 @@ export class UsersService {
         username: username // P2025
       },
       data: {
-        username: newName
+        username: newName // P2002
       }
     });
     return this.prisma.exclude<any,any>(user, ['password'])
