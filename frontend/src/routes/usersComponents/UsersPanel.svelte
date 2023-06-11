@@ -3,8 +3,8 @@ import axios from "../../axios.config";
 import { id, user, reloadImage, logged, socket} from "../../stores";
 import type { User } from "../../types";
 import { Status } from "../../types";
-import deleteIcon from "../../assets/redLose.png";
-import acceptIcon from "../../assets/greenWin.png";
+import deleteIcon from "../../assets/new_cross.png";
+import acceptIcon from "../../assets/new_check.png";
 import { handleImageError } from "../../utils";
 
 
