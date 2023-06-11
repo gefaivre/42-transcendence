@@ -37,8 +37,8 @@ export class PongService {
     }
   }
 
-  async removeUser(socketId: string) : Promise<string | undefined> {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+  async removeUser(socketId: string): Promise<string | undefined> {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
       const room : string | undefined = await this.removeUserFromRoom(user);
@@ -48,7 +48,7 @@ export class PongService {
   }
 
   handleRequestGame(socketId: string, friend: string | undefined, settings: Settings): string | undefined {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
       if (friend !== undefined) {
@@ -77,7 +77,7 @@ export class PongService {
   }
 
   cancelRequest(socketId: string) {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
       const room: Room | undefined = this.rooms.find(room => room.player1 === user);
@@ -89,7 +89,7 @@ export class PongService {
   }
 
   gameAlreadyRequested(socketId: string) {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
       const room: Room | undefined = this.rooms.find(room => room.player1.prismaId === user.prismaId);
@@ -100,9 +100,9 @@ export class PongService {
     return false;
   }
 
-  handleWatchGame(socketId: string, game: GameDto) : string | undefined {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
-    const room: Room | undefined = this.rooms.find(room => room.id === game.gameName);
+  handleWatchGame(socketId: string, game: GameDto): string | undefined {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+    const room: Room | undefined = this.getRoomById(game.gameName)
 
     if (room !== undefined && user !== undefined) {
       room.watchers.push(user);
@@ -111,7 +111,7 @@ export class PongService {
     return undefined;
   }
 
-  private async removeUserFromRoom(user: WsUser) : Promise<string | undefined> {
+  private async removeUserFromRoom(user: WsUser): Promise<string | undefined> {
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
     if (room !== undefined) {
       if (room.start === true) {
@@ -145,7 +145,7 @@ export class PongService {
     const gamesStateDto: GameStateDto[] = [];
     this.rooms.forEach(room => {
       if (room.start === true) {
-        let result = room.game.loop();
+        const result = room.game.loop();
         gamesStateDto.push({ id: room.id, state: room.game.getState() });
         if (JSON.stringify(result) !== '{}')
          this.endMatch(room);
@@ -154,7 +154,7 @@ export class PongService {
     return gamesStateDto;
   }
 
-  getRoomList() : RoomDto[] {
+  getRoomList(): RoomDto[] {
     let roomList: RoomDto[] = [];
 
     this.rooms.forEach(room => {
@@ -175,7 +175,7 @@ export class PongService {
   }
 
   handleControls(socketId: string, pressed: boolean, key: string) {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
     const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
 
     if (room !== undefined) {
@@ -208,8 +208,8 @@ export class PongService {
     }
   }
 
-  getWinner(roomId: string) : string {
-    const room: Room | undefined = this.rooms.find(room => room.id === roomId)
+  getWinner(roomId: string): string {
+    const room: Room | undefined = this.getRoomById(roomId)
     if (room !== undefined) {
       if (room.game.leftScore === 10)
         return room.player1.socketId;
@@ -219,8 +219,8 @@ export class PongService {
     return '';
   }
 
-  getLoser(roomId: string) : string {
-    const room: Room | undefined = this.rooms.find(room => room.id === roomId)
+  getLoser(roomId: string): string {
+    const room: Room | undefined = this.getRoomById(roomId)
     if (room !== undefined) {
       if (room.game.leftScore === 10)
         return room.player2!.socketId;
@@ -230,17 +230,19 @@ export class PongService {
     return '';
   }
 
-  getUsername(socketId: string) : string  | undefined {
-    const user: WsUser | undefined = this.pongUsers.find(user => user.socketId === socketId);
-    if (user !== undefined)
-      return user.username;
+  getUsername(socketId: string): string | undefined {
+    return this.pongUsers.find(user => user.socketId === socketId)?.username
   }
 
   getUserBySocketId(id: string) {
     return this.pongUsers.find(user => user.socketId === id)
   }
 
-  getRoomPlayers(roomId: string) : { player1: string; player2: string } | undefined {
+  private getRoomById(id: string) {
+    return this.rooms.find(room => room.id === id)
+  }
+
+  getRoomPlayers(roomId: string): { player1: string; player2: string } | undefined {
     const room: Room | undefined = this.rooms.find(room => room.id === roomId)
     if (room !== undefined && room.player2 !== undefined) {
       return { player1: room.player1.username, player2: room.player2.username }
@@ -248,13 +250,11 @@ export class PongService {
   }
 
   getRoomSettings(roomId: string): Settings | undefined {
-    const room: Room | undefined = this.rooms.find(room => room.id === roomId);
-    if (room !== undefined)
-      return (room.settings);
+    return this.rooms.find(room => room.id === roomId)?.settings
   }
 
   removeRoom(roomId: string) {
-    const room: Room | undefined = this.rooms.find(room => room.id === roomId);
+    const room: Room | undefined = this.getRoomById(roomId)
     if (room !== undefined) {
       const toDelete: number = this.rooms.indexOf(room);
       this.rooms.splice(toDelete, 1);
