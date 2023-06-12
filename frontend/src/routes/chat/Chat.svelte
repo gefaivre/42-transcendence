@@ -1,15 +1,38 @@
 <script lang="ts">
+    import axios from "../../axios.config";
+    import type { User } from "../../types";
     import ChatPanel from "./ChatPanel.svelte";
+    import { onMount } from "svelte";
+    import PublicView from "./PublicView.svelte";
+    import Discuss from "./Discuss.svelte";
 
+  let user: User;
+  export let params;
+
+  onMount(() => getProfile())
+
+  async function getProfile() {
+    try {
+      const response = await axios.get('/auth/whoami')
+      user = response.data;
+    }
+    catch (e) {
+    }
+  }
 
 </script>
 
   <div class="component">
 
     <ChatPanel />
+    <!-- bind:user -->
 
     <div class="second-panel">
-       ouais
+      {#if params.name === null}
+        <PublicView/>
+      {:else}
+        <Discuss/>
+      {/if}
     </div>
   </div>
 

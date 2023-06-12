@@ -1,10 +1,40 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+    import type { Channel, User } from "../../types";
+    import axios from "../../axios.config";
+
+
+    // export let user: User;
+    let channels: Channel[] = [];
+
+
+  onMount(() => getAll())
+
+  async function getAll() {
+    try {
+      const response = await axios.get('/channel');
+      channels = response.data;
+      console.log(channels)
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
 
 </script>
 
   <div class="chat-panel">
     <div class="ctn-title">
       <h1 class="title">Chat</h1>
+    </div>
+
+    <div class="chat-list">
+      <ul>
+          {#each channels as channel}
+            <li>
+              <a href="#/chat/{channel.name}">{channel.name}</a>
+            </li>
+          {/each}
+      </ul>
     </div>
 
   </div>
