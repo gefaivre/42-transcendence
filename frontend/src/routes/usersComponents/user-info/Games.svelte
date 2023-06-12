@@ -143,7 +143,7 @@
   .games .lineFriends .redDot {
     height: 25px;
     width: 25px;
-    background-color: #f93729;
+    background-color: #e30613;
     border-radius: 50%;
     border: solid 1px black;
   }
@@ -151,7 +151,7 @@
   .games .lineFriends .greenDot {
     height: 25px;
     width: 25px;
-    background-color: #15db36;
+    background-color: #068f3a;
     border-radius: 50%;
     border: solid 1px black;
   }
