@@ -13,7 +13,7 @@ import DirectMessage from './routes/DirectMessage.svelte'
 
 export default {
   '/': Leaderboard,
-  '/chat': Chat,
+  '/chat/:name?': Chat,
   '/channel/:name': ThomasChan,
   '/Channels': Channels,
   '/leaderboard': Leaderboard,
