@@ -127,4 +127,14 @@ export class UsersController {
     return this.users.unblockByUsername(req.user.id, username)
   }
 
+  @Get('me/channel')
+  getChannels(@Req() request: any) {
+    return this.users.getChannels(request.user.id)
+  }
+
+  @Get('me/dm')
+  getDirectMessagePenpals(@Req() request: any) {
+    return this.users.getDirectMessagePenpals(request.user.username)
+  }
+
 }

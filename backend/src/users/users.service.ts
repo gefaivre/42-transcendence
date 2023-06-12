@@ -444,4 +444,41 @@ export class UsersService {
     return usernames.some((_username: string) => _username === username)
   }
 
+  async getChannels(id: number) {
+    const channels = await this.prisma.user.findUnique({
+      where: {
+        id: id
+      },
+      select: {
+        channels: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+    return channels?.channels.map((channel => channel.name))
+  }
+
+  async getDirectMessagePenpals(username: string) {
+    const a = await this.prisma.directMessage.findMany({
+      distinct: ['senderId', 'receiverId'],
+      select: {
+        sender: {
+          select: {
+            username: true
+          }
+        },
+        receiver: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    const b = a.flatMap(({ sender, receiver }) => [sender.username, receiver.username])
+    const c = b.filter((_username: string) => _username !== username)
+    return c
+  }
+
 }
