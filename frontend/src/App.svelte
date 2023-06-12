@@ -2,9 +2,9 @@
     export const title = 'Mon titre';
 
     import axios from './axios.config'
-    import messageIcon  from './assets/whiteChat.png'
-    import gameIcon     from './assets/whiteGame.png'
-    import leaderIcon     from './assets/podium.png'
+    import messageIcon  from './assets/new_chat.png'
+    import gameIcon     from './assets/new_game.png'
+    import leaderIcon     from './assets/new_podium.png'
     import { id, logged, user, reloadImage, socket } from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
