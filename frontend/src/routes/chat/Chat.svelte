@@ -5,13 +5,18 @@
     import { onMount } from "svelte";
     import PublicView from "./PublicView.svelte";
     import Discuss from "./Discuss.svelte";
+    import Create from "./Create.svelte";
 
   let user: User;
+
   export let params;
+
+  let create: boolean = false;
 
   onMount(() => getProfile())
 
   async function getProfile() {
+    console.log(params)
     try {
       const response = await axios.get('/auth/whoami')
       user = response.data;
@@ -24,14 +29,16 @@
 
   <div class="component">
 
-    <ChatPanel />
+    <ChatPanel bind:create/>
     <!-- bind:user -->
 
     <div class="second-panel">
-      {#if params.name === null}
+      {#if create}
+        <Create />
+      {:else if params.name === null}
         <PublicView/>
       {:else}
-        <Discuss/>
+        <Discuss bind:params/>
       {/if}
     </div>
   </div>
