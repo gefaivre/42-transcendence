@@ -20,7 +20,7 @@
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
       // { label: 'Channel', icon: channelIcon, link: '#/Channel'},
-      { label: 'Messages', icon: messageIcon, link: '#/message' },
+      { label: 'Messages', icon: messageIcon, link: '#/chat' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
       { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
     ];
