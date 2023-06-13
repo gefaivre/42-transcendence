@@ -7,14 +7,13 @@ import deleteIcon from "../../assets/new_cross.png";
 import acceptIcon from "../../assets/new_check.png";
 import { handleImageError } from "../../utils";
 
-
 export let pageUser: User;
 export let settings: boolean;
+export let onlineStatus: Status;
+
 let isBlocked: boolean = false;
-let onlineStatus: Status = null;
 
-
-async function logout() {
+  async function logout() {
     try {
       await axios.get("/auth/logout");
       logged.set("false");
