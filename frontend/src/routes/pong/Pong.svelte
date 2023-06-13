@@ -8,6 +8,7 @@
   import { Status } from "../../types";
   import { socket as _socket } from "../../stores"
   import { toast } from '@zerodevx/svelte-toast/dist'
+  import { querystring } from "svelte-spa-router";
 
   class Match {
     player1: string;
@@ -34,9 +35,16 @@
   const socket = ioClient('http://localhost:3000', {
     path: '/pong',
     withCredentials: true
-    });
+  });
 
   onMount(() => {
+
+    const searchParams = new URLSearchParams($querystring)
+    if (searchParams.has('player2') === true) {
+      friendly = true
+      friendUsername = searchParams.get('player2')
+    }
+
     socket.on('gameStart', (match) => {
       currentMatch = match;
       console.log("game started");
@@ -98,7 +106,7 @@
 
     socket.on('alreadyRequested', () => {
       toast.push('Game already requested!');
-      gameRequest = false; 
+      gameRequest = false;
     });
 
     return ()=> {
@@ -162,7 +170,6 @@
     socket.emit('cancelRequest', {});
     gameRequest = false;
   }
-
 
   function watchGame(game: string) {
     socket.emit('watchGame', {gameName: game});

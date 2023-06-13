@@ -6,15 +6,14 @@
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
   import type { DirectMessage, WsException } from "../../types";
+    import { push } from "svelte-spa-router";
 
   export let params: any = {}
   const name = params.name;
 
-
   let socket: Socket = null
   let message: string = null
   let messages: DirectMessage[] = []
-
 
   onMount(() => load())
 
@@ -53,7 +52,6 @@
     })
   }
 
-
   function dm() {
     socket.emit('sendDirectMessage', {
       content: message,
@@ -67,25 +65,27 @@
 
   onDestroy(() => socket.disconnect())
 
-  </script>
+</script>
 
-  {#if $logged === 'true'}
-    <br>
-    <br>
-    <h1>{params.name}</h1>
-    <br>
-    <br>
-    {#each messages as _message}
-      <li><b>{_message.sender}</b>: {_message.content}</li>
-    {/each}
-    <br>
-    <br>
-    <form on:submit|preventDefault={dm}>
-      <input type="text" placeholder="message" bind:value={message}>
-      <button type="submit">send</button>
-    </form>
-    <br>
-    <br>
-  {:else}
-    <h1>UNAUTHORIZED ACCESS</h1>
-  {/if}
+{#if $logged === 'true'}
+  <br>
+  <br>
+  <h1>{params.name}</h1>
+  <br>
+  <br>
+  {#each messages as _message}
+    <li><b>{_message.sender}</b>: {_message.content}</li>
+  {/each}
+  <br>
+  <br>
+  <form on:submit|preventDefault={dm}>
+    <input type="text" placeholder="message" bind:value={message}>
+    <button type="submit">send</button>
+  </form>
+  <br>
+  <br>
+  <button on:click={() => push(`/Pong?player2=${params.name}`)}>invite to play</button>
+
+{:else}
+  <h1>UNAUTHORIZED ACCESS</h1>
+{/if}
