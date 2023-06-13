@@ -80,7 +80,7 @@
 {#if pageUser.username != null}
   <div class="component">
 
-    <UsersPanel bind:pageUser bind:settings />
+    <UsersPanel bind:pageUser bind:settings bind:onlineStatus/>
 
     <div class="second-panel">
       {#if settings}
