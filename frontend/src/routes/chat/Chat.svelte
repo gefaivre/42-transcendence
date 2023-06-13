@@ -11,7 +11,6 @@
 
   export let params;
 
-  let create: boolean = false;
 
   onMount(() => getProfile())
 
@@ -29,12 +28,11 @@
 
   <div class="component">
 
-    <ChatPanel bind:create/>
-    <!-- bind:user -->
+    <ChatPanel />
 
     <div class="second-panel">
-      {#if create}
-        <Create />
+      {#if params.type === "new"}
+        <Create bind:user/>
       {:else if params.name === null}
         <PublicView/>
       {:else}

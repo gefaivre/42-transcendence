@@ -1,14 +1,15 @@
 <script lang="ts">
-    import type { Channel, ChannelDto } from "../../types";
+    import type { Channel, ChannelDto, User } from "../../types";
     import axios from "../../axios.config";
     import { ChannelStatus } from '../../types';
 
 
 
+  export let user: User;
 
-let channels: Channel[] = []
+  let channels: Channel[] = []
 
-let channel: ChannelDto = {
+  let channel: ChannelDto = {
     channelName: null,
     status: null,
     password: ''
@@ -88,8 +89,13 @@ async function create() {
 <br>
 <br>
 <br>
+<h1>Friends</h1>
 
-find friends
+  {#each user.friends as friend}
+  <li>
+    <a href="#/chat/dm/{friend.username}">{friend.username}</a>
+  </li>
+  {/each}
 
 <style>
 

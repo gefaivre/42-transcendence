@@ -5,7 +5,6 @@
 
 
     // export let user: User;
-    export let create:boolean;
     let channels: string[] = [];
     let dms: string[] = [];
 
@@ -27,11 +26,11 @@
 
   <div class="chat-panel">
     <div class="ctn-title">
-      <h1 class="title">Chat</h1>
+      <a href="#/chat" class="title">Chat</a>
     </div>
 
     <div class="create-button">
-      <button on:click={() => (create = !create)}>New</button>
+      <a class="button" href="#/chat/new">New</a>
     </div>
 
     <div class="chat-list">
@@ -68,7 +67,7 @@
     align-items: center;
   }
 
-  button {
+  .button {
     border: solid 1px black;
     border-radius: 5px;
     background-color: azure;

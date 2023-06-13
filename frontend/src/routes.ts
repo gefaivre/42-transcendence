@@ -17,7 +17,7 @@ export default {
   '/channel/:name': ThomasChan,
   '/Channels': Channels,
   '/leaderboard': Leaderboard,
-  '/users/:name': Users,
+  '/users/:name': Users, 
   '/message': Message,
   '/test': Test,
   '/message/create': CreateChannel,
