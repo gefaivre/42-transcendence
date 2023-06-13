@@ -144,10 +144,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // emit to recipient if connected
     const _recipient: WsUser | undefined = this.chat.chatUsers.find(user => user.username === message.recipient)
     if (_recipient !== undefined)
-      this.server.to(_recipient.socketId).emit('dm', message.content)
+      this.server.to(_recipient.socketId).emit('dm', message.content, sender.username)
 
     // emit to sender so he doesn't need to refresh the page to see the message
-    this.server.to(client.id).emit('dm', message.content)
+    this.server.to(client.id).emit('dm', message.content, sender.username)
 
     return this.eventHandlerSuccess(sender, message.recipient, WsActionSuccess.DirectMessage)
   }
