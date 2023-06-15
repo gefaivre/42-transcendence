@@ -4,9 +4,6 @@
     import { ChannelStatus } from '../../types';
 
 
-
-  export let user: User;
-
   let channels: Channel[] = []
 
   let channel: ChannelDto = {
@@ -69,34 +66,51 @@ async function create() {
 
 </script>
 
+<div class="create-pannel">
 
-<h1>HERE YOU CAN CREATE CHANNEL</h1>
+  <h1>Create Channel</h1>
 
-<fieldset>
-    <legend>Add Channel</legend><br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Public}>Public &#9989<br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Private}>Private &#9940<br>
-    <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected &#128273<br>
-    <input type="text" bind:value={channel.channelName} placeholder="channel name">
-    <button on:click={create}>Add</button>
-    {#if channel.status == ChannelStatus.Protected}
+  <div class="create">
+
+
+    <fieldset>
+      <legend>Add Channel</legend><br>
+      <input type=radio bind:group={channel.status} value={ChannelStatus.Public}>Public &#9989<br>
+      <input type=radio bind:group={channel.status} value={ChannelStatus.Private}>Private &#9940<br>
+      <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected &#128273<br>
+      <input type="text" bind:value={channel.channelName} placeholder="channel name">
+      <button on:click={create}>Add</button>
+      {#if channel.status == ChannelStatus.Protected}
       <input type="text" bind:value={channel.password} placeholder="password">
-    {/if}
-</fieldset>
+      {/if}
+    </fieldset>
 
-
-<br>
-<br>
-<br>
-<br>
-<h1>Friends</h1>
-
-  {#each user.friends as friend}
-  <li>
-    <a href="#/chat/dm/{friend.username}">{friend.username}</a>
-  </li>
-  {/each}
+  </div>
+  </div>
 
 <style>
+
+.create-pannel {
+  background-color: var(--lite-grey);
+  border: solid 1px black;
+  border-radius: 40px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  margin: 50px;
+  height: 80%;
+  width: 80%;
+
+}
+
+h1 {
+  height: 35px;
+  text-align: center;
+}
+
+ .create {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+ }
 
 </style>

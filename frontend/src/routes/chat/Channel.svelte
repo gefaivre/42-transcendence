@@ -7,8 +7,8 @@
     import ioClient from 'socket.io-client';
     import type { Socket } from "socket.io-client";
     import type { Channel, PostEmitDto, ChannelDto, WsException } from "../../types";
+    import { set_input_type } from "svelte/internal";
 
-    export let params: any = {}
     let socket: Socket = null
     let message: string = ''
     let password: string = ''
@@ -17,6 +17,20 @@
     let isAdmin: boolean = false
     let isMember: boolean = false
     let posts: PostEmitDto[] = []
+    let channelName: string = null;
+    let listChannel: string[] = [];
+    let tab:string = "find";
+
+    onMount(() => getChannels())
+
+    async function getChannels() {
+    try {
+      const response = await axios.get('/users/me/channel');
+      listChannel = response.data;
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
 
     function post() {
       socket.emit('sendPost', {
@@ -54,7 +68,7 @@
 
     async function getChannel() {
       try {
-        const response = await axios.get(`/channel/${params.name}`)
+        const response = await axios.get(`/channel/${channelName}`)
         channel = response.data
       } catch (e) {
         channel = null
@@ -90,85 +104,119 @@
       }
     }
 
-    // TODO: what if we manually change `id` store value ?
-    onMount(async () => {
+    // TODO: what if we manually change `id` store value
+      async function setup() {
+        channel = (await axios.get(`/channel/${channelName}`)).data
+        socket = ioClient('http://localhost:3000', {
+          path: '/chat',
+          withCredentials: true
+        })
 
-      channel = (await axios.get(`/channel/${params.name}`)).data
-
-      socket = ioClient('http://localhost:3000', {
-        path: '/chat',
-        withCredentials: true
-      })
-
-      if (channel.users.find(user => user.id.toString() === $id))
-        joinRoom()
-      else {
-        if (confirm('Join this channel ?') === false)
-          return pop()
-        if (channel.status === 'Protected') {
-          password = prompt('Enter password')
-          if (password === '')
-            console.error(`Unable to join channel ${channel.name}: Empty password.`)
-          if (password === null)
+        if (channel.users.find(user => user.id.toString() === $id))
+          joinRoom()
+        else {
+          if (confirm('Join this channel ?') === false)
             return pop()
+          if (channel.status === 'Protected') {
+            password = prompt('Enter password')
+            if (password === '')
+              console.error(`Unable to join channel ${channel.name}: Empty password.`)
+            if (password === null)
+              return pop()
+          }
+          joinChannel()
         }
-        joinChannel()
-      }
 
-      isOwner = channel.ownerId.toString() === $id
-      isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
-      isMember = true
+        isOwner = channel.ownerId.toString() === $id
+        isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
+        isMember = true
 
-      socket.on('connect', () => {
-        console.log('Connected')
-      })
+        socket.on('connect', () => {
+          console.log('Connected')
+        })
 
-      socket.on('disconnect', (cause) => {
-        console.log('Disconnected:', cause)
-      })
+        socket.on('disconnect', (cause) => {
+          console.log('Disconnected:', cause)
+        })
 
-      socket.on('post', (post: PostEmitDto) => {
-        console.log('receive post')
-        posts.push(post)
-        posts = posts
-      })
-
-      // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
-      socket.on('exception', (e: WsException) => {
-        console.error(e)
-        return pop()
-      })
-
-      // TODO: is it used ?
-      socket.on('error', (e) => {
-        console.error(e)
-        return pop()
-      })
-
-      // TODO: typedef event
-      socket.on('channelEvent', (event: any) => {
-        if (event.event === 'join') {
-          const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+        socket.on('post', (post: PostEmitDto) => {
+          console.log('receive post')
           posts.push(post)
           posts = posts
-        }
-        else if (event.event === 'leave') {
-          const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
-          posts.push(post)
-          posts = posts
-        }
-      })
+        })
 
-    })//fin
+        // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
+        socket.on('exception', (e: WsException) => {
+          console.error(e)
+          return pop()
+        })
+
+        // TODO: is it used ?
+        socket.on('error', (e) => {
+          console.error(e)
+          return pop()
+        })
+
+        // TODO: typedef event
+        socket.on('channelEvent', (event: any) => {
+          if (event.event === 'join') {
+            const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+            posts.push(post)
+            posts = posts
+          }
+          else if (event.event === 'leave') {
+            const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
+            posts.push(post)
+            posts = posts
+          }
+        })
+
+    }//fin
+
+    function yes()
+    {
+      console.log("yes");
+    }
 
     onDestroy(() => socket.disconnect())
 
   </script>
 
-  {#if $logged === 'true'}
-    <br>
-    <br>
-    {#if isMember}
+
+
+<div class="chat-channel">
+
+  <div class="nav">
+    {#if tab == "find"}
+      <button class="activeButton" on:click={() => tab = "find"}>find</button>
+    {:else}
+      <button on:click={() => tab = "find"}>find</button>
+    {/if}
+
+    {#if tab == "channel"}
+      <button class="activeButton" on:click={() => tab = "channel"}>channel</button>
+    {:else}
+      <button on:click={() => tab = "channel"}>channel</button>
+    {/if}
+  </div>
+
+  {#if tab == "find"}
+  <div class="find">
+    <div class="list list_channel">
+      <div class="title">
+        <h2>Your channel</h2>
+      </div>
+      <ul class="friends-list">
+        {#each listChannel as channel}
+          <li><button on:click={() => yes()}>{channel}</button></li>
+        {/each}
+      </ul>
+    </div>
+  </div>
+  {:else}
+    channel here
+
+  <!-- {#if isMember}
       <table>
         <tbody>
           <tr>
@@ -193,7 +241,6 @@
                 <button on:click={() => revokeAdmin(admin.id)}>revoke admin</button>
                 <button on:click={() => ban(admin.id)}>ban</button>
               {/if}
-              <br>
             {/each}
             </td>
           </tr>
@@ -208,7 +255,6 @@
               {#if isAdmin}
                 <button on:click={() => ban(user.id)}>ban</button>
               {/if}
-              <br>
             {/each}
             </td>
           </tr>
@@ -219,23 +265,78 @@
         <li><b>{post.author}</b>: {post.content}</li>
       {/each}
       </ul>
-      <br>
-      <br>
       <form on:submit|preventDefault={post}>
         <input type="text" placeholder="message" bind:value={message}>
         <button type="submit">send</button>
       </form>
-      <br>
-      <br>
       <button on:click={() => leaveChannel()}>Leave</button>
-    {/if}
-  {:else}
-    <h1>UNAUTHORIZED ACCESS</h1>
+    {/if}-->
+
   {/if}
 
-  <style>
-    ul {
-      display: inline-block;
-      text-align: left;
-    }
-  </style>
+</div>
+
+<style>
+
+.chat-channel{
+  background-color: var(--lite-grey);
+  border: solid 1px black;
+  border-radius: 40px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  margin: 50px;
+  height: 80%;
+  width: 80%;
+}
+
+  .nav {
+    height: 40px;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav button {
+    border-bottom: solid 1px var(--black);
+    flex: auto;
+  }
+
+  .nav .activeButton {
+    border-bottom: none;
+  }
+
+  .nav button:not(:last-child) {
+    border-right: solid 1px var(--black);
+  }
+
+  .find {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    height: 100%;
+
+  }
+
+  .list {
+    background-color: var(--lite-grey);
+    border: solid 1px black;
+    border-radius: 30px;
+    margin: 30px;
+  }
+
+  .list .title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+  }
+
+  li {
+    height: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: var(--lite-lite-lite-grey);
+  }
+  li:nth-child(2n + 1) {
+    background-color: var(--lite-lite-grey);
+  }
+</style>

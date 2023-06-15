@@ -4,7 +4,6 @@
     import ChatPanel from "./ChatPanel.svelte";
     import { onMount } from "svelte";
     import PublicView from "./PublicView.svelte";
-    import Discuss from "./Discuss.svelte";
     import Create from "./Create.svelte";
     import DirectMessage from "./DirectMessage.svelte";
     import Channel from "./Channel.svelte";
@@ -40,11 +39,11 @@
 
     <DirectMessage bind:user/>
 
-    <!--  <Channel bind:params />
+    <Channel/>
 
-   <Create bind:user/>
+    <Create/>
 
-    <PublicView/> -->
+    <PublicView/>
 
   </div>
 

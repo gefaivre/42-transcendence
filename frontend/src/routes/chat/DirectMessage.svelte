@@ -169,7 +169,9 @@
   border-radius: 40px;
   display: grid;
   grid-template-rows: auto 1fr;
-  margin: 20px;
+  margin: 50px;
+  height: 80%;
+  width: 80%;
 }
 
   .nav {

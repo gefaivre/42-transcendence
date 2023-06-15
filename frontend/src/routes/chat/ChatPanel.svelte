@@ -122,7 +122,7 @@
     background-color: var(--lite-lite-lite-grey);
     color: black;
   }
-  
+
   li:nth-child(2n + 1) {
     background-color: var(--lite-lite-grey);
   }
