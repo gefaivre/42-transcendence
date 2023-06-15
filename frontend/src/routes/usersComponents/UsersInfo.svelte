@@ -1,9 +1,10 @@
 <script lang="ts">
   import axios from "../../axios.config";
+  import { id } from "../../stores";
   import type { Match, Stat, User } from "../../types";
   import Friends from "./user-info/Friends.svelte";
-  import Games from "./user-info/Games.svelte";
-  import Statistics from "./user-info/Statistics.svelte";
+  import Settings from "./user-info/Settings.svelte";
+  import Stats from "./user-info/Stats.svelte";
 
   export let pageUser: User;
 
@@ -57,14 +58,11 @@
 </script>
 
 <div class="info-container">
-
-
   <Friends bind:pageUser />
-
-  <Games bind:pageUser bind:matchHistory />
-
-  <Statistics bind:statistics />
-
+  <Stats bind:pageUser bind:matchHistory bind:statistics/>
+  {#if pageUser.id.toString() === $id}
+    <Settings/>
+  {/if}
 </div>
 
 <style>
@@ -74,11 +72,10 @@
     background-color: var(--grey);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(0px, 1fr) minmax(0px, 1fr);
+    grid-template-rows: 1fr 1fr;
     justify-items: center;
     align-items: center;
   }
-
 
   @media screen and (max-width: 1200px) {
     .info-container {

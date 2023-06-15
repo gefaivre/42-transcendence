@@ -29,7 +29,7 @@
 
 </script>
 
-<div class="box-info username">
+<div class="username">
 
     <h1>Change your username</h1>
     <div class="content">
@@ -43,13 +43,6 @@
   h1 {
     color: var(--white);
     text-align: center;
-  }
-
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
   }
 
   .username {

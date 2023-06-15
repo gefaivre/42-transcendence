@@ -24,7 +24,7 @@
 
 </script>
 
-<div class="box-info password">
+<div class="password">
   <h1>Change your password</h1>
   <div class="content">
     <input type="text" placeholder="new password" bind:value={password} />
@@ -39,17 +39,12 @@
     text-align: center;
   }
 
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-  }
   .password {
     place-self: center;
     width: 250px;
     height: 100px;
   }
+
   .password .content {
     margin-top: 5%;
     display: flex;
