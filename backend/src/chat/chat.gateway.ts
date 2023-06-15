@@ -135,7 +135,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const recipient: any = await this.users.findByUsername(message.recipient)
 
     // db
-    await this.dm.create({
+    const dm = await this.dm.create({
       content: message.content,
       senderId: sender.prismaId,
       receiverId: recipient.id
@@ -144,10 +144,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // emit to recipient if connected
     const _recipient: WsUser | undefined = this.chat.chatUsers.find(user => user.username === message.recipient)
     if (_recipient !== undefined)
-      this.server.to(_recipient.socketId).emit('dm', message.content, sender.username)
+      this.server.to(_recipient.socketId).emit('dm', message.content, sender.username, dm.date)
 
     // emit to sender so he doesn't need to refresh the page to see the message
-    this.server.to(client.id).emit('dm', message.content, sender.username)
+    this.server.to(client.id).emit('dm', message.content, sender.username, dm.date)
 
     return this.eventHandlerSuccess(sender, message.recipient, WsActionSuccess.DirectMessage)
   }
