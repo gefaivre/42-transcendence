@@ -6,10 +6,12 @@
     import PublicView from "./PublicView.svelte";
     import Discuss from "./Discuss.svelte";
     import Create from "./Create.svelte";
+    import DirectMessage from "./DirectMessage.svelte";
+    import Channel from "./Channel.svelte";
 
   let user: User;
 
-  export let params;
+  export let params: any = [];
 
 
   onMount(() => getProfile())
@@ -24,22 +26,29 @@
     }
   }
 
+  // DM
+  // Channels
+  // Create channels
+  // All
+
 </script>
+
+
 
   <div class="component">
 
-    <ChatPanel />
 
-    <div class="second-panel">
-      {#if params.type === "new"}
-        <Create bind:user/>
-      {:else if params.name === null}
-        <PublicView/>
-      {:else}
-        <Discuss bind:params/>
-      {/if}
-    </div>
+    <DirectMessage bind:user/>
+
+    <!--  <Channel bind:params />
+
+   <Create bind:user/>
+
+    <PublicView/> -->
+
   </div>
+
+
 
 
 <style>
@@ -47,14 +56,9 @@
   .component {
     height: 100%;
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     background-color: var(--black);
-  }
-
-  .second-panel {
-    grid-column: 2 / 3;
-    background-color: var(--grey);
-    overflow-y: auto;
   }
 
 </style>

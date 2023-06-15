@@ -34,19 +34,34 @@
     </div>
 
     <div class="chat-list">
-      <h2> Channel </h2>
+
+      <div class="ctn-title">
+        <h2> Channel </h2>
+      </div>
         <ul>
           {#each channels as channel}
-          <li>
-            <a href="#/chat/channel/{channel}">{channel}</a>
+          <li >
+            <div class="name">
+              <a href="#/chat/channel/{channel}">{channel}</a>
+            </div>
+            <div class="action">
+              A
+            </div>
           </li>
           {/each}
         </ul>
-      <h2> Dm </h2>
+      <div class="ctn-title">
+        <h2> Dm </h2>
+      </div>
       <ul>
         {#each dms as dm}
-        <li>
-          <a href="#/chat/dm/{dm}">{dm}</a>
+        <li >
+          <div class="name">
+            <a href="#/chat/dm/{dm}">{dm}</a>
+          </div>
+          <div class="action">
+            A
+          </div>
         </li>
         {/each}
       </ul>
@@ -88,7 +103,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
   }
+
 
   .title {
     font-size: 50px;
@@ -97,5 +114,25 @@
     letter-spacing: 0.5px;
     color: var(--pink);
   }
+
+  li {
+    height: 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    background-color: var(--lite-lite-lite-grey);
+    color: black;
+  }
+  
+  li:nth-child(2n + 1) {
+    background-color: var(--lite-lite-grey);
+  }
+
+  .name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 5%;
+  }
+
 
 </style>
