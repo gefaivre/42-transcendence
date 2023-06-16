@@ -50,7 +50,6 @@
 <style>
 
 .box-info {
-  margin: 20px;
   border: solid 2px var(--grey);
   box-shadow: 0 0 10px var(--lite-grey);
   background-color: var(--lite-grey);

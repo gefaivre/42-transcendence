@@ -1,17 +1,28 @@
 <script lang="ts">
   import axios from "../axios.config";
   import { id, user, logged, socket } from "../stores";
-  import { Status, type User } from "../types";
-  import UsersInfo from "./usersComponents/UsersInfo.svelte";
-  import UsersSettings from "./usersComponents/UsersSettings.svelte";
-  import NotFound from "./NotFound.svelte";
-  import UsersPanel from "./usersComponents/UsersPanel.svelte";
+  import type { Status, User, Match, Stat } from "../types";
+  import Friends from "./usersComponents/user-info/Friends.svelte";
+  import Stats from "./usersComponents/user-info/Stats.svelte";
+  import Settings from "./usersComponents/user-info/Settings.svelte";
+  import Infos from "./usersComponents/user-info/Infos.svelte";
 
-  export let params;
+  export let params: any;
+
+  let matchHistory: Match[] = [];
+
+  let statistics: Stat = {
+    lostGames: 0,
+    wonGames: 0,
+    totalGames: 0,
+    ratioGames: 0,
+    mmr: null,
+    averageWin: { score: 0, opponentScore: 0 },
+    averageLose: { score: 0, opponentScore: 0 },
+    nbrOfFriends: 0,
+  };
 
   const name = params.name;
-
-  let settings: boolean = false;
 
   let isBlocked: boolean = false;
   let onlineStatus: Status = null;
@@ -77,35 +88,37 @@
 
 </script>
 
-{#if pageUser.username != null}
-  <div class="component">
+<div class="component">
 
-    <UsersPanel bind:pageUser bind:settings bind:onlineStatus/>
+  <Infos bind:pageUser bind:onlineStatus/>
 
-    <div class="second-panel">
-      {#if settings}
-        <UsersSettings />
-      {:else}
-        <UsersInfo bind:pageUser/>
-      {/if}
-    </div>
-  </div>
-{:else}
-  <NotFound />
-{/if}
+  <Friends bind:pageUser/>
+
+  <Stats bind:pageUser bind:matchHistory bind:statistics/>
+
+  {#if pageUser.id.toString() === $id}
+    <Settings/>
+  {/if}
+
+</div>
 
 <style>
+
   .component {
     height: 100%;
     display: grid;
-    grid-template-columns: 320px 1fr;
+    place-items: center;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     background-color: var(--black);
   }
 
-  .second-panel {
-    grid-column: 2 / 3;
-    background-color: var(--grey);
-    overflow-y: auto;
+  @media screen and (max-width: 1200px) {
+    .component {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr, 1fr, 1fr;
+      /* grid-template-rows: 125px 1fr 1fr 1fr 1fr; */
+    }
   }
 
 </style>
