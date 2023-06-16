@@ -56,12 +56,12 @@
     <thead slot="head">
       <tr>
         <th>
-          Name
-          <Sort key="name" on:sort={onSort} />
+          Rank
+          <Sort key="rank" on:sort={onSort} />
         </th>
         <th>
-          Lastname
-          <Sort key="lastName" on:sort={onSort} />
+         Name
+          <Sort key="name" on:sort={onSort} />
         </th>
         <th>
           Age
@@ -71,9 +71,9 @@
     </thead>
     <tbody>
       {#each rows2 as row, index (row)}
-        <Row {index} on:click={() => onCellClick(row)}>
+      <Row {index} on:click={() => onCellClick(row)}>
+          <td data-label="Rank">{(index + 1) + page * pageSize}</td>
           <td data-label="Name">{row.name}</td>
-          <td data-label="Lastname">{row.lastName}</td>
           <td data-label="Age">{row.age}</td>
         </Row>
       {/each}
@@ -82,4 +82,3 @@
       <Pagination {page} {pageSize} count={rowsCount} serverSide={true} on:pageChange={onPageChange} />
     </div>
   </Table>
-  

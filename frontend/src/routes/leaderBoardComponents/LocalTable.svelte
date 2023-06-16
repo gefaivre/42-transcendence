@@ -7,6 +7,7 @@
   import { sortNumber, sortString } from "./sorting.js";
 
   let rows = [];
+  let rowsCount = 0;
   let page = 0; //first page
   let pageSize = 5; //optional, 10 by default
 
@@ -33,18 +34,28 @@
       event.detail.key
     );
   }
+  async function load(_page) {
+      const data = await getData(_page, pageSize, text, sorting);
+      rows = data.rows;
+      rowsCount = data.rowsCount;
+    }
+  
+  function onPageChange(event) {
+      load(event.detail.page);
+          page = event.detail.page;
+    }
 </script>
 
 <Table {page} {pageSize} {rows} let:rows={rows2}>
   <thead slot="head">
     <tr>
       <th>
-        Name
-        <Sort key="name" on:sort={onSortString} />
+        Rank
+        <Sort key="rank" on:sort={onSortString} />
       </th>
       <th>
-        Lastname
-        <Sort key="lastName" on:sort={onSortString} />
+        Name
+        <Sort key="Name" on:sort={onSortString} />
       </th>
       <th>
         Age
@@ -55,8 +66,8 @@
   <tbody>
     {#each rows2 as row, index (row)}
       <Row {index} on:click={() => onCellClick(row)}>
+        <td data-label="Rank">{(index + 1) + pageSize * page}</td>
         <td data-label="Name">{row.name}</td>
-        <td data-label="Lastname">{row.lastName}</td>
         <td data-label="Age">{row.age}</td>
       </Row>
     {/each}
