@@ -116,7 +116,7 @@
   @media screen and (max-width: 1200px) {
     .component {
       grid-template-columns: 1fr;
-      grid-template-rows: 1fr, 1fr, 1fr, 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr;
       /* grid-template-rows: 125px 1fr 1fr 1fr 1fr; */
     }
   }
