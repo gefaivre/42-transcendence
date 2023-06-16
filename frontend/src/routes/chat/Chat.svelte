@@ -55,6 +55,7 @@
   .component {
     height: 100%;
     display: grid;
+    place-items: center;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     background-color: var(--black);

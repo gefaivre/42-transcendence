@@ -284,7 +284,6 @@
   border-radius: 40px;
   display: grid;
   grid-template-rows: auto 1fr;
-  margin: 50px;
   height: 80%;
   width: 80%;
 }
