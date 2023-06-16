@@ -7,7 +7,7 @@
   export let matchHistory: Match[];
   export let statistics: Stat
 
-  let tab: any
+  let tab: string = 'statistics'
   let opponent: any;
 
   async function getUsernameById(id: number) {
@@ -35,7 +35,7 @@
     {/if}
   </div>
   {#if tab === 'statistics'}
-  <div class='statistics overflow'>
+  <div class='overflow'>
     <!--lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO |
     MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE-->
     <div class="stat-grid">
@@ -78,7 +78,7 @@
     </div>
   </div>
   {:else}
-  <div class="games overflow">
+  <div class="overflow">
     <ul>
       {#each matchHistory as match}
         {#if match.winnerId == pageUser.id}
@@ -180,7 +180,7 @@
   border: solid 2px var(--grey);
   box-shadow: 0 0 10px var(--lite-grey);
   background-color: var(--lite-grey);
-  border-radius: 30px;
+  border-radius: 20px;
   height: 80%;
   width: 80%;
   display: flex;
@@ -228,11 +228,6 @@ li:nth-child(2n + 1) {
   flex: 1;
   overflow: auto;
   border-radius: 0 0 30px 30px;
-}
-
-.games {
-  display: flex;
-  flex-direction: column;
 }
 
 .lineFriends {
