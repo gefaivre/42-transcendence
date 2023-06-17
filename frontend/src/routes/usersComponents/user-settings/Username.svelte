@@ -29,14 +29,15 @@
 
 </script>
 
-<div class="username">
-
-    <h1>Change your username</h1>
-    <div class="content">
-      <input type="text" placeholder="new username" bind:value={username} />
-      <button on:click={updateUsername}>Update</button>
-    </div>
+<div class="overflow">
+  <br>
+  <br>
+  <h1>Change your username</h1>
+  <div class="content">
+    <input type="text" placeholder="new username" class="input-bordered w-full max-w-xs" />
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => updateUsername()}>Update</button>
   </div>
+</div>
 
 <style>
 
@@ -45,22 +46,9 @@
     text-align: center;
   }
 
-  .username {
+  .overflow {
     place-self: center;
-    width: 250px;
-    height: 100px;
-  }
-
-  .username .content {
-    margin-top: 5%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .username .content input {
-    border-radius: 10px;
+    flex: 1;
   }
 
 </style>

@@ -24,11 +24,13 @@
 
 </script>
 
-<div class="password">
+<div class="overflow">
+  <br>
+  <br>
   <h1>Change your password</h1>
   <div class="content">
-    <input type="text" placeholder="new password" bind:value={password} />
-    <button on:click={updatePassword}>Update</button>
+    <input type="text" placeholder="new username" class="input-bordered w-full max-w-xs" />
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => updatePassword()}>Update</button>
   </div>
 </div>
 
@@ -39,22 +41,9 @@
     text-align: center;
   }
 
-  .password {
+  .overflow {
     place-self: center;
-    width: 250px;
-    height: 100px;
-  }
-
-  .password .content {
-    margin-top: 5%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .password .content input {
-    border-radius: 10px;
+    flex: 1;
   }
 
 </style>
