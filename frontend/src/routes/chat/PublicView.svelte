@@ -28,11 +28,11 @@
   <div class="view">
 
     <ul>
-      {#each channels as channel}
+      <!-- {#each channels as channel}
         <li>
           <a contenteditable="false" bind:innerHTML={channel.name} href="#/chat/channel/{channel.name}">{channel.name}</a>
         </li>
-      {/each}
+      {/each} -->
     </ul>
 
   </div>

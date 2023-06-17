@@ -45,7 +45,7 @@
     place-items: center;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    background-color: var(--black);
+    /* background-color: #303030; */
   }
 
   @media screen and (max-width: 1200px) {

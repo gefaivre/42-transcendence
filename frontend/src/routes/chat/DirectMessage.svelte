@@ -94,47 +94,49 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton" on:click={() => tab = "find"}>find</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Shearch</button>
     {:else}
-      <button on:click={() => tab = "find"}>find</button>
+      <button class="left" on:click={() => tab = "find"}>Shearch</button>
     {/if}
 
     {#if tab == "dm"}
-      <button class="activeButton" on:click={() => tab = "dm"}>dm</button>
+      <button class="activeButton right" on:click={() => tab = "dm"}>Dm</button>
     {:else}
-      <button on:click={() => tab = "dm"}>dm</button>
+      <button class="right" on:click={() => tab = "dm"}>Dm</button>
     {/if}
   </div>
 
   {#if tab == "find"}
   <div class="find">
-    <div class="list list_friends">
       <div class="title">
         <h2>All your friends</h2>
       </div>
-      <ul class="friends-list">
-        {#if user !== undefined}
-          {#each user.friends as friend}
-            <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
-          {/each}
-        {/if}
-      </ul>
-    </div>
-    <div class="list list-all">
-    <div class="title">
-      <h2>Recent dm</h2>
-    </div>
-      <ul class="friends-list">
-        {#each listDm as name}
+      <div class="title">
+        <h2>Recent dm</h2>
+      </div>
+      <div class="list ">
+        <ul class="friends-list">
+          {#if user !== undefined}
+            {#each user.friends as friend}
+              <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
+            {/each}
+          {/if}
+        </ul>
+      </div>
+      <div class="list">
+        <ul class="friends-list">
+          {#each listDm as name}
           <li><button on:click={() => pushToDmTab(name)}> {name}</button></li>
-        {/each}
-      </ul>
+          {/each}
+        </ul>
+      </div>
     </div>
-  </div>
   {:else}
-  <div class="ch">
+  <div class="disccus">
     {#if chatUser == null}
-      <h1>you are not conected with a user</h1>
+    <div class="void">
+      <h1>You are not conected with a user</h1>
+    </div>
     {:else}
       <h1>{chatUser}</h1>
       <button class="invite-button" on:click={() => push(`/Pong?player2=${chatUser}`)}>invite to play</button>
@@ -163,15 +165,13 @@
 <style>
 
 
-.chat-dm {
-  background-color: var(--lite-grey);
-  border: solid 1px black;
-  border-radius: 40px;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: 80%;
-  width: 80%;
-}
+  .chat-dm {
+    box-sizing: content-box;
+    height: 80%;
+    width: 80%;
+    min-height: 200px;
+    min-width: 200px;
+  }
 
   .nav {
     height: 40px;
@@ -180,12 +180,23 @@
   }
 
   .nav button {
-    border-bottom: solid 1px var(--black);
     flex: auto;
+    font-family: Courier, monospace;
+    color: var(--orange);
+    background-color: var(--grey);
   }
 
   .nav .activeButton {
-    border-bottom: none;
+    background-color: none;
+    text-decoration: underline;
+  }
+
+  .left {
+    border-top-left-radius: 15px;
+  }
+
+  .right {
+    border-top-right-radius: 15px;
   }
 
   .nav button:not(:last-child) {
@@ -195,24 +206,30 @@
   .find {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-    height: 100%;
-
-  }
-
-  .list {
+    grid-template-rows: auto 1fr;
     background-color: var(--lite-grey);
-    border: solid 1px black;
-    border-radius: 30px;
-    margin: 30px;
+    border-radius: 0 0 15px 15px;
   }
 
-  .list .title {
+  .title {
+    height: 40px;
+    background-color: var(--lite-grey);
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 30px;
   }
+
+  .list {
+    flex: 1;
+    overflow: auto;
+    border-radius: 0 0 0px 15px;
+    background-color: #0084ff;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
 
   li {
     height: 40px;
@@ -220,8 +237,22 @@
     grid-template-columns: 1fr;
     background-color: var(--lite-lite-lite-grey);
   }
+
   li:nth-child(2n + 1) {
     background-color: var(--lite-lite-grey);
+  }
+
+  .disccus {
+    background-color: var(--lite-grey);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+
+  .disccus .void {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
 
