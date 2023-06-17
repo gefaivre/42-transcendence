@@ -110,14 +110,16 @@
     place-items: center;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
+    grid-auto-rows: 500px;
+    grid-auto-columns: 5000px;
     background-color: var(--black);
+    overflow-y: scroll;
   }
 
   @media screen and (max-width: 1200px) {
     .component {
       grid-template-columns: 1fr;
-      grid-template-rows: 1fr 1fr 1fr 1fr;
-      /* grid-template-rows: 125px 1fr 1fr 1fr 1fr; */
+      grid-template-rows: 1fr;
     }
   }
 

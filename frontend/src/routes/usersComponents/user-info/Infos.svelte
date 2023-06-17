@@ -148,50 +148,54 @@
   </div>
   <br>
 	{#if pageUser.id.toString() === $id}
-    <button on:click={() => logout()}>Logout</button>
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => logout()}>Logout</button>
   {:else}
     <!-- online status -->
 		{#if onlineStatus === Status.offline}
-		  This user is offline
+      <div class="badge badge-error gap-2">
+        offline
+      </div>
 		{:else if onlineStatus === Status.online}
-		  This user is online
+      <div class="badge badge-success gap-2">
+        online
+      </div>
 		{:else if onlineStatus === Status.ingame}
-		  This user is ingame
+      <div class="badge badge-info gap-2">
+        ingame
+      </div>
 		{/if}
     <br>
     <br>
     <!--friendship -->
 	  {#if pageUser.friends.some((user) => user.id.toString() === $id)}
-      <button on:click={removeFriendById}>
-        Remove friend
-      </button>
+      <button class="btn" on:click={removeFriendById}>Remove friend</button>
 		{:else if pageUser.requestFriends.some((user) => user.id.toString() === $id)}
-      <button on:click={cancelFriendshipRequestById}>
-        Cancel friendship request
-      </button>
+      <button class="btn" on:click={cancelFriendshipRequestById}>Cancel friendship request</button>
 		{:else if pageUser.pendingFriends.some((user) => user.id.toString() === $id)}
-      This user requested you as friend
-		  <button on:click={acceptFriendshipRequestById}>
-        Accept
+    <span>
+      <button class="btn no-animation">This user requested you as friend</button>
+		  <button class="btn btn-square btn-outline" on:click={acceptFriendshipRequestById}>
 				<img class="button-image" src={acceptIcon} alt="accept"/>
       </button>
-		  <button on:click={dismissFriendshipRequestById}>
-        Dismiss
-				<img class="buttton-image" src={deleteIcon} alt="dismiss"/>
+		  <button class="btn btn-square btn-outline" on:click={dismissFriendshipRequestById}>
+				<img class="button-image" src={deleteIcon} alt="dismiss"/>
       </button>
+    </span>
 		{:else}
-      <button on:click={requestFriendship}>Request friend</button>
+      <button class="btn" on:click={requestFriendship}>Request friend</button>
+      <br>
+      <br>
 		{/if}
+    <br>
+    <br>
+    <br>
+    <br>
     <br>
     <!--blocked -->
 		{#if isBlocked === true}
-			<button on:click={unblockByUsername}>
-        Unblock
-      </button>
+      <button on:click={unblockByUsername} class="btn">Unblock</button>
 		{:else}
-			<button on:click={blockByUsername}>
-        Block
-      </button>
+      <button on:click={blockByUsername} class="btn">Block</button>
 		{/if}
   {/if}
 </div>
