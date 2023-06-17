@@ -166,11 +166,11 @@
 
 
   .chat-dm {
+    display: flex;
+    flex-direction: column;
     box-sizing: content-box;
-    height: 80%;
-    width: 80%;
-    min-height: 200px;
-    min-width: 200px;
+    height: 400px;
+    width: 550px;
   }
 
   .nav {
@@ -204,6 +204,7 @@
   }
 
   .find {
+    height: 360px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
@@ -223,11 +224,13 @@
     flex: 1;
     overflow: auto;
     border-radius: 0 0 0px 15px;
-    background-color: #0084ff;
   }
 
   *::-webkit-scrollbar {
     display: none;
+  }
+  li {
+    display: block;
   }
 
 
@@ -243,6 +246,7 @@
   }
 
   .disccus {
+    height: 360px;
     background-color: var(--lite-grey);
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
@@ -258,9 +262,8 @@
 
 
 .chatbox {
-  height: 80%;
-  width: 50%;
-  overflow-y: auto;
+  height: 280px;
+  overflow-y: scroll;
   background-color: #333;
   color: #fff;
   border: 2px solid green;

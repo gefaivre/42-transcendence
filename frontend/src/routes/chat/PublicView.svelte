@@ -23,16 +23,18 @@
 
 <div class="create-pannel">
 
-  <h1>view all Channel</h1>
+  <div class="title">
+    <h1>view all Channel</h1>
+  </div>
 
   <div class="view">
 
     <ul>
-      <!-- {#each channels as channel}
+      {#each channels as channel}
         <li>
           <a contenteditable="false" bind:innerHTML={channel.name} href="#/chat/channel/{channel.name}">{channel.name}</a>
         </li>
-      {/each} -->
+      {/each}
     </ul>
 
   </div>
@@ -42,24 +44,52 @@
 
 .create-pannel {
   background-color: var(--lite-grey);
-  border: solid 1px black;
-  border-radius: 40px;
+  border-radius: 15px;
   display: grid;
   grid-template-rows: auto 1fr;
-  height: 80%;
-  width: 80%;
+  height: 400px;
+  width: 550px;
+}
+
+.title {
+  display: flex;
+  height: 40px;
+  background-color: var(--grey);
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px 15px 0 0;
+
 }
 
 h1 {
-  height: 35px;
-  text-align: center;
+    font-family: Courier, monospace;
+    color: var(--orange);
 }
 
  .view {
-   display: flex;
-   justify-content: center;
-   align-items: center;
+   height: 360px;
+   overflow: auto;
  }
+
+ li {
+    display: block;
+  }
+
+
+  li {
+    height: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: var(--lite-lite-lite-grey);
+  }
+
+  li:nth-child(2n + 1) {
+    background-color: var(--lite-lite-grey);
+  }
+
+ *::-webkit-scrollbar {
+    display: none;
+  }
 
 
 </style>
