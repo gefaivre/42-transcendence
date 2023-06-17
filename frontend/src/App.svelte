@@ -2,9 +2,9 @@
     export const title = 'Mon titre';
 
     import axios from './axios.config'
-    import messageIcon  from './assets/new_chat.png'
-    import gameIcon     from './assets/new_game.png'
-    import leaderIcon     from './assets/new_podium.png'
+    import chatIcon  from './assets/chat.svg'
+    import gameIcon     from './assets/joystick.svg'
+    import leaderboardIcon     from './assets/leaderboard.svg'
     import { id, logged, user, reloadImage, socket } from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
@@ -19,10 +19,9 @@
 
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
-      // { label: 'Channel', icon: channelIcon, link: '#/Channel'},
-      { label: 'Messages', icon: messageIcon, link: '#/chat' },
+      { label: 'Messages', icon: chatIcon, link: '#/chat' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
-      { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
+      { label: 'LeaderBoard', icon: leaderboardIcon, link: '#/leaderboard'}
     ];
 
     $: getProfile()

@@ -137,7 +137,7 @@
 .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 30px 30px;
+  border-radius: 0 0 20px 20px;
 }
 
 .stat-grid {
@@ -148,7 +148,7 @@
 }
 
 .stat-grid .tiles:last-child {
-  border-radius: 0 0 30px 0;
+  border-radius: 0 0 20px 0;
 }
 
 .stat-grid .lite {
@@ -227,7 +227,7 @@ li:nth-child(2n + 1) {
 .box-info .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 30px 30px;
+  border-radius: 0 0 20px 20px;
 }
 
 .lineFriends {

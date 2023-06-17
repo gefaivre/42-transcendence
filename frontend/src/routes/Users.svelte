@@ -111,7 +111,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     grid-auto-rows: 500px;
-    grid-auto-columns: 5000px;
+    grid-auto-columns: 500px;
     background-color: var(--black);
     overflow-y: scroll;
   }
