@@ -2,9 +2,9 @@
     export const title = 'Mon titre';
 
     import axios from './axios.config'
-    import messageIcon  from './assets/new_chat.png'
-    import gameIcon     from './assets/new_game.png'
-    import leaderIcon     from './assets/new_podium.png'
+    import chatIcon  from './assets/chat.svg'
+    import gameIcon     from './assets/joystick.svg'
+    import leaderboardIcon     from './assets/leaderboard.svg'
     import { id, logged, user, reloadImage, socket } from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
@@ -19,10 +19,9 @@
 
     const menuItems = [
       // { label: 'Home', icon: homeIcon, link: '#/Menu'},
-      // { label: 'Channel', icon: channelIcon, link: '#/Channel'},
-      { label: 'Messages', icon: messageIcon, link: '#/message' },
+      { label: 'Messages', icon: chatIcon, link: '#/chat' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
-      { label: 'LeaderBoard', icon: leaderIcon, link: '#/leaderboard'}
+      { label: 'LeaderBoard', icon: leaderboardIcon, link: '#/leaderboard'}
     ];
 
     $: getProfile()
@@ -47,14 +46,14 @@
 
   {#if $logged === 'true'}
   <div class="screen">
-    <div class="profileLink">
-    {#if $user}
-      <a use:link href="/users/{$user.username}">
-        <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
-      </a>
-    {/if}
-    </div>
-    <div class="nav">
+      <div class="profileLink">
+        {#if $user}
+        <a use:link href="/users/{$user.username}">
+          <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
+        </a>
+        {/if}
+      </div>
+      <div class="nav">
       {#each menuItems as item}
       <a href={item.link}>
         <img  class="linkButton" src={item.icon} alt={item.label} />
@@ -67,8 +66,8 @@
     <div class="routes">
       {#if $user}
         <Router {routes}/>
-      {/if}
-    </div>
+        {/if}
+      </div>
   </div>
 
   {:else}
@@ -92,6 +91,7 @@
    --grey: #222222;
    --black: black;
    --white: white;
+   --orange: #f96d00;
    --pink: rgb(255, 88, 171);
    --imageRadius: 50%;
   }
@@ -110,6 +110,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
   }
 
   .profileLink .profilePicture {
@@ -153,6 +154,7 @@
   .routes {
     grid-column: 2 / 3;
     grid-row: 1 / 4;
+    background-color: #303030;
   }
 
 </style>

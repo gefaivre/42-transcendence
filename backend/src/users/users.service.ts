@@ -478,7 +478,8 @@ export class UsersService {
     })
     const b = a.flatMap(({ sender, receiver }) => [sender.username, receiver.username])
     const c = b.filter((_username: string) => _username !== username)
-    return c
+    const d = Array.from(new Set(c)) // remove duplicates
+    return d
   }
 
 }

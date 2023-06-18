@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs'
 
 const prisma = new PrismaClient()
 
@@ -42,6 +43,8 @@ async function main() {
       mmr: randomNumber()
     }
   })
+  fs.mkdirSync(`/app/images/root`)
+
 
   if (root === null) return
 
@@ -69,6 +72,7 @@ async function main() {
         mmr: randomNumber()
       }
     })
+    fs.mkdirSync(`/app/images/${user.username}`)
     if (i % 3 === 0) {
       // add admin
       await prisma.channel.update({

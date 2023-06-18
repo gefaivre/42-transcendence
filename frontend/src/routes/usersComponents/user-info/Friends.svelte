@@ -82,7 +82,7 @@
 
 </script>
 
-<div class="friends">
+<div class="box-info">
     {#if $id === pageUser.id.toString()}
       <div class="nav">
         {#if friendspage == "Friends"}
@@ -205,12 +205,11 @@
   </div>
 
 <style>
-    .friends {
-    margin: 50px;
+  .box-info {
     border: solid 2px var(--grey);
     box-shadow: 0 0 10px var(--lite-grey);
     background-color: var(--lite-grey);
-    border-radius: 30px;
+    border-radius: 20px;
     height: 80%;
     width: 80%;
     display: flex;
@@ -231,23 +230,26 @@
     align-items: center;
     justify-content: center;
   }
+
   li {
     height: 40px;
     display: grid;
     grid-template-columns: 2fr 1fr;
     background-color: var(--lite-lite-lite-grey);
   }
+
   li:nth-child(2n + 1) {
     background-color: var(--lite-lite-grey);
   }
 
-  .friends .user {
+  .box-info .user {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-left: 5%;
   }
-  .friends .user .name {
+
+  .box-info .user .name {
     margin-left: 5%;
   }
 
@@ -260,22 +262,22 @@
     gap: 5px;
   }
 
-  .friends .nav {
+  .box-info .nav {
     height: 40px;
     display: flex;
     justify-content: space-around;
   }
 
-  .friends .nav button {
+  .box-info .nav button {
     border-bottom: solid 1px var(--black);
     flex: auto;
   }
 
-  .friends .nav .activeButton {
+  .box-info .nav .activeButton {
     border-bottom: none;
   }
 
-  .friends .nav button:not(:last-child) {
+  .box-info .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
 

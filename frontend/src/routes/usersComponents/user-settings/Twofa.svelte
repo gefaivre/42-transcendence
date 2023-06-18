@@ -42,7 +42,7 @@ import { toast } from '@zerodevx/svelte-toast/dist'
 
 </script>
 
-  <div class="box-info twofa">
+  <div class="twofa">
     {#if $user.TwoFA === false && steptwo === false}
       <button on:click={enable2FA}>Enable TWOFA</button>
     {:else if qrcode !== ''}
@@ -55,15 +55,6 @@ import { toast } from '@zerodevx/svelte-toast/dist'
   </div>
 
 <style>
-
-
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-  }
-
 
   .twofa {
     display:flex ;
