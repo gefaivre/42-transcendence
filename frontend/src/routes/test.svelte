@@ -3,5 +3,5 @@
   import RemoteTable from "./leaderBoardComponents/RemoteTable.svelte";
 </script>
 
-<h4>Client side processing</h4>
+<h4>testing leaderboard</h4>
 <LocalTable />

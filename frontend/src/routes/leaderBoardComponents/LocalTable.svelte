@@ -7,6 +7,7 @@
   import { getAll, getUsers } from "./server.js";
   import { sortNumber, sortString } from "./sorting.js";
   import type { User } from "../../types";
+  import { getData } from "./server.js";
 
   let rows = [];
   let users= [];
@@ -62,7 +63,7 @@
   <tbody>
     {#each rows2 as row, index (row)}
       <Row {index} on:click={() => onCellClick(row)}>
-        <td data-label="Rank">{(index + 1) + pageSize * page}</td>
+        <td data-label="id">{row.id}</td>
         <td data-label="username">{row.username}</td>
         <td data-label="Age">{row.mmr}</td>
       </Row>

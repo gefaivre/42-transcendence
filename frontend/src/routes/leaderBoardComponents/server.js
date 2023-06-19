@@ -38,7 +38,7 @@ export function getAll(text) {
   });
 }
 
-export function getData(pmmr, pmmrSize, text, sorting) {
+export function getData(page, pageSize, text, sorting) {
   let originalData = generateData();
   console.log("getting data");
 
@@ -77,7 +77,7 @@ export function getData(pmmr, pmmrSize, text, sorting) {
         rows = originalRows;
       }
 
-      resolve({ rows: rows.slice(0, pmmrSize), rowsCount: rowsCount - 1 });
+      resolve({ rows: rows.slice(0, pageSize), rowsCount: rowsCount - 1 });
     }, 500);
   });
 }
