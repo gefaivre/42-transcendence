@@ -1,18 +1,23 @@
-<script>
+<script lang=ts>
   //Row component is optional and only serves to render odd/even row, you can use <tr> instead.
   //Sort component is optional
   import { onMount } from "svelte";
+
   import Table, { Pagination, Row, Search, Sort } from "./Table.svelte";
-  import { getAll } from "./server.js";
+  import { getAll, getUsers } from "./server.js";
   import { sortNumber, sortString } from "./sorting.js";
+  import type { User } from "../../types";
 
   let rows = [];
+  let users= [];
   let rowsCount = 0;
   let page = 0; //first page
   let pageSize = 5; //optional, 10 by default
 
   onMount(async () => {
     rows = await getAll();
+    users = await getUsers();
+    console.log(users);
   });
 
   function onCellClick(row) {
@@ -28,22 +33,13 @@
   }
 
   function onSortNumber(event) {
-    event.detail.rows = sortString(
+    event.detail.rows = sortNumber(
       event.detail.rows,
       event.detail.dir,
       event.detail.key
     );
   }
-  async function load(_page) {
-      const data = await getData(_page, pageSize, text, sorting);
-      rows = data.rows;
-      rowsCount = data.rowsCount;
-    }
-  
-  function onPageChange(event) {
-      load(event.detail.page);
-          page = event.detail.page;
-    }
+
 </script>
 
 <Table {page} {pageSize} {rows} let:rows={rows2}>
@@ -54,12 +50,12 @@
         <Sort key="rank" on:sort={onSortString} />
       </th>
       <th>
-        Name
-        <Sort key="Name" on:sort={onSortString} />
+        username
+        <Sort key="username" on:sort={onSortString} />
       </th>
       <th>
-        Age
-        <Sort key="age" on:sort={onSortNumber} />
+        elo
+        <Sort key="mmr" on:sort={onSortNumber} />
       </th>
     </tr>
   </thead>
@@ -67,8 +63,8 @@
     {#each rows2 as row, index (row)}
       <Row {index} on:click={() => onCellClick(row)}>
         <td data-label="Rank">{(index + 1) + pageSize * page}</td>
-        <td data-label="Name">{row.name}</td>
-        <td data-label="Age">{row.age}</td>
+        <td data-label="username">{row.username}</td>
+        <td data-label="Age">{row.mmr}</td>
       </Row>
     {/each}
   </tbody>
