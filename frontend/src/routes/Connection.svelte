@@ -21,6 +21,7 @@
     toast.push('Welcome! 👋', { classes: ['success'] })
     logged.set('true')
     push('/')
+    location.reload();
   }
 
   function failure2FA() {
@@ -61,6 +62,7 @@
         user.password = null
         logged.set('true')
         push('/')
+        location.reload();
       }
     } catch (e) {
       toast.push(e.response.data.message, { classes: ['failure'] })
