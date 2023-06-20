@@ -263,7 +263,12 @@ export class PongService {
 
   private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
-    const winner: Omit<User, 'password'> | null  = await this.users.findById(room.player2!.prismaId);
+    let winnerId: number;
+    if (loser && loser.id == room.player1.prismaId)
+      winnerId = room.player2!.prismaId
+    else
+      winnerId = room.player1.prismaId
+    const winner: Omit<User, 'password'> | null  = await this.users.findById(winnerId);
 
     if (loser !== null && winner !== null) {
       const R1: number = 10 ** (loser.mmr / 400);
