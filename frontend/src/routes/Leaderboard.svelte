@@ -6,13 +6,19 @@
 	// TODO: get rid of unused `User` fields
 	let users = [];
 
+  const pageLength = 10
+  let page = 1
+  let totalPages: number
+  let pagesArray: Array<number> = []
+
 	onMount(() => getUsers());
 
 	async function getUsers() {
 		try {
 			const response = await axios.get("/users");
       users = response.data;
-			console.log(users);
+      totalPages = users.length / pageLength + 1
+      pagesArray = Array.from({length: totalPages}, (x, i) => i+1)
 			sortByMMR();
 		} catch (e) {
 			console.log(e.response.data.messsage);
@@ -31,45 +37,57 @@
 
 </script>
 
-<div class="screen">
-	<table class="leaderboard">
-		<thead>
-			<tr>
-				<th colspan="4">The big leaderboard</th>
-			</tr>
-			<tr>
-				<th>Rank</th>
-				<th>User</th>
-				<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
-				<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each users as user, i}
-				<tr>
-					<td>{i + 1}</td>
-					<td>
-						<a href="#/users/{user.username}">
-							<span class="user">
-								<img class="pp" src="http://localhost:3000/images/actual/{user.id}" on:error={handleImageError} alt="pp"/>
-								<p class="username">{user.username}</p>
-							</span>
-						</a>
-					</td>
-					<td>{user.mmr}</td>
-					<td>{user.games}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
+<br>
+<br>
+
+<table>
+	<thead>
+		<tr>
+			<th>Rank</th>
+			<th>User</th>
+			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
+			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
+		</tr>
+	</thead>
+	<tbody>
+	{#each users as user, i}
+    {#if i >= (page-1) * pageLength && i < page * pageLength}
+		<tr>
+			<td>{i + 1}</td>
+			<td>
+				<a href="#/users/{user.username}">
+					<span class="user">
+						<img class="pp" src="http://localhost:3000/images/actual/{user.id}" on:error={handleImageError} alt="pp"/>
+						<p class="username">{user.username}</p>
+					</span>
+				</a>
+			</td>
+			<td>{user.mmr}</td>
+			<td>{user.games}</td>
+		</tr>
+    {/if}
+  {/each}
+	</tbody>
+</table>
+
+<br>
+<br>
+
+<div class="join">
+{#each pagesArray as _page}
+  <button on:click={() => page = _page} class="join-item btn">{_page}</button>
+{/each}
 </div>
 
 <style>
-	.screen {
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
+
+  table {
+    margin: auto;
+  }
+
+  .join {
+		text-align: center;
+  }
 
 	td {
 		text-align: center;
