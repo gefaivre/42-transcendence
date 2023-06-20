@@ -41,6 +41,8 @@
   }
 
   function post() {
+    if (!message || message === '')
+      return ;
     socket.emit('sendPost', {
       content: message,
       channelName: channel.name,
