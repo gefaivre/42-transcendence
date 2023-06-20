@@ -1,14 +1,26 @@
 <script lang="ts">
+
+  import { onMount } from "svelte";
   import axios from "../../../axios.config";
   import type { Match, Stat, User } from "../../../types";
   import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
-  export let matchHistory: Match[];
-  export let statistics: Stat
 
   let tab: string = 'statistics'
   let opponent: any;
+  let matchHistory: Match[] = [];
+
+  let statistics: Stat = {
+    lostGames: 0,
+    wonGames: 0,
+    totalGames: 0,
+    ratioGames: 0,
+    mmr: null,
+    averageWin: { score: 0, opponentScore: 0 },
+    averageLose: { score: 0, opponentScore: 0 },
+    nbrOfFriends: 0,
+  };
 
   async function getUsernameById(id: number) {
     try {
@@ -18,6 +30,40 @@
       console.log(e);
     }
   }
+
+  function getStatistics() {
+    console.log('matchshistory', matchHistory)
+    const rankedMatch = matchHistory.filter((match) => match.ranked === true);
+
+    statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
+    statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
+    statistics.totalGames = rankedMatch.length;
+    statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
+    statistics.averageWin.score = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
+    statistics.averageWin.opponentScore = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+    statistics.averageLose.score = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
+    statistics.averageLose.opponentScore = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
+    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
+    console.log('stats', statistics);
+  }
+
+  async function getMatchHistory() {
+    try {
+      const response = await axios.get(`matchs/history/${pageUser.id}`)
+      matchHistory = response.data
+      console.log('matchs', matchHistory)
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  onMount(async () => {
+    await getMatchHistory()
+    getStatistics()
+  })
 
 </script>
 
