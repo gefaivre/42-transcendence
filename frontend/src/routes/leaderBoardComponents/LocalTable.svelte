@@ -10,12 +10,15 @@
   import { getData } from "./server.js";
 
   let rows = [];
+  let saveRows = [];
   let rowsCount = 0;
   let page = 0; //first page
   let pageSize = 5; //optional, 10 by default
 
   onMount(async () => {
     rows = await getAll();
+    rows = sortNumber(rows, "desc", "mmr");
+    saveRows = rows;
   });
 
   function onCellClick(row) {
@@ -38,6 +41,11 @@
     );
   }
 
+  function getRank(mmr)
+  {
+    return 1;
+  }
+
 </script>
 
 <Table {page} {pageSize} {rows} let:rows={rows2}>
@@ -45,7 +53,7 @@
     <tr>
       <th>
         Rank
-        <Sort key="rank" on:sort={onSortString} />
+        <Sort key="mmr" on:sort={onSortString} />
       </th>
       <th>
         username
