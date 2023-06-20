@@ -7,8 +7,6 @@
 
     let channels: Channel[] = [];
 
-
-
     onMount(() => getAll())
 
     async function getAll() {
@@ -18,6 +16,10 @@
       } catch (e) {
         console.log(e.response.data.message)
       }
+    }
+
+    async function joinChannel(channelName: string) {
+      axios.post('http://localhost:3000/chat', {channelName: channelName});
     }
 </script>
 
@@ -32,7 +34,7 @@
     <ul>
       {#each channels as channel}
         <li>
-          <a contenteditable="false" bind:innerHTML={channel.name} href="#/chat/channel/{channel.name}">{channel.name}</a>
+        <p><span>{channel.name}</span><button on:click={() => joinChannel(channel.name)}>join</button></p>
         </li>
       {/each}
     </ul>
@@ -70,6 +72,20 @@ h1 {
    height: 360px;
    overflow: auto;
  }
+
+button {
+  float: right;
+  margin-right:5em;
+  background-color:#3b82f6;
+  font-size:0.8em;
+  border: 1px solid #1d4ed8;
+  border-radius:4px;
+  color: var(--white);
+}
+span {
+  float: left;
+  margin-left:5em;
+}
 
  li {
     display: block;
