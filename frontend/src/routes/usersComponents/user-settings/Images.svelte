@@ -65,7 +65,7 @@
       <div class="imageContainer">
         <div>
           <button class="hidden-button" on:click={() => updatePP(image.id)}>
-            <img class="pp" src="http://localhost:3000/images/{image.id}" alt={image.name}/>
+            <img class="pp" src="{COMMON_BASE_URL}:3000/images/{image.id}" alt={image.name}/>
           </button>
         </div>
         <div class="imageButton">

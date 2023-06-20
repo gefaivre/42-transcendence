@@ -134,7 +134,7 @@
             <span>-</span>
             <span>{match.loserScore}</span>
             <span>
-              <img class="pp" src="http://localhost:3000/images/actual/{match.loserId}" on:error={handleImageError} alt="pp"/>
+              <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{match.loserId}" on:error={handleImageError} alt="pp"/>
             </span>
             <span id="flexStart">
               {#await (opponent = getUsernameById(match.loserId))}
@@ -156,7 +156,7 @@
             <span>-</span>
             <span>{match.winnerScore}</span>
             <span>
-              <img class="pp" src="http://localhost:3000/images/actual/{match.winnerId}" on:error={handleImageError} alt="pp"/>
+              <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{match.winnerId}" on:error={handleImageError} alt="pp"/>
             </span>
             <span id="flexStart">
               {#await (opponent = getUsernameById(match.winnerId))}

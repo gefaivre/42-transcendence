@@ -24,7 +24,7 @@ export class AuthService {
           client_id: process.env.FT_UID,
           client_secret: process.env.FT_SECRET,
           code: code,
-          redirect_uri: 'http://localhost:3000/auth/42'
+          redirect_uri: `${process.env.COMMON_BASE_URL}:3000/auth/42`
         }
       })
       return res.data.access_token

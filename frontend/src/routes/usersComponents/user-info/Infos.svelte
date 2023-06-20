@@ -140,7 +140,7 @@
 
 <div class="ctn-infos">
   <div class="ctn-image">
-    <img class="image" src="http://localhost:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" on:error={handleImageError} alt="profil"/>
+    <img class="image" src="{COMMON_BASE_URL}:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" on:error={handleImageError} alt="profil"/>
   </div>
   <br>
   <div class="ctn-title">

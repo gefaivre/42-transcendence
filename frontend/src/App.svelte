@@ -32,7 +32,7 @@
         user.set(response.data)
         id.set(response.data.id.toString())
         logged.set('true')
-        $socket = ioClient('http://localhost:3000', {
+        $socket = ioClient(axios.defaults.baseURL, {
           path: '/user',
           withCredentials: true,
           query: { id: $user.id, username: $user.username }
@@ -41,7 +41,6 @@
       }
     }
 
-
 </script>
 
   {#if $logged === 'true'}
@@ -49,7 +48,7 @@
       <div class="profileLink">
         {#if $user}
         <a use:link href="/users/{$user.username}">
-          <img class="profilePicture" src='http://localhost:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
+          <img class="profilePicture" src='{COMMON_BASE_URL}:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
         </a>
         {/if}
       </div>

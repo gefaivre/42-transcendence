@@ -116,7 +116,7 @@
 
   async function setup(channelName: string) {
     channel = (await axios.get(`/channel/${channelName}`)).data
-    socket = ioClient('http://localhost:3000', {
+    socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
       withCredentials: true
     })
