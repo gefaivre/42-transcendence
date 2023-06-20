@@ -1,26 +1,13 @@
 <script lang="ts">
   import axios from "../axios.config";
   import { id, user, logged, socket } from "../stores";
-  import type { Status, User, Match, Stat } from "../types";
+  import type { Status, User } from "../types";
   import Friends from "./usersComponents/user-info/Friends.svelte";
   import Stats from "./usersComponents/user-info/Stats.svelte";
   import Settings from "./usersComponents/user-info/Settings.svelte";
   import Infos from "./usersComponents/user-info/Infos.svelte";
 
   export let params: any;
-
-  let matchHistory: Match[] = [];
-
-  let statistics: Stat = {
-    lostGames: 0,
-    wonGames: 0,
-    totalGames: 0,
-    ratioGames: 0,
-    mmr: null,
-    averageWin: { score: 0, opponentScore: 0 },
-    averageLose: { score: 0, opponentScore: 0 },
-    nbrOfFriends: 0,
-  };
 
   const name = params.name;
 
@@ -94,7 +81,7 @@
 
   <Friends bind:pageUser/>
 
-  <Stats bind:pageUser bind:matchHistory bind:statistics/>
+  <Stats bind:pageUser/>
 
   {#if pageUser.id.toString() === $id}
     <Settings/>
