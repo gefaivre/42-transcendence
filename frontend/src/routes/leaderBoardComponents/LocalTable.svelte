@@ -55,6 +55,10 @@
         elo
         <Sort key="mmr" on:sort={onSortNumber} />
       </th>
+      <th>
+        games
+        <Sort key="games" on:sort={onSortNumber} />
+      </th>
     </tr>
   </thead>
   <tbody>
@@ -63,6 +67,7 @@
         <td data-label="id">{row.id}</td>
         <td data-label="username">{row.username}</td>
         <td data-label="mmr">{row.mmr}</td>
+        <td data-label="games">{row.games}</td>
       </Row>
     {/each}
   </tbody>
