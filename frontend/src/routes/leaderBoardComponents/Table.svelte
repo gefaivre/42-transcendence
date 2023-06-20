@@ -61,7 +61,6 @@
     }
   
     function onSearch(event) {
-      console.log("searching?")
       dispatch("search", event.detail);
     }
   </script>

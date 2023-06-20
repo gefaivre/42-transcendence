@@ -8,6 +8,7 @@
   
   <script>
     import { createEventDispatcher, getContext } from "svelte";
+    import { detach_before_dev } from "svelte/internal";
     const dispatch = createEventDispatcher();
     const stateContext = getContext("state");
   
@@ -48,15 +49,29 @@
       dispatch("search", detail);
   
       if (detail.preventDefault !== true) {
-        if (detail.text.length === 0) {
+        if (detail.text.length === 0)
+        {
           stateContext.setRows(state.rows);
-        } else {
-          stateContext.setRows(
-            detail.rows.filter(r => detail.filter(r, detail.text, index))
-          );
+        }
+        else 
+        {
+          if (detail.originalEvent.key === "Backspace")
+          {
+           // stateContext.setRows(state.rows);
+            detail.rows = state.rows;
+            stateContext.setRows(
+              detail.rows.filter(r => detail.filter(r, detail.text, index)));
+          }
+          else
+          {  
+            stateContext.setRows(
+              detail.rows.filter(r => detail.filter(r, detail.text, index))
+              );
+          }
         }
         stateContext.setPage(0, 0);
-      } else {
+      } 
+      else {
         stateContext.setRows(detail.rows);
       }
     }

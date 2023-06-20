@@ -40,7 +40,6 @@ export function getAll(text) {
 
 export function getData(page, pageSize, text, sorting) {
   let originalData = generateData();
-  console.log("getting data");
 
   if (sorting) {
     if (sorting.key === "mmr") {

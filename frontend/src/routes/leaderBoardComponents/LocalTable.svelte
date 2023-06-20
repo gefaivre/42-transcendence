@@ -10,15 +10,12 @@
   import { getData } from "./server.js";
 
   let rows = [];
-  let users= [];
   let rowsCount = 0;
   let page = 0; //first page
   let pageSize = 5; //optional, 10 by default
 
   onMount(async () => {
     rows = await getAll();
-    users = await getUsers();
-    console.log(users);
   });
 
   function onCellClick(row) {
@@ -65,7 +62,7 @@
       <Row {index} on:click={() => onCellClick(row)}>
         <td data-label="id">{row.id}</td>
         <td data-label="username">{row.username}</td>
-        <td data-label="Age">{row.mmr}</td>
+        <td data-label="mmr">{row.mmr}</td>
       </Row>
     {/each}
   </tbody>
