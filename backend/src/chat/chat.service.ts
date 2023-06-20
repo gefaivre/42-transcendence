@@ -31,7 +31,6 @@ export class ChatService {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
-      this.removeUser(user.username) // avoid duplicates (one username link to multiple ids)
       const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId }
       this.chatUsers.push(chatUser)
       return chatUser
@@ -39,8 +38,8 @@ export class ChatService {
   }
 
   // One username can link to multiple clients (this might/should change)
-  removeUser(username: string) {
-    this.chatUsers = this.chatUsers.filter(user => user.username !== username)
+  removeUser(socketId: string) {
+    this.chatUsers = this.chatUsers.filter(user => user.socketId !== socketId)
   }
 
   async retrieveChannelPosts(channelName: string): Promise<PostEmitDto[]> {
