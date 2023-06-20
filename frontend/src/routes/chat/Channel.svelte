@@ -1,31 +1,31 @@
 <script lang="ts">
 
-    import axios from "../../axios.config";
-    import { onDestroy, onMount } from "svelte";
-    import { logged, id, user } from "../../stores";
-    import { pop } from "svelte-spa-router";
-    import ioClient from 'socket.io-client';
-    import type { Socket } from "socket.io-client";
-    import type { Channel, PostEmitDto, ChannelDto, WsException } from "../../types";
-    import { set_input_type } from "svelte/internal";
+  import axios from "../../axios.config";
+  import { onDestroy, onMount } from "svelte";
+  import { logged, id, user } from "../../stores";
+  import { pop } from "svelte-spa-router";
+  import ioClient from 'socket.io-client';
+  import type { Socket } from "socket.io-client";
+  import type { Channel, PostEmitDto, ChannelDto, WsException } from "../../types";
 
-    let socket: Socket = null
-    let message: string = ''
-    let password: string = ''
-    let channel: Channel = null
-    let isOwner: boolean = false
-    let isAdmin: boolean = false
-    let isMember: boolean = false
-    let posts: PostEmitDto[] = []
-    let channelName: string = null;
-    let listChannel: string[] = [];
-    let tab:string = "find";
-    let chatbox: any
+  let socket: Socket = null
+  let message: string = ''
+  let password: string = ''
+  let channel: Channel = null
+  let isOwner: boolean = false
+  let isAdmin: boolean = false
+  let isMember: boolean = false
+  let posts: PostEmitDto[] = []
+  let channelName: string = null;
+  let listChannel: string[] = [];
+  let tab:string = "find";
+  let chatbox: any
 
+  onMount(() => getChannels())
 
-    onMount(() => getChannels())
+  onDestroy(() => closeSocket())
 
-    async function getChannels() {
+  async function getChannels() {
     try {
       const response = await axios.get('/users/me/channel');
       listChannel = response.data;
@@ -34,155 +34,160 @@
     }
   }
 
-    function post() {
-      socket.emit('sendPost', {
-        content: message,
-        channelName: channel.name,
-      }, (response: string) => {
-        console.log(response)
-        message = ''
-      })
+  function closeSocket() {
+    if (socket){
+      socket.disconnect()
     }
+  }
 
-    function joinRoom() {
-      socket.emit('joinRoom', channel.name, (response: string) => {
-        console.log(response)
-      })
+  function post() {
+    socket.emit('sendPost', {
+      content: message,
+      channelName: channel.name,
+    }, (response: string) => {
+      console.log(response)
+      message = ''
+    })
+  }
+
+  function joinRoom() {
+    socket.emit('joinRoom', channel.name, (response: string) => {
+      console.log(response)
+    })
+  }
+
+  function joinChannel() {
+    socket.emit('joinChannel', {
+      channelName: channel.name,
+      status: channel.status,
+      password: password
+    } as ChannelDto, (response: string) => {
+      console.log(response)
+      joinRoom()
+    })
+  }
+
+  function leaveChannel() {
+    socket.emit('leaveChannel', channel.name, (response: string) => {
+      console.log(response)
+      return pop()
+    })
+  }
+
+  async function getChannel() {
+    try {
+      const response = await axios.get(`/channel/${channelName}`)
+      channel = response.data
+    } catch (e) {
+      channel = null
+      console.log(e)
     }
+  }
 
-    function joinChannel() {
-        socket.emit('joinChannel', {
-          channelName: channel.name,
-          status: channel.status,
-          password: password
-        } as ChannelDto, (response: string) => {
-          console.log(response)
-          joinRoom()
-        })
+  async function revokeAdmin(id: number) {
+    try {
+      await axios.patch(`/channel/${channel.name}/admin/revoke/${id}`, null)
+      getChannel()
+    } catch (e) {
+      console.log(e.response.data.message)
     }
+  }
 
-    function leaveChannel() {
-      socket.emit('leaveChannel', channel.name, (response: string) => {
-        console.log(response)
+  async function promoteAdmin(id: number) {
+    try {
+      await axios.patch(`/channel/${channel.name}/admin/promote/${id}`, null)
+      getChannel()
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
+
+  async function ban(userId: number) {
+    try {
+      const response = await axios.delete(`/channel/${channel.name}/${userId}`)
+      console.log(response)
+      getChannel()
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
+
+  async function setup(channelName: string) {
+    channel = (await axios.get(`/channel/${channelName}`)).data
+    socket = ioClient('http://localhost:3000', {
+      path: '/chat',
+      withCredentials: true
+    })
+
+    if (channel.users.find(user => user.id.toString() === $id))
+      joinRoom()
+    else {
+      if (confirm('Join this channel ?') === false)
         return pop()
-      })
-    }
-
-    async function getChannel() {
-      try {
-        const response = await axios.get(`/channel/${channelName}`)
-        channel = response.data
-      } catch (e) {
-        channel = null
-        console.log(e)
-      }
-    }
-
-    async function revokeAdmin(id: number) {
-      try {
-        await axios.patch(`/channel/${channel.name}/admin/revoke/${id}`, null)
-        getChannel()
-      } catch (e) {
-        console.log(e.response.data.message)
-      }
-    }
-
-    async function promoteAdmin(id: number) {
-      try {
-        await axios.patch(`/channel/${channel.name}/admin/promote/${id}`, null)
-        getChannel()
-      } catch (e) {
-        console.log(e.response.data.message)
-      }
-    }
-
-    async function ban(userId: number) {
-      try {
-        const response = await axios.delete(`/channel/${channel.name}/${userId}`)
-        console.log(response)
-        getChannel()
-      } catch (e) {
-        console.log(e.response.data.message)
-      }
-    }
-
-      async function setup(channelName: string) {
-        channel = (await axios.get(`/channel/${channelName}`)).data
-        socket = ioClient('http://localhost:3000', {
-          path: '/chat',
-          withCredentials: true
-        })
-
-        if (channel.users.find(user => user.id.toString() === $id))
-          joinRoom()
-        else {
-          if (confirm('Join this channel ?') === false)
-            return pop()
-          if (channel.status === 'Protected') {
-            password = prompt('Enter password')
-            if (password === '')
-              console.error(`Unable to join channel ${channel.name}: Empty password.`)
-            if (password === null)
-              return pop()
-          }
-          joinChannel()
-        }
-
-        isOwner = channel.ownerId.toString() === $id
-        isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
-        isMember = true
-
-        socket.on('connect', () => {
-          console.log('Connected')
-        })
-
-        socket.on('disconnect', (cause) => {
-          console.log('Disconnected:', cause)
-        })
-
-        socket.on('post', (post: PostEmitDto) => {
-          console.log('receive post')
-          posts.push(post)
-          posts = posts
-        })
-
-        // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
-        socket.on('exception', (e: WsException) => {
-          console.error(e)
+      if (channel.status === 'Protected') {
+        password = prompt('Enter password')
+        if (password === '')
+          console.error(`Unable to join channel ${channel.name}: Empty password.`)
+        if (password === null)
           return pop()
-        })
-
-        // TODO: is it used ?
-        socket.on('error', (e) => {
-          console.error(e)
-          return pop()
-        })
-
-        // TODO: typedef event
-        socket.on('channelEvent', (event: any) => {
-          if (event.event === 'join') {
-            const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
-            posts.push(post)
-            posts = posts
-          }
-          else if (event.event === 'leave') {
-            const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
-            posts.push(post)
-            posts = posts
-          }
-        })
-
-    }//fin
-
-    function connectChannel(channel: string)
-    {
-      channelName = channel;
-      setup(channel);
-      tab = "channel";
-      console.log("yes");
+      }
+      joinChannel()
     }
 
-    onDestroy(() => socket.disconnect())
+    isOwner = channel.ownerId.toString() === $id
+    isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
+    isMember = true
+
+    socket.on('connect', () => {
+      console.log('Connected')
+    })
+
+    socket.on('disconnect', (cause) => {
+      console.log('Disconnected:', cause)
+    })
+
+    socket.on('post', (post: PostEmitDto) => {
+      console.log('receive post')
+      posts.push(post)
+      posts = posts
+    })
+
+    // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
+    socket.on('exception', (e: WsException) => {
+      console.error(e)
+      return pop()
+    })
+
+    // TODO: is it used ?
+    socket.on('error', (e) => {
+      console.error(e)
+      return pop()
+    })
+
+    // TODO: typedef event
+    socket.on('channelEvent', (event: any) => {
+      if (event.event === 'join') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+      else if (event.event === 'leave') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+    })
+
+  }//fin
+
+  function connectChannel(channel: string)
+  {
+    channelName = channel;
+    setup(channel);
+    tab = "channel";
+    console.log("yes");
+  }
+
 
   </script>
 

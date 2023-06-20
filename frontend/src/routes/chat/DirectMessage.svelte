@@ -82,7 +82,13 @@
 
   }
 
-  onDestroy(() => socket.disconnect())
+  onDestroy(() => closeSocket())
+
+  function closeSocket() {
+    if (socket){
+      socket.disconnect()
+    }
+  }
 
   // afterUpdate(() => {
   //   chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth'})
