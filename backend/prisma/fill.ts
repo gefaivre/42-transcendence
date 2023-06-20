@@ -4,25 +4,25 @@ const numberOfUsers = 10 // How many user do you want to add ?
 const yourUsername = "test" // Your username
 
   type User = {
-  id: number
-  username: string
-  password: string
-  mmr: number
-  games: number
-  ft_login: string | null
-  friends: { id: number, username: string }[]
-  friendOf: { id: number, username: string }[]
-  pendingFriends: { id: number, username: string }[]
-  requestFriends: { id: number, username: string }[]
-  wins: { id: number, winnerScore: number, loserScore: number}[]
-  loses: { id: number, winnerScore: number, loserScore: number}[]
-  TwoFA: boolean
-}
-
+    id: number
+    username: string
+    password: string
+    mmr: number
+    games: number
+    ft_login: string | null
+    friends: { id: number, username: string }[]
+    friendOf: { id: number, username: string }[]
+    pendingFriends: { id: number, username: string }[]
+    requestFriends: { id: number, username: string }[]
+    wins: { id: number, winnerScore: number, loserScore: number}[]
+    loses: { id: number, winnerScore: number, loserScore: number}[]
+    TwoFA: boolean,
+    ownedChannels: {id: number}[],
+  }
 
 let tab = new Array<User>();
-const prisma = new PrismaClient()
 
+const prisma = new PrismaClient()
 
 function randomUsername(): string {
 		let result = '-t-';
@@ -37,6 +37,17 @@ function randomUsername(): string {
 		}
 		return result;
   }
+
+function randomChanName(): string {
+  let result = '-t-';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let nameSize = Math.floor(Math.random() * (10 - 1) + 1);
+
+  for(let i:number = 0; i < nameSize; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
 
 function randomString(): string {
   return Math.random().toString(36).slice(2).substring(0,7)
@@ -199,6 +210,40 @@ async function createMatchrelation(user1: number, user2: number) {
       tab[user2] = user;
 }
 
+async function createChannel(user1: number)
+{
+  try {
+
+   await prisma.channel.create({
+      data: {
+        name: randomChanName(),
+        ownerId: tab[user1].id,
+        admins: { connect: { id: tab[user1].id } },
+        users: { connect: { id: tab[user1].id } },
+        status: "Public",
+        password: ""
+      }
+    })
+  } catch (e){}
+}
+
+function joinChan(user2: number, user1: number)
+{
+  prisma.channel.update({
+    where: {
+      id: tab[user1].ownedChannels[0]?.id
+    },
+    data: {
+      users: {
+        connect: {
+          id: tab[user2].id
+        }
+      }
+    }
+  })
+}
+
+
 async function getUser(name: string) {
   return prisma.user.findUnique({
     where: {
@@ -231,7 +276,8 @@ async function getUser(name: string) {
       },
       channels: true,
       wins: true,
-      loses:true
+      loses:true,
+      ownedChannels: true
     }
   })
 }
@@ -243,11 +289,6 @@ async function createUser() {
       password: '',
       games: randomNumber(),
       mmr: randomNumber(),
-      images: {
-        create: {
-          path: "/app/images/basic_pp.jpg",
-        }
-      },
     },
     include: {
       pendingFriends: {
@@ -276,7 +317,9 @@ async function createUser() {
       },
       channels: true,
       wins: true,
-      loses:true
+      loses:true,
+      ownedChannels: true
+
 
     }
   })
@@ -326,8 +369,20 @@ async function main() {
       }
     }
 
-console.log(tab[0])
-
+  // Connect Channels
+  console.log("Connect Channels")
+  for (let user1 = 0; user1 < tab.length; user1++)
+  {
+    createChannel(user1)
+    for ( let user2 = 0; user2 < tab.length; user2++)
+    {
+      //join user1 chan
+      if (user1 != user2)
+      {
+        joinChan(user2, user1)
+      }
+    }
+  }
 }
 
 main()

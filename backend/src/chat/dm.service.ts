@@ -33,6 +33,7 @@ export class DirectMessageService {
       },
       select: {
         content: true,
+        date: true,
         sender: {
           select: {
             username: true
@@ -48,7 +49,8 @@ export class DirectMessageService {
     return (messages.map(message => ({
       content: message.content,
       sender: message.sender.username,
-      reveiver: message.receiver.username
+      reveiver: message.receiver.username,
+      date: message.date
     })))
   }
 
