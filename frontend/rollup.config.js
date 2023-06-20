@@ -51,7 +51,8 @@ export default {
 		url(),
         replace({
             preventAssignment: true,
-            FT_AUTHORIZE: JSON.stringify(process.env.FT_AUTHORIZE)
+            FT_AUTHORIZE: JSON.stringify(process.env.FT_AUTHORIZE),
+            COMMON_BASE_URL: JSON.stringify(process.env.COMMON_BASE_URL)
         }),
 		svelte({
 			preprocess: sveltePreprocess({ sourceMap: !production }),

@@ -5,7 +5,7 @@ import { UserStatus, Status } from 'src/types';
 @WebSocketGateway({
   path: '/user',
   cors: {
-    origin: 'http://localhost:8080',
+    origin: `${process.env.COMMON_BASE_URL}:8080`,
     credentials: true
   },
 })

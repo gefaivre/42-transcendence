@@ -23,7 +23,7 @@
       return
     }
 
-    socket = ioClient('http://localhost:3000', {
+    socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
       withCredentials: true
     })

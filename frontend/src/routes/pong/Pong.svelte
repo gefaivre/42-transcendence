@@ -32,7 +32,7 @@
   let gameRequest: boolean = false;
   let watch = false;
 
-  const socket = ioClient('http://localhost:3000', {
+  const socket = ioClient(axios.defaults.baseURL, {
     path: '/pong',
     withCredentials: true
   });

@@ -57,7 +57,7 @@
 			<td>
 				<a href="#/users/{user.username}">
 					<span class="user">
-						<img class="pp" src="http://localhost:3000/images/actual/{user.id}" on:error={handleImageError} alt="pp"/>
+						<img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{user.id}" on:error={handleImageError} alt="pp"/>
 						<p class="username">{user.username}</p>
 					</span>
 				</a>

@@ -28,6 +28,7 @@ services:
       FT_UID: $FT_UID
       FT_SECRET: $FT_SECRET
       OTP_SECRET: $OTP_SECRET
+      COMMON_BASE_URL: $COMMON_BASE_URL
     depends_on:
       - "db"
     volumes:
@@ -42,6 +43,7 @@ services:
       - "8080:8080"
     environment:
       FT_AUTHORIZE: $FT_AUTHORIZE
+      COMMON_BASE_URL: $COMMON_BASE_URL
     volumes:
       - ./frontend:/app
 

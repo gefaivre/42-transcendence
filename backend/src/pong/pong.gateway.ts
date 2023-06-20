@@ -14,7 +14,7 @@ import { BadRequestTransformationFilter } from 'src/filters';
 @WebSocketGateway({
   path: '/pong',
   cors: {
-    origin: 'http://localhost:8080',
+    origin: `${process.env.COMMON_BASE_URL}:8080`,
     credentials: true
   },
 })
