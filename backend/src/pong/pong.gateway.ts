@@ -29,7 +29,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     if (this.pong.gameAlreadyRequested(client.id)) {
-      this.server.emit('alreadyRequested', {});
+      this.server.to(client.id).emit('alreadyRequested', {});
       return ;
     }
       
