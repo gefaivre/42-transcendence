@@ -5,41 +5,32 @@
   import Twofa from "../user-settings/Twofa.svelte";
   import Username from "../user-settings/Username.svelte";
 
-  let tab: string = 'images'
+  const enum Tab {
+    Images,
+    TwoFA,
+    Username,
+    Password
+  }
+
+  let tab: Tab = Tab.Images
 
 </script>
 
 <div class="box-info">
   <div class="nav">
-    {#if tab === 'images'}
-      <button class="activeButton" on:click={() => tab = 'images'}>images</button>
-    {:else}
-      <button on:click={() => tab = 'images'}>images</button>
-    {/if}
-    {#if tab === '2FA'}
-      <button class="activeButton" on:click={() => tab = '2FA'}>2FA</button>
-    {:else}
-      <button on:click={() => tab = '2FA'}>2FA</button>
-    {/if}
-    {#if tab === 'username'}
-      <button class="activeButton" on:click={() => tab = 'username'}>username</button>
-    {:else}
-      <button on:click={() => tab = 'username'}>username</button>
-    {/if}
-    {#if tab === 'password'}
-      <button class="activeButton" on:click={() => tab = 'password'}>password</button>
-    {:else}
-      <button on:click={() => tab = 'password'}>password</button>
-    {/if}
+    <button on:click={() => tab = Tab.Images} class={tab === Tab.Images ? 'activeButton': undefined}>Images</button>
+    <button on:click={() => tab = Tab.TwoFA} class={tab === Tab.TwoFA ? 'activeButton': undefined}>2FA</button>
+    <button on:click={() => tab = Tab.Username} class={tab === Tab.Username ? 'activeButton': undefined}>Username</button>
+    <button on:click={() => tab = Tab.Password} class={tab === Tab.Password ? 'activeButton': undefined}>Password</button>
   </div>
 
-  {#if tab === 'images'}
+  {#if tab === Tab.Images}
     <Images/>
-  {:else if tab === '2FA'}
+  {:else if tab === Tab.TwoFA}
     <Twofa/>
-  {:else if tab === 'username'}
+  {:else if tab === Tab.Username}
     <Username/>
-  {:else if tab === 'password'}
+  {:else if tab === Tab.Password}
     <Password/>
   {:else}
     yolo

@@ -33,9 +33,11 @@
   <br>
   <br>
   <h1>Change your username</h1>
+  <br>
+  <br>
   <div class="content">
-    <input type="text" placeholder="new username" class="input-bordered w-full max-w-xs" />
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => updateUsername()}>Update</button>
+    <input bind:value={username} type="text" placeholder="new username" class="input input-sm input-bordered" />
+    <button class="btn btn-sm" on:click={() => updateUsername()}>Update</button>
   </div>
 </div>
 

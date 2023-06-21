@@ -4,10 +4,11 @@
   import axios from "../../../axios.config";
   import type { Match, Stat, User } from "../../../types";
   import { handleImageError } from "../../../utils";
+    import Settings from "./Settings.svelte";
 
   export let pageUser: User;
 
-  let tab: string = 'statistics'
+  // let tab: string = 'statistics'
   let opponent: any;
   let matchHistory: Match[] = [];
 
@@ -22,6 +23,13 @@
     nbrOfFriends: 0,
   };
 
+  const enum Tab {
+    Statistics,
+    GameHistory
+  }
+
+  let tab: Tab = Tab.Statistics
+
   async function getUsernameById(id: number) {
     try {
       const response = await axios.get(`/users/id/${id}`)
@@ -33,20 +41,25 @@
 
   function getStatistics() {
     console.log('matchshistory', matchHistory)
-    const rankedMatch = matchHistory.filter((match) => match.ranked === true);
+    const ranked = matchHistory.filter((match) => match.ranked === true);
 
-    statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
-    statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
-    statistics.totalGames = rankedMatch.length;
-    statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
-    statistics.averageWin.score = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
-    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
-    statistics.averageWin.opponentScore = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
-    .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
-    statistics.averageLose.score = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
-    .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
-    statistics.averageLose.opponentScore = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
-    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
+    statistics.wonGames = ranked.filter((match) => match.winnerId == pageUser.id).length;
+    statistics.lostGames = ranked.filter((match) => match.winnerId != pageUser.id).length;
+    statistics.totalGames = ranked.length;
+
+    // so we don't display 'NaN'
+    if (statistics.totalGames !== 0) {
+      statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
+      statistics.averageWin.score = +(ranked.filter((match) => match.winnerId === pageUser.id)
+      .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
+      statistics.averageWin.opponentScore = +(ranked.filter((match) => match.winnerId === pageUser.id)
+      .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+      statistics.averageLose.score = +(ranked.filter((match) => match.winnerId != pageUser.id)
+      .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
+      statistics.averageLose.opponentScore = +(ranked.filter((match) => match.winnerId != pageUser.id)
+      .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
+    }
+
     console.log('stats', statistics);
   }
 
@@ -69,21 +82,11 @@
 
 <div class="box-info">
   <div class="nav">
-    {#if tab === 'statistics'}
-      <button class="activeButton" on:click={() => tab = 'statistics'}>statistics</button>
-    {:else}
-      <button on:click={() => tab = 'statistics'}>statistics</button>
-    {/if}
-    {#if tab === 'games'}
-      <button class="activeButton" on:click={() => tab = 'games'}>game history</button>
-    {:else}
-      <button on:click={() => tab = 'games'}>game history</button>
-    {/if}
+    <button on:click={() => tab = Tab.Statistics} class={tab === Tab.Statistics ? 'activeButton' : undefined}>Statistics</button>
+    <button on:click={() => tab = Tab.GameHistory} class={tab === Tab.GameHistory ? 'activeButton' : undefined}>Game History</button>
   </div>
-  {#if tab === 'statistics'}
+  {#if tab === Tab.Statistics}
   <div class='overflow'>
-    <!--lOST GAME | WON GAME | TOTAL GAMES | GAME RATINO |
-    MMR | AVERAGE SCORE WHEN WIN | AVERAGE SCORE WHEN LOSE-->
     <div class="stat-grid">
       <div class="tiles">
         <h2>Total games</h2>

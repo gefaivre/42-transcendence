@@ -8,7 +8,15 @@
   import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
-  let friendspage: String = "Friends";
+
+  const enum Tab {
+    Friends,
+    Request,
+    Pending,
+    Blocked
+  }
+
+  let tab: Tab = Tab.Friends
 
   async function removeFriendByName(name: string) {
     try {
@@ -85,35 +93,16 @@
 <div class="box-info">
     {#if $id === pageUser.id.toString()}
       <div class="nav">
-        {#if friendspage == "Friends"}
-          <button class="activeButton" on:click={() => friendspage = "Friends"}>friends</button>
-        {:else}
-          <button on:click={() => friendspage = "Friends"}>friends</button>
-        {/if}
-
-        {#if friendspage == "Request"}
-          <button class="activeButton" on:click={() => friendspage = "Request"}>request</button>
-        {:else}
-          <button on:click={() => friendspage = "Request"}>request</button>
-        {/if}
-
-        {#if friendspage == "Pending"}
-          <button class="activeButton" on:click={() => friendspage = "Pending"}>pending</button>
-        {:else}
-          <button on:click={() => friendspage = "Pending"}>pending</button>
-        {/if}
-
-        {#if friendspage == "Blocked"}
-          <button class="activeButton" on:click={() => friendspage = "Blocked"}>blocked</button>
-        {:else}
-          <button on:click={() => friendspage = "Blocked"}>blocked</button>
-        {/if}
+        <button on:click={() => tab = Tab.Friends} class={tab === Tab.Friends ? 'activeButton' : undefined}>Friends</button>
+        <button on:click={() => tab = Tab.Request} class={tab === Tab.Request ? 'activeButton' : undefined}>Request</button>
+        <button on:click={() => tab = Tab.Pending} class={tab === Tab.Pending ? 'activeButton' : undefined}>Pending</button>
+        <button on:click={() => tab = Tab.Blocked} class={tab === Tab.Blocked ? 'activeButton' : undefined}>Blocked</button>
       </div>
     {:else}
       <h1>Friends</h1>
     {/if}
 
-    {#if friendspage == "Friends"}
+    {#if tab === Tab.Friends}
       <div class="overflow">
         <ul>
           {#each pageUser.friends as friend}
@@ -134,7 +123,7 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Request" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Request && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.requestFriends as requestFriends}
@@ -159,7 +148,7 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Pending" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Pending && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.pendingFriends as pendingFriends}
@@ -180,7 +169,7 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Blocked" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Blocked && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.blocked as blocked}
