@@ -194,15 +194,16 @@
   </div>
 
 <style>
+
   .box-info {
     border: solid 2px var(--grey);
     box-shadow: 0 0 10px var(--lite-grey);
     background-color: var(--lite-grey);
     border-radius: 20px;
-    height: 80%;
-    width: 80%;
     display: flex;
     flex-direction: column;
+    height: var(--panel-height);
+    width: var(--panel-width);
   }
 
   .pp {

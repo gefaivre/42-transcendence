@@ -204,6 +204,8 @@
 
 .ctn-infos {
   display: grid;
+  height: var(--panel-height);
+  width: var(--panel-width);
 }
 
 .ctn-title {
