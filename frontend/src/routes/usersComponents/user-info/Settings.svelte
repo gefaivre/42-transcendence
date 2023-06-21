@@ -1,5 +1,6 @@
 <script lang="ts">
 
+  import type { User } from "../../../types";
   import Images from "../user-settings/Images.svelte";
   import Password from "../user-settings/Password.svelte";
   import Twofa from "../user-settings/Twofa.svelte";
@@ -14,6 +15,8 @@
 
   let tab: Tab = Tab.Images
 
+  export let pageUser: User
+
 </script>
 
 <div class="box-info">
@@ -21,7 +24,9 @@
     <button on:click={() => tab = Tab.Images} class={tab === Tab.Images ? 'activeButton': undefined}>Images</button>
     <button on:click={() => tab = Tab.TwoFA} class={tab === Tab.TwoFA ? 'activeButton': undefined}>2FA</button>
     <button on:click={() => tab = Tab.Username} class={tab === Tab.Username ? 'activeButton': undefined}>Username</button>
+    {#if pageUser.ft_login === null}
     <button on:click={() => tab = Tab.Password} class={tab === Tab.Password ? 'activeButton': undefined}>Password</button>
+    {/if}
   </div>
 
   {#if tab === Tab.Images}
@@ -30,7 +35,7 @@
     <Twofa/>
   {:else if tab === Tab.Username}
     <Username/>
-  {:else if tab === Tab.Password}
+  {:else if tab === Tab.Password && pageUser.ft_login === null}
     <Password/>
   {:else}
     yolo

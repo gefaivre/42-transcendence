@@ -84,7 +84,7 @@
   <Stats bind:pageUser/>
 
   {#if pageUser.id.toString() === $id}
-    <Settings/>
+    <Settings bind:pageUser/>
   {/if}
 
 </div>
