@@ -24,6 +24,7 @@
       { label: 'LeaderBoard', icon: leaderboardIcon, link: '#/leaderboard'}
     ];
 
+    logged.set('false');
     $: getProfile()
 
     async function getProfile() {
