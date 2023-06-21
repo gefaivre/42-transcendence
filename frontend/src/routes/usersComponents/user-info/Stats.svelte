@@ -193,7 +193,7 @@
 
   .box-info {
     background-color: var(--lite-grey);
-    border-radius: 20px;
+    border-radius: var(--panel-radius);
     display: flex;
     flex-direction: column;
     height: var(--panel-height);
@@ -203,7 +203,7 @@
 .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 .stat-grid {
@@ -214,7 +214,7 @@
 }
 
 .stat-grid .tiles:last-child {
-  border-radius: 0 0 20px 0;
+  border-radius: 0 0 var(--panel-radius) 0;
 }
 
 .stat-grid .lite {
@@ -282,7 +282,7 @@ li:nth-child(2n + 1) {
 .box-info .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 .lineFriends {

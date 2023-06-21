@@ -98,6 +98,7 @@
     --imageRadius: 50%;
     --panel-height: 400px;
     --panel-width: 550px;
+    --panel-radius: 15px;
   }
 
   .screen {

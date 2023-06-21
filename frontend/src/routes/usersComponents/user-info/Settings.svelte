@@ -47,7 +47,7 @@
 
 .box-info {
   background-color: var(--lite-grey);
-  border-radius: 20px;
+  border-radius: var(--panel-radius);
   display: flex;
   flex-direction: column;
   height: var(--panel-height);

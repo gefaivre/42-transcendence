@@ -198,11 +198,11 @@
   }
 
   .left {
-    border-top-left-radius: 15px;
+    border-top-left-radius: var(--panel-radius);
   }
 
   .right {
-    border-top-right-radius: 15px;
+    border-top-right-radius: var(--panel-radius);
   }
 
   .nav button:not(:last-child) {
@@ -215,7 +215,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
     background-color: var(--lite-grey);
-    border-radius: 0 0 15px 15px;
+    border-radius: 0 0 var(--panel-radius) var(--panel-radius);
   }
 
   .title {
@@ -229,7 +229,7 @@
   .list {
     flex: 1;
     overflow: auto;
-    border-radius: 0 0 0px 15px;
+    border-radius: 0 0 0px var(--panel-radius);
   }
 
   *::-webkit-scrollbar {
@@ -254,8 +254,8 @@
   .disccus {
     height: 360px;
     background-color: var(--lite-grey);
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: var(--panel-radius);
+    border-bottom-right-radius: var(--panel-radius);
   }
 
   .disccus .void {
