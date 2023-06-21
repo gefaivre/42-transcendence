@@ -119,12 +119,12 @@
     height: 40px;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    background-color: var(--lite-lite-lite-grey);
+    background-color: var(--li-one);
     color: black;
   }
 
   li:nth-child(2n + 1) {
-    background-color: var(--lite-lite-grey);
+    background-color: var(--li-two);
   }
 
   .name {

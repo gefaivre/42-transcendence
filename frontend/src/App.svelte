@@ -85,15 +85,17 @@
   }
 
   :root {
-   --lite-lite-lite-grey: #acacac;
-   --lite-lite-grey: #888888;
-   --lite-grey: #707070;
-   --grey: #222222;
-   --black: black;
-   --white: white;
-   --orange: #f96d00;
-   --pink: rgb(255, 88, 171);
-   --imageRadius: 50%;
+    --li-one: #393939;
+    --li-two: #505050;
+    --lite-lite-lite-grey: #acacac;
+    --lite-lite-grey: #888888;
+    --lite-grey: #707070;
+    --grey: #222222;
+    --black: black;
+    --white: white;
+    --orange: #f96d00;
+    --pink: rgb(255, 88, 171);
+    --imageRadius: 50%;
   }
 
   .screen {

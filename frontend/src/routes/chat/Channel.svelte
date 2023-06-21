@@ -376,19 +376,14 @@
   }
 
   li {
-    display: block;
-  }
-
-
-  li {
     height: 40px;
     display: grid;
     grid-template-columns: 1fr;
-    background-color: var(--lite-lite-lite-grey);
+    background-color: var(--li-one);
   }
 
   li:nth-child(2n + 1) {
-    background-color: var(--lite-lite-grey);
+    background-color: var(--li-two);
   }
 
   .marquee-container {
