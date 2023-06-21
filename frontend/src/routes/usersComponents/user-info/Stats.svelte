@@ -82,8 +82,8 @@
 
 <div class="box-info">
   <div class="nav">
-    <button on:click={() => tab = Tab.Statistics} class={tab === Tab.Statistics ? 'activeButton' : undefined}>Statistics</button>
-    <button on:click={() => tab = Tab.GameHistory} class={tab === Tab.GameHistory ? 'activeButton' : undefined}>Game History</button>
+    <button on:click={() => tab = Tab.Statistics} class={tab === Tab.Statistics ? 'activeButton left' : 'left'}>Statistics</button>
+    <button on:click={() => tab = Tab.GameHistory} class={tab === Tab.GameHistory ? 'activeButton right' : 'right'}>Game History</button>
   </div>
   {#if tab === Tab.Statistics}
   <div class='overflow'>
@@ -191,10 +191,19 @@
 
 <style>
 
+  .box-info {
+    background-color: var(--lite-grey);
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    height: var(--panel-height);
+    width: var(--panel-width);
+  }
+
 .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 .stat-grid {
@@ -205,16 +214,18 @@
 }
 
 .stat-grid .tiles:last-child {
-  border-radius: 0 0 20px 0;
-}
-
-.stat-grid .lite {
-  background-color: var(--lite-lite-grey);
+  border-radius: 0 0 var(--panel-radius) 0;
 }
 
 .stat-grid .tiles {
   position: relative;
+  background-color: var(--li-two);
+
 }
+.stat-grid .lite {
+  background-color: var(--li-one);
+}
+
 
 .stat-grid .tiles h2 {
   position: absolute;
@@ -233,17 +244,6 @@
   font-size: 3em;
 }
 
-.box-info {
-  border: solid 2px var(--grey);
-  box-shadow: 0 0 10px var(--lite-grey);
-  background-color: var(--lite-grey);
-  border-radius: 20px;
-  height: 80%;
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-}
-
 .box-info .nav {
   height: 40px;
   display: flex;
@@ -251,17 +251,28 @@
 }
 
 .box-info .nav button {
-  border-bottom: solid 1px var(--black);
-  flex: auto;
-}
+    flex: auto;
+    font-family: Courier, monospace;
+    color: var(--orange);
+    background-color: var(--grey);
+  }
 
-.box-info .nav .activeButton {
-  border-bottom: none;
-}
+  .box-info .nav .activeButton {
+    text-decoration: underline;
 
-.box-info .nav button:not(:last-child) {
-  border-right: solid 1px var(--black);
-}
+  }
+
+  .box-info .nav button:not(:last-child) {
+    border-right: solid 1px var(--black);
+  }
+
+  .left {
+    border-top-left-radius: var(--panel-radius);
+  }
+
+  .right {
+    border-top-right-radius: var(--panel-radius);
+  }
 
 li {
   height: 40px;
@@ -284,7 +295,7 @@ li:nth-child(2n + 1) {
 .box-info .overflow {
   flex: 1;
   overflow: auto;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 .lineFriends {

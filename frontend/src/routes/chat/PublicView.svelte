@@ -46,11 +46,11 @@
 
 .create-pannel {
   background-color: var(--lite-grey);
-  border-radius: 15px;
+  border-radius: var(--panel-radius);
   display: grid;
   grid-template-rows: auto 1fr;
-  height: 400px;
-  width: 550px;
+  height: var(--panel-height);
+  width: var(--panel-width);
 }
 
 .title {
@@ -59,7 +59,7 @@
   background-color: var(--grey);
   justify-content: center;
   align-items: center;
-  border-radius: 15px 15px 0 0;
+  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
 
 }
 

@@ -21,11 +21,11 @@
 
 <div class="box-info">
   <div class="nav">
-    <button on:click={() => tab = Tab.Images} class={tab === Tab.Images ? 'activeButton': undefined}>Images</button>
+    <button on:click={() => tab = Tab.Images} class={tab === Tab.Images ? 'activeButton left': 'left'}>Images</button>
     <button on:click={() => tab = Tab.TwoFA} class={tab === Tab.TwoFA ? 'activeButton': undefined}>2FA</button>
     <button on:click={() => tab = Tab.Username} class={tab === Tab.Username ? 'activeButton': undefined}>Username</button>
     {#if pageUser.ft_login === null}
-    <button on:click={() => tab = Tab.Password} class={tab === Tab.Password ? 'activeButton': undefined}>Password</button>
+    <button on:click={() => tab = Tab.Password} class={tab === Tab.Password ? 'activeButton right': 'right'}>Password</button>
     {/if}
   </div>
 
@@ -46,14 +46,12 @@
 <style>
 
 .box-info {
-  border: solid 2px var(--grey);
-  box-shadow: 0 0 10px var(--lite-grey);
   background-color: var(--lite-grey);
-  border-radius: 20px;
-  height: 80%;
-  width: 80%;
+  border-radius: var(--panel-radius);
   display: flex;
   flex-direction: column;
+  height: var(--panel-height);
+  width: var(--panel-width);
 }
 
 .box-info .nav {
@@ -63,16 +61,27 @@
 }
 
 .box-info .nav button {
-  border-bottom: solid 1px var(--black);
-  flex: auto;
-}
+    flex: auto;
+    font-family: Courier, monospace;
+    color: var(--orange);
+    background-color: var(--grey);
+  }
 
-.box-info .nav .activeButton {
-  border-bottom: none;
-}
+  .box-info .nav .activeButton {
+    text-decoration: underline;
 
-.box-info .nav button:not(:last-child) {
-  border-right: solid 1px var(--black);
-}
+  }
+
+  .box-info .nav button:not(:last-child) {
+    border-right: solid 1px var(--black);
+  }
+
+  .left {
+    border-top-left-radius: var(--panel-radius);
+  }
+
+  .right {
+    border-top-right-radius: var(--panel-radius);
+  }
 
 </style>

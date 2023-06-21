@@ -93,10 +93,10 @@
 <div class="box-info">
     {#if $id === pageUser.id.toString()}
       <div class="nav">
-        <button on:click={() => tab = Tab.Friends} class={tab === Tab.Friends ? 'activeButton' : undefined}>Friends</button>
+        <button on:click={() => tab = Tab.Friends} class={tab === Tab.Friends ? 'activeButton left' : 'left'}>Friends</button>
         <button on:click={() => tab = Tab.Request} class={tab === Tab.Request ? 'activeButton' : undefined}>Request</button>
         <button on:click={() => tab = Tab.Pending} class={tab === Tab.Pending ? 'activeButton' : undefined}>Pending</button>
-        <button on:click={() => tab = Tab.Blocked} class={tab === Tab.Blocked ? 'activeButton' : undefined}>Blocked</button>
+        <button on:click={() => tab = Tab.Blocked} class={tab === Tab.Blocked ? 'activeButton right' : 'right'}>Blocked</button>
       </div>
     {:else}
       <h1>Friends</h1>
@@ -194,15 +194,14 @@
   </div>
 
 <style>
+
   .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
     background-color: var(--lite-grey);
-    border-radius: 20px;
-    height: 80%;
-    width: 80%;
+    border-radius: var(--panel-radius);
     display: flex;
     flex-direction: column;
+    height: var(--panel-height);
+    width: var(--panel-width);
   }
 
   .pp {
@@ -258,16 +257,27 @@
   }
 
   .box-info .nav button {
-    border-bottom: solid 1px var(--black);
     flex: auto;
+    font-family: Courier, monospace;
+    color: var(--orange);
+    background-color: var(--grey);
   }
 
   .box-info .nav .activeButton {
-    border-bottom: none;
+    text-decoration: underline;
+
   }
 
   .box-info .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
+  }
+
+  .left {
+    border-top-left-radius: var(--panel-radius);
+  }
+
+  .right {
+    border-top-right-radius: var(--panel-radius);
   }
 
   .actionsButton {

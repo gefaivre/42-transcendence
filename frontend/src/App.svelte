@@ -96,6 +96,9 @@
     --orange: #f96d00;
     --pink: rgb(255, 88, 171);
     --imageRadius: 50%;
+    --panel-height: 400px;
+    --panel-width: 550px;
+    --panel-radius: 15px;
   }
 
   .screen {
