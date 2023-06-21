@@ -30,7 +30,7 @@
 <div class="create-pannel">
 
   <div class="title">
-    <h1>view all Channel</h1>
+    <h1>All channels</h1>
   </div>
 
   <div class="view">

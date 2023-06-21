@@ -199,9 +199,9 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Shearch</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Search</button>
     {:else}
-      <button class="left" on:click={() => tab = "find"}>Shearch</button>
+      <button class="left" on:click={() => tab = "find"}>Search</button>
     {/if}
 
     {#if tab == "channel"}
@@ -214,7 +214,7 @@
   {#if tab == "find"}
     <div class="find">
       <div class="title">
-        <h2>Your channel</h2>
+        <h2>Your channels</h2>
       </div>
       <div class="list">
         <ul class="friends-list">
