@@ -9,8 +9,6 @@
 
   export let params: any;
 
-  const name = params.name;
-
   let isBlocked: boolean = false;
   let onlineStatus: Status = null;
 
@@ -45,32 +43,33 @@
 
   async function getUser() {
     try {
-      let response = await axios.get("/auth/whoami");
+      const response = await axios.get("/auth/whoami");
       user.set(response.data);
-      console.log($user);
       logged.set("true");
       id.set(response.data.id.toString());
-      isBlocked = pageUser.blockedBy.some(
-        (blocked: any) => blocked.id.toString() === $id
-      );
+      isBlocked = pageUser.blockedBy.some(blocked => blocked.id.toString() === $id)
     } catch (e) {
       logged.set("false");
       id.set("0");
     }
   }
 
-  async function getprofile(): Promise<User> {
-    return (await axios.get(`/users/${params.name}`)).data;
-  }
-
   async function selectprofile() {
-    if (params.name != $user.username) {
-      pageUser = await getprofile();
-      console.log(pageUser);
+
+    if (params.name == $user.username) {
+      pageUser = $user
+      return
+    }
+
+    try {
+      const response = await axios.get(`/users/${params.name}`)
+      pageUser = response.data
       $socket.emit('getOnlineStatus', pageUser.username, (response: Status) => {
         onlineStatus = response
       })
-    } else pageUser = $user;
+    } catch(e) {
+      console.log(e)
+    }
   }
 
 </script>

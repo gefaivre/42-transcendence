@@ -109,7 +109,7 @@ export class ChannelController {
     }
   }
 
- @Patch(':channelName/revoke/:userId')
+  @Patch(':channelName/revoke/:userId')
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel
@@ -159,4 +159,8 @@ export class ChannelController {
     }
   }
 
+  @Patch('join/:channelName')
+  async joinChannel(@Param('channelName') channelName: string, @Req() req: any) {
+    return this.channel.addUserToChannel(channelName, req.user.id);
+  }
 }

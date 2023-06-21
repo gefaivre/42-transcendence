@@ -100,9 +100,9 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Shearch</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Search</button>
     {:else}
-      <button class="left" on:click={() => tab = "find"}>Shearch</button>
+      <button class="left" on:click={() => tab = "find"}>Search</button>
     {/if}
 
     {#if tab == "dm"}

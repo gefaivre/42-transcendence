@@ -19,14 +19,18 @@
     }
 
     async function joinChannel(channelName: string) {
-      axios.post('http://localhost:3000/chat', {channelName: channelName});
+      try {
+        await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
+      } catch(e) {
+        console.log(e)
+      }
     }
 </script>
 
 <div class="create-pannel">
 
   <div class="title">
-    <h1>view all Channel</h1>
+    <h1>All channels</h1>
   </div>
 
   <div class="view">
