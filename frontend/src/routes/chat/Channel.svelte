@@ -322,8 +322,8 @@
   border-radius: 15px;
   display: grid;
   grid-template-rows: auto 1fr;
-  height: 400px;
-  width: 550px;
+  height: var(--panel-height);
+  width: var(--panel-width);
 }
 
 .nav {

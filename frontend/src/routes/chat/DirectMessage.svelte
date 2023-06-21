@@ -175,8 +175,8 @@
     display: flex;
     flex-direction: column;
     box-sizing: content-box;
-    height: 400px;
-    width: 550px;
+    height: var(--panel-height);
+    width: var(--panel-width);
   }
 
   .nav {
