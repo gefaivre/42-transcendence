@@ -147,7 +147,11 @@
               {/await}
             </span>
             {#if match.ranked}
-              <span>R</span>
+              <span>
+                <div class="badge badgs-xs badge-ghost">
+                  ranked
+                </div>
+              </span>
             {:else}
               <span />
             {/if}
@@ -169,7 +173,11 @@
               {/await}
             </span>
             {#if match.ranked}
-              <span>R</span>
+              <span>
+                <div class="badge badgs-xs badge-ghost">
+                  ranked
+                </div>
+              </span>
             {:else}
               <span />
             {/if}
