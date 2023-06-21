@@ -33,20 +33,25 @@
 
   function getStatistics() {
     console.log('matchshistory', matchHistory)
-    const rankedMatch = matchHistory.filter((match) => match.ranked === true);
+    const ranked = matchHistory.filter((match) => match.ranked === true);
 
-    statistics.wonGames = rankedMatch.filter((match) => match.winnerId == pageUser.id).length;
-    statistics.lostGames = rankedMatch.filter((match) => match.winnerId != pageUser.id).length;
-    statistics.totalGames = rankedMatch.length;
-    statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
-    statistics.averageWin.score = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
-    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
-    statistics.averageWin.opponentScore = +(rankedMatch.filter((match) => match.winnerId === pageUser.id)
-    .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
-    statistics.averageLose.score = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
-    .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
-    statistics.averageLose.opponentScore = +(rankedMatch.filter((match) => match.winnerId != pageUser.id)
-    .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
+    statistics.wonGames = ranked.filter((match) => match.winnerId == pageUser.id).length;
+    statistics.lostGames = ranked.filter((match) => match.winnerId != pageUser.id).length;
+    statistics.totalGames = ranked.length;
+
+    // so we don't display 'NaN'
+    if (statistics.totalGames !== 0) {
+      statistics.ratioGames = +((statistics.wonGames / statistics.totalGames) *100).toFixed(2);
+      statistics.averageWin.score = +(ranked.filter((match) => match.winnerId === pageUser.id)
+      .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.wonGames).toFixed(2);
+      statistics.averageWin.opponentScore = +(ranked.filter((match) => match.winnerId === pageUser.id)
+      .reduce((sum, match) => sum + match.loserScore, 0) / statistics.wonGames).toFixed(2);
+      statistics.averageLose.score = +(ranked.filter((match) => match.winnerId != pageUser.id)
+      .reduce((sum, match) => sum + match.loserScore, 0) /statistics.lostGames).toFixed(2);
+      statistics.averageLose.opponentScore = +(ranked.filter((match) => match.winnerId != pageUser.id)
+      .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
+    }
+
     console.log('stats', statistics);
   }
 
