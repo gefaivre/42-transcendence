@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Channel, ChannelDto, User } from "../../types";
-    import axios from "../../axios.config";
-    import { ChannelStatus } from '../../types';
 
+  import type { Channel, ChannelDto } from "../../types";
+  import axios from "../../axios.config";
+  import { ChannelStatus } from '../../types';
 
   let channels: Channel[] = []
 
@@ -45,7 +45,7 @@
     }
   }
 
-async function create() {
+  async function create() {
     if (!channel.channelName)
       return alert('Empty channel name')
     if (!channel.status)
@@ -73,22 +73,27 @@ async function create() {
   </div>
 
   <div class="create">
-
-
     <fieldset>
-      <legend>Add Channel</legend><br>
-      <input type=radio bind:group={channel.status} value={ChannelStatus.Public}>Public &#9989<br>
-      <input type=radio bind:group={channel.status} value={ChannelStatus.Private}>Private &#9940<br>
-      <input type=radio bind:group={channel.status} value={ChannelStatus.Protected}>Protected &#128273<br>
-      <input type="text" bind:value={channel.channelName} placeholder="channel name">
-      <button on:click={create}>Add</button>
+      <input type="text" class="input input-sm inpput-bordered" bind:value={channel.channelName} placeholder="channel name">
+      <br>
+      <br>
+      <select class="select select-sm select-bordered" bind:value={channel.status}>
+        <option value={ChannelStatus.Public} selected>Public</option>
+        <option value={ChannelStatus.Private}>Private</option>
+        <option value={ChannelStatus.Protected}>Protected</option>
+      </select>
       {#if channel.status == ChannelStatus.Protected}
-      <input type="text" bind:value={channel.password} placeholder="password">
+        <br>
+        <br>
+        <input type="text" class="input input-sm input-bordered" bind:value={channel.password} placeholder="password">
       {/if}
+      <br>
+      <br>
+      <button class="btn btn-sm" on:click={create}>Create</button>
     </fieldset>
+  </div>
 
-  </div>
-  </div>
+</div>
 
 <style>
 
@@ -99,9 +104,7 @@ async function create() {
   grid-template-rows: auto 1fr;
   height: 400px;
   width: 550px;
-
 }
-
 
 .title {
   display: flex;
@@ -110,19 +113,17 @@ async function create() {
   justify-content: center;
   align-items: center;
   border-radius: 15px 15px 0 0;
-
-
 }
 
 h1 {
-    font-family: Courier, monospace;
-    color: var(--orange);
+  font-family: Courier, monospace;
+  color: var(--orange);
 }
 
- .create {
-   display: flex;
-   justify-content: center;
-   align-items: center;
- }
+.create {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 </style>
