@@ -19,7 +19,11 @@
     }
 
     async function joinChannel(channelName: string) {
-      axios.post('http://localhost:3000/chat', {channelName: channelName});
+      try {
+        await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
+      } catch(e) {
+        console.log(e)
+      }
     }
 </script>
 
