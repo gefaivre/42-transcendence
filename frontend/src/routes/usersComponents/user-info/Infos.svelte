@@ -148,7 +148,7 @@
   </div>
   <br>
 	{#if pageUser.id.toString() === $id}
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => logout()}>Logout</button>
+    <button class="btn" on:click={() => logout()}>Logout</button>
   {:else}
     <!-- online status -->
 		{#if onlineStatus === Status.offline}

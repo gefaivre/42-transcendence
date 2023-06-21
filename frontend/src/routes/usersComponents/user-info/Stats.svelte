@@ -82,8 +82,8 @@
 
 <div class="box-info">
   <div class="nav">
-    <button on:click={() => tab = Tab.Statistics} class={tab === Tab.Statistics ? 'activeButton' : undefined}>Statistics</button>
-    <button on:click={() => tab = Tab.GameHistory} class={tab === Tab.GameHistory ? 'activeButton' : undefined}>Game History</button>
+    <button on:click={() => tab = Tab.Statistics} class={tab === Tab.Statistics ? 'activeButton left' : 'left'}>Statistics</button>
+    <button on:click={() => tab = Tab.GameHistory} class={tab === Tab.GameHistory ? 'activeButton right' : 'right'}>Game History</button>
   </div>
   {#if tab === Tab.Statistics}
   <div class='overflow'>
@@ -217,13 +217,15 @@
   border-radius: 0 0 var(--panel-radius) 0;
 }
 
-.stat-grid .lite {
-  background-color: var(--lite-lite-grey);
-}
-
 .stat-grid .tiles {
   position: relative;
+  background-color: var(--li-two);
+
 }
+.stat-grid .lite {
+  background-color: var(--li-one);
+}
+
 
 .stat-grid .tiles h2 {
   position: absolute;
@@ -249,17 +251,28 @@
 }
 
 .box-info .nav button {
-  border-bottom: solid 1px var(--black);
-  flex: auto;
-}
+    flex: auto;
+    font-family: Courier, monospace;
+    color: var(--orange);
+    background-color: var(--grey);
+  }
 
-.box-info .nav .activeButton {
-  border-bottom: none;
-}
+  .box-info .nav .activeButton {
+    text-decoration: underline;
 
-.box-info .nav button:not(:last-child) {
-  border-right: solid 1px var(--black);
-}
+  }
+
+  .box-info .nav button:not(:last-child) {
+    border-right: solid 1px var(--black);
+  }
+
+  .left {
+    border-top-left-radius: var(--panel-radius);
+  }
+
+  .right {
+    border-top-right-radius: var(--panel-radius);
+  }
 
 li {
   height: 40px;
