@@ -196,8 +196,6 @@
 <style>
 
   .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
     background-color: var(--lite-grey);
     border-radius: 20px;
     display: flex;
