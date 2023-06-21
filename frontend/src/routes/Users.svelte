@@ -101,7 +101,7 @@
     overflow-y: scroll;
   }
 
-  @media screen and (max-width: 1200px) {
+  @media screen and (max-width: 1300px) {
     .component {
       grid-template-columns: 1fr;
       grid-template-rows: 1fr;
