@@ -4,11 +4,9 @@
   import axios from "../../../axios.config";
   import type { Match, Stat, User } from "../../../types";
   import { handleImageError } from "../../../utils";
-    import Settings from "./Settings.svelte";
 
   export let pageUser: User;
 
-  // let tab: string = 'statistics'
   let opponent: any;
   let matchHistory: Match[] = [];
 
