@@ -28,9 +28,11 @@
   <br>
   <br>
   <h1>Change your password</h1>
+  <br>
+  <br>
   <div class="content">
-    <input type="text" placeholder="new username" class="input-bordered w-full max-w-xs" />
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={() => updatePassword()}>Update</button>
+    <input bind:value={password} type="text" placeholder="new password" class="input input-sm input-bordered" />
+    <button class="btn btn-sm" on:click={() => updatePassword()}>Update</button>
   </div>
 </div>
 
