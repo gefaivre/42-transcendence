@@ -8,6 +8,8 @@
   import type { Socket } from "socket.io-client";
   import { type Channel, type PostEmitDto, type ChannelDto, type WsException, ChannelStatus } from "../../types";
   import lockedIcon from '../../assets/lock.svg'
+  import publicIcon from '../../assets/public.svg'
+  import privateIcon from '../../assets/private.svg'
 
   let socket: Socket = null
   let message: string = ''
@@ -221,7 +223,11 @@
             {#if channel}
             <span>
               {#if channel.status === ChannelStatus.Protected}
-                <img src={lockedIcon} alt='' width="30" height="30"/>
+                <img src={lockedIcon} alt='protected' width="30" height="30"/>
+              {:else if channel.status === ChannelStatus.Public}
+                <img src={publicIcon} alt='public' width="30" height="30"/>
+              {:else if channel.status === ChannelStatus.Private}
+                <img src={privateIcon} alt='private' width="30" height="30"/>
               {/if}
             </span>
             <span>

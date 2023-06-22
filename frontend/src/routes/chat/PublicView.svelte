@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { tick } from "svelte";
   import axios from "../../axios.config";
   import { user } from "../../stores";
   import { ChannelStatus, type ChannelDto } from "../../types";
   import { toast } from '@zerodevx/svelte-toast/dist'
+  import lockedIcon from '../../assets/lock.svg'
+  import publicIcon from '../../assets/public.svg'
 
   export let channels: any[]
 
@@ -37,14 +38,16 @@
   <div class="list">
     <ul>
     {#each channels as channel}
-      {#if channel.users.some(_user => _user.username === $user.username) === false}
+      {#if channel.status !== ChannelStatus.Private && channel.users.some(_user => _user.username === $user.username) === false}
       <li class="lineFriends">
         <span>
           {channel.name}
         </span>
         <span>
         {#if channel.status === ChannelStatus.Protected}
-          <input type="text" class="input input-xs" bind:value={password} placeholder="password" disabled>
+          <img src={lockedIcon} alt='protected' width="30" height="30"/>
+        {:else if channel.status === ChannelStatus.Public}
+          <img src={publicIcon} alt='public' width="30" height="30"/>
         {/if}
         </span>
         <span>
@@ -90,7 +93,7 @@ h1 {
 
 .lineFriends {
   display: grid;
-  grid-template-columns: 4fr 2fr 1fr;
+  grid-template-columns: 5fr 1fr 1fr;
 }
 
 .lineFriends span {
