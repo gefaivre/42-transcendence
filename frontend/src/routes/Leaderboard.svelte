@@ -125,7 +125,10 @@
 	th {
 		border-bottom: 1px solid #303030;
     background-color:var(--lite-grey);
-		padding: 10px;
+		padding-left: 2em;
+		padding-right: 2em;
+    padding-top:0.2em;
+    padding-bottom:0.2em;
 	}
 
 	tr:nth-child(even) {
