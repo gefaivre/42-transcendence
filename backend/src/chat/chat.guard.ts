@@ -53,7 +53,7 @@ export class ChatGuard implements CanActivate {
 
       // verify channel password
       else if (channel.status === 'Protected') {
-        if (await this.chat.verifyPassword(channel.channelName, channel.password) === false) {
+        if (await this.channel.verifyPassword(channel.channelName, channel.password) === false) {
           this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.WrongChannelPassword)
         }
       }

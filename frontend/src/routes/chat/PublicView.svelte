@@ -2,19 +2,28 @@
   import { tick } from "svelte";
   import axios from "../../axios.config";
   import { user } from "../../stores";
-  import lockedIcon from '../../assets/lock.svg'
-  import { ChannelStatus } from "../../types";
+  import { ChannelStatus, type ChannelDto } from "../../types";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   export let channels: any[]
 
-  async function joinChannel(channelName: string) {
+  let password: string = null
+
+  async function joinChannel(channel: any) {
+
+    if (channel.status === ChannelStatus.Protected) {
+      password = prompt('Enter password')
+    }
+
     try {
-      await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
-      channels.splice(channels.findIndex(channel => channel.name === channelName))
-      channels = channels
-      tick()
+      await axios.patch(`http://localhost:3000/channel/join`, {
+        channelName: channel.name,
+        password: password,
+        status: channel.status
+      } as ChannelDto)
+      toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 </script>
@@ -35,11 +44,11 @@
         </span>
         <span>
         {#if channel.status === ChannelStatus.Protected}
-          <img src={lockedIcon} alt='' width="30" height="30"/>
+          <input type="text" class="input input-xs" bind:value={password} placeholder="password" disabled>
         {/if}
         </span>
         <span>
-          <button class="btn btn-xs" on:click={() => joinChannel(channel.name)}>join</button>
+          <button class="btn btn-xs" on:click={() => joinChannel(channel)}>join</button>
         </span>
       </li>
       {/if}
@@ -81,7 +90,7 @@ h1 {
 
 .lineFriends {
   display: grid;
-  grid-template-columns: 4fr 1fr 1fr 1fr;
+  grid-template-columns: 4fr 2fr 1fr;
 }
 
 .lineFriends span {

@@ -6,7 +6,7 @@ import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
-import { Prisma } from '@prisma/client';
+import { ChannelStatus, Prisma } from '@prisma/client';
 
 @Controller('channel')
 @UseGuards(AuthGuard('jwt'))
@@ -159,9 +159,12 @@ export class ChannelController {
     }
   }
 
-  @Patch('join/:channelName')
-  async joinChannel(@Param('channelName') channelName: string, @Req() req: any) {
-    return this.channel.addUserToChannel(channelName, req.user.id);
+  @Patch('join')
+  async joinChannel(@Body() channel: ChannelDto, @Req() req: any) {
+    if (channel.status === ChannelStatus.Protected)
+      if (await this.channel.verifyPassword(channel.channelName, channel.password) === false)
+        throw new UnauthorizedException('wrong password')
+    return this.channel.addUserToChannel(channel.channelName, req.user.id);
   }
 
   @Patch('leave/:channelName')

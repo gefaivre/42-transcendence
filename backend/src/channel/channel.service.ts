@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelService {
@@ -186,6 +187,13 @@ export class ChannelService {
         }
       }
     })
+  }
+
+  async verifyPassword(channelName: string, password: string): Promise<boolean> {
+    const channel = await this.findByName(channelName)
+    if (channel === null)
+      return false
+    return bcrypt.compare(password, channel.password)
   }
 
 }
