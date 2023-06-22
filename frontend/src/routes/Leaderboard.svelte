@@ -132,7 +132,11 @@
 		background-color: #eee;
 	}
 
-	.clickable {
+	.clickable:hover {
+    text-decoration:underline;
+	}
+
+	.user:hover {
     text-decoration:underline;
 	}
 
