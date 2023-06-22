@@ -263,15 +263,18 @@
     background-color: var(--grey);
   }
 
-  .box-info .nav .activeButton {
+  .box-info .nav button:hover {
     text-decoration: underline;
-
   }
+  k
 
   .box-info .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
 
+  .box-info .nav .activeButton {
+    font-weight:bold;
+  }
   .left {
     border-top-left-radius: var(--panel-radius);
   }

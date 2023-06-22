@@ -67,9 +67,11 @@
     background-color: var(--grey);
   }
 
-  .box-info .nav .activeButton {
+  .box-info .nav button:hover {
     text-decoration: underline;
-
+  }
+  .box-info .nav .activeButton {
+    font-weight:bold;
   }
 
   .box-info .nav button:not(:last-child) {
