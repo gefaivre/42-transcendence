@@ -99,7 +99,7 @@
         <button on:click={() => tab = Tab.Blocked} class={tab === Tab.Blocked ? 'activeButton right' : 'right'}>Blocked</button>
       </div>
     {:else}
-      <h1>Friends</h1>
+      <h2>Friends</h2>
     {/if}
 
     {#if tab === Tab.Friends}
@@ -211,9 +211,17 @@
     border-radius: 50%;
   }
 
-  h1 {
+  /* same into Pong.svelte */
+  h2 {
+    font-family: Courier, monospace;
+    border-top-right-radius:10px;
+    border-top-left-radius:10px;
+    background-color:var(--grey);
+    font-size:1.3em;
+    color:var(--orange);
+    font-weight:bold;
+    margin-bottom:1em;
     height: 40px;
-    border-bottom: solid 1px black;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -266,7 +274,6 @@
   .box-info .nav button:hover {
     text-decoration: underline;
   }
-  k
 
   .box-info .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
