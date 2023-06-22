@@ -42,11 +42,11 @@
 
 <table>
 	<thead>
-		<tr>
-			<th>Rank</th>
-			<th>User</th>
-			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
-			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
+		<tr class="titles">
+			<th class="title">Rank</th>
+			<th class="title">User</th>
+			<th class="title"><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
+			<th class="title"><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -82,11 +82,21 @@
 <style>
 
   table {
+    color:white;
     margin: auto;
   }
 
   .join {
 		text-align: center;
+  }
+  
+  .titles {
+		color: var(--orange);
+    font-family: Courier, monospace;
+  }
+
+  .title{
+    background-color:var(--grey);
   }
 
 	td {
@@ -96,6 +106,7 @@
 	td,
 	th {
 		border: 1px solid rgb(190, 190, 190);
+    background-color:var(--lite-grey);
 		padding: 10px;
 	}
 
@@ -104,7 +115,7 @@
 	}
 
 	.clickable {
-		color: blue;
+    text-decoration:underline;
 	}
 
 	tbody tr:nth-child(1) > td:nth-child(1) {
