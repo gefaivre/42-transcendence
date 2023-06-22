@@ -163,4 +163,9 @@ export class ChannelController {
   async joinChannel(@Param('channelName') channelName: string, @Req() req: any) {
     return this.channel.addUserToChannel(channelName, req.user.id);
   }
+
+  @Patch('leave/:channelName')
+  async leaveChannel(@Param('channelName') channelName: string, @Req() req: any) {
+    return this.channel.leave(channelName, req.user.id);
+  }
 }

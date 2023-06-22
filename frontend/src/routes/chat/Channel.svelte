@@ -30,6 +30,14 @@
 
   onDestroy(() => closeSocket())
 
+  async function _leaveChannel(name: string) {
+    try {
+      await axios.patch(`/channel/leave/${name}`)
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   function closeSocket() {
     if (socket){
       socket.disconnect()
@@ -228,7 +236,7 @@
               </div>
             </span>
             <span>
-              <button class="btn btn-xs">
+              <button class="btn btn-xs" on:click={() => _leaveChannel(channel.name)}>
                 leave
               </button>
             </span>
