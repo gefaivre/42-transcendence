@@ -333,6 +333,7 @@
     flex: auto;
     font-family: Courier, monospace;
     color: var(--orange);
+    font-size:1.2em;
     background-color: var(--grey);
   }
 

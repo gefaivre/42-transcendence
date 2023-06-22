@@ -71,6 +71,7 @@ h1 {
     font-family: Courier, monospace;
     color: var(--orange);
     font-weight:bold;
+    font-size:1.2em;
 }
 
  .view {

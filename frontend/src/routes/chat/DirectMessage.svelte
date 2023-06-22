@@ -190,6 +190,7 @@
     font-family: Courier, monospace;
     color: var(--orange);
     background-color: var(--grey);
+    font-size:1.2em;
   }
 
   .nav button:hover {

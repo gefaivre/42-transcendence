@@ -323,6 +323,7 @@ h3 {
   font-size:1.1em;
   font-family: Courier, monospace;
   color:var(--orange);
+  font-weight:bold;
   margin-top:1.2em;
 }
 
