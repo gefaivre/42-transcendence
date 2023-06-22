@@ -1,43 +1,40 @@
 <script lang="ts">
   import axios from "../../axios.config";
-  import type { User } from "../../types";
-  import ChatPanel from "./ChatPanel.svelte";
-  import { onMount } from "svelte";
   import PublicView from "./PublicView.svelte";
   import Create from "./Create.svelte";
   import DirectMessage from "./DirectMessage.svelte";
   import Channel from "./Channel.svelte";
 
-  export let params: any = [];
-  let user: User;
+  let channels: any[] = []
 
-  onMount(() => getProfile())
-
-  async function getProfile() {
-    console.log(params)
+  async function getAllChannels() {
     try {
-      const response = await axios.get('/auth/whoami')
-      user = response.data;
-    }
-    catch (e) {
+      const response = await axios.get('/channel')
+      channels = response.data
+    } catch(e) {
+      console.log(e)
     }
   }
 
 </script>
-  
+
   <h1>Chat</h1>
+
+  {#await getAllChannels() then _}
 
   <div class="component">
 
-    <DirectMessage bind:user/>
+    <DirectMessage/>
 
-    <Channel/>
+    <Channel bind:channels/>
 
     <Create/>
 
-    <PublicView/>
+    <PublicView bind:channels/>
 
   </div>
+
+  {/await}
 
 <style>
 

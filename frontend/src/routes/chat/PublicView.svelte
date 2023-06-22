@@ -1,30 +1,22 @@
 <script lang="ts">
-    import axios from "../../axios.config";
-    import { onMount } from "svelte";
-    import type { Channel} from "../../types";
+  import { tick } from "svelte";
+  import axios from "../../axios.config";
+  import { user } from "../../stores";
+  import lockedIcon from '../../assets/lock.svg'
+  import { ChannelStatus } from "../../types";
 
+  export let channels: any[]
 
-
-    let channels: Channel[] = [];
-
-    onMount(() => getAll())
-
-    async function getAll() {
-      try {
-        channels = (await axios.get('/channel')).data
-        console.log(channels)
-      } catch (e) {
-        console.log(e.response.data.message)
-      }
+  async function joinChannel(channelName: string) {
+    try {
+      await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
+      channels.splice(channels.findIndex(channel => channel.name === channelName))
+      channels = channels
+      tick()
+    } catch(e) {
+      console.log(e)
     }
-
-    async function joinChannel(channelName: string) {
-      try {
-        await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
-      } catch(e) {
-        console.log(e)
-      }
-    }
+  }
 </script>
 
 <div class="create-pannel">
@@ -33,18 +25,29 @@
     <h1>All channels</h1>
   </div>
 
-  <div class="view">
-
+  <div class="list">
     <ul>
-      {#each channels as channel}
-        <li>
-        <p><span>{channel.name}</span><button class="btn btn-sm" on:click={() => joinChannel(channel.name)}>join</button></p>
-        </li>
-      {/each}
+    {#each channels as channel}
+      {#if channel.users.some(_user => _user.username === $user.username) === false}
+      <li class="lineFriends">
+        <span>
+          {channel.name}
+        </span>
+        <span>
+        {#if channel.status === ChannelStatus.Protected}
+          <img src={lockedIcon} alt='' width="30" height="30"/>
+        {/if}
+        </span>
+        <span>
+          <button class="btn btn-xs" on:click={() => joinChannel(channel.name)}>join</button>
+        </span>
+      </li>
+      {/if}
+    {/each}
     </ul>
+  </div>
 
-  </div>
-  </div>
+</div>
 
 <style>
 
@@ -64,49 +67,42 @@
   justify-content: center;
   align-items: center;
   border-radius: var(--panel-radius) var(--panel-radius) 0 0;
-
 }
 
 h1 {
-    font-family: Courier, monospace;
-    color: var(--orange);
-    font-weight:bold;
-    font-size:1.2em;
+  font-family: Courier, monospace;
+  color: var(--orange);
 }
 
- .view {
-   height: 360px;
-   overflow: auto;
- }
-
-button {
-  float: right;
-  margin-right: 5em;
+.list {
+  flex: 1;
+  overflow: auto;
 }
 
-span {
-  float: left;
-  margin-left:5em;
+.lineFriends {
+  display: grid;
+  grid-template-columns: 4fr 1fr 1fr 1fr;
 }
 
+.lineFriends span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  li {
-    height: 40px;
-    display: grid;
-    grid-template-columns: 1fr;
-    padding-top: 0.2em; 
-    color: var(--lite-lite-grey);
-    font-weight:bold;
-    background-color: var(--li-one);
-  }
+li {
+  height: 40px;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: var(--li-one);
+}
 
-  li:nth-child(2n + 1) {
-    background-color: var(--li-two);
-  }
+li:nth-child(2n + 1) {
+  background-color: var(--li-two);
+}
 
- *::-webkit-scrollbar {
-    display: none;
-  }
-
+*::-webkit-scrollbar {
+  display: none;
+}
 
 </style>

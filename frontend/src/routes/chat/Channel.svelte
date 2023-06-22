@@ -2,11 +2,12 @@
 
   import axios from "../../axios.config";
   import { onDestroy, onMount } from "svelte";
-  import { logged, id, user } from "../../stores";
+  import { id, user } from "../../stores";
   import { pop } from "svelte-spa-router";
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
-  import type { Channel, PostEmitDto, ChannelDto, WsException } from "../../types";
+  import { type Channel, type PostEmitDto, type ChannelDto, type WsException, ChannelStatus } from "../../types";
+  import lockedIcon from '../../assets/lock.svg'
 
   let socket: Socket = null
   let message: string = ''
@@ -17,22 +18,17 @@
   let isMember: boolean = false
   let posts: PostEmitDto[] = []
   let channelName: string = null;
-  let listChannel: string[] = [];
+  let listChannel: any[] = [];
   let tab:string = "find";
   let chatbox: any
 
-  onMount(() => getChannels())
+  export let channels: any[]
+
+  onMount(() => {
+    listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
+  })
 
   onDestroy(() => closeSocket())
-
-  async function getChannels() {
-    try {
-      const response = await axios.get('/users/me/channel');
-      listChannel = response.data;
-    } catch (e) {
-      console.log(e.response.data.message)
-    }
-  }
 
   function closeSocket() {
     if (socket){
@@ -180,20 +176,16 @@
       }
     })
 
-  }//fin
+  }
 
-  function connectChannel(channel: string)
-  {
+  function connectChannel(channel: string) {
     channelName = channel;
     setup(channel);
     tab = "channel";
     console.log("yes");
   }
 
-
-  </script>
-
-
+</script>
 
 <div class="chat-channel">
 
@@ -214,9 +206,34 @@
   {#if tab == "find"}
     <div class="find">
       <div class="list">
-        <ul class="friends-list">
+        <ul>
           {#each listChannel as channel}
-          <li class="channelName"><button on:click={() => connectChannel(channel)}>{channel}</button></li>
+          <li class="lineFriends">
+            <button on:click={() => connectChannel(channel.name)}>{channel.name}</button>
+            {#if channel}
+            <span>
+              {#if channel.status === ChannelStatus.Protected}
+                <img src={lockedIcon} alt='' width="30" height="30"/>
+              {/if}
+            </span>
+            <span>
+              <div class="badge badgs-xs badge-ghost">
+              {#if channel.owner.id === $user.id}
+                owner
+              {:else if channel.admins.some(admin => admin.username === $user.username)}
+                admin
+              {:else}
+                member
+              {/if}
+              </div>
+            </span>
+            <span>
+              <button class="btn btn-xs">
+                leave
+              </button>
+            </span>
+            {/if}
+          </li>
         {/each}
         </ul>
       </div>
@@ -307,8 +324,8 @@
         <button type="submit">send</button>
       </form>
     {/if}
-  {/if}
 
+  {/if}
 
 </div>
 
@@ -324,91 +341,86 @@
 }
 
 .nav {
-    height: 40px;
-    display: flex;
-    justify-content: space-around;
-  }
+  height: 40px;
+  display: flex;
+  justify-content: space-around;
+}
 
-  .nav button {
-    flex: auto;
-    font-family: Courier, monospace;
-    color: var(--orange);
-    font-size:1.2em;
-    background-color: var(--grey);
-  }
+.nav button {
+  flex: auto;
+  font-family: Courier, monospace;
+  color: var(--orange);
+  background-color: var(--grey);
+}
 
-  .nav .activeButton {
-    background-color: none;
-    font-weight:bold;
-  }
+.nav .activeButton {
+  background-color: none;
+  text-decoration: underline;
+}
 
-  .nav button:hover {
-    text-decoration: underline;
-  }
+.left {
+  border-top-left-radius: 15px;
+}
 
+.right {
+  border-top-right-radius: 15px;
+}
 
+.nav button:not(:last-child) {
+  border-right: solid 1px var(--black);
+}
 
-  .left {
-    border-top-left-radius: 15px;
-  }
+.find {
+  height: 360px;
+  background-color: var(--lite-grey);
+  border-radius: 0 0 15px 15px;
+}
 
-  .right {
-    border-top-right-radius: 15px;
-  }
+.list {
+  flex: 1;
+  overflow: auto;
+}
 
-  .nav button:not(:last-child) {
-    border-right: solid 1px var(--black);
-  }
+li {
+  height: 40px;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: var(--li-one);
+}
 
-  .find {
-    height: 360px;
-    background-color: var(--lite-grey);
-    border-radius: 0 0 15px 15px;
-  }
+li:nth-child(2n + 1) {
+  background-color: var(--li-two);
+}
 
-  .list {
-    flex: 1;
-    overflow: auto;
-  }
+.lineFriends {
+  display: grid;
+  grid-template-columns: 4fr 1fr 1fr 1fr;
+}
 
-  li {
-    height: 40px;
-    display: grid;
-    grid-template-columns: 1fr;
-    background-color: var(--li-one);
-  }
-  
-  .channelName {
-    color: var(--lite-lite-grey);
-    font-weight: bold;
-  }
+.lineFriends span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .channelName:hover {
-    text-decoration:underline;
-  }
-
-  li:nth-child(2n + 1) {
-    background-color: var(--li-two);
-  }
-
-  .marquee-container {
+.marquee-container {
   height: 30px;
   overflow: hidden;
   position: relative;
   line-height: 30px;
-  }
+}
 
-  .marquee {
-    top: 0;
-    left: 100%;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    white-space: nowrap;
-    animation: marquee 20s linear infinite;
-  }
+.marquee {
+  top: 0;
+  left: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+}
 
-  .chatbox {
+.chatbox {
   height: 280px;
   overflow-y: scroll;
   background-color: #333;
@@ -417,7 +429,6 @@
   margin-left: 25%;
   margin-right: 25%;
 }
-
 
 form {
   margin-left: 25%;
@@ -474,11 +485,11 @@ form {
   border-radius: var(--radius-small);
 }
 
-  *::-webkit-scrollbar {
-    display: none;
-  }
+*::-webkit-scrollbar {
+  display: none;
+}
 
-  @keyframes marquee {
+@keyframes marquee {
   0% {
     left: 100%;
   }
@@ -486,6 +497,5 @@ form {
     left: -100%
   }
 }
-
 
 </style>
