@@ -338,8 +338,14 @@
 
   .nav .activeButton {
     background-color: none;
+    font-weight:bold;
+  }
+
+  .nav button:hover {
     text-decoration: underline;
   }
+
+
 
   .left {
     border-top-left-radius: 15px;

@@ -100,9 +100,9 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Search</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Your friends</button>
     {:else}
-      <button class="left" on:click={() => tab = "find"}>Search</button>
+      <button class="left" on:click={() => tab = "find"}>Your friends</button>
     {/if}
 
     {#if tab == "dm"}
@@ -120,7 +120,7 @@
       <div class="title">
         <h2>Recent dm</h2>
       </div>
-      <div class="list ">
+      <div class="list " id="leftList">
         <ul class="friends-list">
           {#if user !== undefined}
             {#each user.friends as friend}
@@ -192,9 +192,13 @@
     background-color: var(--grey);
   }
 
+  .nav button:hover {
+    text-decoration: underline;
+  }
+
   .nav .activeButton {
     background-color: none;
-    text-decoration: underline;
+    font-weight: bold;
   }
 
   .left {
@@ -221,6 +225,7 @@
   .title {
     height: 40px;
     background-color: var(--lite-grey);
+    font-weight:bold;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -229,7 +234,10 @@
   .list {
     flex: 1;
     overflow: auto;
-    border-radius: 0 0 0px var(--panel-radius);
+  }
+
+  #leftList {
+    border-right:1px solid;
   }
 
   *::-webkit-scrollbar {
@@ -237,6 +245,8 @@
   }
   li {
     display: block;
+    color: var(--lite-lite-grey);
+    font-weight: bold;
   }
 
 

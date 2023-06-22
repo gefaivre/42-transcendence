@@ -37,8 +37,8 @@
 
 </script>
 
-<br>
-<br>
+
+<h1>Leaderboard</h1>
 
 <table>
 	<thead>
@@ -81,12 +81,23 @@
 
 <style>
 
+  h1 {
+    margin-top:1em;
+    text-shadow:  0 0 10px ;
+    color: var(--pink);
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom:2em;
+    text-align: center;
+  }
+
   table {
     color:white;
     margin: auto;
     border-collapse: collapse;
     border-radius: 1em;
     overflow: hidden;
+    font-size:1.2em;
   }
 
   .join {

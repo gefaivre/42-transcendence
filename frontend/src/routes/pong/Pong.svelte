@@ -268,7 +268,6 @@
 #all {
   color: var(--white);
   background-color: none;
-  border-left: 1px solid grey;
   padding-bottom: 2em;
   text-align: center;
 }
@@ -284,6 +283,7 @@
 }
 
 #title {
+  margin-top:1em;
   text-shadow:  0 0 10px ;
   color: var(--pink);
   font-size: 2em;
@@ -315,6 +315,7 @@ h2 {
   background-color:var(--grey);
   font-size:1.3em;
   color:var(--orange);
+  font-weight:bold;
   margin-bottom:1em;
 }
 
