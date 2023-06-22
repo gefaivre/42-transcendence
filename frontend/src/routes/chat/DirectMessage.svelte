@@ -100,9 +100,9 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Search</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Your friends</button>
     {:else}
-      <button class="left" on:click={() => tab = "find"}>Search</button>
+      <button class="left" on:click={() => tab = "find"}>Your friends</button>
     {/if}
 
     {#if tab == "dm"}
@@ -120,11 +120,11 @@
       <div class="title">
         <h2>Recent dm</h2>
       </div>
-      <div class="list ">
+      <div class="list " id="leftList">
         <ul class="friends-list">
           {#if user !== undefined}
             {#each user.friends as friend}
-              <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
+              <li class="friend"> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
             {/each}
           {/if}
         </ul>
@@ -132,7 +132,7 @@
       <div class="list">
         <ul class="friends-list">
           {#each listDm as name}
-          <li><button on:click={() => pushToDmTab(name)}> {name}</button></li>
+          <li class="friend"><button on:click={() => pushToDmTab(name)}> {name}</button></li>
           {/each}
         </ul>
       </div>
@@ -190,11 +190,16 @@
     font-family: Courier, monospace;
     color: var(--orange);
     background-color: var(--grey);
+    font-size:1.2em;
+  }
+
+  .nav button:hover {
+    text-decoration: underline;
   }
 
   .nav .activeButton {
     background-color: none;
-    text-decoration: underline;
+    font-weight: bold;
   }
 
   .left {
@@ -221,6 +226,7 @@
   .title {
     height: 40px;
     background-color: var(--lite-grey);
+    font-weight:bold;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -229,7 +235,10 @@
   .list {
     flex: 1;
     overflow: auto;
-    border-radius: 0 0 0px var(--panel-radius);
+  }
+
+  #leftList {
+    border-right:1px solid;
   }
 
   *::-webkit-scrollbar {
@@ -239,6 +248,14 @@
     display: block;
   }
 
+  .friend {
+    color: var(--lite-lite-grey);
+    font-weight: bold;
+  }
+  
+  .friend:hover {
+    text-decoration:underline;
+  }
 
   li {
     height: 40px;

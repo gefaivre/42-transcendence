@@ -199,9 +199,9 @@
 
   <div class="nav">
     {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Search</button>
+      <button class="activeButton left" on:click={() => tab = "find"}>Your channels</button>
     {:else}
-      <button class="left" on:click={() => tab = "find"}>Search</button>
+      <button class="left" on:click={() => tab = "find"}>Your channels</button>
     {/if}
 
     {#if tab == "channel"}
@@ -213,13 +213,10 @@
 
   {#if tab == "find"}
     <div class="find">
-      <div class="title">
-        <h2>Your channels</h2>
-      </div>
       <div class="list">
         <ul class="friends-list">
           {#each listChannel as channel}
-          <li><button on:click={() => connectChannel(channel)}>{channel}</button></li>
+          <li class="channelName"><button on:click={() => connectChannel(channel)}>{channel}</button></li>
         {/each}
         </ul>
       </div>
@@ -336,13 +333,20 @@
     flex: auto;
     font-family: Courier, monospace;
     color: var(--orange);
+    font-size:1.2em;
     background-color: var(--grey);
   }
 
   .nav .activeButton {
     background-color: none;
+    font-weight:bold;
+  }
+
+  .nav button:hover {
     text-decoration: underline;
   }
+
+
 
   .left {
     border-top-left-radius: 15px;
@@ -362,14 +366,6 @@
     border-radius: 0 0 15px 15px;
   }
 
-  .title {
-    height: 40px;
-    background-color: var(--lite-grey);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .list {
     flex: 1;
     overflow: auto;
@@ -380,6 +376,15 @@
     display: grid;
     grid-template-columns: 1fr;
     background-color: var(--li-one);
+  }
+  
+  .channelName {
+    color: var(--lite-lite-grey);
+    font-weight: bold;
+  }
+
+  .channelName:hover {
+    text-decoration:underline;
   }
 
   li:nth-child(2n + 1) {

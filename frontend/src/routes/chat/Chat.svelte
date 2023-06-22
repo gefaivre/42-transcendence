@@ -24,6 +24,8 @@
   }
 
 </script>
+  
+  <h1>Chat</h1>
 
   <div class="component">
 
@@ -39,8 +41,18 @@
 
 <style>
 
+  h1 {
+    margin-top:1em;
+    text-shadow:  0 0 10px ;
+    color: var(--pink);
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom:2em;
+    text-align: center;
+  }
+
   .component {
-    height: 100%;
+    height: 75%;
     display: grid;
     place-items: center;
     grid-template-columns: 1fr 1fr;

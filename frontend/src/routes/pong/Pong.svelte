@@ -189,7 +189,7 @@
 
 
   {#if !gameRequest}
-  <div id="requestGame">
+  <div class="panel">
     <h2>Play game</h2>
     <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">play friendly game</label>
     {#if friendly}
@@ -231,7 +231,7 @@
 
   </div>
 
- <div id="watchGame">
+ <div class="panel">
  <h2>Watch Game</h2>
  {#if gameList.length}
   <ul id="gameList">
@@ -266,34 +266,36 @@
 <style>
 
 #all {
-  font-weight: bold;
-  display: flex;
-  flex-direction: column;
   color: var(--white);
-  background-color: var(--grey);
-  border-left: 1px solid grey;
+  background-color: none;
   padding-bottom: 2em;
   text-align: center;
 }
 
 #body {
   display:flex;
+  flex-direction: row;
   align-content: center;
+  margin-right: 5em;
+  margin-left: 5em;
+  gap: 50px;
+
 }
 
 #title {
-  color: rgb(158, 39, 217);
+  margin-top:1em;
+  text-shadow:  0 0 10px ;
+  color: var(--pink);
   font-size: 2em;
   font-weight: bold;
   margin-bottom:2em;
 }
 
-#watchGame {
-  flex-grow: 1;
-}
-
-#requestGame {
-  flex-grow: 1;
+.panel {
+  background-color: var(--lite-grey);
+  border-radius: var(--panel-radius);
+  flex-grow:1;
+  padding-bottom:1em;
 }
 
 #settingsTable {
@@ -307,21 +309,27 @@
 }
 
 h2 {
+  font-family: Courier, monospace;
+  border-top-right-radius:10px;
+  border-top-left-radius:10px;
+  background-color:var(--grey);
   font-size:1.3em;
-  color:var(--pink);
+  color:var(--orange);
+  font-weight:bold;
   margin-bottom:1em;
 }
 
 h3 {
   font-size:1.1em;
-  color: rgb(158, 39, 217);
+  font-family: Courier, monospace;
+  color:var(--orange);
+  font-weight:bold;
   margin-top:1.2em;
 }
 
 button {
-  background-color:#3b82f6;
+  background-color:#3d4451;
   font-weight: bold;
-  border: 1px solid #1d4ed8;
   border-radius:4px;
   padding:0.5em;
   margin: 1em;
@@ -329,7 +337,7 @@ button {
 }
 
 button:hover {
-  background-color:#1d4ed8
+  background-color:#2d333c
 }
 
 input {
@@ -338,6 +346,12 @@ input {
   padding:0.5em;
   margin:0.5em;
   color: black;
+}
+
+@media only screen and (max-width: 800px) {
+  #body {
+    flex-direction: column;
+  }
 }
 
 </style>

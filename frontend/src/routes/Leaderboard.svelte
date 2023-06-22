@@ -37,23 +37,23 @@
 
 </script>
 
-<br>
-<br>
+
+<h1>Leaderboard</h1>
 
 <table>
 	<thead>
-		<tr>
-			<th>Rank</th>
-			<th>User</th>
-			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
-			<th><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
+		<tr class="titles">
+			<th class="title">Rank</th>
+			<th class="title">User</th>
+			<th class="title"><a class="clickable" href="/#/leaderboard" on:click={() => sortByMMR()}>Mmr</a></th>
+			<th class="title"><a class="clickable" href="/#/leaderboard" on:click={() => sortByGames()}>Games</a></th>
 		</tr>
 	</thead>
 	<tbody>
 	{#each users as user, i}
     {#if i >= (page-1) * pageLength && i < page * pageLength}
 		<tr>
-			<td>{i + 1}</td>
+			<td class="rank">{i + 1}</td>
 			<td>
 				<a href="#/users/{user.username}">
 					<span class="user">
@@ -81,12 +81,40 @@
 
 <style>
 
+  h1 {
+    margin-top:1em;
+    text-shadow:  0 0 10px ;
+    color: var(--pink);
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom:2em;
+    text-align: center;
+  }
+
   table {
+    color:white;
     margin: auto;
+    border-collapse: collapse;
+    border-radius: 1em;
+    overflow: hidden;
+    font-size:1.2em;
   }
 
   .join {
 		text-align: center;
+  }
+  
+  .titles {
+		color: var(--orange);
+    font-family: Courier, monospace;
+  }
+
+  .title {
+    background-color:var(--grey);
+  }
+  
+  .rank {
+    color:var(--grey);
   }
 
 	td {
@@ -95,16 +123,24 @@
 
 	td,
 	th {
-		border: 1px solid rgb(190, 190, 190);
-		padding: 10px;
+		border-bottom: 1px solid #303030;
+    background-color:var(--lite-grey);
+		padding-left: 2em;
+		padding-right: 2em;
+    padding-top:0.2em;
+    padding-bottom:0.2em;
 	}
 
 	tr:nth-child(even) {
 		background-color: #eee;
 	}
 
-	.clickable {
-		color: blue;
+	.clickable:hover {
+    text-decoration:underline;
+	}
+
+	.user:hover {
+    text-decoration:underline;
 	}
 
 	tbody tr:nth-child(1) > td:nth-child(1) {
