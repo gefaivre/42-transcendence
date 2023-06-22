@@ -216,7 +216,7 @@
       <div class="list">
         <ul class="friends-list">
           {#each listChannel as channel}
-          <li><button on:click={() => connectChannel(channel)}>{channel}</button></li>
+          <li class="channelName"><button on:click={() => connectChannel(channel)}>{channel}</button></li>
         {/each}
         </ul>
       </div>
@@ -375,9 +375,15 @@
     display: grid;
     grid-template-columns: 1fr;
     background-color: var(--li-one);
+  }
+  
+  .channelName {
     color: var(--lite-lite-grey);
     font-weight: bold;
-    
+  }
+
+  .channelName:hover {
+    text-decoration:underline;
   }
 
   li:nth-child(2n + 1) {

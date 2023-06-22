@@ -124,7 +124,7 @@
         <ul class="friends-list">
           {#if user !== undefined}
             {#each user.friends as friend}
-              <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
+              <li class="friend"> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
             {/each}
           {/if}
         </ul>
@@ -132,7 +132,7 @@
       <div class="list">
         <ul class="friends-list">
           {#each listDm as name}
-          <li><button on:click={() => pushToDmTab(name)}> {name}</button></li>
+          <li class="friend"><button on:click={() => pushToDmTab(name)}> {name}</button></li>
           {/each}
         </ul>
       </div>
@@ -245,10 +245,16 @@
   }
   li {
     display: block;
+  }
+
+  .friend {
     color: var(--lite-lite-grey);
     font-weight: bold;
   }
-
+  
+  .friend:hover {
+    text-decoration:underline;
+  }
 
   li {
     height: 40px;
