@@ -38,7 +38,7 @@
     <ul>
       {#each channels as channel}
         <li>
-        <p><span>{channel.name}</span><button on:click={() => joinChannel(channel.name)}>join</button></p>
+        <p><span>{channel.name}</span><button class="btn btn-sm" on:click={() => joinChannel(channel.name)}>join</button></p>
         </li>
       {/each}
     </ul>
@@ -79,13 +79,9 @@ h1 {
 
 button {
   float: right;
-  margin-right:5em;
-  background-color:#3b82f6;
-  font-size:0.8em;
-  border: 1px solid #1d4ed8;
-  border-radius:4px;
-  color: var(--white);
+  margin-right: 5em;
 }
+
 span {
   float: left;
   margin-left:5em;
@@ -96,6 +92,9 @@ span {
     height: 40px;
     display: grid;
     grid-template-columns: 1fr;
+    padding-top: 0.2em; 
+    color: var(--lite-lite-grey);
+    font-weight:bold;
     background-color: var(--li-one);
   }
 
