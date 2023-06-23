@@ -168,7 +168,6 @@
 
 <style>
 
-
   .chat-dm {
     display: flex;
     flex-direction: column;
@@ -242,6 +241,7 @@
   *::-webkit-scrollbar {
     display: none;
   }
+
   li {
     display: block;
   }
@@ -279,8 +279,6 @@
     justify-content: center;
     align-items: center;
   }
-
-
 
 .chatbox {
   height: 280px;
