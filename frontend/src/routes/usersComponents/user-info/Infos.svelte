@@ -6,6 +6,8 @@
   import { reloadImage, id, socket, logged, user } from "../../../stores";
   import deleteIcon from "../../../assets/new_cross.png";
   import acceptIcon from "../../../assets/new_check.png";
+  import { toast } from '@zerodevx/svelte-toast/dist'
+  import { push } from "svelte-spa-router";
 
   export let pageUser: User
   export let onlineStatus: Status
@@ -136,6 +138,20 @@
     }
   }
 
+  async function deleteAccount() {
+    if (confirm('Are you sure ?') === true) {
+      try {
+        await axios.delete('/users')
+        push('/')
+        id.set('0')
+        logged.set('false')
+        toast.push('Account deleted', { classes: ['success'] });
+      } catch(e) {
+        toast.push('Error', { classes: ['failure'] });
+      }
+    }
+  }
+
 </script>
 
 <div class="ctn-infos">
@@ -149,6 +165,7 @@
   <br>
 	{#if pageUser.id.toString() === $id}
     <button class="btn" on:click={() => logout()}>Logout</button>
+    <button class="btn" on:click={() => deleteAccount()}>Delete account</button>
   {:else}
     <!-- online status -->
 		{#if onlineStatus === Status.offline}

@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from 'src/filters';
+import { rmSync } from 'fs';
+import { Response } from 'express';
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
@@ -55,9 +57,11 @@ export class UsersController {
   }
 
   @Delete()
-  async remove(@Req() req: any) {
+  async remove(@Req() req: any, @Res({ passthrough: true }) response: Response) {
     try {
       await this.users.remove(req.user.username)
+      rmSync(`/app/images/${req.user.username}`, { recursive: true })
+      response.cookie('jwt', '', { expires: new Date(0) }); // same as GET '/auth/logout'
     } catch(e) {
       throw new NotFoundException('User not found')
     }

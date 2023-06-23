@@ -415,15 +415,6 @@
   text-decoration: underline;
 }
 
-
-.left {
-  border-top-left-radius: 15px;
-}
-
-.right {
-  border-top-right-radius: 15px;
-}
-
 .nav button:not(:last-child) {
   border-right: solid 1px var(--black);
 }
