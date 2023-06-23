@@ -199,14 +199,6 @@
     font-weight: bold;
   }
 
-  .left {
-    border-top-left-radius: var(--panel-radius);
-  }
-
-  .right {
-    border-top-right-radius: var(--panel-radius);
-  }
-
   .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
