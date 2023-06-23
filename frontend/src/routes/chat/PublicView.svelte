@@ -84,6 +84,7 @@
 h1 {
   font-family: Courier, monospace;
   color: var(--orange);
+  font-weight:bold;
 }
 
 .list {

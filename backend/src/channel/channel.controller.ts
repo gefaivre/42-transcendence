@@ -160,7 +160,7 @@ export class ChannelController {
   }
 
   @Patch('join')
-  async joinChannel(@Body() channel: ChannelDto, @Req() req: any) {
+  async joinChannel(@Body() channel: any, @Req() req: any) {
     if (channel.status === ChannelStatus.Protected)
       if (await this.channel.verifyPassword(channel.channelName, channel.password) === false)
         throw new UnauthorizedException('wrong password')
