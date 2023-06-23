@@ -96,6 +96,7 @@
     --panel-height: 400px;
     --panel-width: 550px;
     --panel-radius: 15px;
+    --nav-height: 40px;
   }
 
   .screen {

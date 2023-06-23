@@ -178,7 +178,7 @@
   }
 
   .nav {
-    height: 40px;
+    height: var(--nav-height);
     display: flex;
     justify-content: space-around;
   }
