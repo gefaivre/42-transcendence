@@ -336,6 +336,14 @@ h3 {
   margin-top:1.2em;
 }
 
+input {
+  color: black;
+}
+
+select {
+  color: black;
+}
+
 button:hover {
   background-color:#2d333c
 }
