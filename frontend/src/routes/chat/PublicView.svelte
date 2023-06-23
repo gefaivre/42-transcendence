@@ -107,6 +107,7 @@ h1 {
 
 li {
   height: 40px;
+  color:white;
   display: grid;
   grid-template-columns: 1fr;
   background-color: var(--li-one);

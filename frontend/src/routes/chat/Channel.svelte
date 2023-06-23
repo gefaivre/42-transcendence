@@ -10,6 +10,7 @@
   import lockedIcon from '../../assets/lock.svg'
   import publicIcon from '../../assets/public.svg'
   import privateIcon from '../../assets/private.svg'
+    import Username from "../usersComponents/user-settings/Username.svelte";
 
   let socket: Socket = null
   let message: string = ''
@@ -219,7 +220,7 @@
         <ul>
           {#each listChannel as channel}
           <li class="lineFriends">
-            <button on:click={() => connectChannel(channel.name)}>{channel.name}</button>
+            <button class="chanName" on:click={() => connectChannel(channel.name)}>{channel.name}</button>
             {#if channel}
             <span>
               {#if channel.status === ChannelStatus.Protected}
@@ -257,10 +258,10 @@
     {#if isMember}
     <div class="marquee-container">
       <div class="marquee" aria-hidden="true">
-        <span>name<b>{channel.name}</b></span>
-        <span>Status<b>{channel.status}</b></span>
-        <span>Owner<b><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></b></span>
-        <span>Admins<b>
+        <span>name: <b>{channel.name}</b></span>
+        <span>Status: <b>{channel.status}</b></span>
+        <span>Owner: <b><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></b></span>
+        <span>Admins: <b>
           {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
             <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
             <!-- {#if isOwner}
@@ -269,7 +270,7 @@
             {/if} -->
           {/each}
         </b></span>
-        <span>Members<b>
+        <span>Members: <b>
           {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
             <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
             <!-- {#if isOwner}
@@ -324,18 +325,19 @@
         <ul class="message-list">
 
           {#each posts as post}
-          {post.author} {$user.username}
-            {#if post.author == $user.username}
-            <li class="msg sender">{post.content}</li>
-            {:else}
-            <li class="msg receiver">{post.content}</li>
-            {/if}
-            {/each}
+          {#if post.author != $user.username}
+            <li class="msg receiver">
+            <span class="author">*{post.author}:</span><br>
+            <span class="content">{post.content}</span></li>
+          {:else}
+            <li class="msg sender"><span class="content">{post.content}</span></li>
+          {/if}
+          {/each}
           </ul>
       </div>
       <form on:submit|preventDefault={post}>
-        <input type="text" placeholder="message" bind:value={message}>
-        <button type="submit">send</button>
+        <input type="text" class="input input-sm inpput-bordered" placeholder="message" bind:value={message}>
+        <button type="submit" class="btn btn-sm send">send</button>
       </form>
     {/if}
 
@@ -364,6 +366,7 @@
   flex: auto;
   font-family: Courier, monospace;
   color: var(--orange);
+  font-size:1.2em;
   background-color: var(--grey);
 }
 
@@ -400,20 +403,20 @@
   overflow: auto;
 }
 
-li {
-  height: 40px;
+.lineFriends {
+  color:white;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 4fr 1fr 1fr 1fr;
   background-color: var(--li-one);
+  height:40px;
 }
 
-li:nth-child(2n + 1) {
+.lineFriends:nth-child(2n + 1) {
   background-color: var(--li-two);
 }
 
-.lineFriends {
-  display: grid;
-  grid-template-columns: 4fr 1fr 1fr 1fr;
+.chanName:hover {
+  text-decoration:underline;
 }
 
 .lineFriends span {
@@ -440,18 +443,28 @@ li:nth-child(2n + 1) {
 }
 
 .chatbox {
-  height: 280px;
+  height:100%;
+  width: 80%;
   overflow-y: scroll;
-  background-color: #333;
+  background-color: var(--grey);
   color: #fff;
-  border: 2px solid green;
-  margin-left: 25%;
-  margin-right: 25%;
+  border: 2px solid var(--pink);
+  border-radius:10px;
+  margin-left:10%;
 }
 
 form {
-  margin-left: 25%;
-  margin-right: 25%;
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-bottom:2%;
+  margin-top:2%;
+}
+
+input {
+  float:left;
+}
+.send {
+  float:right;
 }
 
 .message-list {
@@ -461,48 +474,48 @@ form {
   max-width: 400px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   --radius-big: 20px;
   --radius-small: 6px;
 
-  word-wrap: break-word;
 }
 
 .msg {
-  margin-bottom: 6px;
-  padding: 12px;
-  border-radius: 20px;
-  background: #ddd;
-  max-width: 150px;
-  margin-right: auto;
+  overflow-wrap: break-word;
+  margin-bottom:1em;
+
 }
 
 .msg.sender {
-  background: #0084ff;
-  color: #fff;
-  margin-left: auto;
-  margin-right: 0;
+  text-align: right;
+
 }
 
-.sender + .sender {
-  border-radius: var(--radius-big) var(--radius-small)
-    var(--radius-small) var(--radius-big);
+.msg.receiver {
+  text-align:left;
 }
 
-.receiver + .sender {
-  border-bottom-right-radius: var(--radius-small);
+.content {
+  border-radius:var(--radius-big);
+  box-decoration-break: clone;
+  padding:3%;
+  line-height:2.5em;
 }
 
-.sender + .receiver {
-  border-radius: var(--radius-big) var(--radius-big)
-    var(--radius-small) var(--radius-small);
+.author {
+  margin-left:1%;
+  font-size:0.8em;
 }
 
-.receiver + .receiver {
-  border-radius: var(--radius-small);
+.msg.sender .content {
+  background-color: var(--pink);
 }
+
+.msg.receiver .content {
+  background-color: var(--lite-grey);
+
+}
+
 
 *::-webkit-scrollbar {
   display: none;
