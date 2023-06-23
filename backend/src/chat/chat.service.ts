@@ -8,7 +8,6 @@ import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
@@ -59,13 +58,6 @@ export class ChatService {
 
   getUserBySocketId(id: string): WsUser | undefined {
     return this.chatUsers.find(user => user.socketId === id)
-  }
-
-  async verifyPassword(channelName: string, password: string): Promise<boolean> {
-    const channel = await this.channel.findByName(channelName)
-    if (channel === null)
-      return false
-    return bcrypt.compare(password, channel.password)
   }
 
 }

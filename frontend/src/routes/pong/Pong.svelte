@@ -191,41 +191,52 @@
   {#if !gameRequest}
   <div class="panel">
     <h2>Play game</h2>
-    <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">play friendly game</label>
+
+    <h3>Opponent</h3>
+    <input bind:value={friendUsername} type="text" placeholder="your friend username" class="input">
+
+    <br>
+
+    <h3>Game type</h3>
+
+    <select class="select select-bordered" bind:value={friendly}>
+      <option value={true} selected>Friendly</option>
+      <option value={false}>Ranked</option>
+    </select>
+
+    <br>
+
     {#if friendly}
-    <input bind:value={friendUsername} type="text" placeholder="your friend username">
 
     <h3>Settings</h3>
     <table id="settingsTable">
 
     <tr>
     <td align="left"><label for="ballSpeed">ball speed</label></td>
-    <td align="right"><input name="ballSpeed" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="ballSize">ball size</label></td>
-    <td align="right"><input name="ballSize" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="paddleSpeed">paddle speed</label></td>
-    <td align="right"><input name="paddleSpeed" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="paddleSize">paddle size</label></td>
-    <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
     </table>
     {/if}
-
-
   <br>
   {#if friendly}
-  <button id="requestButton" on:click={requestGame}>request friendly game</button>
+  <button class="btn" on:click={requestGame}>request friendly game</button>
   {:else}
-  <button id="requestButton" on:click={requestGame}>request random game</button>
+  <button class="btn" on:click={requestGame}>request random game</button>
   {/if}
 
 
@@ -257,7 +268,9 @@
 
 {#if gameRequest}
 <h3>Game requested ! Waiting for your opponent ...</h3>
-<button on:click={cancelRequest}>Cancel</button>
+<br>
+<br>
+<button class="btn" on:click={cancelRequest}>Cancel</button>
 {/if}
 
 </div>
@@ -304,10 +317,6 @@
   margin-right:auto;
 }
 
-#checkbox {
-  margin-left:0;
-}
-
 h2 {
   font-family: Courier, monospace;
   border-top-right-radius:10px;
@@ -327,25 +336,16 @@ h3 {
   margin-top:1.2em;
 }
 
-button {
-  background-color:#3d4451;
-  font-weight: bold;
-  border-radius:4px;
-  padding:0.5em;
-  margin: 1em;
-  color: var(--white);
+input {
+  color: black;
+}
+
+select {
+  color: black;
 }
 
 button:hover {
   background-color:#2d333c
-}
-
-input {
-  border-radius: 2px;
-  font-weight:normal;
-  padding:0.5em;
-  margin:0.5em;
-  color: black;
 }
 
 @media only screen and (max-width: 800px) {

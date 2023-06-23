@@ -1,30 +1,34 @@
 <script lang="ts">
-    import axios from "../../axios.config";
-    import { onMount } from "svelte";
-    import type { Channel} from "../../types";
+  import axios from "../../axios.config";
+  import { user } from "../../stores";
+  import { ChannelStatus, type ChannelDto } from "../../types";
+  import { toast } from '@zerodevx/svelte-toast/dist'
+  import lockedIcon from '../../assets/lock.svg'
+  import publicIcon from '../../assets/public.svg'
 
+  export let channels: any[]
 
+  let password: string = ''
 
-    let channels: Channel[] = [];
+  async function joinChannel(channel: any) {
 
-    onMount(() => getAll())
-
-    async function getAll() {
-      try {
-        channels = (await axios.get('/channel')).data
-        console.log(channels)
-      } catch (e) {
-        console.log(e.response.data.message)
-      }
+    if (channel.status === ChannelStatus.Protected) {
+      password = prompt('Enter password')
     }
 
-    async function joinChannel(channelName: string) {
-      try {
-        await axios.patch(`http://localhost:3000/channel/join/${channelName}`)
-      } catch(e) {
-        console.log(e)
-      }
+    try {
+      await axios.patch(`http://localhost:3000/channel/join`, {
+        channelName: channel.name,
+        password: password,
+        status: channel.status
+      } as ChannelDto)
+      toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
+      password = ''
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
+      password = ''
     }
+  }
 </script>
 
 <div class="create-pannel">
@@ -33,18 +37,31 @@
     <h1>All channels</h1>
   </div>
 
-  <div class="view">
-
+  <div class="list">
     <ul>
-      {#each channels as channel}
-        <li>
-        <p><span>{channel.name}</span><button class="btn btn-sm" on:click={() => joinChannel(channel.name)}>join</button></p>
-        </li>
-      {/each}
+    {#each channels as channel}
+      {#if channel.status !== ChannelStatus.Private && channel.users.some(_user => _user.username === $user.username) === false}
+      <li class="lineFriends">
+        <span>
+          {channel.name}
+        </span>
+        <span>
+        {#if channel.status === ChannelStatus.Protected}
+          <img src={lockedIcon} alt='protected' width="30" height="30"/>
+        {:else if channel.status === ChannelStatus.Public}
+          <img src={publicIcon} alt='public' width="30" height="30"/>
+        {/if}
+        </span>
+        <span>
+          <button class="btn btn-xs" on:click={() => joinChannel(channel)}>join</button>
+        </span>
+      </li>
+      {/if}
+    {/each}
     </ul>
+  </div>
 
-  </div>
-  </div>
+</div>
 
 <style>
 
@@ -64,49 +81,43 @@
   justify-content: center;
   align-items: center;
   border-radius: var(--panel-radius) var(--panel-radius) 0 0;
-
 }
 
 h1 {
-    font-family: Courier, monospace;
-    color: var(--orange);
-    font-weight:bold;
-    font-size:1.2em;
+  font-family: Courier, monospace;
+  color: var(--orange);
+  font-weight:bold;
 }
 
- .view {
-   height: 360px;
-   overflow: auto;
- }
-
-button {
-  float: right;
-  margin-right: 5em;
+.list {
+  flex: 1;
+  overflow: auto;
 }
 
-span {
-  float: left;
-  margin-left:5em;
+.lineFriends {
+  display: grid;
+  grid-template-columns: 5fr 1fr 1fr;
 }
 
+.lineFriends span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  li {
-    height: 40px;
-    display: grid;
-    grid-template-columns: 1fr;
-    padding-top: 0.2em; 
-    color: var(--lite-lite-grey);
-    font-weight:bold;
-    background-color: var(--li-one);
-  }
+li {
+  height: 40px;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: var(--li-one);
+}
 
-  li:nth-child(2n + 1) {
-    background-color: var(--li-two);
-  }
+li:nth-child(2n + 1) {
+  background-color: var(--li-two);
+}
 
- *::-webkit-scrollbar {
-    display: none;
-  }
-
+*::-webkit-scrollbar {
+  display: none;
+}
 
 </style>

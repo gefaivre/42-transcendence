@@ -1,6 +1,4 @@
 <script lang="ts">
-    export const title = 'Mon titre';
-
     import axios from './axios.config'
     import chatIcon  from './assets/chat.svg'
     import gameIcon     from './assets/joystick.svg'
@@ -18,7 +16,6 @@
     })
 
     const menuItems = [
-      // { label: 'Home', icon: homeIcon, link: '#/Menu'},
       { label: 'Messages', icon: chatIcon, link: '#/chat' },
       { label: 'Game', icon: gameIcon, link: '#/Pong'},
       { label: 'LeaderBoard', icon: leaderboardIcon, link: '#/leaderboard'}
@@ -99,6 +96,7 @@
     --panel-height: 400px;
     --panel-width: 550px;
     --panel-radius: 15px;
+    --nav-height: 40px;
   }
 
   .screen {

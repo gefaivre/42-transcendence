@@ -1,24 +1,13 @@
 <script lang="ts">
 
-  import type { Channel, ChannelDto } from "../../types";
+  import type {ChannelDto } from "../../types";
   import axios from "../../axios.config";
   import { ChannelStatus } from '../../types';
-
-  let channels: Channel[] = []
 
   let channel: ChannelDto = {
     channelName: null,
     status: null,
     password: ''
-  }
-
-  async function getAll() {
-    try {
-      channels = (await axios.get('channel', { withCredentials: true })).data
-      console.log(channels)
-    } catch (e) {
-      console.log(e.response.data.message)
-    }
   }
 
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
@@ -27,19 +16,6 @@
       return
     try {
       await axios.delete(`channel/${name}`, { withCredentials: true })
-      getAll()
-    } catch (e) {
-      console.log(e.response.data.message)
-    }
-  }
-
-  // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
-  async function removeAll() {
-    if (!window.confirm("Are you sure ?"))
-      return
-    try {
-      await axios.delete(`channel`, { withCredentials: true })
-      getAll()
     } catch (e) {
       console.log(e.response.data.message)
     }
@@ -53,9 +29,7 @@
     if (channel.status === ChannelStatus.Protected && channel.password === '')
       return alert('Empty channel password')
     try {
-      console.log(channel);
       await axios.post('channel', channel, { withCredentials: true })
-      getAll()
     } catch (e) {
       console.log(e.response.data.message)
     }

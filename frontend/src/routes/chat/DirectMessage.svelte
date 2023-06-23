@@ -1,14 +1,12 @@
 <script lang="ts">
 
   import axios from "../../axios.config";
-  import { logged } from "../../stores";
+  import { user } from "../../stores";
   import { onMount, onDestroy, afterUpdate } from "svelte";
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
-  import type { DirectMessage, User, WsException } from "../../types";
+  import type { DirectMessage, WsException } from "../../types";
   import { push } from "svelte-spa-router";
-
-  export let user: User;
 
   let socket: Socket = null
   let message: string = null
@@ -122,9 +120,9 @@
       </div>
       <div class="list " id="leftList">
         <ul class="friends-list">
-          {#if user !== undefined}
-            {#each user.friends as friend}
-              <li class="friend"> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
+          {#if $user !== undefined}
+            {#each $user.friends as friend}
+              <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
             {/each}
           {/if}
         </ul>
@@ -170,7 +168,6 @@
 
 <style>
 
-
   .chat-dm {
     display: flex;
     flex-direction: column;
@@ -180,7 +177,7 @@
   }
 
   .nav {
-    height: 40px;
+    height: var(--nav-height);
     display: flex;
     justify-content: space-around;
   }
@@ -244,6 +241,7 @@
   *::-webkit-scrollbar {
     display: none;
   }
+
   li {
     display: block;
   }
@@ -252,7 +250,7 @@
     color: var(--lite-lite-grey);
     font-weight: bold;
   }
-  
+
   .friend:hover {
     text-decoration:underline;
   }
@@ -281,8 +279,6 @@
     justify-content: center;
     align-items: center;
   }
-
-
 
 .chatbox {
   height: 280px;

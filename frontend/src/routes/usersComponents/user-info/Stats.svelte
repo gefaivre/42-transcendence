@@ -189,14 +189,14 @@
 
 <style>
 
-  .box-info {
-    background-color: var(--lite-grey);
-    border-radius: var(--panel-radius);
-    display: flex;
-    flex-direction: column;
-    height: var(--panel-height);
-    width: var(--panel-width);
-  }
+.box-info {
+  background-color: var(--lite-grey);
+  border-radius: var(--panel-radius);
+  display: flex;
+  flex-direction: column;
+  height: var(--panel-height);
+  width: var(--panel-width);
+}
 
 .overflow {
   flex: 1;
@@ -218,12 +218,11 @@
 .stat-grid .tiles {
   position: relative;
   background-color: var(--li-two);
-
 }
+
 .stat-grid .lite {
   background-color: var(--li-one);
 }
-
 
 .stat-grid .tiles h2 {
   position: absolute;
@@ -243,36 +242,37 @@
 }
 
 .box-info .nav {
-  height: 40px;
+  height: var(--nav-height);
   display: flex;
   justify-content: space-around;
 }
 
 .box-info .nav button {
-    flex: auto;
-    font-family: Courier, monospace;
-    color: var(--orange);
-    background-color: var(--grey);
-  }
+  flex: auto;
+  font-family: Courier, monospace;
+  color: var(--orange);
+  background-color: var(--grey);
+}
 
 .box-info .nav button:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
-  .box-info .nav .activeButton {
-    font-weight:bold;
-  }
 
-  .box-info .nav button:not(:last-child) {
-    border-right: solid 1px var(--black);
-  }
+.box-info .nav .activeButton {
+  font-weight:bold;
+}
 
-  .left {
-    border-top-left-radius: var(--panel-radius);
-  }
+.box-info .nav button:not(:last-child) {
+  border-right: solid 1px var(--black);
+}
 
-  .right {
-    border-top-right-radius: var(--panel-radius);
-  }
+.left {
+  border-top-left-radius: var(--panel-radius);
+}
+
+.right {
+  border-top-right-radius: var(--panel-radius);
+}
 
 li {
   height: 40px;
