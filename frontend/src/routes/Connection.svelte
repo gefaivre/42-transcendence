@@ -145,9 +145,9 @@
 
   {/if}
 
-
 </div>
-  <style>
+
+<style>
 
   .screen {
     height: 100vh;
@@ -196,7 +196,5 @@
     height: 65px;
     width: 65px;
   }
-
-
 
 </style>

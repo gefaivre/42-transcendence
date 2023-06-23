@@ -16,27 +16,27 @@ import { toast } from '@zerodevx/svelte-toast/dist'
     $user.TwoFA = true;
     steptwo = false;
     } catch (e) {
-    toast.push('Bad 2FA code', { classes: ['failure'] })
-    console.log(e.response.data.message)
+      toast.push('Bad 2FA code', { classes: ['failure'] })
+      console.log(e.response.data.message)
     }
   }
 
   async function enable2FA() {
     try {
-    const response = await axios.patch(`/auth/2FA/enable`, null)
-    qrcode = response.data
-    steptwo = true;
+      const response = await axios.patch(`/auth/2FA/enable`, null)
+      qrcode = response.data
+      steptwo = true;
     } catch (e) {
-    console.log(e.response.data.message)
+      console.log(e.response.data.message)
     }
   }
 
   async function disable2FA() {
     try {
-    await axios.patch(`/auth/2FA/disable`, null)
-    $user.TwoFA = false;
+      await axios.patch(`/auth/2FA/disable`, null)
+      $user.TwoFA = false;
     } catch (e) {
-    console.log(e.response.data.message)
+      console.log(e.response.data.message)
     }
   }
 
