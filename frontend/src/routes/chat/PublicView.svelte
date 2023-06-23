@@ -8,7 +8,7 @@
 
   export let channels: any[]
 
-  let password: string = null
+  let password: string = ''
 
   async function joinChannel(channel: any) {
 
@@ -23,8 +23,10 @@
         status: channel.status
       } as ChannelDto)
       toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
+      password = ''
     } catch(e) {
       toast.push(e.response.data.message, { classes: ['failure'] })
+      password = ''
     }
   }
 </script>
@@ -84,6 +86,7 @@
 h1 {
   font-family: Courier, monospace;
   color: var(--orange);
+  font-weight:bold;
 }
 
 .list {
