@@ -356,10 +356,12 @@ input {
 
 .msg.sender .content {
   background-color: var(--pink);
+  border-bottom-right-radius:var(--radius-small);
 }
 
 .msg.receiver .content {
   background-color: var(--lite-grey);
+  border-bottom-left-radius:var(--radius-small);
 }
 
 

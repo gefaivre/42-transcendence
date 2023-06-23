@@ -499,10 +499,12 @@ input {
 }
 
 .msg.sender .content {
+  border-bottom-right-radius:var(--radius-small);
   background-color: var(--pink);
 }
 
 .msg.receiver .content {
+  border-bottom-left-radius:var(--radius-small);
   background-color: var(--lite-grey);
 
 }
