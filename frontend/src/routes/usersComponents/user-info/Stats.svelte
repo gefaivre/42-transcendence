@@ -189,21 +189,6 @@
 
 <style>
 
-.box-info {
-  background-color: var(--lite-grey);
-  border-radius: var(--panel-radius);
-  display: flex;
-  flex-direction: column;
-  height: var(--panel-height);
-  width: var(--panel-width);
-}
-
-.overflow {
-  flex: 1;
-  overflow: auto;
-  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
-}
-
 .stat-grid {
   height: 100%;
   display: grid;
@@ -241,37 +226,8 @@
   font-size: 3em;
 }
 
-.box-info .nav {
-  height: var(--nav-height);
-  display: flex;
-  justify-content: space-around;
-}
-
-.box-info .nav button {
-  flex: auto;
-  font-family: Courier, monospace;
-  color: var(--orange);
-  background-color: var(--grey);
-}
-
-.box-info .nav button:hover {
-  text-decoration: underline;
-}
-
-.box-info .nav .activeButton {
-  font-weight:bold;
-}
-
 .box-info .nav button:not(:last-child) {
   border-right: solid 1px var(--black);
-}
-
-.left {
-  border-top-left-radius: var(--panel-radius);
-}
-
-.right {
-  border-top-right-radius: var(--panel-radius);
 }
 
 li {
@@ -290,12 +246,6 @@ li:nth-child(2n + 1) {
   height: 35px;
   border: 1px solid rgb(78, 78, 78);
   border-radius: 50%;
-}
-
-.box-info .overflow {
-  flex: 1;
-  overflow: auto;
-  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 .lineFriends {
