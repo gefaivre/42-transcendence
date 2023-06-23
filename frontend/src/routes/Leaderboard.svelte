@@ -53,7 +53,7 @@
 	{#each users as user, i}
     {#if i >= (page-1) * pageLength && i < page * pageLength}
 		<tr>
-			<td class="rank">{i + 1}</td>
+			<td>{i + 1}</td>
 			<td>
 				<a href="#/users/{user.username}">
 					<span class="user">
@@ -103,7 +103,7 @@
   .join {
 		text-align: center;
   }
-  
+
   .titles {
 		color: var(--orange);
     font-family: Courier, monospace;
@@ -112,17 +112,12 @@
   .title {
     background-color:var(--grey);
   }
-  
-  .rank {
-    color:var(--grey);
-  }
 
 	td {
 		text-align: center;
 	}
 
-	td,
-	th {
+	td, th {
 		border-bottom: 1px solid #303030;
     background-color:var(--lite-grey);
 		padding-left: 2em;
@@ -157,7 +152,6 @@
 
 	.user {
 		display: flex;
-		display: flex;
 		align-items: center;
 	}
 
@@ -167,7 +161,9 @@
 		border: 1px solid rgb(78, 78, 78);
 		border-radius: 50%;
 	}
+
 	.username {
 		padding-left: 10px;
 	}
+
 </style>
