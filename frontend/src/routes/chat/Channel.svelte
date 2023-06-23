@@ -254,96 +254,69 @@
       </div>
     </div>
   {:else}
+    <div class="ctn-chan">
 
-    {#if isMember}
-    <div class="marquee-container">
-      <div class="marquee" aria-hidden="true">
-        <span>name: <b>{channel.name}</b></span>
-        <span>Status: <b>{channel.status}</b></span>
-        <span>Owner: <b><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></b></span>
-        <span>Admins: <b>
-          {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
-            <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
-            <!-- {#if isOwner}
-              <button on:click={() => revokeAdmin(admin.id)}>revoke admin</button>
-              <button on:click={() => ban(admin.id)}>ban</button>
-            {/if} -->
-          {/each}
-        </b></span>
-        <span>Members: <b>
-          {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
-            <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
-            <!-- {#if isOwner}
-              <button on:click={() => promoteAdmin(user.id)}>promote admin</button>
-            {/if}
-            {#if isAdmin}
-              <button on:click={() => ban(user.id)}>ban</button>
-            {/if}-->
-          {/each}
-        </b>
-        </span>
-      </div>
-    </div>
-
-              <!-- <td>Admins</td>
-              <td>
-              {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
-                <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
-                {#if isOwner}
-                  <button on:click={() => revokeAdmin(admin.id)}>revoke admin</button>
-                  <button on:click={() => ban(admin.id)}>ban</button>
+            <div class="chan-list">
+              <ul>
+                {#if channel}
+                <li><h1>--owner--</h1></li>
+                <li><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></li>
+                <li><h1>--admins--</h1></li>
+                {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
+                <li>
+                  <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
+                  {#if isOwner}
+                  <div style="display: flex;">
+                    <button on:click={() => revokeAdmin(admin.id)}>down</button>
+                    <button on:click={() => ban(admin.id)}>ban</button>
+                  </div>
+                    {/if}
+                </li>
+                {/each}
+                <li><h1>--users--</h1></li>
+                {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
+                <li>
+                  <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
+                  <div style="display: flex;">
+                    {#if isOwner}
+                      <button class="btn btn-xs" on:click={() => promoteAdmin(user.id)}>up</button>
+                    {/if}
+                    {#if isAdmin}
+                      <button class="btn btn-xs" on:click={() => ban(user.id)}>ban</button>
+                    {/if}
+                  </div>
+                </li>
+                {/each}
                 {/if}
-              {/each}
-              </td> -->
-              <!-- <td>Members</td>
-              <td>
-              {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
-                <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
-                {#if isOwner}
-                  <button on:click={() => promoteAdmin(user.id)}>promote admin</button>
-                {/if}
-                {#if isAdmin}
-                  <button on:click={() => ban(user.id)}>ban</button>
-                {/if}
-              {/each}
-              </td>
-            </tr> -->
-        <!-- <div class="overflow">
-          <ul>
-            {#each posts as post}
-              <li><b>{post.author}</b>: {post.content}</li>
-            {/each}
-          </ul>
-          <form on:submit|preventDefault={post}>
-            <input type="text" placeholder="message" bind:value={message}>
-            <button type="submit">send</button>
-          </form>
-        </div>
-        <button on:click={() => leaveChannel()}>Leave</button> -->
+              </ul>
+            </div>
 
-        <div class="chatbox" bind:this={chatbox}>
-        <ul class="message-list">
+            <div class="chat2">
 
-          {#each posts as post}
-          {#if post.author != $user.username}
-            <li class="msg receiver">
-            <span class="author">*{post.author}:</span><br>
-            <span class="content">{post.content}</span></li>
-          {:else}
-            <li class="msg sender"><span class="content">{post.content}</span></li>
-          {/if}
-          {/each}
-          </ul>
-      </div>
-      <form on:submit|preventDefault={post}>
-        <input type="text" class="input input-sm inpput-bordered" placeholder="message" bind:value={message}>
-        <button type="submit" class="btn btn-sm send">send</button>
-      </form>
-    {/if}
+              <div class="chatbox" bind:this={chatbox}>
+                <ul class="message-list">
+                  {#each posts as post}
+                  {#if post.author != $user.username}
+                    <li class="msg receiver">
+                    <span class="author">*{post.author}:</span><br>
+                    <span class="content">{post.content}</span></li>
+                  {:else}
+                    <li class="msg sender"><span class="content">{post.content}</span></li>
+                  {/if}
+                  {/each}
+                </ul>
+              </div>
+              <form class="chat-form" on:submit|preventDefault={post}>
+                <input type="text" placeholder="message" bind:value={message}>
+              </form>
+
+            </div>
+           </div>
 
   {/if}
 
-</div>
+
+  </div>
 
 <style>
 
@@ -402,6 +375,11 @@
   height:40px;
 }
 
+.chan-list {
+  overflow: auto;
+}
+
+
 .lineFriends:nth-child(2n + 1) {
   background-color: var(--li-two);
 }
@@ -410,52 +388,40 @@
   text-decoration:underline;
 }
 
+li h1 {
+  color: #fff;
+}
+
 .lineFriends span {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.marquee-container {
-  height: 30px;
-  overflow: hidden;
-  position: relative;
-  line-height: 30px;
-}
+.ctn-chan {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  max-height: 331px;
 
-.marquee {
-  top: 0;
-  left: 100%;
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  white-space: nowrap;
-  animation: marquee 20s linear infinite;
 }
 
 .chatbox {
-  height:270px;
-  width: 80%;
+  width: 100%;
+  height: 336px;
   overflow-y: scroll;
   background-color: var(--grey);
   color: #fff;
   border: 2px solid var(--pink);
-  border-radius:10px;
-  margin-left:10%;
 }
 
-form {
-  margin-left: 20%;
-  margin-right: 20%;
-  margin-bottom:2%;
-  margin-top:2%;
+
+.chat-form {
+  display: flex;
 }
 
-input {
-  float:left;
-}
-.send {
-  float:right;
+.chat-form input {
+  width: 100%;
+  border-radius: 0 0 var(--panel-radius) 0;
 }
 
 .message-list {
