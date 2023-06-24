@@ -122,7 +122,7 @@
         <ul class="friends-list">
           {#if $user !== undefined}
             {#each $user.friends as friend}
-              <li> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
+              <li class="friend"> <button on:click={() => pushToDmTab(friend.username)}> {friend.username}</button> </li>
             {/each}
           {/if}
         </ul>
@@ -142,23 +142,28 @@
       <h1>You are not conected with a user</h1>
     </div>
     {:else}
-      <h1>{chatUser}</h1>
-      <button class="invite-button" on:click={() => push(`/Pong?player2=${chatUser}`)}>invite to play</button>
+      <div class="chatHeader">
+      <h1 class="friendName">{chatUser}</h1>
+      <button class="btn btn-sm invite-button" on:click={() => push(`/Pong?player2=${chatUser}`)}>invite to play</button>
+      </div>
       <div class="chatbox" bind:this={chatbox}>
         <ul class="message-list">
           {#each messages as _message}
-            {_message.date}
             {#if _message.sender !== chatUser}
-            <li class="msg sender">{_message.content}</li>
+            <li class="msg sender">
+            <span class="date">{_message.date}</span><br>
+            <span class="content">{_message.content}</span></li>
             {:else}
-            <li class="msg receiver">{_message.content}</li>
+            <li class="msg receiver">
+            <span class="date">{_message.date}</span><br>
+            <span class="content">{_message.content}</span></li>
             {/if}
             {/each}
           </ul>
       </div>
       <form on:submit|preventDefault={sendDM}>
-        <input type="text" placeholder="message" bind:value={message}>
-        <button type="submit">send</button>
+        <input type="text"  class="input input-sm inpput-bordered" placeholder="message" bind:value={message}>
+        <button type="submit" class="btn btn-sm send">send</button>
       </form>
     {/if}
   </div>
@@ -234,28 +239,21 @@
     display: none;
   }
 
-  li {
-    display: block;
+
+  .friend {  
+    color:white;
+    display: grid;
+    grid-template-columns: 4fr 1fr 1fr 1fr;
+    background-color: var(--li-one);
+    height:40px;
+  }
+  .friend:nth-child(2n + 1){
+   background-color: var(--li-two);
   }
 
-  .friend {
-    color: var(--lite-lite-grey);
-    font-weight: bold;
-  }
 
   .friend:hover {
     text-decoration:underline;
-  }
-
-  li {
-    height: 40px;
-    display: grid;
-    grid-template-columns: 1fr;
-    background-color: var(--li-one);
-  }
-
-  li:nth-child(2n + 1) {
-    background-color: var(--li-two);
   }
 
   .disccus {
@@ -273,73 +271,99 @@
   }
 
 .chatbox {
-  height: 280px;
+  height: 75%;
+  width: 80%;
   overflow-y: scroll;
-  background-color: #333;
+  background-color: var(--grey);
   color: #fff;
-  border: 2px solid green;
-  margin-left: 25%;
-  margin-right: 25%;
+  border: 2px solid var(--pink);
+  border-radius:10px;
+  margin-left:10%;
+}
+
+.chatHeader {
+  margin-bottom:1.5%;
+  margin-top:0.5%;
+  margin-right:10%;
+  margin-left: 10%;
 }
 
 .invite-button {
-  margin-left: 25%;
-  margin-right: 25%;
+  float:left;
+}
+
+.chatHeader h1 {
+  float: right;
+}
+
+.friendName {
+  font-size:1.2em;
+  font-weight:bold;
+  color:white;
 }
 
 form {
-  margin-left: 25%;
-  margin-right: 25%;
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-bottom:2%;
+  margin-top:2%;
 }
 
-.message-list {
+input {
+  float:left;
+}
+.send {
+  float:right;
+}
+
+
+.message-list {  
   list-style: none;
   margin: 1rem auto;
   padding: 0;
   max-width: 400px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   --radius-big: 20px;
   --radius-small: 6px;
 
-  word-wrap: break-word;
 }
 
 .msg {
-  margin-bottom: 6px;
-  padding: 12px;
-  border-radius: 20px;
-  background: #ddd;
-  max-width: 150px;
-  margin-right: auto;
+  overflow-wrap: break-word;
+  margin-bottom:1em;
 }
 
 .msg.sender {
-  background: #0084ff;
-  color: #fff;
-  margin-left: auto;
-  margin-right: 0;
+  text-align: right;
 }
 
-.sender + .sender {
-  border-radius: var(--radius-big) var(--radius-small)
-    var(--radius-small) var(--radius-big);
+.msg.receiver {
+  text-align:left;
 }
 
-.receiver + .sender {
-  border-bottom-right-radius: var(--radius-small);
+.date {
+  font-size:0.8em;
 }
 
-.sender + .receiver {
-  border-radius: var(--radius-big) var(--radius-big)
-    var(--radius-small) var(--radius-small);
+.content {
+  border-radius:var(--radius-big);
+  box-decoration-break: clone;
+  padding:3%;
+  line-height:2.5em;
 }
 
-.receiver + .receiver {
-  border-radius: var(--radius-small);
+.msg.sender .content {
+  background-color: var(--pink);
+  border-bottom-right-radius:var(--radius-small);
 }
+
+.msg.receiver .content {
+  background-color: var(--lite-grey);
+  border-bottom-left-radius:var(--radius-small);
+}
+
+
 
 </style>

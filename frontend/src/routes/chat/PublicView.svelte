@@ -87,6 +87,7 @@ h1 {
   font-family: Courier, monospace;
   color: var(--orange);
   font-weight:bold;
+  font-size:1.2em;
 }
 
 .list {
@@ -107,6 +108,7 @@ h1 {
 
 li {
   height: 40px;
+  color:white;
   display: grid;
   grid-template-columns: 1fr;
   background-color: var(--li-one);
