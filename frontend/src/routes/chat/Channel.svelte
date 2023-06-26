@@ -311,7 +311,7 @@
                     <li><button on:click={() => ban(user.id)}>ban</button></li>
                     <li><button on:click={() => kick(user.id)}>kick</button></li>
                     <li><button on:click={() => mute(user.id)}>mute</button></li>
-                    <li><button on:click={() => promoteAdmin(user.id)}>down</button></li>
+                    <li><button on:click={() => promoteAdmin(user.id)}>up</button></li>
                   {/if}
                 </ul>
               </details>
