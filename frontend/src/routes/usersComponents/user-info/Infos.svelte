@@ -21,6 +21,7 @@
       id.set("0");
       if ($socket !== null && $socket !== undefined)
         $socket.disconnect()
+      push('/')
     } catch (e) {
       console.log(e);
     }
