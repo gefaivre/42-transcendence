@@ -113,7 +113,7 @@
 
   async function ban(userId: number) {
     try {
-      const response = await axios.delete(`/channel/${channel.name}/${userId}`)
+      const response = await axios.delete(`/channel/ban/${channel.name}/${userId}`)
       console.log(response)
       getChannel()
     } catch (e) {
@@ -123,6 +123,16 @@
 
   async function mute(userId: number) {
 
+  }
+
+  async function kick(userId: number) {
+    try {
+      const response = await axios.delete(`/channel/kick/${channel.name}/${userId}`)
+      console.log(response)
+      getChannel()
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
   }
 
   async function setup(channelName: string) {
@@ -281,8 +291,9 @@
                 <details class="dropdown">
                   <summary class="m-1 btn btn-xs">settings</summary>
                   <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
-                    <li><a on:click={() => ban(admin.id)}>ban</a></li>
-                    <li><a on:click={() => revokeAdmin(admin.id)}>down</a></li>
+                    <li><button on:click={() => kick(admin.id)}>kick</button></li>
+                    <li><button on:click={() => ban(admin.id)}>ban</button></li>
+                    <li><button on:click={() => revokeAdmin(admin.id)}>down</button></li>
                   </ul>
                 </details>
               {/if}
@@ -297,9 +308,10 @@
                 <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
                   <li><a contenteditable="false" href="#/users/{user.username}">profile</a></li>
                   {#if isAdmin}
-                    <li><a on:click={() => promoteAdmin(user.id)}>up</a></li>
-                    <li><a on:click={() => ban(user.id)}>ban</a></li>
-                    <li><a on:click={() => mute(user.id)}>mute</a></li>
+                    <li><button on:click={() => ban(user.id)}>ban</button></li>
+                    <li><button on:click={() => kick(user.id)}>kick</button></li>
+                    <li><button on:click={() => mute(user.id)}>mute</button></li>
+                    <li><button on:click={() => promoteAdmin(user.id)}>down</button></li>
                   {/if}
                 </ul>
               </details>

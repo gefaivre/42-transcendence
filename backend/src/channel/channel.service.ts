@@ -83,6 +83,11 @@ export class ChannelService {
     return channel !== null && channel.admins.some(admin => admin.id === userId)
   }
 
+  async isBanned(channelName: string, userId: number): Promise<boolean> {
+    const banned = await this.getBanned(channelName)
+    return banned !== undefined && banned.some(user => user.id === userId)
+  }
+
   addUserToChannel(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
@@ -159,6 +164,21 @@ export class ChannelService {
     })
   }
 
+  banUser(channelName: string, userId: number) {
+    return this.prisma.channel.update({
+      where: {
+        name: channelName // P2025
+      },
+      data: {
+        banned: {
+          connect: {
+            id: userId // P2025
+          }
+        }
+      }
+    })
+  }
+
   promoteAdmin(channelName: string, userId: number) {
     return this.prisma.channel.update({
       where: {
@@ -196,4 +216,15 @@ export class ChannelService {
     return bcrypt.compare(password, channel.password)
   }
 
+  async getBanned(channelName: string) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName
+      },
+      select: {
+        banned: true
+      }
+    })
+    return channel?.banned
+  }
 }
