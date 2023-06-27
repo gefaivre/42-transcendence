@@ -6,7 +6,7 @@ import { ChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
-import { Prisma } from '@prisma/client';
+import { ChannelStatus, Prisma } from '@prisma/client';
 
 @Controller('channel')
 @UseGuards(AuthGuard('jwt'))
@@ -109,7 +109,7 @@ export class ChannelController {
     }
   }
 
- @Patch(':channelName/revoke/:userId')
+  @Patch(':channelName/revoke/:userId')
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel
@@ -159,4 +159,16 @@ export class ChannelController {
     }
   }
 
+  @Patch('join')
+  async joinChannel(@Body() channel: ChannelDto, @Req() req: any) {
+    if (channel.status === ChannelStatus.Protected)
+      if (await this.channel.verifyPassword(channel.channelName, channel.password) === false)
+        throw new UnauthorizedException('wrong password')
+    return this.channel.addUserToChannel(channel.channelName, req.user.id);
+  }
+
+  @Patch('leave/:channelName')
+  async leaveChannel(@Param('channelName') channelName: string, @Req() req: any) {
+    return this.channel.leave(channelName, req.user.id);
+  }
 }

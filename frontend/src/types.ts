@@ -75,6 +75,7 @@ export type DirectMessage = {
   content: string
   sender: string
   recipient: string
+  date: Date
 }
 
 export type Match = {

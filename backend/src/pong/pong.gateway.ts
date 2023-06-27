@@ -14,7 +14,7 @@ import { BadRequestTransformationFilter } from 'src/filters';
 @WebSocketGateway({
   path: '/pong',
   cors: {
-    origin: 'http://localhost:8080',
+    origin: `${process.env.COMMON_BASE_URL}:8080`,
     credentials: true
   },
 })
@@ -29,7 +29,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     if (this.pong.gameAlreadyRequested(client.id)) {
-      this.server.emit('alreadyRequested', {});
+      this.server.to(client.id).emit('alreadyRequested', {});
       return ;
     }
       

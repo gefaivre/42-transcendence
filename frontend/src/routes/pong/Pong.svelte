@@ -8,6 +8,7 @@
   import { Status } from "../../types";
   import { socket as _socket } from "../../stores"
   import { toast } from '@zerodevx/svelte-toast/dist'
+  import { querystring } from "svelte-spa-router";
 
   class Match {
     player1: string;
@@ -31,12 +32,19 @@
   let gameRequest: boolean = false;
   let watch = false;
 
-  const socket = ioClient('http://localhost:3000', {
+  const socket = ioClient(axios.defaults.baseURL, {
     path: '/pong',
     withCredentials: true
-    });
+  });
 
   onMount(() => {
+
+    const searchParams = new URLSearchParams($querystring)
+    if (searchParams.has('player2') === true) {
+      friendly = true
+      friendUsername = searchParams.get('player2')
+    }
+
     socket.on('gameStart', (match) => {
       currentMatch = match;
       console.log("game started");
@@ -98,7 +106,7 @@
 
     socket.on('alreadyRequested', () => {
       toast.push('Game already requested!');
-      gameRequest = false; 
+      gameRequest = false;
     });
 
     return ()=> {
@@ -163,7 +171,6 @@
     gameRequest = false;
   }
 
-
   function watchGame(game: string) {
     socket.emit('watchGame', {gameName: game});
   }
@@ -182,49 +189,60 @@
 
 
   {#if !gameRequest}
-  <div id="requestGame">
+  <div class="panel">
     <h2>Play game</h2>
-    <input id="checkbox" type="checkbox" name="friendly" bind:checked={friendly}><label for="friendly">play friendly game</label>
+
+    <h3>Opponent</h3>
+    <input bind:value={friendUsername} type="text" placeholder="your friend username" class="input">
+
+    <br>
+
+    <h3>Game type</h3>
+
+    <select class="select select-bordered" bind:value={friendly}>
+      <option value={true} selected>Friendly</option>
+      <option value={false}>Ranked</option>
+    </select>
+
+    <br>
+
     {#if friendly}
-    <input bind:value={friendUsername} type="text" placeholder="your friend username">
 
     <h3>Settings</h3>
     <table id="settingsTable">
 
     <tr>
     <td align="left"><label for="ballSpeed">ball speed</label></td>
-    <td align="right"><input name="ballSpeed" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.ballSpeed} type="number" min="0.5" max="3" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="ballSize">ball size</label></td>
-    <td align="right"><input name="ballSize" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.ballSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="paddleSpeed">paddle speed</label></td>
-    <td align="right"><input name="paddleSpeed" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.paddleSpeed} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
 
     <tr>
     <td align="left"><label for="paddleSize">paddle size</label></td>
-    <td align="right"><input name="paddleSize" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
+    <td align="right"><input class="input" bind:value={settings.paddleSize} type="number" min="0.5" max="2" step="0.1"></td>
     </tr>
     </table>
     {/if}
-
-
   <br>
   {#if friendly}
-  <button id="requestButton" on:click={requestGame}>request friendly game</button>
+  <button class="btn" on:click={requestGame}>request friendly game</button>
   {:else}
-  <button id="requestButton" on:click={requestGame}>request random game</button>
+  <button class="btn" on:click={requestGame}>request random game</button>
   {/if}
 
 
   </div>
 
- <div id="watchGame">
+ <div class="panel">
  <h2>Watch Game</h2>
  {#if gameList.length}
   <ul id="gameList">
@@ -250,7 +268,9 @@
 
 {#if gameRequest}
 <h3>Game requested ! Waiting for your opponent ...</h3>
-<button on:click={cancelRequest}>Cancel</button>
+<br>
+<br>
+<button class="btn" on:click={cancelRequest}>Cancel</button>
 {/if}
 
 </div>
@@ -259,34 +279,36 @@
 <style>
 
 #all {
-  font-weight: bold;
-  display: flex;
-  flex-direction: column;
   color: var(--white);
-  background-color: var(--grey);
-  border-left: 1px solid grey;
+  background-color: none;
   padding-bottom: 2em;
   text-align: center;
 }
 
 #body {
   display:flex;
+  flex-direction: row;
   align-content: center;
+  margin-right: 5em;
+  margin-left: 5em;
+  gap: 50px;
+
 }
 
 #title {
-  color: rgb(158, 39, 217);
+  margin-top:1em;
+  text-shadow:  0 0 10px ;
+  color: var(--pink);
   font-size: 2em;
   font-weight: bold;
   margin-bottom:2em;
 }
 
-#watchGame {
-  flex-grow: 1;
-}
-
-#requestGame {
-  flex-grow: 1;
+.panel {
+  background-color: var(--lite-grey);
+  border-radius: var(--panel-radius);
+  flex-grow:1;
+  padding-bottom:1em;
 }
 
 #settingsTable {
@@ -295,42 +317,41 @@
   margin-right:auto;
 }
 
-#checkbox {
-  margin-left:0;
-}
-
 h2 {
+  font-family: Courier, monospace;
+  border-top-right-radius:10px;
+  border-top-left-radius:10px;
+  background-color:var(--grey);
   font-size:1.3em;
-  color:var(--pink);
+  color:var(--orange);
+  font-weight:bold;
   margin-bottom:1em;
 }
 
 h3 {
   font-size:1.1em;
-  color: rgb(158, 39, 217);
+  font-family: Courier, monospace;
+  color:var(--orange);
+  font-weight:bold;
   margin-top:1.2em;
 }
 
-button {
-  background-color:#3b82f6;
-  font-weight: bold;
-  border: 1px solid #1d4ed8;
-  border-radius:4px;
-  padding:0.5em;
-  margin: 1em;
-  color: var(--white);
+input {
+  color: black;
+}
+
+select {
+  color: black;
 }
 
 button:hover {
-  background-color:#1d4ed8
+  background-color:#2d333c
 }
 
-input {
-  border-radius: 2px;
-  font-weight:normal;
-  padding:0.5em;
-  margin:0.5em;
-  color: black;
+@media only screen and (max-width: 800px) {
+  #body {
+    flex-direction: column;
+  }
 }
 
 </style>

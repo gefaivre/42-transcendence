@@ -31,7 +31,7 @@ export class AuthController {
     // TODO (?): throw http exception
     // code we sent could have been wrong
     if (access_token === null)
-      return response.redirect('http://localhost:8080')
+      return response.redirect(`${process.env.COMMON_BASE_URL}:8080`)
 
     // exchange access token for user data
     const ft_user = await this.auth.getFortyTwoUser(access_token);
@@ -66,8 +66,9 @@ export class AuthController {
     response.cookie(jwtKey, jwtValue, { httpOnly: true })
 
     return user.TwoFA === true
-    ? response.redirect('http://localhost:8080/#/2FA')
-    : response.redirect('http://localhost:8080')
+    ? response.redirect(`${process.env.COMMON_BASE_URL}:8080/#/2FA`)
+    : response.redirect(`${process.env.COMMON_BASE_URL}:8080`)
+
   }
 
   @Post('signup')

@@ -78,7 +78,7 @@
   }
 
   function drawPaddles() {
-    ctx.fillStyle = 'rgb(158, 39, 217)';
+    ctx.fillStyle = 'rgb(249, 109, 0)';
     ctx.fillRect(leftPaddle.posx, leftPaddle.posy,
       leftPaddle.width, leftPaddle.height);
     ctx.fillRect(rightPaddle.posx, rightPaddle.posy,
@@ -127,7 +127,7 @@
 #players {
   text-align: center;
   font-weight: bold;
-  color:#3b82f6;
+  color:var(--lite-lite-grey);
   margin-bottom: 1em;
 }
 

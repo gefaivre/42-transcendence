@@ -24,11 +24,15 @@
 
 </script>
 
-<div class="box-info password">
+<div class="overflow">
+  <br>
+  <br>
   <h1>Change your password</h1>
+  <br>
+  <br>
   <div class="content">
-    <input type="text" placeholder="new password" bind:value={password} />
-    <button on:click={updatePassword}>Update</button>
+    <input bind:value={password} type="text" placeholder="new password" class="input input-sm input-bordered" />
+    <button class="btn btn-sm" on:click={() => updatePassword()}>Update</button>
   </div>
 </div>
 
@@ -39,27 +43,9 @@
     text-align: center;
   }
 
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-  }
-  .password {
+  .overflow {
     place-self: center;
-    width: 250px;
-    height: 100px;
-  }
-  .password .content {
-    margin-top: 5%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .password .content input {
-    border-radius: 10px;
+    flex: 1;
   }
 
 </style>

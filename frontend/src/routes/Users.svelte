@@ -1,17 +1,13 @@
 <script lang="ts">
   import axios from "../axios.config";
   import { id, user, logged, socket } from "../stores";
-  import { Status, type User } from "../types";
-  import UsersInfo from "./usersComponents/UsersInfo.svelte";
-  import UsersSettings from "./usersComponents/UsersSettings.svelte";
-  import NotFound from "./NotFound.svelte";
-  import UsersPanel from "./usersComponents/UsersPanel.svelte";
+  import type { Status, User } from "../types";
+  import Friends from "./usersComponents/user-info/Friends.svelte";
+  import Stats from "./usersComponents/user-info/Stats.svelte";
+  import Settings from "./usersComponents/user-info/Settings.svelte";
+  import Infos from "./usersComponents/user-info/Infos.svelte";
 
-  export let params;
-
-  const name = params.name;
-
-  let settings: boolean = false;
+  export let params: any;
 
   let isBlocked: boolean = false;
   let onlineStatus: Status = null;
@@ -47,65 +43,69 @@
 
   async function getUser() {
     try {
-      let response = await axios.get("/auth/whoami");
+      const response = await axios.get("/auth/whoami");
       user.set(response.data);
-      console.log($user);
       logged.set("true");
       id.set(response.data.id.toString());
-      isBlocked = pageUser.blockedBy.some(
-        (blocked: any) => blocked.id.toString() === $id
-      );
+      isBlocked = pageUser.blockedBy.some(blocked => blocked.id.toString() === $id)
     } catch (e) {
       logged.set("false");
       id.set("0");
     }
   }
 
-  async function getprofile(): Promise<User> {
-    return (await axios.get(`/users/${params.name}`)).data;
-  }
-
   async function selectprofile() {
-    if (params.name != $user.username) {
-      pageUser = await getprofile();
-      console.log(pageUser);
+
+    if (params.name == $user.username) {
+      pageUser = $user
+      return
+    }
+
+    try {
+      const response = await axios.get(`/users/${params.name}`)
+      pageUser = response.data
       $socket.emit('getOnlineStatus', pageUser.username, (response: Status) => {
         onlineStatus = response
       })
-    } else pageUser = $user;
+    } catch(e) {
+      console.log(e)
+    }
   }
 
 </script>
 
-{#if pageUser.username != null}
-  <div class="component">
+<div class="component">
 
-    <UsersPanel bind:pageUser bind:settings />
+  <Infos bind:pageUser bind:onlineStatus/>
 
-    <div class="second-panel">
-      {#if settings}
-        <UsersSettings />
-      {:else}
-        <UsersInfo bind:pageUser/>
-      {/if}
-    </div>
-  </div>
-{:else}
-  <NotFound />
-{/if}
+  <Friends bind:pageUser/>
+
+  <Stats bind:pageUser/>
+
+  {#if pageUser.id.toString() === $id}
+    <Settings bind:pageUser/>
+  {/if}
+
+</div>
 
 <style>
+
   .component {
     height: 100%;
     display: grid;
-    grid-template-columns: 320px 1fr;
-    background-color: var(--black);
+    place-items: center;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-auto-rows: 500px;
+    grid-auto-columns: 500px;
+    overflow-y: scroll;
   }
 
-  .second-panel {
-    grid-column: 2 / 3;
-    background-color: var(--grey);
-    overflow-y: auto;
+  @media screen and (max-width: 1300px) {
+    .component {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+    }
   }
 
 </style>

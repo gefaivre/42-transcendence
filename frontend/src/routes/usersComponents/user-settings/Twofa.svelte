@@ -16,33 +16,33 @@ import { toast } from '@zerodevx/svelte-toast/dist'
     $user.TwoFA = true;
     steptwo = false;
     } catch (e) {
-    toast.push('Bad 2FA code', { classes: ['failure'] })
-    console.log(e.response.data.message)
+      toast.push('Bad 2FA code', { classes: ['failure'] })
+      console.log(e.response.data.message)
     }
   }
 
   async function enable2FA() {
     try {
-    const response = await axios.patch(`/auth/2FA/enable`, null)
-    qrcode = response.data
-    steptwo = true;
+      const response = await axios.patch(`/auth/2FA/enable`, null)
+      qrcode = response.data
+      steptwo = true;
     } catch (e) {
-    console.log(e.response.data.message)
+      console.log(e.response.data.message)
     }
   }
 
   async function disable2FA() {
     try {
-    await axios.patch(`/auth/2FA/disable`, null)
-    $user.TwoFA = false;
+      await axios.patch(`/auth/2FA/disable`, null)
+      $user.TwoFA = false;
     } catch (e) {
-    console.log(e.response.data.message)
+      console.log(e.response.data.message)
     }
   }
 
 </script>
 
-  <div class="box-info twofa">
+  <div class="twofa">
     {#if $user.TwoFA === false && steptwo === false}
       <button on:click={enable2FA}>Enable TWOFA</button>
     {:else if qrcode !== ''}
@@ -55,15 +55,6 @@ import { toast } from '@zerodevx/svelte-toast/dist'
   </div>
 
 <style>
-
-
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-  }
-
 
   .twofa {
     display:flex ;

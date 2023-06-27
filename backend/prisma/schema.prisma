@@ -90,6 +90,7 @@ model Post {
 
 model DirectMessage {
   id          Int   @id @default(autoincrement())
+  date        DateTime @default(now())
   content     String
   senderId    Int
   receiverId  Int

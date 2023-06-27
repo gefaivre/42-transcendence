@@ -8,7 +8,15 @@
   import { handleImageError } from "../../../utils";
 
   export let pageUser: User;
-  let friendspage: String = "Friends";
+
+  const enum Tab {
+    Friends,
+    Request,
+    Pending,
+    Blocked
+  }
+
+  let tab: Tab = Tab.Friends
 
   async function removeFriendByName(name: string) {
     try {
@@ -82,44 +90,25 @@
 
 </script>
 
-<div class="friends">
+<div class="box-info">
     {#if $id === pageUser.id.toString()}
       <div class="nav">
-        {#if friendspage == "Friends"}
-          <button class="activeButton" on:click={() => friendspage = "Friends"}>friends</button>
-        {:else}
-          <button on:click={() => friendspage = "Friends"}>friends</button>
-        {/if}
-
-        {#if friendspage == "Request"}
-          <button class="activeButton" on:click={() => friendspage = "Request"}>request</button>
-        {:else}
-          <button on:click={() => friendspage = "Request"}>request</button>
-        {/if}
-
-        {#if friendspage == "Pending"}
-          <button class="activeButton" on:click={() => friendspage = "Pending"}>pending</button>
-        {:else}
-          <button on:click={() => friendspage = "Pending"}>pending</button>
-        {/if}
-
-        {#if friendspage == "Blocked"}
-          <button class="activeButton" on:click={() => friendspage = "Blocked"}>blocked</button>
-        {:else}
-          <button on:click={() => friendspage = "Blocked"}>blocked</button>
-        {/if}
+        <button on:click={() => tab = Tab.Friends} class={tab === Tab.Friends ? 'activeButton left' : 'left'}>Friends</button>
+        <button on:click={() => tab = Tab.Request} class={tab === Tab.Request ? 'activeButton' : undefined}>Request</button>
+        <button on:click={() => tab = Tab.Pending} class={tab === Tab.Pending ? 'activeButton' : undefined}>Pending</button>
+        <button on:click={() => tab = Tab.Blocked} class={tab === Tab.Blocked ? 'activeButton right' : 'right'}>Blocked</button>
       </div>
     {:else}
-      <h1>Friends</h1>
+      <h2>Friends</h2>
     {/if}
 
-    {#if friendspage == "Friends"}
+    {#if tab === Tab.Friends}
       <div class="overflow">
         <ul>
           {#each pageUser.friends as friend}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{friend.id}" on:error={handleImageError} alt="pp"/>
+                <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{friend.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{friend.username}">{friend.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
@@ -134,13 +123,13 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Request" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Request && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.requestFriends as requestFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{requestFriends?.id}" on:error={handleImageError} alt="pp"/>
+                <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{requestFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{requestFriends?.username}">
                   {requestFriends?.username}
                 </a>
@@ -159,13 +148,13 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Pending" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Pending && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.pendingFriends as pendingFriends}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{pendingFriends?.id}" on:error={handleImageError} alt="pp"/>
+                <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{pendingFriends?.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{pendingFriends?.username}">
                   {pendingFriends?.username}</a>
               </div>
@@ -180,13 +169,13 @@
           {/each}
         </ul>
       </div>
-    {:else if friendspage == "Blocked" && $id === pageUser.id.toString()}
+    {:else if tab === Tab.Blocked && $id === pageUser.id.toString()}
       <div class="overflow">
         <ul>
           {#each pageUser.blocked as blocked}
             <li>
               <div class="user">
-                <img class="pp" src="http://localhost:3000/images/actual/{blocked.id}" on:error={handleImageError} alt="pp"/>
+                <img class="pp" src="{COMMON_BASE_URL}:3000/images/actual/{blocked.id}" on:error={handleImageError} alt="pp"/>
                 <a class="name" href="#/users/{blocked.username}"> {blocked.username}</a>
               </div>
               {#if $id === pageUser.id.toString()}
@@ -205,17 +194,6 @@
   </div>
 
 <style>
-    .friends {
-    margin: 50px;
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
-    height: 80%;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-  }
 
   .pp {
     width: 35px;
@@ -224,30 +202,41 @@
     border-radius: 50%;
   }
 
-  h1 {
+  /* same into Pong.svelte */
+  h2 {
+    font-family: Courier, monospace;
+    border-top-right-radius:10px;
+    border-top-left-radius:10px;
+    background-color:var(--grey);
+    font-size:1.3em;
+    color:var(--orange);
+    font-weight:bold;
+    margin-bottom:1em;
     height: 40px;
-    border-bottom: solid 1px black;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
   li {
     height: 40px;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    background-color: var(--lite-lite-lite-grey);
-  }
-  li:nth-child(2n + 1) {
-    background-color: var(--lite-lite-grey);
+    background-color: var(--li-one);
   }
 
-  .friends .user {
+  li:nth-child(2n + 1) {
+    background-color: var(--li-two);
+  }
+
+  .box-info .user {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-left: 5%;
   }
-  .friends .user .name {
+
+  .box-info .user .name {
     margin-left: 5%;
   }
 
@@ -260,22 +249,7 @@
     gap: 5px;
   }
 
-  .friends .nav {
-    height: 40px;
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .friends .nav button {
-    border-bottom: solid 1px var(--black);
-    flex: auto;
-  }
-
-  .friends .nav .activeButton {
-    border-bottom: none;
-  }
-
-  .friends .nav button:not(:last-child) {
+  .box-info .nav button:not(:last-child) {
     border-right: solid 1px var(--black);
   }
 
@@ -294,12 +268,6 @@
   .btnImage {
     height: 25px;
     width: 25px;
-  }
-
-  .overflow {
-    flex: 1;
-    overflow: auto;
-    border-radius: 0 0 30px 30px;
   }
 
   *::-webkit-scrollbar {

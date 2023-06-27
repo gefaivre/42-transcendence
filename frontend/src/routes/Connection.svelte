@@ -21,6 +21,7 @@
     toast.push('Welcome! 👋', { classes: ['success'] })
     logged.set('true')
     push('/')
+    location.reload();
   }
 
   function failure2FA() {
@@ -61,6 +62,7 @@
         user.password = null
         logged.set('true')
         push('/')
+        location.reload();
       }
     } catch (e) {
       toast.push(e.response.data.message, { classes: ['failure'] })
@@ -120,18 +122,18 @@
 
   {:else if action === 'signup'}
     <div class="action">
-      <input type="text" placeholder="username" bind:value={user.username}><br>
-      <input type="text" placeholder="password" bind:value={user.password}><br>
-      <button on:click={signup}>signup</button>
-      <button on:click={() => action = ''}>return</button>
+      <input type="text" placeholder="username" class="input input-bordered" bind:value={user.username}><br>
+      <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}><br>
+      <button class="btn" on:click={signup}>signup</button>
+      <button class="btn" on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'signin'}
     <div class="action">
-      <input type="text" placeholder="username" bind:value={user.username}><br>
-      <input type="text" placeholder="password" bind:value={user.password}><br>
-      <button on:click={login}>login</button>
-      <button on:click={() => action = ''}>return</button>
+      <input type="text" placeholder="username" class="input input-bordered" bind:value={user.username}/><br>
+      <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}/><br>
+      <button class="btn" on:click={login}>login</button>
+      <button class="btn" on:click={() => action = ''}>return</button>
     </div>
 
   {:else if action === 'qrcode'}
@@ -143,9 +145,9 @@
 
   {/if}
 
-
 </div>
-  <style>
+
+<style>
 
   .screen {
     height: 100vh;
@@ -194,7 +196,5 @@
     height: 65px;
     width: 65px;
   }
-
-
 
 </style>

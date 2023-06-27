@@ -34,7 +34,6 @@
       images = response.data
       getPPs()
     } catch(e) {
-		toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 
@@ -58,14 +57,14 @@
 
 </script>
 
-<div class="box-info image">
+<div class="image">
     <h1>Change your pp</h1>
     <div class="image-list">
       {#each images as image}
       <div class="imageContainer">
         <div>
           <button class="hidden-button" on:click={() => updatePP(image.id)}>
-            <img class="pp" src="http://localhost:3000/images/{image.id}" alt={image.name}/>
+            <img class="pp" src="{COMMON_BASE_URL}:3000/images/{image.id}" alt={image.name}/>
           </button>
         </div>
         <div class="imageButton">
@@ -97,13 +96,6 @@
   h1 {
     color: var(--white);
     text-align: center;
-  }
-
-  .box-info {
-    border: solid 2px var(--grey);
-    box-shadow: 0 0 10px var(--lite-grey);
-    background-color: var(--lite-grey);
-    border-radius: 30px;
   }
 
   .image-list {
@@ -160,11 +152,9 @@
   }
 
   @media screen and (max-width: 1200px) {
-
     .image {
     width: 250px;
     }
-
   }
 
 </style>
