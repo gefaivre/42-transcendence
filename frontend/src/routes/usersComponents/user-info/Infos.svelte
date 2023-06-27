@@ -11,8 +11,8 @@
 
   export let pageUser: User
   export let onlineStatus: Status
+  export let isBlocked: boolean
 
-  let isBlocked: boolean = false;
 
   async function logout() {
     try {
@@ -21,6 +21,7 @@
       id.set("0");
       if ($socket !== null && $socket !== undefined)
         $socket.disconnect()
+      push('/')
     } catch (e) {
       console.log(e);
     }

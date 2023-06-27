@@ -51,8 +51,39 @@ export class ChannelController {
     }
   }
 
-  @Delete(':channelName/:userId')
-  async removeUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
+  @Delete('kick/:channelName/:userId')
+  async kickUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
+
+    // kicked user has to be member of the channel
+    const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
+    if (isMember === false)
+      throw new BadRequestException('user not member of channel')
+
+    // only admins can kick
+    const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === request.user.id)
+    if (isAdmin === false)
+      throw new BadRequestException('user not admin of channel')
+
+    // owner cannot be kicked
+    const isOwner: boolean = user.id === channel.ownerId
+    if (isOwner === true)
+      throw new BadRequestException('user is owner of the channel')
+
+    // This try/catch because the built-in exception layer returns '500 Internal Error' on any prisma exception.
+    // And we want to avoid 500! After those previous checks it should be good, but none of the above logic is atomic.
+    // Between those 'verification steps' channel could have been deleted, user could have been deleted too, etc.
+    // None of the above pipes act as unconditionnal guarantees.
+    try {
+      await this.channel.removeUser(channel.name, user.id)
+      this.logger.log(`user ${request.user.id} banned user ${user.id} from channel ${channel.name}`)
+      return `user ${request.user.id} banned user ${user.id} from channel ${channel.name}`
+    } catch(e) {
+      throw new UnauthorizedException(`cannot remove user ${user.id} from channel ${channel.name} (internal error)`)
+    }
+  }
+
+  @Delete('ban/:channelName/:userId')
+  async banUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // banned user has to be member of the channel
     const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
@@ -75,6 +106,7 @@ export class ChannelController {
     // None of the above pipes act as unconditionnal guarantees.
     try {
       await this.channel.removeUser(channel.name, user.id)
+      await this.channel.banUser(channel.name, user.id)
       this.logger.log(`user ${request.user.id} banned user ${user.id} from channel ${channel.name}`)
       return `user ${request.user.id} banned user ${user.id} from channel ${channel.name}`
     } catch(e) {
@@ -82,7 +114,7 @@ export class ChannelController {
     }
   }
 
-  @Patch(':channelNname/promote/:userId')
+  @Patch('promote/:channelName/:userId')
   async promoteAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // promoted user has to be member of the channel
@@ -109,7 +141,7 @@ export class ChannelController {
     }
   }
 
-  @Patch(':channelName/revoke/:userId')
+  @Patch('revoke/:channelName/:userId')
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel
@@ -161,9 +193,14 @@ export class ChannelController {
 
   @Patch('join')
   async joinChannel(@Body() channel: ChannelDto, @Req() req: any) {
+
+    if (await this.channel.isBanned(channel.channelName, req.user.id) === true)
+      throw new UnauthorizedException('banned')
+
     if (channel.status === ChannelStatus.Protected)
       if (await this.channel.verifyPassword(channel.channelName, channel.password) === false)
         throw new UnauthorizedException('wrong password')
+
     return this.channel.addUserToChannel(channel.channelName, req.user.id);
   }
 

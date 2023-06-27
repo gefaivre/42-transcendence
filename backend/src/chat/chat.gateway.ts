@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto, PostEmitDto } from './dto/post.dto';
-import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ChannelDto } from 'src/channel/dto/channel.dto';
 import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureCause, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
@@ -14,6 +14,8 @@ import { SendDirectMessageDto } from './dto/send-direct-message.dto';
 import { DirectMessageService } from './dm.service';
 import { UsersService } from 'src/users/users.service';
 import { CreateDirectMessage } from './types/CreateDirectMessage';
+import { MuteDto } from './dto/mute.dto';
+import { User } from '@prisma/client';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -67,6 +69,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, room, WsActionSuccess.JoinRoom)
   }
 
+  // TODO: check if user is not banned
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
@@ -112,6 +115,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume the channel exists
     const channelId: number = (await this.channel.findByName(post.channelName))?.id as number
 
+    // Check if user is muted
+    if (this.chat.isMutedByPrismaId(user.prismaId) === true)
+      return this.eventHandlerFailure(user, post.channelName, WsActionFailure.Post, WsFailureCause.UserMuted)
+
     // TODO (?): try/catch
     const _post = await this.posts.create({ content: post.content, channelId: channelId, authorId: user.prismaId })
 
@@ -125,6 +132,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
   }
 
+  // TODO: check if user is not blocked
   @SubscribeMessage('sendDirectMessage')
   async handleSendDirectMessage(@ConnectedSocket() client: Socket, @MessageBody() message: SendDirectMessageDto) {
 
@@ -152,6 +160,31 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(sender, message.recipient, WsActionSuccess.DirectMessage)
   }
 
+  // TODO: log must precise from which channel user has been muted
+  @SubscribeMessage('mute')
+  async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: MuteDto) {
+
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
+
+    // Since `MutedDto` has validated `body` (more particularly the `UserExist` validation) we assume `mutedUser` is not undefined
+    // const mutedUser: WsUser = this.chat.chatUsers.find(user => user.prismaId === body.userId) as WsUser
+    const mutedUser: Omit<User, 'password'> | null = await this.users.findById(body.userId)
+
+    if (mutedUser === null)
+      return this.eventHandlerFailure(user, '', WsActionFailure.Mute, WsFailureCause.UserNotFound)
+
+    // Only admins can mute
+    if (await this.channel.isAdmin(body.channelName, user.prismaId) === false)
+      return this.eventHandlerFailure(user, mutedUser.username, WsActionFailure.Mute, WsFailureCause.UserNotAdmin)
+
+    // Check if user already muted
+    if (this.chat.isMutedByPrismaId(body.userId) === true)
+      return this.eventHandlerFailure(user, mutedUser.username, WsActionFailure.Mute, WsFailureCause.UserAlreadyMuted)
+
+    this.chat.mute(body.channelName, body.userId, body.seconds)
+    return this.eventHandlerSuccess(user, mutedUser.username, WsActionSuccess.Mute)
+  }
 
   afterInit() {
     this.logger.log(WsActionSuccess.Init)

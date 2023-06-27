@@ -45,9 +45,11 @@
       const dm: DirectMessage = {
         content: _message,
         sender: sender,
-        recipient: 'foo',
+        recipient: $user.username,
         date: date
       }
+      if ($user.blocked.some(user => user.username === dm.sender) === true)
+        dm.content = '*blocked content*'
       messages.push(dm)
       messages = messages
       })

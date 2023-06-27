@@ -11,6 +11,7 @@
   import publicIcon from '../../assets/public.svg'
   import privateIcon from '../../assets/private.svg'
     import Username from "../usersComponents/user-settings/Username.svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let socket: Socket = null
   let message: string = ''
@@ -95,7 +96,7 @@
 
   async function revokeAdmin(id: number) {
     try {
-      await axios.patch(`/channel/${channel.name}/admin/revoke/${id}`, null)
+      await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
@@ -104,7 +105,7 @@
 
   async function promoteAdmin(id: number) {
     try {
-      await axios.patch(`/channel/${channel.name}/admin/promote/${id}`, null)
+      await axios.patch(`/channel/promote/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
@@ -113,7 +114,28 @@
 
   async function ban(userId: number) {
     try {
-      const response = await axios.delete(`/channel/${channel.name}/${userId}`)
+      const response = await axios.delete(`/channel/ban/${channel.name}/${userId}`)
+      console.log(response)
+      getChannel()
+    } catch (e) {
+      console.log(e.response.data.message)
+    }
+  }
+
+  async function mute(userId: number) {
+    socket.emit('mute', {
+      channelName: channel.name,
+      userId: userId,
+      seconds: 30
+    }, (response: string) => {
+      console.log(response)
+      toast.push(response, { classes: ['success'] })
+    })
+  }
+
+  async function kick(userId: number) {
+    try {
+      const response = await axios.delete(`/channel/kick/${channel.name}/${userId}`)
       console.log(response)
       getChannel()
     } catch (e) {
@@ -157,14 +179,15 @@
 
     socket.on('post', (post: PostEmitDto) => {
       console.log('receive post')
+      if ($user.blocked.some(user => user.username === post.author) === true)
+        post.content = '*blocked content*'
       posts.push(post)
       posts = posts
     })
 
-    // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
     socket.on('exception', (e: WsException) => {
       console.error(e)
-      return pop()
+      toast.push(e.message, { classes: ['failure'] })
     })
 
     // TODO: is it used ?
@@ -256,40 +279,56 @@
   {:else}
     <div class="ctn-chan">
 
-            <div class="chan-list">
-              <ul>
-                {#if channel}
-                <li><h1>--owner--</h1></li>
-                <li><a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/></li>
-                <li><h1>--admins--</h1></li>
-                {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
-                <li>
-                  <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
-                  {#if isOwner}
-                  <div style="display: flex;">
-                    <button on:click={() => revokeAdmin(admin.id)}>down</button>
-                    <button on:click={() => ban(admin.id)}>ban</button>
-                  </div>
-                    {/if}
-                </li>
-                {/each}
-                <li><h1>--users--</h1></li>
-                {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
-                <li>
-                  <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
-                  <div style="display: flex;">
-                    {#if isOwner}
-                      <button class="btn btn-xs" on:click={() => promoteAdmin(user.id)}>up</button>
-                    {/if}
-                    {#if isAdmin}
-                      <button class="btn btn-xs" on:click={() => ban(user.id)}>ban</button>
-                    {/if}
-                  </div>
-                </li>
-                {/each}
-                {/if}
+      <div class="chan-list">
+        <ul>
+        {#if channel}
+          <li><h1>--owner--</h1></li>
+          <li>
+            <a contenteditable="false" bind:innerHTML={channel.owner.username} href="#/users/{channel.owner.username}"/>
+            <details class="dropdown">
+              <summary class="m-1 btn btn-xs">settings</summary>
+              <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+                <li><a contenteditable="false" href="#/users/{channel.owner.username}">profile</a></li>
               </ul>
-            </div>
+            </details>
+          </li>
+          <li><h1>--admins--</h1></li>
+          {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
+            <li>
+              <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
+              {#if isOwner}
+                <details class="dropdown">
+                  <summary class="m-1 btn btn-xs">settings</summary>
+                  <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+                    <li><button on:click={() => kick(admin.id)}>kick</button></li>
+                    <li><button on:click={() => ban(admin.id)}>ban</button></li>
+                    <li><button on:click={() => revokeAdmin(admin.id)}>down</button></li>
+                  </ul>
+                </details>
+              {/if}
+            </li>
+          {/each}
+          <li><h1>--users--</h1></li>
+          {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
+            <li>
+              <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
+              <details class="dropdown">
+                <summary class="m-1 btn btn-xs">settings</summary>
+                <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+                  <li><a contenteditable="false" href="#/users/{user.username}">profile</a></li>
+                  {#if isAdmin}
+                    <li><button on:click={() => ban(user.id)}>ban</button></li>
+                    <li><button on:click={() => kick(user.id)}>kick</button></li>
+                    <li><button on:click={() => mute(user.id)}>mute(30s)</button></li>
+                    <li><button on:click={() => promoteAdmin(user.id)}>up</button></li>
+                  {/if}
+                </ul>
+              </details>
+            </li>
+          {/each}
+        {/if}
+        </ul>
+      </div>
 
             <div class="chat2">
 
@@ -314,7 +353,6 @@
            </div>
 
   {/if}
-
 
   </div>
 
@@ -378,7 +416,6 @@
 .chan-list {
   overflow: auto;
 }
-
 
 .lineFriends:nth-child(2n + 1) {
   background-color: var(--li-two);

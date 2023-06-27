@@ -1,6 +1,6 @@
 <script lang="ts">
   import axios from "../axios.config";
-  import { id, user, logged, socket } from "../stores";
+  import { id, user, socket } from "../stores";
   import type { Status, User } from "../types";
   import Friends from "./usersComponents/user-info/Friends.svelte";
   import Stats from "./usersComponents/user-info/Stats.svelte";
@@ -32,41 +32,30 @@
   $: {
     const { newName } = params.name;
     if (newName !== name) {
-      reload();
-    }
-  }
-
-  async function reload() {
-    getUser();
-    selectprofile();
-  }
-
-  async function getUser() {
-    try {
-      const response = await axios.get("/auth/whoami");
-      user.set(response.data);
-      logged.set("true");
-      id.set(response.data.id.toString());
-      isBlocked = pageUser.blockedBy.some(blocked => blocked.id.toString() === $id)
-    } catch (e) {
-      logged.set("false");
-      id.set("0");
+      selectprofile();
     }
   }
 
   async function selectprofile() {
 
-    if (params.name == $user.username) {
+    if (params.name === $user.username) {
       pageUser = $user
       return
     }
 
     try {
+
+      // get user
       const response = await axios.get(`/users/${params.name}`)
       pageUser = response.data
+
+      // get online status
       $socket.emit('getOnlineStatus', pageUser.username, (response: Status) => {
         onlineStatus = response
       })
+
+      // get blocked status
+      isBlocked = pageUser.blockedBy.some(blocked => blocked.id.toString() === $id)
     } catch(e) {
       console.log(e)
     }
@@ -76,7 +65,7 @@
 
 <div class="component">
 
-  <Infos bind:pageUser bind:onlineStatus/>
+  <Infos bind:pageUser bind:onlineStatus bind:isBlocked/>
 
   <Friends bind:pageUser/>
 
