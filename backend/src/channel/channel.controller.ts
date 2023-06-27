@@ -114,7 +114,7 @@ export class ChannelController {
     }
   }
 
-  @Patch(':channelNname/promote/:userId')
+  @Patch('promote/:channelName/:userId')
   async promoteAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // promoted user has to be member of the channel
@@ -141,7 +141,7 @@ export class ChannelController {
     }
   }
 
-  @Patch(':channelName/revoke/:userId')
+  @Patch('revoke/:channelName/:userId')
   async revokeAdmin(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
     // revoked user has to be member of the channel

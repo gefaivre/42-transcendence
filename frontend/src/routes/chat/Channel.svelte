@@ -96,7 +96,7 @@
 
   async function revokeAdmin(id: number) {
     try {
-      await axios.patch(`/channel/${channel.name}/admin/revoke/${id}`, null)
+      await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
@@ -105,7 +105,7 @@
 
   async function promoteAdmin(id: number) {
     try {
-      await axios.patch(`/channel/${channel.name}/admin/promote/${id}`, null)
+      await axios.patch(`/channel/promote/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
       console.log(e.response.data.message)
