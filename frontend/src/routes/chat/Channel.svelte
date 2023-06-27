@@ -11,6 +11,7 @@
   import publicIcon from '../../assets/public.svg'
   import privateIcon from '../../assets/private.svg'
     import Username from "../usersComponents/user-settings/Username.svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let socket: Socket = null
   let message: string = ''
@@ -122,7 +123,14 @@
   }
 
   async function mute(userId: number) {
-
+    socket.emit('mute', {
+      channelName: channel.name,
+      userId: userId,
+      seconds: 30
+    }, (response: string) => {
+      console.log(response)
+      toast.push(response, { classes: ['success'] })
+    })
   }
 
   async function kick(userId: number) {
@@ -175,10 +183,9 @@
       posts = posts
     })
 
-    // TODO: would be nice to pop _only_ when exception doesn't come from a post failure
     socket.on('exception', (e: WsException) => {
       console.error(e)
-      return pop()
+      toast.push(e.message, { classes: ['failure'] })
     })
 
     // TODO: is it used ?
@@ -310,7 +317,7 @@
                   {#if isAdmin}
                     <li><button on:click={() => ban(user.id)}>ban</button></li>
                     <li><button on:click={() => kick(user.id)}>kick</button></li>
-                    <li><button on:click={() => mute(user.id)}>mute</button></li>
+                    <li><button on:click={() => mute(user.id)}>mute(30s)</button></li>
                     <li><button on:click={() => promoteAdmin(user.id)}>up</button></li>
                   {/if}
                 </ul>

@@ -54,19 +54,17 @@ export class ChannelController {
   @Delete('kick/:channelName/:userId')
   async kickUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
 
-    console.log('kick')
-
-    // banned user has to be member of the channel
+    // kicked user has to be member of the channel
     const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)
     if (isMember === false)
       throw new BadRequestException('user not member of channel')
 
-    // only admins can ban
+    // only admins can kick
     const isAdmin: boolean = channel.admins.some((admin: any) => admin.id === request.user.id)
     if (isAdmin === false)
       throw new BadRequestException('user not admin of channel')
 
-    // owner cannot be banned
+    // owner cannot be kicked
     const isOwner: boolean = user.id === channel.ownerId
     if (isOwner === true)
       throw new BadRequestException('user is owner of the channel')
@@ -86,8 +84,6 @@ export class ChannelController {
 
   @Delete('ban/:channelName/:userId')
   async banUser(@Req() request: any, @Param('userId', UserByIdPipe) user: any, @Param('channelName', ChannelByNamePipe) channel: any) {
-
-    console.log('ban')
 
     // banned user has to be member of the channel
     const isMember: boolean = channel.users.some((_user: any) => _user.id === user.id)

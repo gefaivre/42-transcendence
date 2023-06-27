@@ -6,7 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
-import { WsUser } from 'src/types';
+import { Muted, WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
 
 @Injectable()
@@ -20,6 +20,7 @@ export class ChatService {
   ) {}
 
   chatUsers: WsUser[] = [];
+  muteUsers: Muted[] = [];
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];
@@ -58,6 +59,20 @@ export class ChatService {
 
   getUserBySocketId(id: string): WsUser | undefined {
     return this.chatUsers.find(user => user.socketId === id)
+  }
+
+  mute(channelName: string, userId: number, seconds: number) {
+    this.muteUsers.push({ channelName: channelName, userPrismaId: userId } as Muted)
+    const ms: number = seconds * 1000
+    setTimeout(() => this.unmute(channelName, userId), ms)
+  }
+
+  unmute(channelName: string, userId: number): void {
+    this.muteUsers = this.muteUsers.filter((muted: Muted) => muted.channelName !== channelName || muted.userPrismaId !== userId)
+  }
+
+  isMutedByPrismaId(id: number): boolean {
+    return this.muteUsers.some((muted: Muted) => muted.userPrismaId === id)
   }
 
 }
