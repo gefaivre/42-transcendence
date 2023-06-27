@@ -179,6 +179,8 @@
 
     socket.on('post', (post: PostEmitDto) => {
       console.log('receive post')
+      if ($user.blocked.some(user => user.username === post.author) === true)
+        post.content = '*blocked content*'
       posts.push(post)
       posts = posts
     })
