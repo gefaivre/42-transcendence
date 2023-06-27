@@ -13,3 +13,8 @@ export const enum Status {
 export type UserStatus = WsUser & {
   status: Status
 }
+
+export type Muted = {
+  channelName: string
+  userPrismaId: number
+}

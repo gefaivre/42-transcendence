@@ -8,7 +8,8 @@ export const enum WsActionSuccess {
   JoinRoom = 'joined room',
   JoinChannel = 'joined channel',
   LeaveChannel = 'left channel',
-  DirectMessage = 'send dm to'
+  DirectMessage = 'send dm to',
+  Mute = 'muted'
 }
 
 export const enum WsActionFailure {
@@ -18,7 +19,8 @@ export const enum WsActionFailure {
   JoinRoom = 'unauthorized to join room',
   JoinChannel = 'unauthorized to join channel',
   LeaveChannel = 'unauthorized to leave channel',
-  DirectMessage = 'unable to dm'
+  DirectMessage = 'unable to dm',
+  Mute = 'unable to mute'
 }
 
 export const enum WsFailureCause {
@@ -26,6 +28,9 @@ export const enum WsFailureCause {
   ChannelNotFound = 'channel not found',
   UserNotInChannel = 'user not in channel',
   UserAlreadyJoined = 'user already in channel',
+  UserNotAdmin = 'user not admin',
+  UserAlreadyMuted = 'user already muted',
+  UserMuted = 'user is muted',
   WrongChannelPassword = 'wrong password',
   PrivateChannel = 'this channel is private',
   AuthCookieNotFound = 'authentication header not found',
