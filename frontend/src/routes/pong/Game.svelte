@@ -19,16 +19,13 @@
     
     if (state.countdown === 0)
       countdown = 0;
-    else if (state.countdown <= 100)
-      countdown = 1;
-    else if (state.countdown <= 200)
-      countdown = 2;
     else
-      countdown = 3;
+      countdown = Math.trunc(state.countdown / 100);
   };
 
   export let players = {player1: '', player2: ''};
   export let gameSettings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
+  export let gamePause: boolean = false;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -41,6 +38,7 @@
 
   let frameHeight: number;
   let frameWidth: number;
+
 
 
   if (winWidth / winHeight < 1.5) {
@@ -103,7 +101,7 @@
 <p id="score">{leftScore}  -  {rightScore}</p>
 <div id="game">
   <canvas id="canvas" bind:this={canvas} width={frame.width} height={frame.height}></canvas><br>
-  {#if countdown != 0}
+  {#if countdown != 0 && !gamePause}
   <p transition:fade id="countdown">{countdown}</p>
   {/if}
 </div>
@@ -111,6 +109,11 @@
 <div id="instructions">
   Use 🡑 and 🡓 or 'w' and 's' to move the paddles
 </div>
+{#if gamePause}
+<div id="pause">
+  Waiting for your opponent ... victory in <span transition:fade > {countdown} </span>
+</div>
+{/if}
 </div>
 
 <style>

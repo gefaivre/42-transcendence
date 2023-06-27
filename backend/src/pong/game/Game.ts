@@ -25,7 +25,11 @@ export class Game {
     this.leftScore = 0;
     this.rightScore = 0;
 
-    this.countdown = 300;
+    this.countdown = 400;
+  }
+
+  pause(time: number) {
+    this.countdown = time * 100;
   }
 
 
@@ -45,7 +49,7 @@ export class Game {
         || this.ball.posx + this.ball.radius >= this.frame.width) {
         this.updateScore();
         this.ball.reset();
-        this.countdown = 300;
+        this.countdown = 400;
       }
       if (this.leftScore === 10 || this.rightScore === 10) {
         return ({

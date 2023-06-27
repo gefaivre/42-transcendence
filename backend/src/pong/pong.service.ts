@@ -302,7 +302,7 @@ export class PongService {
     if (user) {
       const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
       if (room && room.start == true) {
-        // room.game.pause();
+        room.game.pause(15);
       }
     }
   }

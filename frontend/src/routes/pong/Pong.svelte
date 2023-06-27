@@ -15,6 +15,8 @@
     player2: string;
   }
 
+  let pause: boolean = false;
+
   let settings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
 
   let gameList: Match[] = [];
@@ -272,7 +274,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:gameSettings={settings} bind:players={currentMatch} bind:update_state={update_child}></Game>
+<Game bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 

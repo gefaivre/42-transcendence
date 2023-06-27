@@ -115,6 +115,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: Socket) {
+
     const room: string | undefined = await this.pong.removeUser(client.id);
     if (room !== undefined) {
       const username = this.pong.getUsername(client.id);
