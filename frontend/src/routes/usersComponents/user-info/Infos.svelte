@@ -11,8 +11,8 @@
 
   export let pageUser: User
   export let onlineStatus: Status
+  export let isBlocked: boolean
 
-  let isBlocked: boolean = false;
 
   async function logout() {
     try {
