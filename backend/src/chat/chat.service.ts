@@ -30,7 +30,7 @@ export class ChatService {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
-      const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId }
+      const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId, lastPing: Date.now()}
       this.chatUsers.push(chatUser)
       return chatUser
     }

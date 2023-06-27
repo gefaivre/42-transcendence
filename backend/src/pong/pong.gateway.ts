@@ -26,6 +26,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server: Server;
 
+  @SubscribeMessage('ping')
+  handlePing(client: Socket) {
+    if (this.pong.IsLagging(client.id))
+      this.pong.pauseGame(client.id);
+  }
+
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     if (this.pong.gameAlreadyRequested(client.id)) {

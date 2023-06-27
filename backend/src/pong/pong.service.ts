@@ -28,11 +28,11 @@ export class PongService {
     return this.auth.validateToken(token)
   }
 
-  async addUser(socketId: string, tokenData: any) {
+   async addUser(socketId: string, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
-      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId })
+      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
       return user.username;
     }
   }
@@ -285,4 +285,25 @@ export class PongService {
     }
   }
 
+  IsLagging(socketId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+    
+    if (user) {
+      if (Date.now() - user.lastPing > 4000)
+        return true
+      user.lastPing = Date.now();
+    }
+    return false
+  }
+
+  pauseGame(socketId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+
+    if (user) {
+      const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+      if (room && room.start == true) {
+        // room.game.pause();
+      }
+    }
+  }
 }

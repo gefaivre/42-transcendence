@@ -37,6 +37,16 @@
     withCredentials: true
   });
 
+
+  setInterval(() => {
+  const start = Date.now();
+
+  socket.emit("ping", () => {
+      const duration = Date.now() - start;
+      console.log(duration);
+    });
+  }, 1000);
+
   onMount(() => {
 
     const searchParams = new URLSearchParams($querystring)

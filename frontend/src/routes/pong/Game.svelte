@@ -108,6 +108,9 @@
   {/if}
 </div>
 <p id="players">{players.player1}  VS  {players.player2}</p>
+<div id="instructions">
+  Use 🡑 and 🡓 or 'w' and 's' to move the paddles
+</div>
 </div>
 
 <style>
@@ -153,6 +156,12 @@
   font-weight: bold;
   color: var(--lite-lite-lite-grey);
 
+}
+
+#instructions {
+  font-family:'Courier New', Courier, monospace;
+  font-size: 0.5em;
+  color:var(--orange);
 }
 </style>
 
