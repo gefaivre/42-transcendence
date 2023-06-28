@@ -23,8 +23,14 @@
   let posts: PostEmitDto[] = []
   let channelName: string = null;
   let listChannel: any[] = [];
-  let tab:string = "find";
   let chatbox: any
+
+  const enum Tab {
+    AllChannels,
+    OneChannel
+  }
+
+  let tab: Tab = Tab.AllChannels
 
   export let channels: any[]
 
@@ -215,8 +221,7 @@
   function connectChannel(channel: string) {
     channelName = channel;
     setup(channel);
-    tab = "channel";
-    console.log("yes");
+    tab = Tab.OneChannel
   }
 
 </script>
@@ -224,20 +229,17 @@
 <div class="chat-channel">
 
   <div class="nav">
-    {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Your channels</button>
-    {:else}
-      <button class="left" on:click={() => tab = "find"}>Your channels</button>
-    {/if}
-
-    {#if tab == "channel"}
-      <button class="activeButton right" on:click={() => tab = "channel"}>{#if channelName != null} {channelName} {:else} Channel {/if}</button>
-    {:else}
-      <button class="right" on:click={() => tab = "channel"}>{#if channelName != null} {channelName} {:else} Channel {/if}</button>
-    {/if}
+    <button on:click={() => tab = Tab.AllChannels} class={tab === Tab.AllChannels ? 'activeButton left' : 'left'}>Your channels</button>
+    <button on:click={() => tab = Tab.OneChannel} class={tab === Tab.OneChannel ? 'activeButton right' : 'right'}>
+      {#if channelName !== null}
+        {channelName}
+      {:else}
+        Channel
+      {/if}
+    </button>
   </div>
 
-  {#if tab == "find"}
+  {#if tab === Tab.AllChannels}
     <div class="find">
       <div class="list">
         <ul>
