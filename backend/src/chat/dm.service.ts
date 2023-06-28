@@ -54,4 +54,36 @@ export class DirectMessageService {
     })))
   }
 
+  async getPenpals(username: string) {
+    const messages = await this.prisma.directMessage.findMany({
+      where: {
+        OR: [
+          {
+            sender: {
+              username: username
+            }
+          },
+          {
+            receiver: {
+              username: username
+            }
+          }
+        ]
+      },
+      select: {
+        sender: {
+          select: {
+            username: true
+          }
+        },
+        receiver: {
+          select: {
+            username: true
+          }
+        }
+      }
+    })
+    return [... new Set(messages.flatMap(message => [message.sender.username, message.receiver.username]))].filter(_username => _username !== username)
+  }
+
 }

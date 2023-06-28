@@ -7,6 +7,7 @@
   import publicIcon from '../../assets/public.svg'
 
   export let channels: any[]
+  export let reloadChannels = async () => {}
 
   let password: string = ''
 
@@ -22,6 +23,7 @@
         password: password,
         status: channel.status
       } as ChannelDto)
+      await reloadChannels()
       toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
       password = ''
     } catch(e) {
@@ -29,6 +31,7 @@
       password = ''
     }
   }
+
 </script>
 
 <div class="create-pannel">
