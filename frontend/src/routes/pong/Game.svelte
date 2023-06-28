@@ -4,7 +4,7 @@
   import { Ball, Frame, Paddle } from './Objects'
   import { fade } from 'svelte/transition';
 
-  export const update_state = (state: GameState) => {
+  export function update_state(state: GameState) {
     leftScore = state.score.leftScore;
     rightScore = state.score.rightScore;
 
@@ -61,6 +61,7 @@
   let leftScore: number = 0;
   let rightScore: number = 0;
   
+
   onMount(() => {
     ctx = canvas.getContext("2d");
     
@@ -111,7 +112,7 @@
 </div>
 {#if gamePause}
 <div id="pause">
-  Waiting for your opponent ... victory in <span transition:fade > {countdown} </span>
+  Waiting for a player ... end of match in <span transition:fade > {countdown} </span>
 </div>
 {/if}
 </div>
@@ -171,6 +172,7 @@
   font-weight: bold;
   color:var(--lite-lite-grey);
 }
+
 </style>
 
 

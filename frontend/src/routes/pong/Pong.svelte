@@ -135,7 +135,8 @@
       gameRequest = false;
     });
 
-    return ()=> {
+    return ()=> { 
+      console.log('I leave');
       socket.close();
     };
   });
