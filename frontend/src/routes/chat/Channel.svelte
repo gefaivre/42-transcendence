@@ -166,9 +166,10 @@
     }
   }
 
-  function connectChannel(channel: string) {
+  async function connectChannel(_channel: string) {
     tab = Tab.OneChannel
-    channelName = channel;
+    channelName = _channel
+    await getChannel()
     socket.emit('joinRoom', channelName)
   }
 
