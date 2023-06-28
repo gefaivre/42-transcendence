@@ -30,7 +30,6 @@ export class PongService {
 
    async addUser(socketId: string, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
-
     if (user !== null) {
       this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
       return user.username;
@@ -283,17 +282,53 @@ export class PongService {
       await this.users.updateGameStats(loser.username, loser.games + 1, loserMmr);
       await this.users.updateGameStats(winner.username, winner.games + 1, winnerMmr);
     }
+  } 
+
+  getUserById(prismaId: number) {
+    return this.pongUsers.find(user => user.prismaId === prismaId);
   }
 
-  IsLagging(socketId: string) {
-    const user: WsUser | undefined = this.getUserBySocketId(socketId)
-    
+  async reconnectUser(socketId: string, tokenData: any): Promise<string | undefined> {
+    const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
+
     if (user) {
-      if (Date.now() - user.lastPing > 4000)
-        return true
-      user.lastPing = Date.now();
+      const wsUser = this.getUserById(user.id);
+      if (wsUser) {
+        wsUser.socketId = socketId;
+        const room: Room | undefined = this.rooms.find(room => room.disconnected?.user.prismaId === wsUser.prismaId);
+        if (room) {
+          delete(room.disconnected);
+          room.game.unPause();
+          return (room.id);
+        }
+      }
     }
-    return false
+
+  }
+
+  // IsLagging(socketId: string) {
+  //   const user: WsUser | undefined = this.getUserBySocketId(socketId)
+    
+  //   if (user) {
+  //     if (Date.now() - user.lastPing > 4000)
+  //       return true
+  //     user.lastPing = Date.now();
+  //   }
+  //   return false
+  // }
+
+  tempDisconnect(socketId: string) : boolean{
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+
+    if (user) {
+      const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+      if (room) {
+        room.disconnected = {user: user, time: Date.now()};
+        return true;
+      }
+    }
+
+    return false;
   }
 
   pauseGame(socketId: string) {
@@ -305,5 +340,30 @@ export class PongService {
         room.game.pause(15);
       }
     }
+  }
+  
+  isTimeout(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id == roomId);
+
+    if (room) {
+      if (room.disconnected)
+        if (Date.now() - room.disconnected.time >= 12000) {
+          return room.disconnected.user.socketId;
+        }
+    }
+  }
+
+  isPaused(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id == roomId);
+    if (room && room.disconnected) {
+      return true;
+    }
+    return false;
+  }
+  
+  getRoomId(clientId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.player1.socketId === clientId || room.player2?.socketId === clientId);
+    if (room) 
+      return room.id;
   }
 }

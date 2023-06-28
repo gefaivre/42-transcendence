@@ -32,6 +32,9 @@ export class Game {
     this.countdown = time * 100;
   }
 
+  unPause() {
+    this.countdown = 400;
+  }
 
   loop() {
     if (this.countdown != 0) {

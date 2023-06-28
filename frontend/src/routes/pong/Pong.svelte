@@ -75,6 +75,20 @@
       }
     });
 
+    socket.on('unPause', () => {
+      pause = false;
+      toast.push('game will resume');
+    });
+
+    socket.on('pause', () => {
+      pause = true;
+      toast.push('game will resume');
+    });
+
+    socket.on('bothLeft', () => {
+      toast.push('both players left the game');
+    });
+
     socket.on('win', () => {
       restart();
       toast.push('you win!', { classes: ['success'] });

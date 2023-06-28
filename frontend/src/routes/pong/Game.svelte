@@ -158,7 +158,6 @@
   font-size: 3.5em;
   font-weight: bold;
   color: var(--lite-lite-lite-grey);
-
 }
 
 #instructions {
@@ -166,5 +165,12 @@
   font-size: 0.5em;
   color:var(--orange);
 }
+
+#pause {
+  text-align: center;
+  font-weight: bold;
+  color:var(--lite-lite-grey);
+}
 </style>
+
 
