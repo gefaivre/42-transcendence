@@ -11,6 +11,9 @@
     password: ''
   }
 
+  // export let channels: any[]
+  export let reloadChannels = async () => {}
+
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function remove(name: string) {
     if (!window.confirm("Are you sure ?"))
@@ -31,6 +34,7 @@
       return toast.push('Empty channel password', { classes: ['failure'] })
     try {
       await axios.post('channel', channel, { withCredentials: true })
+      await reloadChannels()
     } catch (e) {
       console.log(e.response.data.message)
     }

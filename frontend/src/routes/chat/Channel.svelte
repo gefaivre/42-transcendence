@@ -29,9 +29,11 @@
   let tab: Tab = Tab.AllChannels
 
   export let channels: any[]
+  export let reloadChannels = async () => {}
+
+  $: listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
 
   onMount(() => {
-    listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
 
     socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
@@ -79,6 +81,7 @@
   async function leaveChannel(name: string) {
     try {
       await axios.patch(`/channel/leave/${name}`)
+      await reloadChannels()
     } catch(e) {
       console.log(e)
     }
