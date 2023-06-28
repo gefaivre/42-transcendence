@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Socket, Server } from 'socket.io'
 import { ChatService } from './chat.service';
 import { PostDto, PostEmitDto } from './dto/post.dto';
-import { Logger, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ChannelDto } from 'src/channel/dto/channel.dto';
 import { ChatGuard } from './chat.guard';
 import { WsActionSuccess, WsActionFailure, WsFailureCause, WsHandlerSuccessServerLog, WsHandlerSuccessClientLog, WsLifecycleHookSuccessServerLog, WsLifecycleHookSuccessClientLog, WsLifecycleHookFailureServerLog, WsLifecycleHookFailureClientLog, WsHandlerFailureServerLog, WsHandlerFailureClientLog } from './types/types';
@@ -69,12 +69,27 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, room, WsActionSuccess.JoinRoom)
   }
 
-  // TODO: check if user is not banned
+  @SubscribeMessage('leaveRoom')
+  async handleLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
+
+    // Since `ChatGuard` has been applied we assume `user` is not undefined
+    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
+
+    client.leave(room)
+
+    return this.eventHandlerSuccess(user, room, WsActionSuccess.LeaveRoom)
+  }
+
+  // This is not used anymore: frontend join channel via HTTP at '/channel/join/'
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
+
+    // Check if user is banned
+    if (await this.channel.isBanned(channel.channelName, user.prismaId) === true)
+      return this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.UserBanned)
 
     try {
       await this.channel.addUserToChannel(channel.channelName, user.prismaId)
@@ -87,6 +102,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
+  // This is not used anymore: fontend leave channel via HTTP at '/channel/leave/:channelName'
   @SubscribeMessage('leaveChannel')
   async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
 
@@ -132,7 +148,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
   }
 
-  // TODO: check if user is not blocked
   @SubscribeMessage('sendDirectMessage')
   async handleSendDirectMessage(@ConnectedSocket() client: Socket, @MessageBody() message: SendDirectMessageDto) {
 
@@ -167,8 +182,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
-    // Since `MutedDto` has validated `body` (more particularly the `UserExist` validation) we assume `mutedUser` is not undefined
-    // const mutedUser: WsUser = this.chat.chatUsers.find(user => user.prismaId === body.userId) as WsUser
     const mutedUser: Omit<User, 'password'> | null = await this.users.findById(body.userId)
 
     if (mutedUser === null)
