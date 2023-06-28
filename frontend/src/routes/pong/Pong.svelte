@@ -283,6 +283,8 @@
   background-color: none;
   padding-bottom: 2em;
   text-align: center;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 #body {
