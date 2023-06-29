@@ -19,9 +19,8 @@
   function success2FA() {
     code = null
     toast.push('Welcome! 👋', { classes: ['success'] })
+    push(`/Users/${user.username}`)
     logged.set('true')
-    push('/')
-    location.reload();
   }
 
   function failure2FA() {
@@ -58,11 +57,10 @@
         action = 'qrcode';
       } else {
         toast.push('Welcome! 👋', { classes: ['success'] })
+        push(`/Users/${user.username}`)
         user.username = null
         user.password = null
         logged.set('true')
-        push('/')
-        location.reload();
       }
     } catch (e) {
       toast.push(e.response.data.message, { classes: ['failure'] })

@@ -61,9 +61,11 @@
     </div>
 
     <div class="routes">
-      {#if $user}
-        <Router {routes}/>
+      {#await getProfile() then _}
+        {#if $user}
+          <Router {routes}/>
         {/if}
+      {/await}
       </div>
   </div>
 
