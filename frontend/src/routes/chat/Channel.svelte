@@ -174,6 +174,53 @@
     }
   }
 
+  async function updateChannelPassword(name: string) {
+
+    const password: string = prompt('new password')
+
+    if (password === null)
+      return
+
+    if (password === '')
+      return toast.push('empty password', { classes: ['failure'] })
+
+    const body = { channelName: name, password: password }
+
+    try {
+      await axios.patch('/channel/password', body)
+      toast.push('password updated!', { classes: ['success'] })
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
+    }
+  }
+
+  async function updateChannelStatus(name: string, status: ChannelStatus) {
+
+    let password: string = ''
+
+    if (status === ChannelStatus.Protected) {
+      password = prompt('channel password')
+      if (password === null)
+        return
+      if (password === '')
+        return toast.push('empty password', { classes: ['failure'] })
+    }
+
+    const body = {
+      channelName: name,
+      status: status,
+      password: password
+    }
+
+    try {
+      await axios.patch('/channel/status', body)
+      toast.push('status updated!', { classes: ['success'] })
+      await reloadChannels()
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
+    }
+  }
+
 </script>
 
 <div class="chat-channel">
@@ -232,6 +279,28 @@
     <div class="ctn-chan">
 
       <div class="chan-list">
+        {#if channel?.owner?.id === $user.id}
+        <!-- channel visibility -->
+        <details class="dropdown">
+          <summary class="m-1 btn btn-xs">Change visibility</summary>
+          <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+          {#if channel.status === ChannelStatus.Public}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Private)}>private</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Protected)}>protected</button></li>
+          {:else if channel.status === ChannelStatus.Protected}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Public)}>public</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Private)}>private</button></li>
+          {:else}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Public)}>public</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Protected)}>protected</button></li>
+          {/if}
+          </ul>
+        </details>
+        <!-- channel password -->
+          {#if channel?.status === ChannelStatus.Protected}
+            <button class="btn btn-xs" on:click={() => updateChannelPassword(channel.name)}>Change password</button>
+          {/if}
+        {/if}
         <ul>
         {#if channel}
           <li><h1>--owner--</h1></li>

@@ -15,6 +15,12 @@
 
     if (channel.status === ChannelStatus.Protected) {
       password = prompt('Enter password')
+      if (password === null) {
+        password = ''
+        return
+      }
+      else if (password === '')
+        return toast.push('empty password', { classes: ['failure'] })
     }
 
     try {
