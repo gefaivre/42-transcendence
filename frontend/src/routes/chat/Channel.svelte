@@ -2,85 +2,108 @@
 
   import axios from "../../axios.config";
   import { onDestroy, onMount } from "svelte";
-  import { id, user } from "../../stores";
-  import { pop } from "svelte-spa-router";
+  import { user } from "../../stores";
   import ioClient from 'socket.io-client';
   import type { Socket } from "socket.io-client";
-  import { type Channel, type PostEmitDto, type ChannelDto, type WsException, ChannelStatus } from "../../types";
+  import { type Channel, type PostEmitDto, type WsException, ChannelStatus } from "../../types";
   import lockedIcon from '../../assets/lock.svg'
   import publicIcon from '../../assets/public.svg'
   import privateIcon from '../../assets/private.svg'
-    import Username from "../usersComponents/user-settings/Username.svelte";
   import { toast } from '@zerodevx/svelte-toast/dist'
 
   let socket: Socket = null
   let message: string = ''
-  let password: string = ''
   let channel: Channel = null
   let isOwner: boolean = false
   let isAdmin: boolean = false
-  let isMember: boolean = false
   let posts: PostEmitDto[] = []
   let channelName: string = null;
   let listChannel: any[] = [];
-  let tab:string = "find";
   let chatbox: any
 
+  const enum Tab {
+    AllChannels,
+    OneChannel
+  }
+
+  let tab: Tab = Tab.AllChannels
+
   export let channels: any[]
+  export let reloadChannels = async () => {}
+
+  $: listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
 
   onMount(() => {
-    listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
+
+    socket = ioClient(axios.defaults.baseURL, {
+      path: '/chat',
+      withCredentials: true
+    })
+
+    socket.on('connect', () => {
+      console.log('Connected')
+    })
+
+    socket.on('disconnect', (cause) => {
+      console.log('Disconnected:', cause)
+    })
+
+    socket.on('post', (post: PostEmitDto) => {
+      console.log('receive post')
+      if ($user.blocked.some(user => user.username === post.author) === true)
+        post.content = '*blocked content*'
+      posts.push(post)
+      posts = posts
+    })
+
+    socket.on('exception', (e: WsException) => {
+      console.error(e)
+      toast.push(e.message, { classes: ['failure'] })
+    })
+
+    // TODO: typedef event
+    socket.on('channelEvent', (event: any) => {
+      if (event.event === 'join') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+      else if (event.event === 'leave') {
+        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
+        posts.push(post)
+        posts = posts
+      }
+    })
   })
 
   onDestroy(() => closeSocket())
 
-  async function _leaveChannel(name: string) {
+  async function leaveChannel(name: string) {
     try {
       await axios.patch(`/channel/leave/${name}`)
+      await reloadChannels()
     } catch(e) {
       console.log(e)
     }
   }
 
   function closeSocket() {
-    if (socket){
+    if (socket !== null) {
       socket.disconnect()
+      channelName = null
+      posts.splice(0, posts.length)
     }
   }
 
   function post() {
-    if (!message || message === '')
-      return ;
+    if (message === null || message === '')
+      return;
     socket.emit('sendPost', {
       content: message,
-      channelName: channel.name,
+      channelName: channelName,
     }, (response: string) => {
       console.log(response)
       message = ''
-    })
-  }
-
-  function joinRoom() {
-    socket.emit('joinRoom', channel.name, (response: string) => {
-      console.log(response)
-    })
-  }
-
-  function joinChannel() {
-    socket.emit('joinChannel', {
-      channelName: channel.name,
-      status: channel.status,
-      password: password
-    } as ChannelDto, (response: string) => {
-      console.log(response)
-      joinRoom()
-    })
-  }
-
-  function leaveChannel() {
-    socket.emit('leaveChannel', channel.name, (response: string) => {
-      console.log(response)
-      return pop()
     })
   }
 
@@ -143,80 +166,20 @@
     }
   }
 
-  async function setup(channelName: string) {
-    channel = (await axios.get(`/channel/${channelName}`)).data
-    socket = ioClient(axios.defaults.baseURL, {
-      path: '/chat',
-      withCredentials: true
-    })
-
-    if (channel.users.find(user => user.id.toString() === $id))
-      joinRoom()
-    else {
-      if (confirm('Join this channel ?') === false)
-        return pop()
-      if (channel.status === 'Protected') {
-        password = prompt('Enter password')
-        if (password === '')
-          console.error(`Unable to join channel ${channel.name}: Empty password.`)
-        if (password === null)
-          return pop()
-      }
-      joinChannel()
-    }
-
-    isOwner = channel.ownerId.toString() === $id
-    isAdmin = channel.admins.some(admin => admin.id.toString() === $id)
-    isMember = true
-
-    socket.on('connect', () => {
-      console.log('Connected')
-    })
-
-    socket.on('disconnect', (cause) => {
-      console.log('Disconnected:', cause)
-    })
-
-    socket.on('post', (post: PostEmitDto) => {
-      console.log('receive post')
-      if ($user.blocked.some(user => user.username === post.author) === true)
-        post.content = '*blocked content*'
-      posts.push(post)
-      posts = posts
-    })
-
-    socket.on('exception', (e: WsException) => {
-      console.error(e)
-      toast.push(e.message, { classes: ['failure'] })
-    })
-
-    // TODO: is it used ?
-    socket.on('error', (e) => {
-      console.error(e)
-      return pop()
-    })
-
-    // TODO: typedef event
-    socket.on('channelEvent', (event: any) => {
-      if (event.event === 'join') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
-      }
-      else if (event.event === 'leave') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
-      }
-    })
-
+  async function connectChannel(_channel: string) {
+    tab = Tab.OneChannel
+    channelName = _channel
+    await getChannel()
+    socket.emit('joinRoom', channelName)
   }
 
-  function connectChannel(channel: string) {
-    channelName = channel;
-    setup(channel);
-    tab = "channel";
-    console.log("yes");
+  function switchTab(target: Tab) {
+    tab = target
+    if (target === Tab.AllChannels) {
+      socket.emit('leaveRoom', channelName)
+      channelName = null
+      posts.splice(0, posts.length)
+    }
   }
 
 </script>
@@ -224,20 +187,17 @@
 <div class="chat-channel">
 
   <div class="nav">
-    {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Your channels</button>
-    {:else}
-      <button class="left" on:click={() => tab = "find"}>Your channels</button>
-    {/if}
-
-    {#if tab == "channel"}
-      <button class="activeButton right" on:click={() => tab = "channel"}>{#if channelName != null} {channelName} {:else} Channel {/if}</button>
-    {:else}
-      <button class="right" on:click={() => tab = "channel"}>{#if channelName != null} {channelName} {:else} Channel {/if}</button>
-    {/if}
+    <button on:click={() => switchTab(Tab.AllChannels)} class={tab === Tab.AllChannels ? 'activeButton left' : 'left'}>Your channels</button>
+    <button on:click={() => switchTab(Tab.OneChannel)} class={tab === Tab.OneChannel ? 'activeButton right' : 'right'}>
+      {#if channelName !== null}
+        {channelName}
+      {:else}
+        Channel
+      {/if}
+    </button>
   </div>
 
-  {#if tab == "find"}
+  {#if tab === Tab.AllChannels}
     <div class="find">
       <div class="list">
         <ul>
@@ -266,7 +226,7 @@
               </div>
             </span>
             <span>
-              <button class="btn btn-xs" on:click={() => _leaveChannel(channel.name)}>
+              <button class="btn btn-xs" on:click={() => leaveChannel(channel.name)}>
                 leave
               </button>
             </span>

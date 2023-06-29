@@ -45,10 +45,14 @@ export class PostsController {
     return this.posts.findByChannel(id)
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get('dm/:username')
   getAllMesagesBetweenTwoUsers(@Req() request: any, @Param('username', UserByUsernamePipe) user: any) {
     return this.dm.findAllMesagesBetweenTwoUsers(request.user.id, user.id)
+  }
+
+  @Get('penpals/foo')
+  getPenals(@Req() request: any) {
+    return this.dm.getPenpals(request.user.username)
   }
 
 }
