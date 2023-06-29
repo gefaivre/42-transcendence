@@ -66,7 +66,7 @@ export class AuthController {
     response.cookie(jwtKey, jwtValue, { httpOnly: true })
 
     return user.TwoFA === true
-    ? response.redirect(`${process.env.COMMON_BASE_URL}:8080/#/2FA`)
+    ? response.redirect(`${process.env.COMMON_BASE_URL}:8080/?twoFA=true`)
     : response.redirect(`${process.env.COMMON_BASE_URL}:8080`)
 
   }

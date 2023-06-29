@@ -30,15 +30,18 @@
   };
 
   $: {
-    const { newName } = params.name;
-    if (newName !== name) {
-      selectprofile();
+    if (params != undefined)
+    {
+      const { newName } = params.name;
+      if (newName !== name) {
+        selectprofile();
+      }
     }
   }
 
   async function selectprofile() {
 
-    if (params.name === $user.username) {
+    if (params == undefined || params.name === $user.username) {
       pageUser = $user
       return
     }
