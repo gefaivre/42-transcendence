@@ -57,17 +57,14 @@
       statistics.averageLose.opponentScore = +(ranked.filter((match) => match.winnerId != pageUser.id)
       .reduce((sum, match) => sum + match.winnerScore, 0) /statistics.lostGames).toFixed(2);
     }
-
-    console.log('stats', statistics);
   }
 
   async function getMatchHistory() {
     try {
       const response = await axios.get(`matchs/history/${pageUser.id}`)
       matchHistory = response.data
-      console.log('matchs', matchHistory)
     } catch(e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

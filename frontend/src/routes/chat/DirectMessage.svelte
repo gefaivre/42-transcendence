@@ -38,11 +38,10 @@
     })
 
     socket.on('connect', () => {
-      console.log('Connected')
     })
 
     socket.on('exception', (e: WsException) => {
-      console.error(e)
+      toast.push(e.message, {classes: ['failure']})
     })
 
     socket.on('dm', (_message: string, sender: string, date: Date) => {
