@@ -36,6 +36,24 @@ export class PongService {
     }
   }
 
+  async reconnectUser(socketId: string, tokenData: any): Promise<string | undefined> {
+    const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
+
+    if (user) {
+      const wsUser = this.getUserById(user.id);
+      if (wsUser) {
+        wsUser.socketId = socketId;
+        wsUser.lastPing = Date.now();
+        const room: Room | undefined = this.rooms.find(room => room.disconnected?.user.prismaId === wsUser.prismaId);
+        if (room) {
+          delete(room.disconnected);
+          room.game.unPause();
+          return (room.id);
+        }
+      }
+    }
+  }
+
   async disconnectUser(socketId: string): Promise<string | undefined> {
     const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
@@ -296,25 +314,7 @@ export class PongService {
     return this.pongUsers.find(user => user.prismaId === prismaId);
   }
 
-  async reconnectUser(socketId: string, tokenData: any): Promise<string | undefined> {
-    const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
-
-    if (user) {
-      const wsUser = this.getUserById(user.id);
-      if (wsUser) {
-        wsUser.socketId = socketId;
-        wsUser.lastPing = Date.now();
-        const room: Room | undefined = this.rooms.find(room => room.disconnected?.user.prismaId === wsUser.prismaId);
-        if (room) {
-          delete(room.disconnected);
-          room.game.unPause();
-          return (room.id);
-        }
-      }
-    }
-
-  }
-
+ 
   isLagging(socketId: string) {
     const user: WsUser | undefined = this.getUserBySocketId(socketId)
     
@@ -359,7 +359,7 @@ export class PongService {
 
     if (room) {
       if (room.disconnected)
-        if (Date.now() - room.disconnected.time >= 12000) {
+        if (room.game.countdown === 0) {
           return room.disconnected.user.socketId;
         }
     }
