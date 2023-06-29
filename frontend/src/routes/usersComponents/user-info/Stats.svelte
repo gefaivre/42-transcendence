@@ -4,6 +4,7 @@
   import axios from "../../../axios.config";
   import type { Match, Stat, User } from "../../../types";
   import { handleImageError } from "../../../utils";
+  import { toast } from '@zerodevx/svelte-toast/dist';
 
   export let pageUser: User;
 
@@ -33,12 +34,11 @@
       const response = await axios.get(`/users/id/${id}`)
       return response.data.username;
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
   function getStatistics() {
-    console.log('matchshistory', matchHistory)
     const ranked = matchHistory.filter((match) => match.ranked === true);
 
     statistics.wonGames = ranked.filter((match) => match.winnerId == pageUser.id).length;

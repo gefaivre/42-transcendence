@@ -18,7 +18,7 @@
       password = null;
       replace(`/users/${$user.username}`);
     } catch (e) {
-      console.log(e.response.data.message);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

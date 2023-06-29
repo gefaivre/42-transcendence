@@ -52,8 +52,6 @@
 
   let size = frameWidth / 30;
 
-  console.log('win width = ', winWidth)
-  console.log('frame width = ', frameWidth)
   const frame: Frame =  new Frame(frameWidth, frameHeight);
   const ball: Ball =  new Ball(frame, gameSettings); 
   const leftPaddle: Paddle = new Paddle(true, frame, gameSettings); 

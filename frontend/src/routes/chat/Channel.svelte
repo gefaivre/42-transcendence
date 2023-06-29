@@ -57,7 +57,6 @@
     })
 
     socket.on('exception', (e: WsException) => {
-      console.error(e)
       toast.push(e.message, { classes: ['failure'] })
     })
 

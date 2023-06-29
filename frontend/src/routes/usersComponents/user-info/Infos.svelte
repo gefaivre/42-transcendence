@@ -23,7 +23,7 @@
         $socket.disconnect()
       push('/')
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -37,7 +37,7 @@
       pageUser = pageUser
       $user = $user
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -55,7 +55,7 @@
       $user = $user
 
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -69,13 +69,11 @@
       index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
       pageUser.requestFriends.splice(index, 1);
 
-      console.log($user.friends)
-
       pageUser = pageUser
       $user = $user
 
     } catch (e) {
-      console.log(e);
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -99,7 +97,7 @@
       $user = $user
 
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -108,7 +106,7 @@
       await axios.patch(`/users/block/${pageUser.username}`, null);
       isBlocked = true;
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -117,7 +115,7 @@
       await axios.patch(`/users/unblock/${pageUser.username}`, null);
       isBlocked = false;
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -135,7 +133,7 @@
       $user = $user
 
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

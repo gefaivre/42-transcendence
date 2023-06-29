@@ -7,6 +7,7 @@
   import type { Socket } from "socket.io-client";
   import type { DirectMessage, WsException } from "../../types";
   import { push } from "svelte-spa-router";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let socket: Socket = null
   let message: string = null
@@ -28,7 +29,7 @@
       const response = await axios.get('/posts/penpals/foo')
       penpals = response.data
     } catch(e) {
-      console.log(e)
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
 
     socket = ioClient(axios.defaults.baseURL, {
@@ -72,7 +73,6 @@
       content: message,
       recipient: chatUser
     } as DirectMessage, (response: string) => {
-      console.log(response)
       message = ''
       messages = messages
     })
@@ -83,7 +83,7 @@
       const response = await axios.get(`/posts/dm/${username}`)
       messages = response.data
     } catch (e) {
-      console.log(e)
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
