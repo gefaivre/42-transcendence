@@ -47,7 +47,6 @@
 
   socket.emit("ping", () => {
       const duration = Date.now() - start;
-      console.log(duration);
     });
   }, 1000);
 
@@ -69,9 +68,7 @@
       if (res.response === true) {
         currentMatch = res.players;
         settings = res.settings;
-        console.log(res);
         watch = true;
-        console.log('watcherMode on');
       } else {
         alert('This match is no longer played, refresh the page');
       }
@@ -141,7 +138,6 @@
     });
 
     return ()=> { 
-      console.log('I leave');
       socket.close();
     };
   });
@@ -157,7 +153,6 @@
   }
 
   getGames();
-  console.log('gameList', gameList);
 
   async function getGames() {
     let games = (await axios.get('/pong')).data;
@@ -188,7 +183,6 @@
   }
 
   function requestGame() {
-    console.log('settings', settings);
     if (friendly) {
       socket.emit('requestGame', { friend: friendUsername, settings: settings });
     } else {

@@ -3,6 +3,7 @@
   import type { GameState, Settings } from './Class';
   import { Ball, Frame, Paddle } from './Objects'
   import { fade } from 'svelte/transition';
+    import { push } from 'svelte-spa-router';
 
   export function update_state(state: GameState) {
     leftScore = state.score.leftScore;
@@ -41,7 +42,6 @@
   let frameWidth: number;
 
 
-
   if (winWidth / winHeight < 1.5) {
     frameWidth = winWidth;
     frameHeight = Math.round(winWidth / 1.5);
@@ -51,9 +51,6 @@
   }
 
   let size = frameWidth / 30;
-
-  console.log('win width = ', winWidth)
-  console.log('frame width = ', frameWidth)
   const frame: Frame =  new Frame(frameWidth, frameHeight);
   const ball: Ball =  new Ball(frame, gameSettings); 
   const leftPaddle: Paddle = new Paddle(true, frame, gameSettings); 
@@ -64,10 +61,26 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+
+    let urls = Array.from(document.getElementsByTagName('a'));
+    const oldurls = new Map();
+    urls.forEach(url => {
+      console.log(url.attributes.href.value);
+      oldurls[url.attributes.href.value] = url.onclick;
+      if (url.attributes.href.value !== '#/Pong')
+      url.onclick = function(){
+      if (window.confirm("leave the game ?"))
+        goto(url.baseURI);
+      };
+  });
+
     
     game_loop();
     return () => {
       cancelAnimationFrame(animationId);
+      urls.forEach(url => {
+        url.onclick = oldurls[url.attributes.href.value];
+      });
     };
   });
 
@@ -95,6 +108,7 @@
     ctx.clearRect(0, 0, frame.width, frame.height);
     drawPaddles();
     drawBall();
+    
   };
 </script>
 
