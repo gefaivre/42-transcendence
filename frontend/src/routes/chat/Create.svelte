@@ -21,7 +21,7 @@
     try {
       await axios.delete(`channel/${name}`, { withCredentials: true })
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -36,7 +36,7 @@
       await axios.post('channel', channel, { withCredentials: true })
       await reloadChannels()
     } catch (e) {
-      console.log(e.response.data.message)
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
     channel.channelName = null
     channel.status = null

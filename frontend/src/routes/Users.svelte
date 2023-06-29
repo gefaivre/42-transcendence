@@ -6,6 +6,7 @@
   import Stats from "./usersComponents/user-info/Stats.svelte";
   import Settings from "./usersComponents/user-info/Settings.svelte";
   import Infos from "./usersComponents/user-info/Infos.svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   export let params: any;
 
@@ -57,7 +58,7 @@
       // get blocked status
       isBlocked = pageUser.blockedBy.some(blocked => blocked.id.toString() === $id)
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

@@ -6,6 +6,7 @@
   import deleteIcon from "../../../assets/new_cross.png";
   import acceptIcon from "../../../assets/new_check.png";
   import { handleImageError } from "../../../utils";
+  import { toast } from '@zerodevx/svelte-toast/dist';
 
   export let pageUser: User;
 
@@ -31,7 +32,7 @@
       pageUser = pageUser
 
     } catch (e) {
-      console.log(e);
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -48,7 +49,7 @@
       pageUser = pageUser
 
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -62,7 +63,7 @@
       pageUser = pageUser
 
     } catch (e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -76,7 +77,7 @@
       pageUser = pageUser
 
     } catch (e) {
-      console.log(e);
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -84,7 +85,7 @@
     try {
       await axios.patch(`/users/unblock/${username}`, null);
     } catch (e) {
-      console.log(e);
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

@@ -41,15 +41,12 @@
     })
 
     socket.on('connect', () => {
-      console.log('Connected')
     })
 
     socket.on('disconnect', (cause) => {
-      console.log('Disconnected:', cause)
     })
 
     socket.on('post', (post: PostEmitDto) => {
-      console.log('receive post')
       if ($user.blocked.some(user => user.username === post.author) === true)
         post.content = '*blocked content*'
       posts.push(post)
@@ -57,7 +54,6 @@
     })
 
     socket.on('exception', (e: WsException) => {
-      console.error(e)
       toast.push(e.message, { classes: ['failure'] })
     })
 
@@ -83,7 +79,7 @@
       await axios.patch(`/channel/leave/${name}`)
       await reloadChannels()
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -102,7 +98,6 @@
       content: message,
       channelName: channelName,
     }, (response: string) => {
-      console.log(response)
       message = ''
     })
   }
@@ -113,7 +108,7 @@
       channel = response.data
     } catch (e) {
       channel = null
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -122,7 +117,7 @@
       await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -131,17 +126,16 @@
       await axios.patch(`/channel/promote/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
   async function ban(userId: number) {
     try {
       const response = await axios.delete(`/channel/ban/${channel.name}/${userId}`)
-      console.log(response)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -151,7 +145,6 @@
       userId: userId,
       seconds: 30
     }, (response: string) => {
-      console.log(response)
       toast.push(response, { classes: ['success'] })
     })
   }
@@ -159,10 +152,9 @@
   async function kick(userId: number) {
     try {
       const response = await axios.delete(`/channel/kick/${channel.name}/${userId}`)
-      console.log(response)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

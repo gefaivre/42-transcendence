@@ -35,7 +35,7 @@
       const response = await axios.post('/auth/2FA/login', { token: code })
       return response.data === true ? success2FA() : failure2FA()
     } catch (e) {
-      console.log(e)
+        toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -53,7 +53,6 @@
 
     try {
       const response = await axios.post('/auth/login', user)
-      console.log('response', response)
       if (response.data === 'jwt2fa') {
         action = 'qrcode';
       } else {

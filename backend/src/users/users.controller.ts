@@ -69,55 +69,46 @@ export class UsersController {
 
   @Post('friendship/request/:id')
   requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    console.log('controller request friendship')
     return this.users.requestFriendship(req.user.id, id)
   }
 
   @Post('friendship/cancelById/:id')
   cancelFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    console.log('controller cancel friendship request by id')
     return this.users.cancelFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/cancelByName/:username')
   cancelFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
-    console.log('controller cancel friendship request by name')
     return this.users.cancelFriendshipRequestByName(req.user.id, username)
   }
 
   @Post('friendship/acceptById/:id')
   acceptFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    console.log('controller accept friendship request by id')
     return this.users.acceptFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/acceptByName/:username')
   acceptFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
-    console.log('controller accept friendship request by name(', req.user.id, 'accept', username, ')')
     return this.users.acceptFriendshipRequestByName(req.user.id, username);
   }
 
   @Post('friendship/dismissById/:id')
   dismissFriendshipRequestById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    console.log('controller dismiss friendship request by id')
     return this.users.dismissFriendshipRequestById(req.user.id, id)
   }
 
   @Post('friendship/dismissByName/:username')
   dismissFriendshipRequestByName(@Param('username') username: string, @Req() req: any) {
-    console.log('controller dismiss friendship request by name')
     return this.users.dismissFriendshipRequestByName(req.user.id, username)
   }
 
   @Post('friendship/removeById/:id')
   removeFriendById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    console.log('controller remove friend by id')
     return this.users.removeFriendById(req.user.id, id)
   }
 
   @Post('friendship/removeByName/:username')
   removeFriendByName(@Param('username') username: string, @Req() req: any) {
-    console.log('controller remove friend by name')
     return this.users.removeFriendByName(req.user.id, username)
   }
 

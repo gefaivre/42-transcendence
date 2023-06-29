@@ -17,7 +17,6 @@ import { toast } from '@zerodevx/svelte-toast/dist'
     steptwo = false;
     } catch (e) {
       toast.push('Bad 2FA code', { classes: ['failure'] })
-      console.log(e.response.data.message)
     }
   }
 
@@ -27,7 +26,7 @@ import { toast } from '@zerodevx/svelte-toast/dist'
       qrcode = response.data
       steptwo = true;
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -36,7 +35,7 @@ import { toast } from '@zerodevx/svelte-toast/dist'
       await axios.patch(`/auth/2FA/disable`, null)
       $user.TwoFA = false;
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
