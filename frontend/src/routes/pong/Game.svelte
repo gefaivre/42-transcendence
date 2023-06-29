@@ -26,6 +26,7 @@
   export let players = {player1: '', player2: ''};
   export let gameSettings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
   export let gamePause: boolean = false;
+  export let away: string = '';
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -60,7 +61,6 @@
 
   let leftScore: number = 0;
   let rightScore: number = 0;
-  
 
   onMount(() => {
     ctx = canvas.getContext("2d");
@@ -105,16 +105,18 @@
   {#if countdown != 0 && !gamePause}
   <p transition:fade id="countdown">{countdown}</p>
   {/if}
+  {#if gamePause}
+  <p id="pause">
+    Waiting for {away} ... end of match in <span transition:fade > {countdown} </span>
+  </p>
+ {/if}
 </div>
 <p id="players">{players.player1}  VS  {players.player2}</p>
 <div id="instructions">
   Use 🡑 and 🡓 or 'w' and 's' to move the paddles
 </div>
-{#if gamePause}
-<div id="pause">
-  Waiting for a player ... end of match in <span transition:fade > {countdown} </span>
-</div>
-{/if}
+
+
 </div>
 
 <style>
@@ -168,7 +170,9 @@
 }
 
 #pause {
-  text-align: center;
+  position: absolute;
+  top: 60%;
+  left: 25%;
   font-weight: bold;
   color:var(--lite-lite-grey);
 }

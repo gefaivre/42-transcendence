@@ -36,7 +36,7 @@ export class PongService {
     }
   }
 
-  async removeUser(socketId: string): Promise<string | undefined> {
+  async disconnectUser(socketId: string): Promise<string | undefined> {
     const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
@@ -260,6 +260,14 @@ export class PongService {
     }
   }
 
+  removeUser(clientId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(clientId);
+    if (user) {
+      const toDelete: number = this.pongUsers.indexOf(user);
+      this.pongUsers.splice(toDelete, 1);
+    }
+  }
+
   private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
     let winnerId: number;
@@ -295,6 +303,7 @@ export class PongService {
       const wsUser = this.getUserById(user.id);
       if (wsUser) {
         wsUser.socketId = socketId;
+        wsUser.lastPing = Date.now();
         const room: Room | undefined = this.rooms.find(room => room.disconnected?.user.prismaId === wsUser.prismaId);
         if (room) {
           delete(room.disconnected);
@@ -306,16 +315,19 @@ export class PongService {
 
   }
 
-  // IsLagging(socketId: string) {
-  //   const user: WsUser | undefined = this.getUserBySocketId(socketId)
+  isLagging(socketId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
     
-  //   if (user) {
-  //     if (Date.now() - user.lastPing > 4000)
-  //       return true
-  //     user.lastPing = Date.now();
-  //   }
-  //   return false
-  // }
+    if (user) {
+      if (Date.now() - user.lastPing > 4000) {
+        console.log('lag = ', Date.now() - user.lastPing);
+        user.lastPing = Date.now();
+        return true
+      }
+      user.lastPing = Date.now();
+    }
+    return false
+  }
 
   tempDisconnect(socketId: string) : boolean{
     const user: WsUser | undefined = this.getUserBySocketId(socketId)

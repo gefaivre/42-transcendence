@@ -26,13 +26,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server: Server;
 
-  // @SubscribeMessage('ping')
-  // handlePing(client: Socket) {
-  //   if (this.pong.IsLagging(client.id)) {
-  //     this.pong.pauseGame(client.id);
-  //     console.log(`client ${client.id} is lagging`);
-  //   }
-  // }
+   @SubscribeMessage('ping')
+   handlePing(client: Socket) {
+     if (this.pong.isLagging(client.id)) {
+       this.pong.pauseGame(client.id);
+       console.log(`client ${client.id} is lagging`);
+     }
+  }
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
@@ -86,7 +86,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (clientId) {
         const username = this.pong.getUsername(clientId);
         this.server.to(game.id).emit('opponentLeft', {username: username});
-        this.pong.removeUser(clientId);
+        this.pong.disconnectUser(clientId);
         this.pong.removeRoom(game.id);
       } else {
         this.server.to(game.id).emit('gameState', game.state);
@@ -113,7 +113,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const roomId = await this.pong.reconnectUser(client.id, tokenData);
       if (roomId) {
         client.join(roomId); 
-        this.server.to(roomId).emit('unPause');
+        const players = this.pong.getRoomPlayers(roomId);
+        this.server.to(roomId).emit('unPause', players);
         console.log(`pongWebsocket: client ${client.id} is back`);
       } else {
         const username: string | undefined = await this.pong.addUser(client.id, tokenData);
@@ -139,6 +140,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.leave(room);
         this.server.to(room).emit('bothLeft');
         this.pong.removeRoom(room);
+        this.pong.removeUser(client.id);
       } else if (this.pong.tempDisconnect(client.id)) {
         const username = this.pong.getUsername(client.id);
         this.pong.pauseGame(client.id);

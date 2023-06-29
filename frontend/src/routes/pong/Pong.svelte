@@ -30,6 +30,8 @@
   let friendly = false;
   let friendUsername = '';
 
+  let awayPlayer: string = '';
+
   let inGame: boolean = false;
   let gameRequest: boolean = false;
   let watch = false;
@@ -59,7 +61,7 @@
 
     socket.on('gameStart', (match) => {
       currentMatch = match;
-      console.log("game started");
+      toast.push('game is starting !');
       $_socket.emit('setOnlineStatus', Status.offline)
     });
 
@@ -75,18 +77,21 @@
       }
     });
 
-    socket.on('unPause', () => {
+    socket.on('unPause', (match) => {
       pause = false;
-      toast.push('game will resume');
+      currentMatch = match
+      toast.push('Player reconnection: game resumes')
     });
 
-    socket.on('pause', () => {
+    socket.on('pause', (username) => {
       pause = true;
-      toast.push('game will resume');
+      awayPlayer = username.username;
     });
 
     socket.on('bothLeft', () => {
+      restart();
       toast.push('both players left the game');
+      inGame = false;
     });
 
     socket.on('win', () => {
@@ -289,7 +294,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:update_state={update_child}></Game>
+<Game bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:away={awayPlayer} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 
