@@ -3,7 +3,6 @@
   import type { GameState, Settings } from './Class';
   import { Ball, Frame, Paddle } from './Objects'
   import { fade } from 'svelte/transition';
-    import { push } from 'svelte-spa-router';
 
   export function update_state(state: GameState) {
     leftScore = state.score.leftScore;
@@ -51,6 +50,7 @@
   }
 
   let size = frameWidth / 30;
+
   const frame: Frame =  new Frame(frameWidth, frameHeight);
   const ball: Ball =  new Ball(frame, gameSettings); 
   const leftPaddle: Paddle = new Paddle(true, frame, gameSettings); 

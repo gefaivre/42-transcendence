@@ -30,7 +30,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
    handlePing(client: Socket) {
      if (this.pong.isLagging(client.id)) {
        this.pong.pauseGame(client.id);
-       console.log(`client ${client.id} is lagging`);
      }
   }
 
@@ -107,7 +106,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (authHeader === undefined) {
       this.server.to(client.id).emit('unauthorized', { user: client.id });
-      console.log(`pongWebsocket: client ${client.id} is unauthorized`);
     } else {
       const tokenData = await this.pong.validateUser(authHeader);
       const roomId = await this.pong.reconnectUser(client.id, tokenData);
@@ -115,12 +113,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.join(roomId); 
         const players = this.pong.getRoomPlayers(roomId);
         this.server.to(roomId).emit('unPause', players);
-        console.log(`pongWebsocket: client ${client.id} is back`);
       } else {
         const username: string | undefined = await this.pong.addUser(client.id, tokenData);
         if (username === undefined) {
           this.server.to(client.id).emit('unauthorized', { user: client.id });
-          console.log(`pongWebsocket: client ${client.id} is unauthorized`);
         } else {
           this.server.to(client.id).emit('welcome', { user: client.id });
           const roomList : RoomDto[] = this.pong.getRoomList();
@@ -131,7 +127,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: Socket) {
-    console.log(client.id, 'has disconnected');
 
     const room: string | undefined = this.pong.getRoomId(client.id);
     if (room) {

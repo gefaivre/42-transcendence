@@ -4,6 +4,7 @@
   import Create from "./Create.svelte";
   import DirectMessage from "./DirectMessage.svelte";
   import Channel from "./Channel.svelte";
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let channels: any[] = []
 
@@ -12,7 +13,7 @@
       const response = await axios.get('/channel')
       channels = response.data
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

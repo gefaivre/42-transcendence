@@ -48,7 +48,6 @@ export class ChannelByNamePipe implements PipeTransform<string, Promise<any>> {
 export class FileSizeValidationPipe implements PipeTransform<Express.Multer.File, Express.Multer.File> {
   transform(value: any, metadata: ArgumentMetadata) {
 
-    console.log(value)
 
     if (value.mimetype !== 'image/png' && value.mimetype !== 'image/jpg')
       throw new BadRequestException('Wrong file format. Only jpg and png are supported.')

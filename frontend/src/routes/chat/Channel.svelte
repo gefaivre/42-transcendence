@@ -41,15 +41,12 @@
     })
 
     socket.on('connect', () => {
-      console.log('Connected')
     })
 
     socket.on('disconnect', (cause) => {
-      console.log('Disconnected:', cause)
     })
 
     socket.on('post', (post: PostEmitDto) => {
-      console.log('receive post')
       if ($user.blocked.some(user => user.username === post.author) === true)
         post.content = '*blocked content*'
       posts.push(post)
@@ -57,7 +54,6 @@
     })
 
     socket.on('exception', (e: WsException) => {
-      console.error(e)
       toast.push(e.message, { classes: ['failure'] })
     })
 
@@ -83,7 +79,7 @@
       await axios.patch(`/channel/leave/${name}`)
       await reloadChannels()
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -102,7 +98,6 @@
       content: message,
       channelName: channelName,
     }, (response: string) => {
-      console.log(response)
       message = ''
     })
   }
@@ -113,7 +108,7 @@
       channel = response.data
     } catch (e) {
       channel = null
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -122,7 +117,7 @@
       await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -131,17 +126,16 @@
       await axios.patch(`/channel/promote/${channel.name}/${id}`, null)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
   async function ban(userId: number) {
     try {
       const response = await axios.delete(`/channel/ban/${channel.name}/${userId}`)
-      console.log(response)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -151,7 +145,6 @@
       userId: userId,
       seconds: 30
     }, (response: string) => {
-      console.log(response)
       toast.push(response, { classes: ['success'] })
     })
   }
@@ -159,10 +152,9 @@
   async function kick(userId: number) {
     try {
       const response = await axios.delete(`/channel/kick/${channel.name}/${userId}`)
-      console.log(response)
       getChannel()
     } catch (e) {
-      console.log(e.response.data.message)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -179,6 +171,53 @@
       socket.emit('leaveRoom', channelName)
       channelName = null
       posts.splice(0, posts.length)
+    }
+  }
+
+  async function updateChannelPassword(name: string) {
+
+    const password: string = prompt('new password')
+
+    if (password === null)
+      return
+
+    if (password === '')
+      return toast.push('empty password', { classes: ['failure'] })
+
+    const body = { channelName: name, password: password }
+
+    try {
+      await axios.patch('/channel/password', body)
+      toast.push('password updated!', { classes: ['success'] })
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
+    }
+  }
+
+  async function updateChannelStatus(name: string, status: ChannelStatus) {
+
+    let password: string = ''
+
+    if (status === ChannelStatus.Protected) {
+      password = prompt('channel password')
+      if (password === null)
+        return
+      if (password === '')
+        return toast.push('empty password', { classes: ['failure'] })
+    }
+
+    const body = {
+      channelName: name,
+      status: status,
+      password: password
+    }
+
+    try {
+      await axios.patch('/channel/status', body)
+      toast.push('status updated!', { classes: ['success'] })
+      await reloadChannels()
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
     }
   }
 
@@ -240,6 +279,28 @@
     <div class="ctn-chan">
 
       <div class="chan-list">
+        {#if channel?.owner?.id === $user.id}
+        <!-- channel visibility -->
+        <details class="dropdown">
+          <summary class="m-1 btn btn-xs">Change visibility</summary>
+          <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+          {#if channel.status === ChannelStatus.Public}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Private)}>private</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Protected)}>protected</button></li>
+          {:else if channel.status === ChannelStatus.Protected}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Public)}>public</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Private)}>private</button></li>
+          {:else}
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Public)}>public</button></li>
+            <li><button on:click={() => updateChannelStatus(channel.name, ChannelStatus.Protected)}>protected</button></li>
+          {/if}
+          </ul>
+        </details>
+        <!-- channel password -->
+          {#if channel?.status === ChannelStatus.Protected}
+            <button class="btn btn-xs" on:click={() => updateChannelPassword(channel.name)}>Change password</button>
+          {/if}
+        {/if}
         <ul>
         {#if channel}
           <li><h1>--owner--</h1></li>

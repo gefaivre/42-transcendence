@@ -320,7 +320,6 @@ export class PongService {
     
     if (user) {
       if (Date.now() - user.lastPing > 4000) {
-        console.log('lag = ', Date.now() - user.lastPing);
         user.lastPing = Date.now();
         return true
       }

@@ -227,7 +227,6 @@ export class UsersService {
   }
 
   async requestFriendship(id: number, friendId: number) {
-    console.log('service request friendship')
     return this.prisma.user.update({
       where: {
         id: id // P2016
@@ -243,7 +242,6 @@ export class UsersService {
   }
 
   async cancelFriendshipRequestById(id: number, friendId: number) {
-    console.log('service cancel friendship request by id')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -257,7 +255,6 @@ export class UsersService {
   }
 
   async cancelFriendshipRequestByName(id: number, username: string) {
-    console.log('service cancel friendship request by name')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -271,7 +268,6 @@ export class UsersService {
   }
 
   async acceptFriendshipRequestById(id: number, friendId: number) {
-    console.log('service accept friendship request by id')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -291,7 +287,6 @@ export class UsersService {
   }
 
   async acceptFriendshipRequestByName(id: number, username: string) {
-    console.log('service accept friendship request by name  ',id, ' to ', username)
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -319,7 +314,6 @@ export class UsersService {
   }
 
   async dismissFriendshipRequestById(id: number, friendId: number) {
-    console.log('service dismiss friendship request by id')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -333,7 +327,6 @@ export class UsersService {
   }
 
   async dismissFriendshipRequestByName(id: number, username: string) {
-    console.log('service dismiss friendship request by name')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -347,7 +340,6 @@ export class UsersService {
   }
 
   async removeFriendById(id: number, friendId: number) {
-    console.log('service remove friend by id')
     return this.prisma.user.update({
       where: {
         id: id // P2025
@@ -364,7 +356,6 @@ export class UsersService {
   }
 
   async removeFriendByName(id: number, username: string) {
-    console.log('service remove friend by name')
     return this.prisma.user.update({
       where: {
         id: id // P2025

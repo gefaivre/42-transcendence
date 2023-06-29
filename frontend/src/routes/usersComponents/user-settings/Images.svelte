@@ -24,7 +24,7 @@
       getPPs();
       $reloadImage++;
     } catch (e) {
-      console.error(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -34,6 +34,7 @@
       images = response.data
       getPPs()
     } catch(e) {
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -42,7 +43,7 @@
       await axios.patch(`/images/${id}`)
       $reloadImage++;
     } catch(e) {
-      console.log(e);
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -51,7 +52,7 @@
       await axios.delete(`/images/${id}`)
       images = images.filter((image: any) => image.id !== id)
     } catch(e) {
-      console.log(e)
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
