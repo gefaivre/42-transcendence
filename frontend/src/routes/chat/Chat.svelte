@@ -26,11 +26,11 @@
 
     <DirectMessage/>
 
-    <Channel bind:channels/>
+    <Channel bind:channels reloadChannels={getAllChannels}/>
 
-    <Create/>
+    <Create reloadChannels={getAllChannels}/>
 
-    <PublicView bind:channels/>
+    <PublicView bind:channels reloadChannels={getAllChannels}/>
 
   </div>
 

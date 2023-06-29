@@ -12,20 +12,23 @@
   let message: string = null
   let messages: DirectMessage[] = []
   let chatbox: any
-  let tab: string = "find";
-  let listDm: string[] = [];
-  let chatUser: string = null;
+  let penpals: string[] = []
+  let chatUser: string = null
 
-  onMount(() => getAll())
+  const enum Tab {
+    Friends,
+    DM
+  }
 
-  async function load(username: string) {
+  let tab: Tab = Tab.Friends
+
+  onMount(async () => {
+
     try {
-      const response = await axios.get(`/posts/dm/${username}`)
-      messages = response.data
-      console.log(response)
-    } catch (e) {
+      const response = await axios.get('/posts/penpals/foo')
+      penpals = response.data
+    } catch(e) {
       console.log(e)
-      return
     }
 
     socket = ioClient(axios.defaults.baseURL, {
@@ -52,17 +55,17 @@
         dm.content = '*blocked content*'
       messages.push(dm)
       messages = messages
-      })
-    }
+    })
 
-  async function getAll() {
-    try {
-      listDm = (await axios.get('/users/me/dm')).data
-      console.log(listDm)
-    } catch (e) {
-      console.log(e.response.data.message)
-    }
-  }
+  })
+
+  onDestroy(() =>  {
+    closeSocket()
+    messages.splice(0, messages.length)
+    penpals.splice(0, penpals.length)
+    chatUser = null
+    message = null
+  })
 
   function sendDM() {
     socket.emit('sendDirectMessage', {
@@ -75,18 +78,31 @@
     })
   }
 
-  function pushToDmTab(username: string) {
-    chatUser = username;
-    load(username);
-    tab = "dm";
-
+  async function getDMsByUsername(username: string) {
+    try {
+      const response = await axios.get(`/posts/dm/${username}`)
+      messages = response.data
+    } catch (e) {
+      console.log(e)
+    }
   }
 
-  onDestroy(() => closeSocket())
+  async function pushToDmTab(username: string) {
+    tab = Tab.DM;
+    chatUser = username;
+    await getDMsByUsername(chatUser)
+  }
 
   function closeSocket() {
-    if (socket){
+    if (socket !== null)
       socket.disconnect()
+  }
+
+  function switchTab(target: Tab) {
+    tab = target
+    if (target === Tab.Friends) {
+      chatUser = null
+      messages.splice(0, messages.length)
     }
   }
 
@@ -99,20 +115,11 @@
 <div class="chat-dm">
 
   <div class="nav">
-    {#if tab == "find"}
-      <button class="activeButton left" on:click={() => tab = "find"}>Your friends</button>
-    {:else}
-      <button class="left" on:click={() => tab = "find"}>Your friends</button>
-    {/if}
-
-    {#if tab == "dm"}
-      <button class="activeButton right" on:click={() => tab = "dm"}>Dm</button>
-    {:else}
-      <button class="right" on:click={() => tab = "dm"}>Dm</button>
-    {/if}
+    <button on:click={() => switchTab(Tab.Friends)} class={tab === Tab.Friends ? 'activeButton left': 'left'}>Your friends</button>
+    <button on:click={() => switchTab(Tab.DM)} class={tab === Tab.DM ? 'activeButton right': 'right'}>DM</button>
   </div>
 
-  {#if tab == "find"}
+  {#if tab === Tab.Friends}
   <div class="find">
       <div class="title">
         <h2>All your friends</h2>
@@ -131,8 +138,8 @@
       </div>
       <div class="list">
         <ul class="friends-list">
-          {#each listDm as name}
-          <li class="friend"><button on:click={() => pushToDmTab(name)}> {name}</button></li>
+          {#each penpals as penpal}
+            <li class="friend"><button on:click={() => pushToDmTab(penpal)}> {penpal}</button></li>
           {/each}
         </ul>
       </div>
@@ -242,7 +249,7 @@
   }
 
 
-  .friend {  
+  .friend {
     color:white;
     display: grid;
     grid-template-columns: 4fr 1fr 1fr 1fr;
@@ -319,7 +326,7 @@ input {
 }
 
 
-.message-list {  
+.message-list {
   list-style: none;
   margin: 1rem auto;
   padding: 0;

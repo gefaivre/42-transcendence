@@ -3,12 +3,16 @@
   import type {ChannelDto } from "../../types";
   import axios from "../../axios.config";
   import { ChannelStatus } from '../../types';
+  import { toast } from '@zerodevx/svelte-toast/dist'
 
   let channel: ChannelDto = {
     channelName: null,
     status: null,
     password: ''
   }
+
+  // export let channels: any[]
+  export let reloadChannels = async () => {}
 
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function remove(name: string) {
@@ -23,13 +27,14 @@
 
   async function create() {
     if (!channel.channelName)
-      return alert('Empty channel name')
+      return toast.push('Empty channel name', { classes: ['failure'] })
     if (!channel.status)
-      return alert('Please select a status')
+      return toast.push('Please select a status', { classes: ['failure'] })
     if (channel.status === ChannelStatus.Protected && channel.password === '')
-      return alert('Empty channel password')
+      return toast.push('Empty channel password', { classes: ['failure'] })
     try {
       await axios.post('channel', channel, { withCredentials: true })
+      await reloadChannels()
     } catch (e) {
       console.log(e.response.data.message)
     }

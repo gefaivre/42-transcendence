@@ -194,6 +194,9 @@ export class ChannelController {
   @Patch('join')
   async joinChannel(@Body() channel: ChannelDto, @Req() req: any) {
 
+    if (await this.channel.findByName(channel.channelName) === null)
+      throw new NotFoundException('channel not found')
+
     if (await this.channel.isBanned(channel.channelName, req.user.id) === true)
       throw new UnauthorizedException('banned')
 
