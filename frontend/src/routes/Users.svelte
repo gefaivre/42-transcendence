@@ -63,6 +63,8 @@
 
 </script>
 
+{#await selectprofile() then _}
+
 <div class="component">
 
   <Infos bind:pageUser bind:onlineStatus bind:isBlocked/>
@@ -76,6 +78,8 @@
   {/if}
 
 </div>
+
+{/await}
 
 <style>
 
