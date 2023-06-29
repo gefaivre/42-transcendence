@@ -35,6 +35,7 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       username: client.handshake.query.username as string,
       prismaId: +(client.handshake.query.id as string),
       socketId: client.id,
+      lastPing: Date.now(),
       status: Status.online
     })
   }

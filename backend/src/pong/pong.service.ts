@@ -28,16 +28,15 @@ export class PongService {
     return this.auth.validateToken(token)
   }
 
-  async addUser(socketId: string, tokenData: any) {
+   async addUser(socketId: string, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
-
     if (user !== null) {
-      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId })
+      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
       return user.username;
     }
   }
 
-  async removeUser(socketId: string): Promise<string | undefined> {
+  async disconnectUser(socketId: string): Promise<string | undefined> {
     const user: WsUser | undefined = this.getUserBySocketId(socketId)
 
     if (user !== undefined) {
@@ -261,6 +260,14 @@ export class PongService {
     }
   }
 
+  removeUser(clientId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(clientId);
+    if (user) {
+      const toDelete: number = this.pongUsers.indexOf(user);
+      this.pongUsers.splice(toDelete, 1);
+    }
+  }
+
   private async updateMmr(room: Room, loserWsUser: WsUser) {
     const loser: Omit<User, 'password'> | null = await this.users.findById(loserWsUser.prismaId);
     let winnerId: number;
@@ -283,6 +290,92 @@ export class PongService {
       await this.users.updateGameStats(loser.username, loser.games + 1, loserMmr);
       await this.users.updateGameStats(winner.username, winner.games + 1, winnerMmr);
     }
+  } 
+
+  getUserById(prismaId: number) {
+    return this.pongUsers.find(user => user.prismaId === prismaId);
   }
 
+  async reconnectUser(socketId: string, tokenData: any): Promise<string | undefined> {
+    const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
+
+    if (user) {
+      const wsUser = this.getUserById(user.id);
+      if (wsUser) {
+        wsUser.socketId = socketId;
+        wsUser.lastPing = Date.now();
+        const room: Room | undefined = this.rooms.find(room => room.disconnected?.user.prismaId === wsUser.prismaId);
+        if (room) {
+          delete(room.disconnected);
+          room.game.unPause();
+          return (room.id);
+        }
+      }
+    }
+
+  }
+
+  isLagging(socketId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+    
+    if (user) {
+      if (Date.now() - user.lastPing > 4000) {
+        console.log('lag = ', Date.now() - user.lastPing);
+        user.lastPing = Date.now();
+        return true
+      }
+      user.lastPing = Date.now();
+    }
+    return false
+  }
+
+  tempDisconnect(socketId: string) : boolean{
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+
+    if (user) {
+      const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+      if (room) {
+        room.disconnected = {user: user, time: Date.now()};
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  pauseGame(socketId: string) {
+    const user: WsUser | undefined = this.getUserBySocketId(socketId)
+
+    if (user) {
+      const room: Room | undefined = this.rooms.find(room => room.player1 === user || room.player2 === user);
+      if (room && room.start == true) {
+        room.game.pause(15);
+      }
+    }
+  }
+  
+  isTimeout(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id == roomId);
+
+    if (room) {
+      if (room.disconnected)
+        if (Date.now() - room.disconnected.time >= 12000) {
+          return room.disconnected.user.socketId;
+        }
+    }
+  }
+
+  isPaused(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id == roomId);
+    if (room && room.disconnected) {
+      return true;
+    }
+    return false;
+  }
+  
+  getRoomId(clientId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.player1.socketId === clientId || room.player2?.socketId === clientId);
+    if (room) 
+      return room.id;
+  }
 }

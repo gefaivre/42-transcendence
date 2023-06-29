@@ -15,6 +15,8 @@
     player2: string;
   }
 
+  let pause: boolean = false;
+
   let settings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
 
   let gameList: Match[] = [];
@@ -28,6 +30,8 @@
   let friendly = false;
   let friendUsername = '';
 
+  let awayPlayer: string = '';
+
   let inGame: boolean = false;
   let gameRequest: boolean = false;
   let watch = false;
@@ -36,6 +40,16 @@
     path: '/pong',
     withCredentials: true
   });
+
+
+  setInterval(() => {
+  const start = Date.now();
+
+  socket.emit("ping", () => {
+      const duration = Date.now() - start;
+      console.log(duration);
+    });
+  }, 1000);
 
   onMount(() => {
 
@@ -47,7 +61,7 @@
 
     socket.on('gameStart', (match) => {
       currentMatch = match;
-      console.log("game started");
+      toast.push('game is starting !');
       $_socket.emit('setOnlineStatus', Status.offline)
     });
 
@@ -61,6 +75,23 @@
       } else {
         alert('This match is no longer played, refresh the page');
       }
+    });
+
+    socket.on('unPause', (match) => {
+      pause = false;
+      currentMatch = match
+      toast.push('Player reconnection: game resumes')
+    });
+
+    socket.on('pause', (username) => {
+      pause = true;
+      awayPlayer = username.username;
+    });
+
+    socket.on('bothLeft', () => {
+      restart();
+      toast.push('both players left the game');
+      inGame = false;
     });
 
     socket.on('win', () => {
@@ -109,7 +140,8 @@
       gameRequest = false;
     });
 
-    return ()=> {
+    return ()=> { 
+      console.log('I leave');
       socket.close();
     };
   });
@@ -262,7 +294,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:gameSettings={settings} bind:players={currentMatch} bind:update_state={update_child}></Game>
+<Game bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:away={awayPlayer} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 

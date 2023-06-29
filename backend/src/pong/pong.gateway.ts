@@ -26,6 +26,14 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server: Server;
 
+   @SubscribeMessage('ping')
+   handlePing(client: Socket) {
+     if (this.pong.isLagging(client.id)) {
+       this.pong.pauseGame(client.id);
+       console.log(`client ${client.id} is lagging`);
+     }
+  }
+
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
     if (this.pong.gameAlreadyRequested(client.id)) {
@@ -74,14 +82,22 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
   sendGameState() {
     const gamesState: GameStateDto[] = this.pong.getGamesState();
     gamesState.forEach(game => {
-      this.server.to(game.id).emit('gameState', game.state);
-      if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
-        const winnerId: string = this.pong.getWinner(game.id);
-        this.server.to(winnerId).emit('win', {});
-        const username: string | undefined = this.pong.getUsername(winnerId);
-        this.server.to(game.id).emit('endWatch', {username: username});
-        const loserId: string = this.pong.getLoser(game.id);
-        this.server.to(loserId).emit('lose', {});
+      const clientId: string | undefined = this.pong.isTimeout(game.id);
+      if (clientId) {
+        const username = this.pong.getUsername(clientId);
+        this.server.to(game.id).emit('opponentLeft', {username: username});
+        this.pong.disconnectUser(clientId);
+        this.pong.removeRoom(game.id);
+      } else {
+        this.server.to(game.id).emit('gameState', game.state);
+        if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
+          const winnerId: string = this.pong.getWinner(game.id);
+          this.server.to(winnerId).emit('win', {});
+          const username: string | undefined = this.pong.getUsername(winnerId);
+          this.server.to(game.id).emit('endWatch', {username: username});
+          const loserId: string = this.pong.getLoser(game.id);
+          this.server.to(loserId).emit('lose', {});
+        }
       }
     });
   }
@@ -94,27 +110,43 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(`pongWebsocket: client ${client.id} is unauthorized`);
     } else {
       const tokenData = await this.pong.validateUser(authHeader);
-      const username: string | undefined = await this.pong.addUser(client.id, tokenData);
-
-      if (username === undefined) {
-        this.server.to(client.id).emit('unauthorized', { user: client.id });
-        console.log(`pongWebsocket: client ${client.id} is unauthorized`);
+      const roomId = await this.pong.reconnectUser(client.id, tokenData);
+      if (roomId) {
+        client.join(roomId); 
+        const players = this.pong.getRoomPlayers(roomId);
+        this.server.to(roomId).emit('unPause', players);
+        console.log(`pongWebsocket: client ${client.id} is back`);
       } else {
-        this.server.to(client.id).emit('welcome', { user: client.id });
-        const roomList : RoomDto[] = this.pong.getRoomList();
-        this.server.to(client.id).emit('gameList', { gameList: roomList });
-        console.log(`pongWebsocket: user ${username} connected`);
+        const username: string | undefined = await this.pong.addUser(client.id, tokenData);
+        if (username === undefined) {
+          this.server.to(client.id).emit('unauthorized', { user: client.id });
+          console.log(`pongWebsocket: client ${client.id} is unauthorized`);
+        } else {
+          this.server.to(client.id).emit('welcome', { user: client.id });
+          const roomList : RoomDto[] = this.pong.getRoomList();
+          this.server.to(client.id).emit('gameList', { gameList: roomList });
+          console.log(`pongWebsocket: user ${username} connected`);
+        }
       }
     }
   }
 
   async handleDisconnect(client: Socket) {
-    const room: string | undefined = await this.pong.removeUser(client.id);
-    if (room !== undefined) {
-      const username = this.pong.getUsername(client.id);
-      client.leave(room);
-      this.server.to(room).emit('opponentLeft', {username: username});
-      this.pong.removeRoom(room);
+    console.log(client.id, 'has disconnected');
+
+    const room: string | undefined = this.pong.getRoomId(client.id);
+    if (room) {
+      if (this.pong.isPaused(room)) {
+        client.leave(room);
+        this.server.to(room).emit('bothLeft');
+        this.pong.removeRoom(room);
+        this.pong.removeUser(client.id);
+      } else if (this.pong.tempDisconnect(client.id)) {
+        const username = this.pong.getUsername(client.id);
+        this.pong.pauseGame(client.id);
+        client.leave(room);
+        this.server.to(room).emit('pause', {username: username});
+      }
     }
   }
 }

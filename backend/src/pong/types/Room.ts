@@ -11,4 +11,6 @@ export type Room = {
   start: boolean;
   ranked: boolean;
   settings: Settings;
+
+  disconnected?: { user: WsUser, time: number  };
 }
