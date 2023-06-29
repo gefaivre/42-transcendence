@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as bcrypt from 'bcrypt';
+import { ChannelStatus } from '@prisma/client';
 
 @Injectable()
 export class ChannelService {
@@ -227,4 +228,30 @@ export class ChannelService {
     })
     return channel?.banned
   }
+
+  async updatePassword(channelName: string, password: string) {
+    const channel = await this.prisma.channel.update({
+      where: {
+        name: channelName // P2025
+      },
+      data: {
+        password: password
+      }
+    })
+    return this.prisma.exclude<any,any>(channel, ['password'])
+  }
+
+  async updateStatus(channelName: string, password: string, status: ChannelStatus) {
+    const channel = await this.prisma.channel.update({
+      where: {
+        name: channelName // P2025
+      },
+      data: {
+        status: status,
+        password: password
+      }
+    })
+    return this.prisma.exclude<any,any>(channel, ['password'])
+  }
+
 }

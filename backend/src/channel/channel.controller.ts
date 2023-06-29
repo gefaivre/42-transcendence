@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { TranscendenceExceptionsFilter } from '../filters';
 import { UserByIdPipe, ChannelByNamePipe } from 'src/pipes';
 import { ChannelStatus, Prisma } from '@prisma/client';
+import { UpdateChannelPasswordDto } from './dto/update-password.dto';
 
 @Controller('channel')
 @UseGuards(AuthGuard('jwt'))
@@ -210,5 +211,48 @@ export class ChannelController {
   @Patch('leave/:channelName')
   async leaveChannel(@Param('channelName') channelName: string, @Req() req: any) {
     return this.channel.leave(channelName, req.user.id);
+  }
+
+  @Patch('password')
+  async updatePassword(@Req() request: any, @Body() body: UpdateChannelPasswordDto) {
+
+    // only owner can change password
+    if (await this.channel.isOwner(body.channelName, request.user.id) === false)
+      throw new UnauthorizedException('Channel ownership required')
+
+    try {
+      body.password = await bcrypt.hash(body.password, 2) // bigger salt would take too long
+    } catch (e) {
+      throw new UnprocessableEntityException('Error about channel password encryption')
+    }
+
+    try {
+      await this.channel.updatePassword(body.channelName, body.password)
+    } catch(e) {
+      throw new ConflictException('Error while updating channel password')
+    }
+  }
+
+  @Patch('status')
+  async updateStatus(@Req() request: any, @Body() body: ChannelDto) {
+
+    // only owner can change status
+    if (await this.channel.isOwner(body.channelName, request.user.id) === false)
+      throw new UnauthorizedException('Channel ownership required')
+
+    if (body.status === ChannelStatus.Protected) {
+      try {
+        body.password = await bcrypt.hash(body.password, 2) // bigger salt would take too long
+      } catch (e) {
+        throw new UnprocessableEntityException('Error about channel password encryption')
+      }
+    }
+
+    try {
+      await this.channel.updateStatus(body.channelName, body.password, body.status)
+    } catch(e) {
+      throw new ConflictException('Error while updating channel status')
+    }
+
   }
 }
