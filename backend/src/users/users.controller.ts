@@ -56,16 +56,16 @@ export class UsersController {
     }
   }
 
-  @Delete()
-  async remove(@Req() req: any, @Res({ passthrough: true }) response: Response) {
-    try {
-      await this.users.remove(req.user.username)
-      rmSync(`/app/images/${req.user.username}`, { recursive: true })
-      response.cookie('jwt', '', { expires: new Date(0) }); // same as GET '/auth/logout'
-    } catch(e) {
-      throw new NotFoundException('User not found')
-    }
-  }
+  // @Delete()
+  // async remove(@Req() req: any, @Res({ passthrough: true }) response: Response) {
+  //   try {
+  //     await this.users.remove(req.user.username)
+  //     rmSync(`/app/images/${req.user.username}`, { recursive: true })
+  //     response.cookie('jwt', '', { expires: new Date(0) }); // same as GET '/auth/logout'
+  //   } catch(e) {
+  //     throw new NotFoundException('User not found')
+  //   }
+  // }
 
   @Post('friendship/request/:id')
   requestFriendship(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
