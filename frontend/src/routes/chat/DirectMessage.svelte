@@ -23,6 +23,8 @@
 
   let tab: Tab = Tab.Friends
 
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
   onMount(async () => {
 
     try {
@@ -44,7 +46,7 @@
       toast.push(e.message, {classes: ['failure']})
     })
 
-    socket.on('dm', (_message: string, sender: string, date: Date) => {
+    socket.on('dm', async (_message: string, sender: string, date: Date) => {
       const dm: DirectMessage = {
         content: _message,
         sender: sender,
@@ -55,7 +57,8 @@
         dm.content = '*blocked content*'
       messages.push(dm)
       messages = messages
-      chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth'})
+      await delay(100);
+      chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
     })
 
   })
@@ -68,7 +71,7 @@
     message = null
   })
 
-  function sendDM() {
+  async function sendDM() {
     socket.emit('sendDirectMessage', {
       content: message,
       recipient: chatUser
@@ -76,13 +79,16 @@
       message = ''
       messages = messages
     })
-    chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth'})
+    await delay(100);
+    chatbox.scroll({ top: chatbox.scrollHeight + 100 , behavior: 'smooth'})
   }
 
   async function getDMsByUsername(username: string) {
     try {
       const response = await axios.get(`/posts/dm/${username}`)
       messages = response.data
+      await delay(100);
+      chatbox.scroll({ top: chatbox.scrollHeight + 100 , behavior: 'smooth'})
     } catch (e) {
         toast.push(e.response.data.message, {classes: ['failure']})
     }
