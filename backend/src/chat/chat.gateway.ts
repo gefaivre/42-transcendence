@@ -165,9 +165,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     } as CreateDirectMessage)
 
     // emit to recipient if connected
-    const _recipient: WsUser | undefined = this.chat.chatUsers.find(user => user.username === message.recipient)
+    // since we can't distinguish the dm socket from the online status socket of the recipient we emit to both (yes, this is ugly)
+    const _recipient: WsUser[] | undefined = this.chat.chatUsers.filter(user => user.username === message.recipient)
     if (_recipient !== undefined)
-      this.server.to(_recipient.socketId).emit('dm', message.content, sender.username, dm.date)
+      _recipient.forEach(r => this.server.to(r.socketId).emit('dm', message.content, sender.username, dm.date))
 
     // emit to sender so he doesn't need to refresh the page to see the message
     this.server.to(client.id).emit('dm', message.content, sender.username, dm.date)
