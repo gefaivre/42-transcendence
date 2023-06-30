@@ -180,11 +180,9 @@
         ingame
       </div>
 		{/if}
-    <br>
-    <br>
     <!--friendship -->
 	  {#if pageUser.friends.some((user) => user.id.toString() === $id)}
-      <button class="btn" on:click={removeFriendById}>Remove friend</button>
+      <button class="btn removeFriend" on:click={removeFriendById}>Remove friend</button>
 		{:else if pageUser.requestFriends.some((user) => user.id.toString() === $id)}
       <button class="btn" on:click={cancelFriendshipRequestById}>Cancel friendship request</button>
 		{:else if pageUser.pendingFriends.some((user) => user.id.toString() === $id)}
@@ -258,6 +256,10 @@
   height: 25px;
   width: 25px;
   float: right;
+}
+
+.removeFriend{
+  margin-top: 5px;
 }
 
 </style>
