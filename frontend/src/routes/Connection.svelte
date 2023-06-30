@@ -26,7 +26,6 @@
   function success2FA() {
     code = null
     toast.push('Welcome! 👋', { classes: ['success'] })
-    console.log("coucoutest");
     push("/");
     logged.set('true')
   }
