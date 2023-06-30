@@ -5,6 +5,7 @@
   import { toast } from '@zerodevx/svelte-toast/dist'
   import lockedIcon from '../../assets/lock.svg'
   import publicIcon from '../../assets/public.svg'
+  import privateIcon from '../../assets/private.svg'
 
   export let channels: any[]
   export let reloadChannels = async () => {}
@@ -49,16 +50,17 @@
   <div class="list">
     <ul>
     {#each channels as channel}
-      {#if channel.status !== ChannelStatus.Private && channel.users.some(_user => _user.username === $user.username) === false}
+      {#if (channel.status !== ChannelStatus.Private && channel.users.some(_user => _user.username === $user.username) === false)
+        || channel.status === ChannelStatus.Private && channel.invited.some(_user => _user.username === $user.username) === true}
       <li class="lineFriends">
-        <span>
-          {channel.name}
-        </span>
+        <span>{channel.name}</span>
         <span>
         {#if channel.status === ChannelStatus.Protected}
           <img src={lockedIcon} alt='protected' width="30" height="30"/>
         {:else if channel.status === ChannelStatus.Public}
           <img src={publicIcon} alt='public' width="30" height="30"/>
+        {:else if channel.status === ChannelStatus.Private}
+          <img src={privateIcon} alt='private' width="30" height="30"/>
         {/if}
         </span>
         <span>

@@ -255,4 +255,20 @@ export class ChannelController {
     }
 
   }
+
+  @Patch('invite')
+  async inviteUser(@Req() request: any, @Body() body: any) {
+
+    // only owner can invite
+    if (await this.channel.isOwner(body.channelName, request.user.id) === false)
+      throw new UnauthorizedException('Channel ownership required')
+
+    try {
+      await this.channel.inviteUser(body.channelName, body.userId)
+    } catch(e) {
+      throw new ConflictException('wtf') // channel not found or already invited
+    }
+
+  }
+
 }
