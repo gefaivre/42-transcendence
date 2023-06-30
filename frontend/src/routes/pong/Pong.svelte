@@ -113,9 +113,9 @@
 
     socket.on('opponentLeft', (player) => {
       restart();
-      if (watch)
+      if (watch && player.username)
         toast.push(player.username + ' has left the game');
-      else
+      else if (player.username)
         toast.push(player.username + ' has left the game, you win!');
       inGame = false;
     });
