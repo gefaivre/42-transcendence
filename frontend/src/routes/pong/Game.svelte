@@ -3,6 +3,7 @@
   import type { GameState, Settings } from './Class';
   import { Ball, Frame, Paddle } from './Objects'
   import { fade } from 'svelte/transition';
+    import { push } from 'svelte-spa-router';
 
   export function update_state(state: GameState) {
     leftScore = state.score.leftScore;
@@ -70,7 +71,7 @@
       if (url.attributes.href.value !== '#/Pong')
       url.onclick = function(){
       if (window.confirm("leave the game ?"))
-        goto(url.baseURI);
+        push('/' + url.attributes.href.value);
       };
   });
 
