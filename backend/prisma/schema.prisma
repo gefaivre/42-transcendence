@@ -94,6 +94,6 @@ model DirectMessage {
   content     String
   senderId    Int
   receiverId  Int
-  sender      User  @relation("SentDM", fields: [senderId], references: [id])
-  receiver    User  @relation("RecvDM", fields: [receiverId], references: [id])
+  sender      User  @relation("SentDM", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User  @relation("RecvDM", fields: [receiverId], references: [id], onDelete: Cascade)
 }

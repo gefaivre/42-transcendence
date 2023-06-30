@@ -206,14 +206,14 @@ export class UsersService {
     return this.prisma.exclude<any,any>(user, ['password'])
   }
 
-  async remove(username: string) {
-    const user: User = await this.prisma.user.delete({
-      where: {
-        username: username // P2025
-      }
-    });
-    return this.prisma.exclude<any,any>(user, ['password'])
-  }
+  // async remove(username: string) {
+  //   const user: User = await this.prisma.user.delete({
+  //     where: {
+  //       username: username // P2025
+  //     }
+  //   });
+  //   return this.prisma.exclude<any,any>(user, ['password'])
+  // }
 
   update2FA(id: number, twofa: boolean) {
     return this.prisma.user.update({

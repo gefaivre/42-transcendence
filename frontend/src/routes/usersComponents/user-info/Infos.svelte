@@ -164,7 +164,7 @@
   <br>
 	{#if pageUser.id.toString() === $id}
     <button class="btn" on:click={() => logout()}>Logout</button>
-    <button class="btn" on:click={() => deleteAccount()}>Delete account</button>
+    <!-- <button class="btn" on:click={() => deleteAccount()}>Delete account</button> -->
   {:else}
     <!-- online status -->
 		{#if onlineStatus === Status.offline}
