@@ -7,6 +7,7 @@
   import { toast } from '@zerodevx/svelte-toast/dist';
 
   export let pageUser: User;
+  let uservalue = pageUser.username;
 
   let opponent: any;
   let matchHistory: Match[] = [];
@@ -21,6 +22,23 @@
     averageLose: { score: 0, opponentScore: 0 },
     nbrOfFriends: 0,
   };
+
+  $: {
+    const newName  = pageUser.username;
+    if (newName !== uservalue) {
+      uservalue = pageUser.username;
+      reload()
+    }
+  }
+
+  onMount(async () => {
+    reload();
+  })
+
+   async function reload() {
+    await getMatchHistory()
+    getStatistics()
+   }
 
   const enum Tab {
     Statistics,
@@ -68,10 +86,6 @@
     }
   }
 
-  onMount(async () => {
-    await getMatchHistory()
-    getStatistics()
-  })
 
 </script>
 
