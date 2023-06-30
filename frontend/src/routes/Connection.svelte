@@ -27,7 +27,7 @@
     code = null
     toast.push('Welcome! 👋', { classes: ['success'] })
     console.log("coucoutest");
-    push(COMMON_BASE_URL + ":8080/test");
+    push("/");
     logged.set('true')
   }
 
