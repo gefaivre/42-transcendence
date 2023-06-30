@@ -26,6 +26,8 @@
     OneChannel
   }
 
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
   let tab: Tab = Tab.AllChannels
 
   export let channels: any[]
@@ -46,11 +48,13 @@
     socket.on('disconnect', (cause) => {
     })
 
-    socket.on('post', (post: PostEmitDto) => {
+    socket.on('post', async (post: PostEmitDto) => {
       if ($user.blocked.some(user => user.username === post.author) === true)
         post.content = '*blocked content*'
       posts.push(post)
       posts = posts
+      await delay(100);
+      chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
     })
 
     socket.on('exception', (e: WsException) => {
@@ -91,7 +95,7 @@
     }
   }
 
-  function post() {
+  async function post() {
     if (message === null || message === '')
       return;
     socket.emit('sendPost', {
@@ -100,6 +104,8 @@
     }, (response: string) => {
       message = ''
     })
+    await delay(100);
+    chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
   }
 
   async function getChannel() {
