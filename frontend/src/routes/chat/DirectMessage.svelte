@@ -55,6 +55,7 @@
         dm.content = '*blocked content*'
       messages.push(dm)
       messages = messages
+      chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth'})
     })
 
   })
@@ -75,6 +76,7 @@
       message = ''
       messages = messages
     })
+    chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth'})
   }
 
   async function getDMsByUsername(username: string) {
