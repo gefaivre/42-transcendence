@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte"
+  import { onDestroy, onMount } from "svelte"
   import  ioClient  from 'socket.io-client';
   import axios  from "axios";
   import Game from "./Game.svelte";

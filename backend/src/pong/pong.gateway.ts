@@ -45,7 +45,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const username: string | undefined = this.pong.getUsername(client.id);
       if (username !== undefined) {
         client.join(username);
-        return 'foo' // this is temporary (hopefully...)
+        return ;
       }
     } else {
       client.join(room);
@@ -86,7 +86,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const username = this.pong.getUsername(clientId);
         this.server.to(game.id).emit('opponentLeft', {username: username});
         this.pong.disconnectUser(clientId);
-        this.pong.removeRoom(game.id);
+        this.pong.removeUser(clientId);
       } else {
         this.server.to(game.id).emit('gameState', game.state);
         if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
@@ -139,6 +139,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const username = this.pong.getUsername(client.id);
         this.pong.pauseGame(client.id);
         client.leave(room);
+        console.log(username, ' has paused the game');
         this.server.to(room).emit('pause', {username: username});
       }
     }
