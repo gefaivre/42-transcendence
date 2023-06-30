@@ -31,6 +31,7 @@ model User {
   ownedChannels  Channel[] @relation("channel_owner")
   bannedChannels Channel[] @relation("channel_banned")
   adminChannels  Channel[] @relation("channel_admins")
+  invitedChannels  Channel[] @relation("channel_invited")
   posts          Post[]
   blocked        User[]  @relation("blocked")
   blockedBy      User[]  @relation("blocked")
@@ -61,6 +62,7 @@ model Channel {
   banned      User[] @relation("channel_banned")
   admins      User[] @relation("channel_admins")
   users       User[] @relation("channel_users")
+  invited     User[] @relation("channel_invited")
   posts       Post[]
   status      ChannelStatus
   password    String

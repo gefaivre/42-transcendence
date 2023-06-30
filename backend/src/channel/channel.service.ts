@@ -28,7 +28,8 @@ export class ChannelService {
         owner: true,
         users: true,
         admins: true,
-        posts: true
+        posts: true,
+        invited: true
       }
     });
   }
@@ -98,6 +99,11 @@ export class ChannelService {
         users: {
           connect: {
             id: userId // P2025
+          }
+        },
+        invited: {
+          disconnect: {
+            id: userId
           }
         }
       }
@@ -249,6 +255,22 @@ export class ChannelService {
       data: {
         status: status,
         password: password
+      }
+    })
+    return this.prisma.exclude<any,any>(channel, ['password'])
+  }
+
+  async inviteUser(channelName: string, userId: number) {
+   const channel = await this.prisma.channel.update({
+      where: {
+        name: channelName // P2025
+      },
+      data: {
+        invited: {
+          connect: {
+            id: userId // P2025
+          }
+        }
       }
     })
     return this.prisma.exclude<any,any>(channel, ['password'])

@@ -221,6 +221,21 @@
     }
   }
 
+  async function inviteUserToChannel(name: string, userId: number) {
+
+    const body = {
+      channelName: name,
+      userId: userId
+    }
+
+    try {
+      await axios.patch('/channel/invite', body)
+      toast.push('invitation send!', { classes: ['success'] })
+    } catch(e) {
+      toast.push(e.response.data.message, { classes: ['failure'] })
+    }
+  }
+
 </script>
 
 <div class="chat-channel">
@@ -299,6 +314,17 @@
         <!-- channel password -->
           {#if channel?.status === ChannelStatus.Protected}
             <button class="btn btn-xs" on:click={() => updateChannelPassword(channel.name)}>Change password</button>
+          {/if}
+        <!-- channel invitation -->
+          {#if channel?.status === ChannelStatus.Private}
+            <details class="dropdown">
+              <summary class="m-1 btn btn-xs">Invite friend</summary>
+              <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
+                {#each $user.friends as friend}
+                  <li><button class="btn btn-xs" on:click={() => inviteUserToChannel(channel.name, friend.id)}>{friend.username}</button></li>
+                {/each}
+              </ul>
+            </details>
           {/if}
         {/if}
         <ul>
