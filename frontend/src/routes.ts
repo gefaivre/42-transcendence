@@ -5,7 +5,7 @@ import Users from './routes/Users.svelte'
 import Pong from './routes/pong/Pong.svelte'
 
 export default {
-  '/': Leaderboard,
+  '/': Users,
   '/chat/:type?/:name?': Chat,
   '/leaderboard': Leaderboard,
   '/users/:name': Users,

@@ -6,6 +6,7 @@
   import Logo42 from "../assets/42_Logo.png"
   import { toast } from '@zerodevx/svelte-toast/dist'
   import type { CreateUserDto } from "../types";
+  import { onMount } from "svelte";
 
   let user: CreateUserDto = {
     username: null,
@@ -16,12 +17,17 @@
   let action: string = ''
   let code: number = null
 
+  export let twoFAValue: string;
+  let twofa:string;
+
+  onMount(() => twofa = twoFAValue)
+
+
   function success2FA() {
     code = null
     toast.push('Welcome! 👋', { classes: ['success'] })
+    push("/");
     logged.set('true')
-    push('/')
-    location.reload();
   }
 
   function failure2FA() {
@@ -57,11 +63,10 @@
         action = 'qrcode';
       } else {
         toast.push('Welcome! 👋', { classes: ['success'] })
+        push("/")
         user.username = null
         user.password = null
         logged.set('true')
-        push('/')
-        location.reload();
       }
     } catch (e) {
       toast.push(e.response.data.message, { classes: ['failure'] })
@@ -95,12 +100,23 @@
     }
   }
 
+
 </script>
 <div class="screen">
 
   <h1 class="title">ft_transcendence</h1>
 
-  {#if action === ''}
+
+  {#if twofa === "true" || action === 'qrcode'}
+    <div class="action">
+      <input type="text" inputmode="numeric" bind:value={code}>
+      <button on:click={validate2FA}>2FA Validate</button>
+      <button on:click={() => {(action = ''); ( twofa = '')}}>return</button>
+      action = {action}
+      twofa = {twofa}
+    </div>
+
+  {:else if action === ''}
     <div class="action">
       <a href={FT_AUTHORIZE}>
         <div class="connect-button">
@@ -135,12 +151,6 @@
       <button class="btn" on:click={() => action = ''}>return</button>
     </div>
 
-  {:else if action === 'qrcode'}
-    <div class="action">
-      <input type="text" inputmode="numeric" bind:value={code}>
-      <button on:click={validate2FA}>2FA Validate</button>
-      <button on:click={() => action = ''}>return</button>
-    </div>
 
   {/if}
 

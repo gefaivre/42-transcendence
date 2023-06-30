@@ -11,6 +11,7 @@
     import { SvelteToast } from '@zerodevx/svelte-toast/dist';
     import { handleImageError } from './utils'
 
+    let twoFAValue;
     const toastApp = new SvelteToast({
       target: document.body,
     })
@@ -22,7 +23,13 @@
     ];
 
     logged.set('false');
-    $: getProfile()
+
+    $: {
+      const params = new URLSearchParams(window.location.search);
+      twoFAValue = params.get('twoFA');
+      params.delete("twoFA")
+      getProfile()
+    }
 
     async function getProfile() {
       try {
@@ -41,35 +48,39 @@
 
 </script>
 
-  {#if $logged === 'true'}
-  <div class="screen">
+{#if $logged === 'true'}
+<div class="screen">
       <div class="profileLink">
         {#if $user}
-        <a use:link href="/users/{$user.username}">
-          <img class="profilePicture" src='{COMMON_BASE_URL}:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
-        </a>
+          <a use:link href="/users/{$user.username}">
+            <img class="profilePicture" src='{COMMON_BASE_URL}:3000/images/actual/{$user.id}/?$reload=${$reloadImage}' on:error={handleImageError} alt="profile">
+          </a>
         {/if}
       </div>
       <div class="nav">
-      {#each menuItems as item}
-      <a href={item.link}>
-        <img  class="linkButton" src={item.icon} alt={item.label} />
-      </a>
-      {/each}
-    </div>
-    <div class="fillSpace">
-    </div>
-
-    <div class="routes">
-      {#if $user}
-        <Router {routes}/>
-        {/if}
+        {#each menuItems as item}
+          <a href={item.link}>
+          <img  class="linkButton" src={item.icon} alt={item.label} />
+          </a>
+        {/each}
       </div>
-  </div>
+      <div class="fillSpace">
+      </div>
 
-  {:else}
-    <Connection/>
-  {/if}
+      <div class="routes">
+        {#await getProfile() then _}
+          {#if $user}
+            <Router {routes}/>
+          {/if}
+        {/await}
+      </div>
+    </div>
+
+    {:else}
+      {#await getProfile() then _}
+        <Connection bind:twoFAValue/>
+      {/await}
+    {/if}
 
   <style>
 
