@@ -242,6 +242,12 @@
     }
   }
 
+  function ft_isAdmin()
+  {
+    if (channel.admins.some(admin => admin.username === $user.username))
+      return true;
+    return false;
+  }
 </script>
 
 <div class="chat-channel">
@@ -349,7 +355,7 @@
           {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
             <li>
               <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
-              {#if isOwner}
+              {#if channel.admins.some(admin => admin.username === $user.username)}
                 <details class="dropdown">
                   <summary class="m-1 btn btn-xs">settings</summary>
                   <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
@@ -369,7 +375,7 @@
                 <summary class="m-1 btn btn-xs">settings</summary>
                 <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
                   <li><a contenteditable="false" href="#/users/{user.username}">profile</a></li>
-                  {#if isAdmin}
+                  {#if ft_isAdmin()}
                     <li><button on:click={() => ban(user.id)}>ban</button></li>
                     <li><button on:click={() => kick(user.id)}>kick</button></li>
                     <li><button on:click={() => mute(user.id)}>mute(30s)</button></li>
