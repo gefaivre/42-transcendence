@@ -157,11 +157,9 @@
   <div class="ctn-image">
     <img class="image" src="{COMMON_BASE_URL}:3000/images/actual/{pageUser.id}?$reload=${$reloadImage}" on:error={handleImageError} alt="profil"/>
   </div>
-  <br>
   <div class="ctn-title">
     <h1 class="title">{pageUser.username}</h1>
   </div>
-  <br>
 	{#if pageUser.id.toString() === $id}
     <button class="btn" on:click={() => logout()}>Logout</button>
     <!-- <button class="btn" on:click={() => deleteAccount()}>Delete account</button> -->
@@ -197,14 +195,7 @@
     </span>
 		{:else}
       <button class="btn" on:click={requestFriendship}>Request friend</button>
-      <br>
-      <br>
 		{/if}
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
     <!--blocked -->
 		{#if isBlocked === true}
       <button on:click={unblockByUsername} class="btn">Unblock</button>
