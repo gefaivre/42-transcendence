@@ -14,8 +14,6 @@
   let socket: Socket = null
   let message: string = ''
   let channel: Channel = null
-  let isOwner: boolean = false
-  let isAdmin: boolean = false
   let posts: PostEmitDto[] = []
   let channelName: string = null;
   let listChannel: any[] = [];
@@ -138,7 +136,7 @@
 
   async function ban(userId: number) {
     try {
-      const response = await axios.delete(`/channel/ban/${channel.name}/${userId}`)
+      await axios.delete(`/channel/ban/${channel.name}/${userId}`)
       getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
@@ -157,7 +155,7 @@
 
   async function kick(userId: number) {
     try {
-      const response = await axios.delete(`/channel/kick/${channel.name}/${userId}`)
+      await axios.delete(`/channel/kick/${channel.name}/${userId}`)
       getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
@@ -242,12 +240,6 @@
     }
   }
 
-  function ft_isAdmin()
-  {
-    if (channel.admins.some(admin => admin.username === $user.username))
-      return true;
-    return false;
-  }
 </script>
 
 <div class="chat-channel">
@@ -368,18 +360,18 @@
             </li>
           {/each}
           <li><h1>--users--</h1></li>
-          {#each channel.users.filter(user => !channel.admins.some(admin => admin.id === user.id)) as user}
+          {#each channel.users.filter(_user => !channel.admins.some(admin => admin.id === _user.id)) as _user}
             <li>
-              <a contenteditable="false" bind:innerHTML={user.username} href="#/users/{user.username}"/>
+              <a contenteditable="false" bind:innerHTML={_user.username} href="#/users/{_user.username}"/>
               <details class="dropdown">
                 <summary class="m-1 btn btn-xs">settings</summary>
                 <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
-                  <li><a contenteditable="false" href="#/users/{user.username}">profile</a></li>
-                  {#if ft_isAdmin()}
-                    <li><button on:click={() => ban(user.id)}>ban</button></li>
-                    <li><button on:click={() => kick(user.id)}>kick</button></li>
-                    <li><button on:click={() => mute(user.id)}>mute(30s)</button></li>
-                    <li><button on:click={() => promoteAdmin(user.id)}>up</button></li>
+                  <li><a contenteditable="false" href="#/users/{_user.username}">profile</a></li>
+                  {#if channel.admins.some(admin => admin.username === $user.username)}
+                    <li><button on:click={() => ban(_user.id)}>ban</button></li>
+                    <li><button on:click={() => kick(_user.id)}>kick</button></li>
+                    <li><button on:click={() => mute(_user.id)}>mute(30s)</button></li>
+                    <li><button on:click={() => promoteAdmin(_user.id)}>up</button></li>
                   {/if}
                 </ul>
               </details>
