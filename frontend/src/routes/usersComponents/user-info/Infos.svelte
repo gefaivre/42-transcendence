@@ -8,6 +8,7 @@
   import acceptIcon from "../../../assets/new_check.png";
   import { toast } from '@zerodevx/svelte-toast/dist'
   import { push } from "svelte-spa-router";
+  import ioClient from 'socket.io-client';
 
   export let pageUser: User
   export let onlineStatus: Status
@@ -105,6 +106,15 @@
     try {
       await axios.patch(`/users/block/${pageUser.username}`, null);
       isBlocked = true;
+      const response = await axios.get('/auth/whoami');
+        user.set(response.data)
+        id.set(response.data.id.toString())
+        logged.set('true')
+        $socket = ioClient(axios.defaults.baseURL, {
+          path: '/user',
+          withCredentials: true,
+          query: { id: $user.id, username: $user.username }
+        })
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -114,6 +124,15 @@
     try {
       await axios.patch(`/users/unblock/${pageUser.username}`, null);
       isBlocked = false;
+      const response = await axios.get('/auth/whoami');
+        user.set(response.data)
+        id.set(response.data.id.toString())
+        logged.set('true')
+        $socket = ioClient(axios.defaults.baseURL, {
+          path: '/user',
+          withCredentials: true,
+          query: { id: $user.id, username: $user.username }
+        })
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
