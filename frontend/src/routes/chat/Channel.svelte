@@ -347,7 +347,7 @@
           {#each channel.admins.filter(admin => admin.id !== channel.ownerId) as admin}
             <li>
               <a contenteditable="false" bind:innerHTML={admin.username} href="#/users/{admin.username}"/>
-              {#if channel.admins.some(admin => admin.username === $user.username)}
+              {#if channel.admins.some(_admin => _admin.username === $user.username && admin.username !== $user.username)}
                 <details class="dropdown">
                   <summary class="m-1 btn btn-xs">settings</summary>
                   <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
