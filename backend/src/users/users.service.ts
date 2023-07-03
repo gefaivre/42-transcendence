@@ -23,13 +23,13 @@ export class UsersService {
     })
 
     // each user with its own image directory
-    fs.mkdirSync(`/app/images/${_user.username}`)
+    fs.mkdirSync(`/app/images/${_user.id}`)
 
     // user created via 42 API: there is an image
     if (user.image !== null && user.image !== undefined) {
 
       // path for the the image
-      const path: string = `/app/images/${_user.username}/default42.jpg`
+      const path: string = `/app/images/${_user.id}/default42.jpg`
 
       // download the image into the docker volume
       const response = await fetch(user.image.href)

@@ -16,7 +16,7 @@ export class ImagesController {
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request: any, file, cb) => {
-        cb(null, `/app/images/${request.user.username}`)
+        cb(null, `/app/images/${request.user.id}`)
       },
       filename: (request, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`)
