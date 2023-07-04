@@ -28,6 +28,7 @@
   export let gameSettings: Settings = { ballSize: 1, ballSpeed: 1, paddleSize: 1, paddleSpeed: 1 };
   export let gamePause: boolean = false;
   export let away: string = '';
+  export let socketInGame: any;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -60,6 +61,15 @@
   let leftScore: number = 0;
   let rightScore: number = 0;
 
+  window.onbeforeunload = function(event) {
+      console.log('test');
+      window.confirm("leave the game ? You will lose");
+      socketInGame.emit('leave');
+      socketInGame.close();
+      cancelAnimationFrame(animationId);
+    };
+
+
   onMount(() => {
     ctx = canvas.getContext("2d");
 
@@ -71,11 +81,12 @@
       if (url.attributes.href.value !== '#/Pong')
       url.onclick = function(){
       if (window.confirm("leave the game ?"))
+        socketInGame.close();
         push('/' + url.attributes.href.value);
       };
   });
 
-    
+        
     game_loop();
     return () => {
       cancelAnimationFrame(animationId);
