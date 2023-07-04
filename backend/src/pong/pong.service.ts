@@ -10,6 +10,7 @@ import { MatchsService } from 'src/matchs/matchs.service';
 import { GameStateDto } from './dto/game-state.dto';
 import { GameDto } from './dto/game.dto';
 import { RoomDto } from './dto/room.dto';
+import { RequestGameDto } from './dto/request-game.dto';
 
 @Injectable()
 export class PongService {
@@ -376,5 +377,27 @@ export class PongService {
     const room: Room | undefined = this.rooms.find(room => room.player1.socketId === clientId || room.player2?.socketId === clientId);
     if (room) 
       return room.id;
+  }
+
+  getRemainingId(roomId: string) {
+    const room: Room | undefined = this.rooms.find(room => room.id == roomId);
+    
+    if (room && room.disconnected) {
+      if (room.disconnected.user.socketId === room.player1.socketId && room.player2)
+        return room.player2.socketId;
+      else
+        return room.player1.socketId;
+    }
+  }
+
+  checkSettings(requestGameDto: RequestGameDto) {
+    const settings = requestGameDto.settings;
+
+    if (settings.ballSize < 0.5 || settings.ballSize > 2
+        || settings.ballSpeed < 0.5 || settings.ballSpeed > 3
+      || settings.paddleSize < 0.5 || settings.paddleSize > 2
+      || settings.paddleSpeed < 0.5 || settings.paddleSpeed > 2)
+      return false;
+  return true;
   }
 }
