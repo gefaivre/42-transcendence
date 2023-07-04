@@ -36,7 +36,7 @@
   let gameRequest: boolean = false;
   let watch = false;
 
-  const socket = ioClient(axios.defaults.baseURL, {
+  let socket = ioClient(axios.defaults.baseURL, {
     path: '/pong',
     withCredentials: true
   });
@@ -130,10 +130,15 @@
 
     socket.on('exception', (e: WsException) => {
       alert(e.message)
-    })
+    });
 
     socket.on('alreadyRequested', () => {
       toast.push('Game already requested!');
+      gameRequest = false;
+    });
+
+    socket.on('badSettings', () => {
+      toast.push('Bad settings');
       gameRequest = false;
     });
 
@@ -186,7 +191,7 @@
     if (friendly) {
       socket.emit('requestGame', { friend: friendUsername, settings: settings });
     } else {
-      socket.emit('requestGame', { settings: settings });
+      socket.emit('requestGame', { friend: undefined,  settings: settings });
     }
 
     gameRequest = true;
@@ -218,10 +223,10 @@
   <div class="panel">
     <h2>Play game</h2>
 
+    {#if friendly}
     <h3>Opponent</h3>
     <input bind:value={friendUsername} type="text" placeholder="your friend username" class="input">
-
-    <br>
+    {/if}
 
     <h3>Game type</h3>
 
@@ -288,7 +293,7 @@
 
 {#if inGame}
 {#key unique}
-<Game bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:away={awayPlayer} bind:update_state={update_child}></Game>
+<Game bind:socketInGame={socket} bind:gameSettings={settings} bind:players={currentMatch} bind:gamePause={pause} bind:away={awayPlayer} bind:update_state={update_child}></Game>
 {/key}
 {/if}
 

@@ -35,6 +35,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('requestGame')
   handleRequestGame(client: Socket, requestGameDto: RequestGameDto) {
+    if (!this.pong.checkSettings(requestGameDto)) {
+      this.server.to(client.id).emit('badSettings');
+      return ;
+    }
     if (this.pong.gameAlreadyRequested(client.id)) {
       this.server.to(client.id).emit('alreadyRequested', {});
       return ;
@@ -88,14 +92,20 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.pong.disconnectUser(clientId);
         this.pong.removeUser(clientId);
       } else {
-        this.server.to(game.id).emit('gameState', game.state);
-        if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
-          const winnerId: string = this.pong.getWinner(game.id);
-          this.server.to(winnerId).emit('win', {});
-          const username: string | undefined = this.pong.getUsername(winnerId);
-          this.server.to(game.id).emit('endWatch', {username: username});
-          const loserId: string = this.pong.getLoser(game.id);
-          this.server.to(loserId).emit('lose', {});
+        if (this.pong.isPaused(game.id)) {
+          const clientId = this.pong.getRemainingId(game.id);
+          if (clientId)
+            this.server.to(clientId).emit('gameState', game.state);
+        } else {
+          this.server.to(game.id).emit('gameState', game.state);
+          if (game.state.score.leftScore === 10 || game.state.score.rightScore === 10) {
+            const winnerId: string = this.pong.getWinner(game.id);
+            this.server.to(winnerId).emit('win', {});
+            const username: string | undefined = this.pong.getUsername(winnerId);
+            this.server.to(game.id).emit('endWatch', {username: username});
+            const loserId: string = this.pong.getLoser(game.id);
+            this.server.to(loserId).emit('lose', {});
+          }
         }
       }
     });
@@ -132,6 +142,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (room) {
       if (this.pong.isPaused(room)) {
         client.leave(room);
+        client.disconnect();
         this.server.to(room).emit('bothLeft');
         this.pong.removeRoom(room);
         this.pong.removeUser(client.id);
@@ -139,6 +150,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const username = this.pong.getUsername(client.id);
         this.pong.pauseGame(client.id);
         client.leave(room);
+        client.disconnect();
         console.log(username, ' has paused the game');
         this.server.to(room).emit('pause', {username: username});
       }
