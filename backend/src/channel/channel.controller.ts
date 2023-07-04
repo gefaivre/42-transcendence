@@ -70,6 +70,10 @@ export class ChannelController {
     if (isOwner === true)
       throw new BadRequestException('user is owner of the channel')
 
+    // cannot kick yourself
+    if (request.user.id === user.id)
+      throw new BadRequestException('user cannot kick himself')
+
     // This try/catch because the built-in exception layer returns '500 Internal Error' on any prisma exception.
     // And we want to avoid 500! After those previous checks it should be good, but none of the above logic is atomic.
     // Between those 'verification steps' channel could have been deleted, user could have been deleted too, etc.
@@ -100,6 +104,10 @@ export class ChannelController {
     const isOwner: boolean = user.id === channel.ownerId
     if (isOwner === true)
       throw new BadRequestException('user is owner of the channel')
+
+    // cannot ban yourself
+    if (request.user.id === user.id)
+      throw new BadRequestException('user cannot ban himself')
 
     // This try/catch because the built-in exception layer returns '500 Internal Error' on any prisma exception.
     // And we want to avoid 500! After those previous checks it should be good, but none of the above logic is atomic.
@@ -159,6 +167,10 @@ export class ChannelController {
     const isOwner: boolean = request.user.id === channel.ownerId
     if (isOwner === false)
       throw new UnauthorizedException('need to be the channel owner')
+
+    // cannot revoke yourself
+    if (request.user.id === user.id)
+      throw new BadRequestException('user cannot revoke himself')
 
     try {
       await this.channel.revokeAdmin(channel.name, user.id)
