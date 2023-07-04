@@ -294,6 +294,10 @@
         </ul>
       </div>
     </div>
+  {:else if channelName === null}
+    <div class="void">
+      <h1>Please select a channel</h1>
+    </div>
   {:else}
     <div class="ctn-chan">
 
@@ -490,7 +494,12 @@ li h1 {
   display: grid;
   grid-template-columns: 1fr 2fr;
   max-height: 331px;
+}
 
+.void {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .chatbox {
@@ -501,7 +510,6 @@ li h1 {
   color: #fff;
   border: 2px solid var(--pink);
 }
-
 
 .chat-form {
   display: flex;
