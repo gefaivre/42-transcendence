@@ -16,6 +16,7 @@
 
   let action: string = ''
   let code: number = null
+  let showPass: boolean = false
 
   export let twoFAValue: string;
   let twofa:string;
@@ -100,6 +101,11 @@
     }
   }
 
+  function returnButton () {
+    action = '';
+    showPass = false;
+  }
+
 
 </script>
 <div class="screen">
@@ -138,17 +144,27 @@
   {:else if action === 'signup'}
     <div class="action">
       <input type="text" placeholder="username" class="input input-bordered" bind:value={user.username}><br>
-      <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}><br>
+      {#if showPass === false}
+        <input type="password" placeholder="password" class="input input-bordered" bind:value={user.password}>
+      {:else}
+        <input type="test" placeholder="password" class="input input-bordered" bind:value={user.password}>
+      {/if}
+      <input type="checkbox" on:click={() =>  showPass = !showPass}/>
       <button class="btn" on:click={signup}>signup</button>
-      <button class="btn" on:click={() => action = ''}>return</button>
+      <button class="btn" on:click={returnButton}>return</button>
     </div>
 
   {:else if action === 'signin'}
     <div class="action">
       <input type="text" placeholder="username" class="input input-bordered" bind:value={user.username}/><br>
-      <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}/><br>
+      {#if showPass === false}
+        <input type="password" placeholder="password" class="input input-bordered" bind:value={user.password}>
+      {:else}
+        <input type="test" placeholder="password" class="input input-bordered" bind:value={user.password}>
+      {/if}
+      <input type="checkbox" on:click={() =>  showPass = !showPass}/>
       <button class="btn" on:click={login}>login</button>
-      <button class="btn" on:click={() => action = ''}>return</button>
+      <button class="btn" on:click={returnButton}>return</button>
     </div>
 
 
