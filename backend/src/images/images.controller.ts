@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Delete, UseInterceptors, UploadedFile, Req, UseGuards, ParseIntPipe, UseFilters } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { FileSizeValidationPipe } from 'src/pipes';
+import { UploadImageExceptionFilter } from 'src/filters';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('images')
@@ -15,13 +16,14 @@ export class ImagesController {
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (request: any, file, cb) => {
-        cb(null, `/app/images/${request.user.username}`)
+        cb(null, `/app/images/${request.user.id}`)
       },
       filename: (request, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`)
       }
     })
   }))
+  @UseFilters(UploadImageExceptionFilter)
   addImage(@Req() request: any, @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File) {
     return this.images.addImage(request.user.id, file);
   }

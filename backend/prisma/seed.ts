@@ -72,7 +72,7 @@ async function main() {
         mmr: randomNumber()
       }
     })
-    fs.mkdirSync(`/app/images/${user.username}`)
+    fs.mkdirSync(`/app/images/${user.id}`)
     if (i % 3 === 0) {
       // add admin
       await prisma.channel.update({
