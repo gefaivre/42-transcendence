@@ -164,7 +164,7 @@
       {/if}
       <input type="checkbox" on:click={() =>  showPass = !showPass}/>
       <button class="btn" on:click={login}>login</button>
-      <button class="btn" on:click={() => action = ''}>return</button>
+      <button class="btn" on:click={returnButton}>return</button>
     </div>
 
 
