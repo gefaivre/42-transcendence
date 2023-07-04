@@ -147,7 +147,7 @@
       {#if showPass === false}
         <input type="password" placeholder="password" class="input input-bordered" bind:value={user.password}>
       {:else}
-        <input type="test" placeholder="password" class="input input-bordered" bind:value={user.password}>
+        <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}>
       {/if}
       <input type="checkbox" on:click={() =>  showPass = !showPass}/>
       <button class="btn" on:click={signup}>signup</button>
@@ -160,7 +160,7 @@
       {#if showPass === false}
         <input type="password" placeholder="password" class="input input-bordered" bind:value={user.password}>
       {:else}
-        <input type="test" placeholder="password" class="input input-bordered" bind:value={user.password}>
+        <input type="text" placeholder="password" class="input input-bordered" bind:value={user.password}>
       {/if}
       <input type="checkbox" on:click={() =>  showPass = !showPass}/>
       <button class="btn" on:click={login}>login</button>
