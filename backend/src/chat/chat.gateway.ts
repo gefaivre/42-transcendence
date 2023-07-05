@@ -157,6 +157,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // TODO: add `UserByNamePipe` into `DirectMessageDto` (would lead to delete `this.userService`)
     const recipient: any = await this.users.findByUsername(message.recipient)
 
+    const blocked = await this.users.isBlocked(recipient.id, sender.username);
+    if (blocked) {
+      this.server.to(client.id).emit('blocked')
+      return;
+    }
+
     // db
     const dm = await this.dm.create({
       content: message.content,
