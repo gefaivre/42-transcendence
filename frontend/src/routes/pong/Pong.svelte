@@ -61,7 +61,7 @@
     socket.on('gameStart', (match) => {
       currentMatch = match;
       toast.push('game is starting !');
-      $_socket.emit('setOnlineStatus', Status.offline)
+      $_socket.emit('setOnlineStatus', Status.ingame)
     });
 
     socket.on('watchGame', (res) => {
@@ -95,12 +95,14 @@
       restart();
       toast.push('you win!', { classes: ['success'] });
       inGame = false;
+      $_socket.emit('setOnlineStatus', Status.online)
     });
 
     socket.on('lose', () => {
       restart();
       toast.push('you lose!', { classes: ['failure'] })
       inGame = false;
+      $_socket.emit('setOnlineStatus', Status.online)
     });
 
     socket.on('endWatch', (player) => {
@@ -115,8 +117,10 @@
       restart();
       if (watch && player.username)
         toast.push(player.username + ' has left the game');
-      else if (player.username)
+      else if (player.username) {
         toast.push(player.username + ' has left the game, you win!');
+        $_socket.emit('setOnlineStatus', Status.online)
+      }
       inGame = false;
     });
 
@@ -142,7 +146,9 @@
       gameRequest = false;
     });
 
-    return ()=> { 
+    socket.on('disconnect', () => $_socket.emit('setOnlineStatus', Status.online))
+
+    return ()=> {
       socket.close();
     };
   });
