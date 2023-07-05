@@ -62,7 +62,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
     if (this.chat.alreadyInRoom(user, room)) {
-      console.log('alreadyInRoom');
       const channelPosts: PostEmitDto[] = await this.chat.retrieveChannelPosts(room)
       for (const post of channelPosts)
         client.emit('post', post)
@@ -131,7 +130,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (recipients) {
       recipients.forEach(recipient => {
         this.sendPost(recipient, user, post, _post);
-        console.log(recipient.username);
       });
     }
 

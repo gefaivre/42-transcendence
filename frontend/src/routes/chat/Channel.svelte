@@ -83,10 +83,12 @@
 
     socket.on('userleave', async(msg) => {
         toast.push(msg.username + " has joined " +  msg.channelName);
+        await reloadChannels();
     });
 
     socket.on('userjoin', async(msg) => {
         toast.push(msg.username + " has joined " +  msg.channelName);
+        await reloadChannels();
     });
 
     socket.on('userban', async (msg) => {
