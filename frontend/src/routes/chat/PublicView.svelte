@@ -12,15 +12,19 @@
 
   let password: string = ''
 
+  export let join: (channelName: string) => void;
+
   async function joinChannel(channel: any) {
 
     if (channel.status === ChannelStatus.Protected) {
       password = prompt('Enter password')
       if (password === null) {
         password = ''
+        join(channel.name);
         return
       }
       else if (password === '')
+        join(channel.name);
         return toast.push('empty password', { classes: ['failure'] })
     }
 
@@ -31,6 +35,7 @@
         status: channel.status
       } as ChannelDto)
       await reloadChannels()
+      join(channel.name);
       toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
       password = ''
     } catch(e) {

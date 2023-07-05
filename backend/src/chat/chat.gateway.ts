@@ -16,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import { CreateDirectMessage } from './types/CreateDirectMessage';
 import { MuteDto } from './dto/mute.dto';
 import { Post, User } from '@prisma/client';
+import { BanKickDto } from './dto/ban.kick.dto';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -60,6 +61,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
+    if (this.chat.alreadyInRoom(user, room))
+      return ;
+
     this.chat.joinRoom(user, room);
     client.join(room)
 
@@ -82,46 +86,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.eventHandlerSuccess(user, room, WsActionSuccess.LeaveRoom)
   }
 
-  // This is not used anymore: frontend join channel via HTTP at '/channel/join/'
-  @SubscribeMessage('joinChannel')
-  async handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: ChannelDto) {
-
-    // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
-
-    // Check if user is banned
-    if (await this.channel.isBanned(channel.channelName, user.prismaId) === true)
-      return this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.UserBanned)
-
-    try {
-      await this.channel.addUserToChannel(channel.channelName, user.prismaId)
-    } catch(e) {
-      return this.eventHandlerFailure(user, channel.channelName, WsActionFailure.JoinChannel, WsFailureCause.InternalError)
+  @SubscribeMessage('ban')
+  async handleBan(@ConnectedSocket() client: Socket, @MessageBody() ban: BanKickDto) {
+    const banned: WsUser | undefined = await this.chat.banUser(client.id, ban.username, ban.channelName);
+    if (banned) {
+      this.server.to(ban.channelName).emit('userban', { channelName: ban.channelName, username: banned.username });
+      client.leave(ban.channelName);
     }
-
-    this.server.to(channel.channelName).emit('channelEvent', { user: user.username, event: 'join' })
-
-    return this.eventHandlerSuccess(user, channel.channelName, WsActionSuccess.JoinChannel)
   }
 
-  // This is not used anymore: fontend leave channel via HTTP at '/channel/leave/:channelName'
-  @SubscribeMessage('leaveChannel')
-  async handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channel: string) {
-
-    // Since `ChatGuard` has been applied we assume `user` is not undefined
-    const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
-
-    try {
-      await this.channel.leave(channel, user.prismaId)
-    } catch(e) {
-      return this.eventHandlerFailure(user, channel, WsActionFailure.LeaveChannel, WsFailureCause.InternalError)
+  @SubscribeMessage('kick')
+  async handleKick(@ConnectedSocket() client: Socket, @MessageBody() kick: BanKickDto) {
+    const kicked: WsUser | undefined = await this.chat.kickUser(client.id, kick.username, kick.channelName);
+    if (kicked) {
+      this.server.to(kick.channelName).emit('userkick', { channelName: kick.channelName, username: kicked.username });
+      client.leave(kick.channelName);
     }
-
-    client.leave(channel)
-
-    this.server.to(channel).emit('channelEvent', { user: user.username, event: 'leave' })
-
-    return this.eventHandlerSuccess(user, channel, WsActionSuccess.LeaveChannel)
   }
 
   @SubscribeMessage('sendPost')

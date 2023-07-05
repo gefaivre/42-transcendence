@@ -39,6 +39,43 @@ export class ChatService {
     }
   }
 
+  async banUser(socketId: string, banUsername: string, channelName: string) {
+    const room = this.rooms.find(room => room.id === channelName);
+    if (room) {
+      const user = room.users.find(user => user.socketId === socketId);
+      if (user) {
+        const isAdmin = await this.channel.isAdmin(channelName, user!.prismaId);
+        if (isAdmin) {
+          if (room) {
+            const banned = room.users.find(user => user.username === banUsername);
+            if (banned) {
+              await this.channel.banUser(channelName, banned.prismaId);
+              return banned;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  async kickUser(socketId: string, kickUsername: string, channelName: string) {
+    const room = this.rooms.find(room => room.id === channelName);
+    if (room) {
+      const user = room.users.find(user => user.socketId === socketId);
+      if (user) {
+        const isAdmin = await this.channel.isAdmin(channelName, user!.prismaId);
+        if (isAdmin) {
+          if (room) {
+            const kicked = room.users.find(user => user.username === kickUsername);
+            if (kicked) {
+              await this.channel.removeUser(channelName, kicked.prismaId);
+              return kicked;
+            }
+          }
+        }
+      }
+    }
+  }
   // One username can link to multiple clients (this might/should change)
   removeUser(socketId: string) {
     this.chatUsers = this.chatUsers.filter(user => user.socketId !== socketId)
@@ -101,5 +138,15 @@ export class ChatService {
     if (room) {
       return room.users;
     }
+  }
+
+  alreadyInRoom(chatUser: WsUser, roomId: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id === roomId);
+    if (room) {
+      const already = room.users.find(user => user.username === chatUser.username);
+      if (already)
+        return true;
+    }
+    return false;
   }
 }
