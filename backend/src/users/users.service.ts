@@ -197,7 +197,7 @@ export class UsersService {
   async updatePassword(username: string, newPassword: string) {
     const user: User = await this.prisma.user.update({
       where: {
-        username: username // P2025
+        username: username // P2025/
       },
       data: {
         password: newPassword

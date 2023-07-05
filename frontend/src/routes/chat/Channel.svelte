@@ -47,8 +47,6 @@
     })
 
     socket.on('post', async (post: PostEmitDto) => {
-      if ($user.blocked.some(user => user.username === post.author) === true)
-        post.content = '*blocked content*'
       posts.push(post)
       posts = posts
       await delay(100);
