@@ -61,6 +61,10 @@
       chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
     })
 
+    socket.on('blocked', () => {
+      toast.push('This user blocked you');
+    });
+
   })
 
   onDestroy(() =>  {
@@ -72,6 +76,8 @@
   })
 
   async function sendDM() {
+    if (!message)
+      return;
     socket.emit('sendDirectMessage', {
       content: message,
       recipient: chatUser
