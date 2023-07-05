@@ -54,10 +54,13 @@
     })
 
     socket.on('post', async (post: PostEmitDto) => {
-      posts.push(post)
-      posts = posts
-      await delay(100);
-      chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+      if (!($user.blocked.some(user => user.username === post.author) === true))
+      {
+        posts.push(post)
+        posts = posts
+        await delay(100);
+        chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+      }
     })
 
     socket.on('exception', (e: WsException) => {
@@ -78,13 +81,23 @@
       }
     });
 
-    socket.on('userban', (msg) => {
+    socket.on('userleave', async(msg) => {
+        toast.push(msg.username + " has joined " +  msg.channelName);
+    });
+
+    socket.on('userjoin', async(msg) => {
+        toast.push(msg.username + " has joined " +  msg.channelName);
+    });
+
+    socket.on('userban', async (msg) => {
       if ($user.username === msg.username) {
         toast.push("you have been banned from " +  msg.channelName);
+        await reloadChannels()
         switchTab(Tab.AllChannels);
       }
       else {
         toast.push(msg.username + " has been banned from " +  msg.channelName);
+        await reloadChannels()
       }
     });
 
@@ -108,11 +121,12 @@
 
   function joinChannel(channelName: string) {
     if (channelName)
-      socket.emit('joinRoom', channelName);
+      connectChannel(channelName);
   }
 
   async function leaveChannel(name: string) {
     try {
+      socket.emit('leaveRoom', name);
       await axios.patch(`/channel/leave/${name}`)
       await reloadChannels()
     } catch(e) {
@@ -191,13 +205,12 @@
     tab = Tab.OneChannel
     channelName = _channel
     await getChannel()
-    socket.emit('joinRoom', channelName)
+    socket.emit('joinRoom', _channel)
   }
 
   function switchTab(target: Tab) {
     tab = target
     if (target === Tab.AllChannels) {
-      socket.emit('leaveRoom', channelName)
       channelName = null
       posts.splice(0, posts.length)
     }

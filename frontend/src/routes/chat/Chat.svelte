@@ -36,7 +36,7 @@
 
     <Channel bind:channels reloadChannels={getAllChannels} joinChan={chanjoined}/>
 
-    <Create reloadChannels={getAllChannels}/>
+    <Create reloadChannels={getAllChannels} join={joinChannel}/>
 
     <PublicView bind:channels reloadChannels={getAllChannels} join={joinChannel}/>
 

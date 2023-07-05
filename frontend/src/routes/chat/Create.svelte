@@ -13,6 +13,7 @@
 
   // export let channels: any[]
   export let reloadChannels = async () => {}
+  export let join: (channelName: string) => void;
 
   // TODO: ensure every socketio client leave the room before deleting the channel (cf. server.socketsLeave())
   async function remove(name: string) {
@@ -35,6 +36,7 @@
     try {
       await axios.post('channel', channel, { withCredentials: true })
       await reloadChannels()
+      join(channel.channelName);
     } catch (e) {
         toast.push(e.response.data.message, {classes: ['failure']})
     }

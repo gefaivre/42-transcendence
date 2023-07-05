@@ -61,10 +61,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
-    if (this.chat.alreadyInRoom(user, room))
+    if (this.chat.alreadyInRoom(user, room)) {
+      console.log('alreadyInRoom');
+      const channelPosts: PostEmitDto[] = await this.chat.retrieveChannelPosts(room)
+      for (const post of channelPosts)
+        client.emit('post', post)
       return ;
+    }
 
     this.chat.joinRoom(user, room);
+    this.server.to(room).emit('userjoin', {username: user.username, channelName: room});
     client.join(room)
 
     const channelPosts: PostEmitDto[] = await this.chat.retrieveChannelPosts(room)
@@ -82,6 +88,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     this.chat.leaveRoom(user, room);
     client.leave(room)
+    this.server.to(room).emit('userleave', {username: user.username, channelName: room});
 
     return this.eventHandlerSuccess(user, room, WsActionSuccess.LeaveRoom)
   }
@@ -124,6 +131,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (recipients) {
       recipients.forEach(recipient => {
         this.sendPost(recipient, user, post, _post);
+        console.log(recipient.username);
       });
     }
 

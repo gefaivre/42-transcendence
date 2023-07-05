@@ -105,6 +105,9 @@
     try {
       await axios.patch(`/users/block/${pageUser.username}`, null);
       isBlocked = true;
+      const response = await axios.get('/auth/whoami');
+      user.set(response.data)
+        id.set(response.data.id.toString())
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -114,6 +117,9 @@
     try {
       await axios.patch(`/users/unblock/${pageUser.username}`, null);
       isBlocked = false;
+      const response = await axios.get('/auth/whoami');
+      user.set(response.data)
+        id.set(response.data.id.toString())
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }

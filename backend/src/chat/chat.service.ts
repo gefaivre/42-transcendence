@@ -78,6 +78,14 @@ export class ChatService {
   }
   // One username can link to multiple clients (this might/should change)
   removeUser(socketId: string) {
+    const user: WsUser | undefined = this.chatUsers.find(chatUser => chatUser.socketId === socketId);
+    if (user) {
+      const rooms: ChatRoom[] | undefined = this.getUserRooms(user);
+      rooms.forEach(room => {
+        const toDel = room.users.indexOf(user);
+        room.users.splice(toDel, 1);
+      });
+    }
     this.chatUsers = this.chatUsers.filter(user => user.socketId !== socketId)
   }
 
@@ -138,6 +146,15 @@ export class ChatService {
     if (room) {
       return room.users;
     }
+  }
+
+  getUserRooms(user: WsUser) {
+    let rooms: ChatRoom[] = [];
+    this.rooms.forEach(room => {
+      if (room.users.find(roomUser => roomUser.prismaId === user.prismaId))
+        rooms.push(room);
+    });
+    return rooms;
   }
 
   alreadyInRoom(chatUser: WsUser, roomId: string) {
