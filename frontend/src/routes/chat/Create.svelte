@@ -64,7 +64,7 @@
       {#if channel.status == ChannelStatus.Protected}
         <br>
         <br>
-        <input type="text" class="input input-sm input-bordered" bind:value={channel.password} placeholder="password">
+        <input type="password" class="input input-sm input-bordered" bind:value={channel.password} placeholder="password">
       {/if}
       <br>
       <br>
