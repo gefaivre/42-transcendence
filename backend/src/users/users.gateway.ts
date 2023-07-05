@@ -31,17 +31,21 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    this.status.push({
-      username: client.handshake.query.username as string,
-      prismaId: +(client.handshake.query.id as string),
-      socketId: client.id,
-      lastPing: Date.now(),
-      status: Status.online
-    })
+    if (this.status.some(status => status.username === client.handshake.query.username) === false) {
+      this.status.push({
+        username: client.handshake.query.username as string,
+        prismaId: +(client.handshake.query.id as string),
+        socketId: client.id,
+        lastPing: Date.now(),
+        status: Status.online
+      })
+    }
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.status = this.status.filter(_client => _client.socketId !== client.id)
+    const toDelete = this.status.findIndex(status => status.socketId === client.id)
+    if (toDelete !== -1)
+      this.status.splice(toDelete, 1)
   }
 
 }
