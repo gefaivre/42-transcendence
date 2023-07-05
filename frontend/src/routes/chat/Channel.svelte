@@ -47,12 +47,13 @@
     })
 
     socket.on('post', async (post: PostEmitDto) => {
-      if ($user.blocked.some(user => user.username === post.author) === true)
-        post.content = '*blocked content*'
-      posts.push(post)
-      posts = posts
-      await delay(100);
-      chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+      if (!($user.blocked.some(user => user.username === post.author) === true))
+      {
+        posts.push(post)
+        posts = posts
+        await delay(100);
+        chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+      }
     })
 
     socket.on('exception', (e: WsException) => {

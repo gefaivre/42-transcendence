@@ -8,6 +8,7 @@ import { Channel } from '@prisma/client';
 import { Post } from '@prisma/client';
 import { Muted, WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
+import { ChatRoom } from './types/ChatRoom';
 
 @Injectable()
 export class ChatService {
@@ -21,6 +22,7 @@ export class ChatService {
 
   chatUsers: WsUser[] = [];
   muteUsers: Muted[] = [];
+  rooms: ChatRoom[] = [];
 
   async validateUser(authHeader: string) {
     const token = authHeader.split('=')[1];
@@ -75,4 +77,29 @@ export class ChatService {
     return this.muteUsers.some((muted: Muted) => muted.userPrismaId === id)
   }
 
+  async joinRoom(user: WsUser, roomId: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
+    if (!room) {
+      const channel = await this.channel.findByName(roomId);
+      if (channel)
+      this.rooms.push({ id: roomId, channelId: channel.id, users: [user]});
+    } else {
+      room.users.push(user);
+    }
+  }
+
+  leaveRoom(user: WsUser, roomId: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
+    if (room) {
+      const toDel: number = room.users.indexOf(user);
+      room.users.splice(toDel, 1);
+    }
+  }
+
+  getRoomUsers(channelId: number) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.channelId === channelId);
+    if (room) {
+      return room.users;
+    }
+  }
 }

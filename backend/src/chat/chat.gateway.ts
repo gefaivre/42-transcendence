@@ -15,7 +15,7 @@ import { DirectMessageService } from './dm.service';
 import { UsersService } from 'src/users/users.service';
 import { CreateDirectMessage } from './types/CreateDirectMessage';
 import { MuteDto } from './dto/mute.dto';
-import { User } from '@prisma/client';
+import { Post, User } from '@prisma/client';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -60,6 +60,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
+    this.chat.joinRoom(user, room);
     client.join(room)
 
     const channelPosts: PostEmitDto[] = await this.chat.retrieveChannelPosts(room)
@@ -75,6 +76,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
+    this.chat.leaveRoom(user, room);
     client.leave(room)
 
     return this.eventHandlerSuccess(user, room, WsActionSuccess.LeaveRoom)
@@ -138,14 +140,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // TODO (?): try/catch
     const _post = await this.posts.create({ content: post.content, channelId: channelId, authorId: user.prismaId })
 
-    this.server.to(post.channelName).emit('post', {
+    const recipients = this.chat.getRoomUsers(channelId);
+    if (recipients) {
+      recipients.forEach(recipient => {
+        this.sendPost(recipient, user, post, _post);
+      });
+    }
+
+    return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
+  }
+
+  async sendPost(recipient: WsUser, user: WsUser, post: PostDto, _post: Post) {
+    const blocked = await this.users.isBlocked(recipient.prismaId, user.username);
+    if (blocked === false) {
+      this.server.to(recipient.socketId).emit('post', {
       channelName: post.channelName,
       content: post.content,
       author: user.username,
       date: _post.date
-    } as PostEmitDto)
-
-    return this.eventHandlerSuccess(user, post.channelName, WsActionSuccess.Post)
+      } as PostEmitDto)
+    }
   }
 
   @SubscribeMessage('sendDirectMessage')
