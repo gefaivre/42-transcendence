@@ -31,6 +31,7 @@
   export let channels: any[]
   export let reloadChannels = async () => {}
   export let joinChan: string = '';
+  export let count: number = 0;
 
   export function joinWSRoom(channelName: string) {
     console.log("test join from Channel.svelte");
@@ -69,28 +70,16 @@
       toast.push(e.message, { classes: ['failure'] })
     })
 
-    // TODO: typedef event
-    socket.on('channelEvent', (event: any) => {
-      if (event.event === 'join') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
-      }
-      else if (event.event === 'leave') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
-      }
-    });
-
     socket.on('userleave', async(msg) => {
-        toast.push(msg.username + " has joined " +  msg.channelName);
-        await reloadChannels();
+      toast.push(msg.username + " has left " +  msg.channelName);
+      await reloadChannels();
+      getChannel();
     });
 
     socket.on('userjoin', async(msg) => {
-        toast.push(msg.username + " has joined " +  msg.channelName);
-        await reloadChannels();
+      toast.push(msg.username + " has joined " +  msg.channelName);
+      await reloadChannels();
+      getChannel();
     });
 
     socket.on('userban', async (msg) => {
@@ -102,6 +91,7 @@
       else {
         toast.push(msg.username + " has been banned from " +  msg.channelName);
         await reloadChannels()
+        getChannel();
       }
     });
 
@@ -114,18 +104,22 @@
       else {
         toast.push(msg.username + " has been kicked from " +  msg.channelName);
         await reloadChannels()
+        getChannel();
       }
     });
 
   })
 
-  $: socket && joinChannel(joinChan);
+  $: count && socket && joinChannel(joinChan);
 
   onDestroy(() => closeSocket())
 
   function joinChannel(channelName: string) {
-    if (channelName)
+    console.log('joinChannel trigger');
+    if (channelName) {
+      console.log('connectChannel trigger');
       connectChannel(channelName);
+    }
   }
 
   async function leaveChannel(name: string) {
@@ -206,10 +200,10 @@
   }
 
   async function connectChannel(_channel: string) {
-    tab = Tab.OneChannel
     channelName = _channel
-    await getChannel()
     socket.emit('joinRoom', _channel)
+    await getChannel()
+    tab = Tab.OneChannel
   }
 
   function switchTab(target: Tab) {

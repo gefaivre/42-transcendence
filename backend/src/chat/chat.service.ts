@@ -49,6 +49,8 @@ export class ChatService {
           if (room) {
             const banned = room.users.find(user => user.username === banUsername);
             if (banned) {
+              const toDel: number = room.users.indexOf(banned);
+              room.users.splice(toDel, 1);
               await this.channel.banUser(channelName, banned.prismaId);
               return banned;
             }
@@ -68,6 +70,8 @@ export class ChatService {
           if (room) {
             const kicked = room.users.find(user => user.username === kickUsername);
             if (kicked) {
+              const toDel: number = room.users.indexOf(kicked);
+              room.users.splice(toDel, 1);
               await this.channel.removeUser(channelName, kicked.prismaId);
               return kicked;
             }

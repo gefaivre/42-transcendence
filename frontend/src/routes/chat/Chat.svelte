@@ -18,9 +18,11 @@
   };
 
   let chanjoined: string = '';
+  let triggerCount: number = 0;
 
   function joinChannel(channelName: string) {
     chanjoined  = channelName;
+    triggerCount++;
   };
 
 
@@ -34,7 +36,7 @@
 
     <DirectMessage/>
 
-    <Channel bind:channels reloadChannels={getAllChannels} joinChan={chanjoined}/>
+    <Channel bind:channels reloadChannels={getAllChannels} joinChan={chanjoined} count={triggerCount}/>
 
     <Create reloadChannels={getAllChannels} join={joinChannel}/>
 
