@@ -37,11 +37,13 @@
         user.set(response.data)
         id.set(response.data.id.toString())
         logged.set('true')
-        $socket = ioClient(axios.defaults.baseURL, {
-          path: '/user',
-          withCredentials: true,
-          query: { id: $user.id, username: $user.username }
-        })
+        if ($socket === null || $socket === undefined) {
+          $socket = ioClient(axios.defaults.baseURL, {
+            path: '/user',
+            withCredentials: true,
+            query: { id: $user.id, username: $user.username }
+          })
+        }
       } catch (e) {
       }
     }
