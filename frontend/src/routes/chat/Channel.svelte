@@ -73,13 +73,15 @@
     socket.on('userleave', async(msg) => {
       toast.push(msg.username + " has left " +  msg.channelName);
       await reloadChannels();
-      getChannel();
+      if (channelName)
+        getChannel();
     });
 
     socket.on('userjoin', async(msg) => {
       toast.push(msg.username + " has joined " +  msg.channelName);
       await reloadChannels();
-      getChannel();
+      if (channelName)
+        getChannel();
     });
 
     socket.on('userban', async (msg) => {
@@ -92,7 +94,8 @@
       else {
         toast.push(msg.username + " has been banned from " +  msg.channelName);
         await reloadChannels()
-        getChannel();
+        if (channelName)
+          getChannel();
       }
     });
 
@@ -105,7 +108,8 @@
       else {
         toast.push(msg.username + " has been kicked from " +  msg.channelName);
         await reloadChannels()
-        getChannel();
+        if (channelName)
+          getChannel();
       }
     });
 
@@ -166,7 +170,8 @@
   async function revokeAdmin(id: number) {
     try {
       await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
-      getChannel()
+      if (channelName)
+        getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }

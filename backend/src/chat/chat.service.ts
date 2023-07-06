@@ -130,7 +130,7 @@ export class ChatService {
     if (!room) {
       const channel = await this.channel.findByName(roomId);
       if (channel)
-      this.rooms.push({ id: roomId, channelId: channel.id, users: [user]});
+        this.rooms.push({ id: roomId, channelId: channel.id, users: [user]});
     } else {
       room.users.push(user);
     }
