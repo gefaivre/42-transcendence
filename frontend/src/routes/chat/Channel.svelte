@@ -109,6 +109,7 @@
       }
     });
 
+
   })
 
   $: count && socket && joinChannel(joinChan);
@@ -180,11 +181,23 @@
     }
   }
 
-  function ban(username: string, channelName: string) {
+  async function ban(username: string, userId: number, channelName: string) {
+    try {
+      await axios.delete(`/channel/ban/${channel.name}/${userId}`)
+      getChannel()
+    } catch (e) {
+      toast.push(e.response.data.message, {classes: ['failure']})
+    }
     socket.emit('ban', { username: username, channelName: channelName });
   }
 
-  function kick(username: string, channelName: string) {
+  async function kick(username: string, userId: number, channelName: string) {
+    try {
+      await axios.delete(`/channel/kick/${channel.name}/${userId}`)
+      getChannel()
+    } catch (e) {
+      toast.push(e.response.data.message, {classes: ['failure']})
+    }
     socket.emit('kick', { username: username, channelName: channelName });
   }
 
@@ -390,8 +403,8 @@
                 <details class="dropdown">
                   <summary class="m-1 btn btn-xs">settings</summary>
                   <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
-                    <li><button on:click={() => kick(admin.username, channel.name)}>kick</button></li>
-                    <li><button on:click={() => ban(admin.username, channel.name)}>ban</button></li>
+                    <li><button on:click={() => kick(admin.username, admin.id, channel.name)}>kick</button></li>
+                    <li><button on:click={() => ban(admin.username, admin.id, channel.name)}>ban</button></li>
                     <li><button on:click={() => revokeAdmin(admin.id)}>down</button></li>
                   </ul>
                 </details>
@@ -407,8 +420,8 @@
                 <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
                   <li><a contenteditable="false" href="#/users/{_user.username}">profile</a></li>
                   {#if channel.admins.some(admin => admin.username === $user.username)}
-                    <li><button on:click={() => ban(_user.username, channel.name)}>ban</button></li>
-                    <li><button on:click={() => kick(_user.username, channel.name)}>kick</button></li>
+                    <li><button on:click={() => ban(_user.username, _user.id, channel.name)}>ban</button></li>
+                    <li><button on:click={() => kick(_user.username, _user.id,  channel.name)}>kick</button></li>
                     <li><button on:click={() => mute(_user.id)}>mute(30s)</button></li>
                     <li><button on:click={() => promoteAdmin(_user.id)}>up</button></li>
                   {/if}

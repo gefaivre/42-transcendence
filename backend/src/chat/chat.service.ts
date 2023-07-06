@@ -39,6 +39,7 @@ export class ChatService {
     }
   }
 
+
   async banUser(socketId: string, banUsername: string, channelName: string) {
     const room = this.rooms.find(room => room.id === channelName);
     if (room) {
@@ -51,8 +52,6 @@ export class ChatService {
             if (banned) {
               const toDel: number = room.users.indexOf(banned);
               room.users.splice(toDel, 1);
-              await this.channel.banUser(channelName, banned.prismaId);
-              await this.channel.removeUser(channelName, banned.prismaId);
               return banned;
             }
           }
@@ -73,7 +72,6 @@ export class ChatService {
             if (kicked) {
               const toDel: number = room.users.indexOf(kicked);
               room.users.splice(toDel, 1);
-              await this.channel.removeUser(channelName, kicked.prismaId);
               return kicked;
             }
           }
@@ -171,4 +169,5 @@ export class ChatService {
     }
     return false;
   }
+
 }

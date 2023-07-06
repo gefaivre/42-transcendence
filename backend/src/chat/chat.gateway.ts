@@ -17,6 +17,7 @@ import { CreateDirectMessage } from './types/CreateDirectMessage';
 import { MuteDto } from './dto/mute.dto';
 import { Post, User } from '@prisma/client';
 import { BanKickDto } from './dto/ban.kick.dto';
+import { Channel } from 'diagnostics_channel';
 
 // TODO: extract `user` someway with Guard, Pipe, Interceptor, Middleware, etc. before handlers execution
 //       (main difficulty here is that TransformationPipe can't be applied upon @ConnectedSocket instance)
@@ -225,6 +226,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
 
+    const userChannels = await this.channel.findUserChannel(user.prismaId);
+    const channelNames = userChannels.map(channel => channel.name);
+    channelNames.forEach(chanName => {
+      this.chat.joinRoom(user, chanName);
+      this.server.to(chanName).emit('userjoin', {username: user.username, channelName: chanName});
+      client.join(chanName);
+    });
+
     return this.lifecycleHookSuccess(user, WsActionSuccess.Connect)
   }
 
@@ -238,6 +247,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
 
     this.chat.removeUser(user.socketId)
+    const userRooms = this.chat.getUserRooms(user);
+    const roomNames = userRooms.map(userRoom => userRoom.id);
+    roomNames.forEach(room => {
+      client.leave(room);
+      this.server.to(room).emit('userleave', {username: user.username, channelName: room});
+    });
+
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)
   }
