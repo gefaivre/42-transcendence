@@ -124,7 +124,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const players = this.pong.getRoomPlayers(roomId);
         this.server.to(roomId).emit('unPause', players);
       } else {
-        const username: string | undefined = await this.pong.addUser(client.id, tokenData);
+        const username: string | undefined = await this.pong.addUser(client, tokenData);
         if (username === undefined) {
           this.server.to(client.id).emit('unauthorized', { user: client.id });
         } else {

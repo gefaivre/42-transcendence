@@ -1,4 +1,7 @@
+import { Socket } from "socket.io";
+
 export type WsUser = {
+  socket: Socket;
   prismaId: number;
   socketId: string;
   username: string;

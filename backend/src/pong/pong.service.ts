@@ -11,6 +11,7 @@ import { GameStateDto } from './dto/game-state.dto';
 import { GameDto } from './dto/game.dto';
 import { RoomDto } from './dto/room.dto';
 import { RequestGameDto } from './dto/request-game.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class PongService {
@@ -29,10 +30,10 @@ export class PongService {
     return this.auth.validateToken(token)
   }
 
-   async addUser(socketId: string, tokenData: any) {
+   async addUser(socket: Socket, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
     if (user !== null) {
-      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
+      this.pongUsers.push({ socket: socket, username: user!.username, prismaId: user!.id, socketId: socket.id , lastPing: Date.now()})
       return user.username;
     }
   }

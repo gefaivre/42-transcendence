@@ -9,6 +9,7 @@ import { Post } from '@prisma/client';
 import { Muted, WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
 import { ChatRoom } from './types/ChatRoom';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChatService {
@@ -29,56 +30,47 @@ export class ChatService {
     return this.auth.validateToken(token)
   }
 
-  async addUser(socketId: string, tokenData: any): Promise<WsUser | undefined> {
+  async addUser(socket: Socket, tokenData: any): Promise<WsUser | undefined> {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
-      const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId, lastPing: Date.now()}
+      const chatUser: WsUser = { socket: socket, username: user.username, prismaId: user.id, socketId: socket.id, lastPing: Date.now()}
       this.chatUsers.push(chatUser)
       return chatUser
     }
   }
 
 
-  async banUser(socketId: string, banUsername: string, channelName: string) {
+  banUser(socketId: string, banUsername: string, channelName: string) {
     const room = this.rooms.find(room => room.id === channelName);
     if (room) {
       const user = room.users.find(user => user.socketId === socketId);
       if (user) {
-        const isAdmin = await this.channel.isAdmin(channelName, user!.prismaId);
-        if (isAdmin) {
-          if (room) {
-            const banned = room.users.find(user => user.username === banUsername);
-            if (banned) {
-              const toDel: number = room.users.indexOf(banned);
-              room.users.splice(toDel, 1);
-              return banned;
-            }
-          }
+        const banned = room.users.find(user => user.username === banUsername);
+        if (banned) {
+          const toDel: number = room.users.indexOf(banned);
+          room.users.splice(toDel, 1);
+          return banned;
+        }
+     }
+    }
+  }
+
+  kickUser(socketId: string, kickUsername: string, channelName: string) {
+    const room = this.rooms.find(room => room.id === channelName);
+    if (room) {
+      const user = room.users.find(user => user.socketId === socketId);
+      if (user) {
+        const kicked = room.users.find(user => user.username === kickUsername);
+        if (kicked) {
+          const toDel: number = room.users.indexOf(kicked);
+          room.users.splice(toDel, 1);
+          return kicked;
         }
       }
     }
   }
 
-  async kickUser(socketId: string, kickUsername: string, channelName: string) {
-    const room = this.rooms.find(room => room.id === channelName);
-    if (room) {
-      const user = room.users.find(user => user.socketId === socketId);
-      if (user) {
-        const isAdmin = await this.channel.isAdmin(channelName, user!.prismaId);
-        if (isAdmin) {
-          if (room) {
-            const kicked = room.users.find(user => user.username === kickUsername);
-            if (kicked) {
-              const toDel: number = room.users.indexOf(kicked);
-              room.users.splice(toDel, 1);
-              return kicked;
-            }
-          }
-        }
-      }
-    }
-  }
   // One username can link to multiple clients (this might/should change)
   removeUser(socketId: string) {
     const user: WsUser | undefined = this.chatUsers.find(chatUser => chatUser.socketId === socketId);
@@ -87,6 +79,10 @@ export class ChatService {
       rooms.forEach(room => {
         const toDel = room.users.indexOf(user);
         room.users.splice(toDel, 1);
+        if (room.users.length === 0) {
+          const toDel = this.rooms.indexOf(room);
+          this.rooms.splice(toDel, 1);
+        }
       });
     }
     this.chatUsers = this.chatUsers.filter(user => user.socketId !== socketId)
@@ -125,12 +121,10 @@ export class ChatService {
     return this.muteUsers.some((muted: Muted) => muted.userPrismaId === id)
   }
 
-  async joinRoom(user: WsUser, roomId: string) {
+  joinRoom(user: WsUser, roomId: string) {
     const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
     if (!room) {
-      const channel = await this.channel.findByName(roomId);
-      if (channel)
-        this.rooms.push({ id: roomId, channelId: channel.id, users: [user]});
+      this.rooms.push({ id: roomId, users: [user]});
     } else {
       room.users.push(user);
     }
@@ -141,11 +135,15 @@ export class ChatService {
     if (room) {
       const toDel: number = room.users.indexOf(user);
       room.users.splice(toDel, 1);
+      if (room.users.length === 0) {
+        const toDel: number = this.rooms.indexOf(room);
+        this.rooms.splice(toDel, 1);
+      }
     }
   }
 
-  getRoomUsers(channelId: number) {
-    const room: ChatRoom | undefined = this.rooms.find(room => room.channelId === channelId);
+  getRoomUsers(channelName: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id === channelName);
     if (room) {
       return room.users;
     }
