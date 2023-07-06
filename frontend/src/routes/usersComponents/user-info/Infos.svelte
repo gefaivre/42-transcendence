@@ -13,7 +13,6 @@
   export let onlineStatus: Status
   export let isBlocked: boolean
 
-
   async function logout() {
     try {
       await axios.get("/auth/logout");
@@ -36,6 +35,8 @@
 
       pageUser = pageUser
       $user = $user
+
+      $socket.emit('requestFriend', pageUser.username)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -46,14 +47,17 @@
       await axios.post(`/users/friendship/removeById/${pageUser.id}`, null);
 
       let index = $user.friends.findIndex(friend => friend.username === pageUser.username)
-      $user.friends.splice(index, 1);
+      if (index !== -1)
+        $user.friends.splice(index, 1);
 
       index = pageUser.friends.findIndex(friend => friend.username === $user.username)
-      pageUser.friends.splice(index, 1);
+      if (index !== -1)
+        pageUser.friends.splice(index, 1);
 
       pageUser = pageUser
       $user = $user
 
+      $socket.emit('removeFriend', pageUser.username)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -64,16 +68,19 @@
       await axios.post(`/users/friendship/cancelById/${pageUser.id}`,null);
 
       let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
-      $user.pendingFriends.splice(index, 1);
+      if (index !== -1)
+        $user.pendingFriends.splice(index, 1);
 
       index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
-      pageUser.requestFriends.splice(index, 1);
+      if (index !== -1)
+        pageUser.requestFriends.splice(index, 1);
 
       pageUser = pageUser
       $user = $user
 
+      $socket.emit('cancelFriend', pageUser.username)
     } catch (e) {
-        toast.push(e.response.data.message, {classes: ['failure']})
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -81,13 +88,14 @@
     try {
       await axios.post(`/users/friendship/acceptById/${pageUser.id}`, null);
 
-
       //delete request
       let index = $user.pendingFriends.findIndex(friend => friend.username === pageUser.username)
-      $user.pendingFriends.splice(index, 1);
+      if (index !== -1)
+        $user.pendingFriends.splice(index, 1);
 
       index = pageUser.requestFriends.findIndex(friend => friend.username === $user.username)
-      pageUser.requestFriends.splice(index, 1);
+      if (index !== -1)
+        pageUser.requestFriends.splice(index, 1);
 
       //add friendship
       pageUser.friends.unshift({ id: $user.id, username: $user.username })
@@ -96,6 +104,7 @@
       pageUser = pageUser
       $user = $user
 
+      $socket.emit('acceptFriend', pageUser.username)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -138,6 +147,7 @@
       pageUser = pageUser
       $user = $user
 
+      $socket.emit('dismissFriend', pageUser.username)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }

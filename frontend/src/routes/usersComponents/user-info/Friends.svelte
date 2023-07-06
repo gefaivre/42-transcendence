@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import axios from "../../../axios.config";
-  import { id } from "../../../stores";
+  import { id, socket } from "../../../stores";
   import type { User } from "../../../types";
   import deleteIcon from "../../../assets/new_cross.png";
   import acceptIcon from "../../../assets/new_check.png";
@@ -24,15 +24,18 @@
       await axios.post(`/users/friendship/removeByName/${name}`,null);
 
       let index = pageUser.friends.findIndex(friend => friend.username === name)
-      pageUser.friends.splice(index, 1)
+      if (index !== -1)
+        pageUser.friends.splice(index, 1)
 
       index = pageUser.friendOf.findIndex(friend => friend.username === name)
-      pageUser.friendOf.splice(index, 1)
+      if (index !== -1)
+        pageUser.friendOf.splice(index, 1)
 
       pageUser = pageUser
 
+      $socket.emit('removeFriend', name)
     } catch (e) {
-        toast.push(e.response.data.message, {classes: ['failure']})
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
@@ -41,13 +44,15 @@
       const response = await axios.post(`/users/friendship/acceptByName/${name}`, null);
 
       const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
-      pageUser.requestFriends.splice(index, 1)
+      if (index !== -1)
+        pageUser.requestFriends.splice(index, 1)
 
       const friend = response.data.friends.find((friend: any) => friend.username === name)
       pageUser.friends.unshift({ id: friend.id, username: name })
 
       pageUser = pageUser
 
+      $socket.emit('acceptFriend', name)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -58,10 +63,12 @@
       await axios.post(`/users/friendship/dismissByName/${name}`, null);
 
       const index = pageUser.requestFriends.findIndex(friend => friend.username === name)
-      pageUser.requestFriends.splice(index, 1)
+      if (index !== -1)
+        pageUser.requestFriends.splice(index, 1)
 
       pageUser = pageUser
 
+      $socket.emit('dismissFriend', name)
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -72,20 +79,26 @@
       await axios.post(`/users/friendship/cancelByName/${name}`,null);
 
       const index = pageUser.pendingFriends.findIndex(friend => friend.username === name)
-      pageUser.pendingFriends.splice(index, 1)
+      if (index !== -1)
+        pageUser.pendingFriends.splice(index, 1)
 
       pageUser = pageUser
 
+      $socket.emit('cancelFriend', pageUser.username)
     } catch (e) {
-        toast.push(e.response.data.message, {classes: ['failure']})
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
   async function unblockByUsername(username: string) {
     try {
       await axios.patch(`/users/unblock/${username}`, null);
+      const index = pageUser.blocked.findIndex(_user => _user.username === username)
+      if (index !== -1)
+        pageUser.blocked.splice(index, 1)
+      pageUser = pageUser
     } catch (e) {
-        toast.push(e.response.data.message, {classes: ['failure']})
+      toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 

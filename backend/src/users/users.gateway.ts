@@ -30,6 +30,58 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('requestFriend')
+  requestFriend(@ConnectedSocket() client: Socket, @MessageBody() username: string) {
+    const user: UserStatus | undefined = this.status.find(user => user.username === username)
+    if (user !== undefined) {
+      this.server.to(user.socketId).emit('requestFriend', client.handshake.query)
+    }
+  }
+
+  @SubscribeMessage('acceptFriend')
+  acceptFriend(@ConnectedSocket() client: Socket, @MessageBody() username: string) {
+    const user: UserStatus | undefined = this.status.find(user => user.username === username)
+    if (user !== undefined) {
+      this.server.to(user.socketId).emit('acceptFriend',
+        client.handshake.query.id,
+        client.handshake.query.username
+      )
+    }
+  }
+
+  @SubscribeMessage('removeFriend')
+  removeFriend(@ConnectedSocket() client: Socket, @MessageBody() username: string) {
+    const user: UserStatus | undefined = this.status.find(user => user.username === username)
+    if (user !== undefined) {
+      this.server.to(user.socketId).emit('removeFriend',
+        client.handshake.query.id,
+        client.handshake.query.username
+      )
+    }
+  }
+
+  @SubscribeMessage('dismissFriend')
+  dismissFriend(@ConnectedSocket() client: Socket, @MessageBody() username: string) {
+    const user: UserStatus | undefined = this.status.find(user => user.username === username)
+    if (user !== undefined) {
+      this.server.to(user.socketId).emit('dismissFriend',
+        client.handshake.query.id,
+        client.handshake.query.username
+      )
+    }
+  }
+
+  @SubscribeMessage('cancelFriend')
+  cancelFriend(@ConnectedSocket() client: Socket, @MessageBody() username: string) {
+    const user: UserStatus | undefined = this.status.find(user => user.username === username)
+    if (user !== undefined) {
+      this.server.to(user.socketId).emit('cancelFriend',
+        client.handshake.query.id,
+        client.handshake.query.username
+      )
+    }
+  }
+
   async handleConnection(@ConnectedSocket() client: Socket) {
     if (this.status.some(status => status.username === client.handshake.query.username) === false) {
       this.status.push({

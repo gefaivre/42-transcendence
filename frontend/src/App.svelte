@@ -3,13 +3,13 @@
     import chatIcon  from './assets/chat.svg'
     import gameIcon     from './assets/joystick.svg'
     import leaderboardIcon     from './assets/leaderboard.svg'
-    import { id, logged, user, reloadImage, socket } from "./stores";
+    import { id, logged, user, reloadImage} from "./stores";
     import routes from "./routes";
     import Router, { link } from "svelte-spa-router";
-    import ioClient from 'socket.io-client';
     import Connection from './routes/Connection.svelte';
     import { SvelteToast } from '@zerodevx/svelte-toast/dist';
     import { handleImageError } from './utils'
+    import ioClient from 'socket.io-client';
 
     let twoFAValue;
     const toastApp = new SvelteToast({
@@ -37,13 +37,6 @@
         user.set(response.data)
         id.set(response.data.id.toString())
         logged.set('true')
-        if ($socket === null || $socket === undefined) {
-          $socket = ioClient(axios.defaults.baseURL, {
-            path: '/user',
-            withCredentials: true,
-            query: { id: $user.id, username: $user.username }
-          })
-        }
       } catch (e) {
       }
     }
