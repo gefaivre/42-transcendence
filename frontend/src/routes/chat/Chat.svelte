@@ -12,7 +12,6 @@
     try {
       const response = await axios.get('/channel')
       channels = response.data
-      console.log(channels);
     } catch(e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }

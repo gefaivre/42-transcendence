@@ -36,7 +36,8 @@
 
     socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
-      withCredentials: true
+      withCredentials: true,
+      extraHeaders: { "dm": "true" }
     })
 
     socket.on('connect', () => {

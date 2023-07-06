@@ -226,13 +226,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
 
-    const userChannels = await this.channel.findUserChannel(user.prismaId);
-    const channelNames = userChannels.map(channel => channel.name);
-    channelNames.forEach(chanName => {
-      this.chat.joinRoom(user, chanName);
-      this.server.to(chanName).emit('userjoin', {username: user.username, channelName: chanName});
-      client.join(chanName);
-    });
+    if (client.handshake.headers.dm === "false") {
+      const userChannels = await this.channel.findUserChannel(user.prismaId);
+      const channelNames = userChannels.map(channel => channel.name);
+      channelNames.forEach(chanName => {
+        this.chat.joinRoom(user, chanName);
+        this.server.to(chanName).emit('userjoin', {username: user.username, channelName: chanName});
+        client.join(chanName);
+      });
+    }
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Connect)
   }
@@ -247,12 +249,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
 
     this.chat.removeUser(user.socketId)
-    const userRooms = this.chat.getUserRooms(user);
-    const roomNames = userRooms.map(userRoom => userRoom.id);
-    roomNames.forEach(room => {
-      client.leave(room);
-      this.server.to(room).emit('userleave', {username: user.username, channelName: room});
-    });
+
+    if (client.handshake.headers.dm === "false") {
+      const userRooms = this.chat.getUserRooms(user);
+      const roomNames = userRooms.map(userRoom => userRoom.id);
+      roomNames.forEach(room => {
+        client.leave(room);
+        this.server.to(room).emit('userleave', {username: user.username, channelName: room});
+      });
+    }
 
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)
