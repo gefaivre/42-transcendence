@@ -248,7 +248,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
 
-    this.chat.removeUser(user.socketId)
 
     if (client.handshake.headers.dm === "false") {
       const userRooms = this.chat.getUserRooms(user);
@@ -258,6 +257,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(room).emit('userleave', {username: user.username, channelName: room});
       });
     }
+    
+    this.chat.removeUser(user.socketId)
 
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)
