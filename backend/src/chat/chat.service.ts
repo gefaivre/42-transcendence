@@ -52,6 +52,7 @@ export class ChatService {
               const toDel: number = room.users.indexOf(banned);
               room.users.splice(toDel, 1);
               await this.channel.banUser(channelName, banned.prismaId);
+              await this.channel.removeUser(channelName, banned.prismaId);
               return banned;
             }
           }

@@ -86,6 +86,7 @@
       if ($user.username === msg.username) {
         toast.push("you have been banned from " +  msg.channelName);
         await reloadChannels()
+        console.log(channel);
         switchTab(Tab.AllChannels);
       }
       else {
@@ -115,9 +116,7 @@
   onDestroy(() => closeSocket())
 
   function joinChannel(channelName: string) {
-    console.log('joinChannel trigger');
     if (channelName) {
-      console.log('connectChannel trigger');
       connectChannel(channelName);
     }
   }
@@ -209,7 +208,7 @@
   function switchTab(target: Tab) {
     tab = target
     if (target === Tab.AllChannels) {
-      channelName = null
+      //channelName = null
       posts.splice(0, posts.length)
     }
   }

@@ -20,11 +20,9 @@
       password = prompt('Enter password')
       if (password === null) {
         password = ''
-        join(channel.name);
         return
       }
       else if (password === '')
-        join(channel.name);
         return toast.push('empty password', { classes: ['failure'] })
     }
 
