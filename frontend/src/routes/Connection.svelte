@@ -83,6 +83,11 @@
       return
     }
 
+   if (user.username.length > 21) {
+      toast.push('Username too long (21 chars max)', { classes: ['failure'] })
+      return
+    }
+
     if (user.password === null) {
       toast.push('Empty password', { classes: ['failure'] })
       return
