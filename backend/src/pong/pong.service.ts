@@ -144,7 +144,8 @@ export class PongService {
   }
 
   private async registerMatch(room: Room, loser: WsUser) {
-    await this.updateMmr(room, loser);
+    if (room.ranked)
+      await this.updateMmr(room, loser);
     if (loser === room.player1) {
       await this.matchs.create({ winnerId: room.player2!.prismaId,
                                       winnerScore: room.game.rightScore,
