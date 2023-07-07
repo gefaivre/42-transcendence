@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
@@ -6,6 +6,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { Prisma, User } from '@prisma/client';
+import { UsersGateway } from 'src/users/users.gateway';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +14,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly users: UsersService,
+    private readonly usersgateway: UsersGateway
   ) {}
 
   // If you cycle through this loop, well, someone stole your login (Ò.Ó)
@@ -97,6 +99,9 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Req() req: any, @Res({ passthrough: true }) response: Response) {
+
+    if (this.usersgateway.status.some(status => status.username === req.user.username) === true)
+      throw new UnauthorizedException('user already logged')
 
     // if 2FA enabled, we will issue a second jwt after authentication complete
     const jwtKey = req.user.TwoFA === true ? 'jwt2fa' : 'jwt'
