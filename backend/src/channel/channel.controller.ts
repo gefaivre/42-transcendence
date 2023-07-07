@@ -80,8 +80,8 @@ export class ChannelController {
     // None of the above pipes act as unconditionnal guarantees.
     try {
       await this.channel.removeUser(channel.name, user.id)
-      this.logger.log(`user ${request.user.id} banned user ${user.id} from channel ${channel.name}`)
-      return `user ${request.user.id} banned user ${user.id} from channel ${channel.name}`
+      this.logger.log(`user ${request.user.id} kicked user ${user.id} from channel ${channel.name}`)
+      return `user ${request.user.id} kicked user ${user.id} from channel ${channel.name}`
     } catch(e) {
       throw new UnauthorizedException(`cannot remove user ${user.id} from channel ${channel.name} (internal error)`)
     }

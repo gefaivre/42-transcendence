@@ -34,6 +34,18 @@ export class ChannelService {
     });
   }
 
+  findUserChannel(userId: number) {
+    return this.prisma.channel.findMany({
+      where : {
+        users: {
+          some: {
+            id: userId
+          }
+        }
+      }
+    });
+  }
+
   findById(channelId: number)  {
     return this.prisma.channel.findUnique({
       where: {

@@ -6,7 +6,7 @@
   import Channel from "./Channel.svelte";
   import { toast } from '@zerodevx/svelte-toast/dist'
 
-  let channels: any[] = []
+  let channels: any[] = [];
 
   async function getAllChannels() {
     try {
@@ -15,7 +15,16 @@
     } catch(e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
-  }
+  };
+
+  let chanjoined: string = '';
+  let triggerCount: number = 0;
+
+  function joinChannel(channelName: string) {
+    chanjoined  = channelName;
+    triggerCount++;
+  };
+
 
 </script>
 
@@ -27,11 +36,11 @@
 
     <DirectMessage/>
 
-    <Channel bind:channels reloadChannels={getAllChannels}/>
+    <Channel bind:channels reloadChannels={getAllChannels} joinChan={chanjoined} count={triggerCount}/>
 
-    <Create reloadChannels={getAllChannels}/>
+    <Create reloadChannels={getAllChannels} join={joinChannel}/>
 
-    <PublicView bind:channels reloadChannels={getAllChannels}/>
+    <PublicView bind:channels reloadChannels={getAllChannels} join={joinChannel}/>
 
   </div>
 

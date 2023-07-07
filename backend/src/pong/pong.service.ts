@@ -11,6 +11,7 @@ import { GameStateDto } from './dto/game-state.dto';
 import { GameDto } from './dto/game.dto';
 import { RoomDto } from './dto/room.dto';
 import { RequestGameDto } from './dto/request-game.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class PongService {
@@ -32,7 +33,7 @@ export class PongService {
    async addUser(socketId: string, tokenData: any) {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
     if (user !== null) {
-      this.pongUsers.push({ username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
+      this.pongUsers.push({username: user!.username, prismaId: user!.id, socketId: socketId , lastPing: Date.now()})
       return user.username;
     }
   }
@@ -309,16 +310,16 @@ export class PongService {
       await this.users.updateGameStats(loser.username, loser.games + 1, loserMmr);
       await this.users.updateGameStats(winner.username, winner.games + 1, winnerMmr);
     }
-  } 
+  }
 
   getUserById(prismaId: number) {
     return this.pongUsers.find(user => user.prismaId === prismaId);
   }
 
- 
+
   isLagging(socketId: string) {
     const user: WsUser | undefined = this.getUserBySocketId(socketId)
-    
+
     if (user) {
       if (Date.now() - user.lastPing > 4000) {
         user.lastPing = Date.now();
@@ -353,7 +354,7 @@ export class PongService {
       }
     }
   }
-  
+
   isTimeout(roomId: string) {
     const room: Room | undefined = this.rooms.find(room => room.id == roomId);
 
@@ -372,16 +373,16 @@ export class PongService {
     }
     return false;
   }
-  
+
   getRoomId(clientId: string) {
     const room: Room | undefined = this.rooms.find(room => room.player1.socketId === clientId || room.player2?.socketId === clientId);
-    if (room) 
+    if (room)
       return room.id;
   }
 
   getRemainingId(roomId: string) {
     const room: Room | undefined = this.rooms.find(room => room.id == roomId);
-    
+
     if (room && room.disconnected) {
       if (room.disconnected.user.socketId === room.player1.socketId && room.player2)
         return room.player2.socketId;

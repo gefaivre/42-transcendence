@@ -12,6 +12,8 @@
 
   let password: string = ''
 
+  export let join: (channelName: string) => void;
+
   async function joinChannel(channel: any) {
 
     if (channel.status === ChannelStatus.Protected) {
@@ -31,6 +33,7 @@
         status: channel.status
       } as ChannelDto)
       await reloadChannels()
+      join(channel.name);
       toast.push(`Successfully joined ${channel.name}`, { classes: ['success'] })
       password = ''
     } catch(e) {

@@ -30,6 +30,14 @@
 
   export let channels: any[]
   export let reloadChannels = async () => {}
+  export let joinChan: string = '';
+  export let count: number = 0;
+
+  export function joinWSRoom(channelName: string) {
+    console.log("test join from Channel.svelte");
+    console.log(channelName);
+  };
+
 
   $: listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
 
@@ -37,7 +45,8 @@
 
     socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
-      withCredentials: true
+      withCredentials: true,
+      query: { dm: 'false', username: $user.username }
     })
 
     socket.on('connect', () => {
@@ -49,10 +58,12 @@
     socket.on('post', async (post: PostEmitDto) => {
       if (!($user.blocked.some(user => user.username === post.author) === true))
       {
-        posts.push(post)
-        posts = posts
-        await delay(100);
-        chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+          if (post.channelName == channelName) {
+          posts.push(post)
+          posts = posts
+          await delay(100);
+          chatbox.scroll({ top: chatbox.scrollHeight + 10000, behavior: 'smooth'})
+        }
       }
     })
 
@@ -60,26 +71,72 @@
       toast.push(e.message, { classes: ['failure'] })
     })
 
-    // TODO: typedef event
-    socket.on('channelEvent', (event: any) => {
-      if (event.event === 'join') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} joined the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
+    socket.on('userleave', async(msg) => {
+      if ($user.username !== msg.username)
+        toast.push(msg.username + " has left " +  msg.channelName);
+      await reloadChannels();
+      if (channelName)
+        await getChannel();
+    });
+
+    socket.on('userjoin', async(msg) => {
+      if ($user.username !== msg.username)
+        toast.push(msg.username + " has joined " +  msg.channelName);
+      await reloadChannels();
+      if (channelName)
+        await getChannel();
+    });
+
+    socket.on('userban', async (msg) => {
+      console.log('userban');
+      if ($user.username === msg.username) {
+        toast.push("you have been banned from " +  msg.channelName);
+        await reloadChannels()
+        console.log(channel);
+        switchTab(Tab.AllChannels);
       }
-      else if (event.event === 'leave') {
-        const post: PostEmitDto = { channelName: '', content: `${event.user} left the channel`, author: 'Event' }
-        posts.push(post)
-        posts = posts
+      else {
+        toast.push(msg.username + " has been banned from " +  msg.channelName);
+        await reloadChannels()
+        if (channelName)
+          getChannel();
       }
-    })
+    });
+
+    socket.on('userkick', async (msg) => {
+      if ($user.username === msg.username) {
+        toast.push("you have been kicked from " +  msg.channelName);
+        await reloadChannels()
+        switchTab(Tab.AllChannels);
+      }
+      else {
+        toast.push(msg.username + " has been kicked from " +  msg.channelName);
+        await reloadChannels()
+        if (channelName)
+          getChannel();
+      }
+    });
+
+
   })
 
+  $: count && socket && joinChannel(joinChan);
+
   onDestroy(() => closeSocket())
+
+  async function joinChannel(_channelName: string) {
+    if (_channelName) {
+      socket.emit('joinRoom', _channelName);
+      channelName = _channelName;
+      await getChannel()
+      tab = Tab.OneChannel
+    }
+  }
 
   async function leaveChannel(name: string) {
     try {
       await axios.patch(`/channel/leave/${name}`)
+      socket.emit('leaveRoom', name);
       await reloadChannels()
     } catch(e) {
       toast.push(e.response.data.message, {classes: ['failure']})
@@ -120,7 +177,8 @@
   async function revokeAdmin(id: number) {
     try {
       await axios.patch(`/channel/revoke/${channel.name}/${id}`, null)
-      getChannel()
+      if (channelName)
+       await getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -129,16 +187,29 @@
   async function promoteAdmin(id: number) {
     try {
       await axios.patch(`/channel/promote/${channel.name}/${id}`, null)
-      getChannel()
+      await getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
   }
 
-  async function ban(userId: number) {
+  async function ban(username: string, userId: number, channelName: string) {
     try {
       await axios.delete(`/channel/ban/${channel.name}/${userId}`)
-      getChannel()
+      socket.emit('ban', { username: username, channelName: channelName });
+      if (channelName)
+       await getChannel()
+    } catch (e) {
+      toast.push(e.response.data.message, {classes: ['failure']})
+    }
+  }
+
+  async function kick(username: string, userId: number, channelName: string) {
+    try {
+      await axios.delete(`/channel/kick/${channel.name}/${userId}`)
+      socket.emit('kick', { username: username, channelName: channelName });
+      if (channelName)
+        await getChannel()
     } catch (e) {
       toast.push(e.response.data.message, {classes: ['failure']})
     }
@@ -154,27 +225,17 @@
     })
   }
 
-  async function kick(userId: number) {
-    try {
-      await axios.delete(`/channel/kick/${channel.name}/${userId}`)
-      getChannel()
-    } catch (e) {
-      toast.push(e.response.data.message, {classes: ['failure']})
-    }
-  }
-
   async function connectChannel(_channel: string) {
-    tab = Tab.OneChannel
     channelName = _channel
+    socket.emit('getChanPosts', _channel);
     await getChannel()
-    socket.emit('joinRoom', channelName)
+    tab = Tab.OneChannel
   }
 
   function switchTab(target: Tab) {
     tab = target
     if (target === Tab.AllChannels) {
-      socket.emit('leaveRoom', channelName)
-      channelName = null
+      channelName = null;
       posts.splice(0, posts.length)
     }
   }
@@ -356,8 +417,8 @@
                 <details class="dropdown">
                   <summary class="m-1 btn btn-xs">settings</summary>
                   <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
-                    <li><button on:click={() => kick(admin.id)}>kick</button></li>
-                    <li><button on:click={() => ban(admin.id)}>ban</button></li>
+                    <li><button on:click={() => kick(admin.username, admin.id, channel.name)}>kick</button></li>
+                    <li><button on:click={() => ban(admin.username, admin.id, channel.name)}>ban</button></li>
                     <li><button on:click={() => revokeAdmin(admin.id)}>down</button></li>
                   </ul>
                 </details>
@@ -373,8 +434,8 @@
                 <ul class="menu dropdown-content bg-base-100 rounded-box w-30">
                   <li><a contenteditable="false" href="#/users/{_user.username}">profile</a></li>
                   {#if channel.admins.some(admin => admin.username === $user.username)}
-                    <li><button on:click={() => ban(_user.id)}>ban</button></li>
-                    <li><button on:click={() => kick(_user.id)}>kick</button></li>
+                    <li><button on:click={() => ban(_user.username, _user.id, channel.name)}>ban</button></li>
+                    <li><button on:click={() => kick(_user.username, _user.id,  channel.name)}>kick</button></li>
                     <li><button on:click={() => mute(_user.id)}>mute(30s)</button></li>
                     <li><button on:click={() => promoteAdmin(_user.id)}>up</button></li>
                   {/if}

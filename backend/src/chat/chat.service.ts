@@ -9,6 +9,7 @@ import { Post } from '@prisma/client';
 import { Muted, WsUser } from 'src/types';
 import { PostEmitDto } from './dto/post.dto';
 import { ChatRoom } from './types/ChatRoom';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChatService {
@@ -39,8 +40,55 @@ export class ChatService {
     }
   }
 
+
+  banUser(socketId: string, banUsername: string, channelName: string) {
+    const room = this.rooms.find(room => room.id === channelName);
+    if (room) {
+      const user = room.users.find(user => user.socketId === socketId);
+      if (user) {
+        const banned = room.users.find(user => user.username === banUsername);
+        if (banned) {
+          const toDel: number = room.users.indexOf(banned);
+          if (toDel !== -1)
+            room.users.splice(toDel, 1);
+          return banned;
+        }
+     }
+    }
+  }
+
+  kickUser(socketId: string, kickUsername: string, channelName: string) {
+    const room = this.rooms.find(room => room.id === channelName);
+    if (room) {
+      const user = room.users.find(user => user.socketId === socketId);
+      if (user) {
+        const kicked = room.users.find(user => user.username === kickUsername);
+        if (kicked) {
+          const toDel: number = room.users.indexOf(kicked);
+          if (toDel !== -1)
+            room.users.splice(toDel, 1);
+          return kicked;
+        }
+      }
+    }
+  }
+
   // One username can link to multiple clients (this might/should change)
   removeUser(socketId: string) {
+    const user: WsUser | undefined = this.chatUsers.find(chatUser => chatUser.socketId === socketId);
+    if (user) {
+      const rooms: ChatRoom[] | undefined = this.getUserRooms(user);
+      rooms.forEach(room => {
+        const toDel = room.users.indexOf(user);
+        if (toDel !== -1)
+          room.users.splice(toDel, 1);
+        if (room.users.length === 0) {
+          const toDel = this.rooms.indexOf(room);
+          if (toDel !== -1)
+            this.rooms.splice(toDel, 1);
+        }
+      });
+    }
     this.chatUsers = this.chatUsers.filter(user => user.socketId !== socketId)
   }
 
@@ -77,12 +125,10 @@ export class ChatService {
     return this.muteUsers.some((muted: Muted) => muted.userPrismaId === id)
   }
 
-  async joinRoom(user: WsUser, roomId: string) {
+  joinRoom(user: WsUser, roomId: string) {
     const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
     if (!room) {
-      const channel = await this.channel.findByName(roomId);
-      if (channel)
-      this.rooms.push({ id: roomId, channelId: channel.id, users: [user]});
+      this.rooms.push({ id: roomId, users: [user]});
     } else {
       room.users.push(user);
     }
@@ -92,14 +138,40 @@ export class ChatService {
     const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
     if (room) {
       const toDel: number = room.users.indexOf(user);
-      room.users.splice(toDel, 1);
+      if (toDel !== -1)
+        room.users.splice(toDel, 1);
+      if (room.users.length === 0) {
+        const toDel: number = this.rooms.indexOf(room);
+        if (toDel !== -1)
+          this.rooms.splice(toDel, 1);
+      }
     }
   }
 
-  getRoomUsers(channelId: number) {
-    const room: ChatRoom | undefined = this.rooms.find(room => room.channelId === channelId);
+  getRoomUsers(channelName: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id === channelName);
     if (room) {
       return room.users;
     }
   }
+
+  getUserRooms(user: WsUser) {
+    let rooms: ChatRoom[] = [];
+    this.rooms.forEach(room => {
+      if (room.users.find(roomUser => roomUser.prismaId === user.prismaId))
+        rooms.push(room);
+    });
+    return rooms;
+  }
+
+  alreadyInRoom(chatUser: WsUser, roomId: string) {
+    const room: ChatRoom | undefined = this.rooms.find(room => room.id === roomId);
+    if (room) {
+      const already = room.users.find(user => user.username === chatUser.username);
+      if (already)
+        return true;
+    }
+    return false;
+  }
+
 }
