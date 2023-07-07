@@ -140,8 +140,8 @@ export class ChannelService {
         newOwner = channel.users.find(user => user.id !== userId)
 
       // promote new owner as admin if not already
-      if (channel.admins.some(admin => admin.id === newOwner?.id) === true)
-        this.promoteAdmin(channelName, newOwner?.id as number)
+      if (channel.admins.some(admin => admin.id === newOwner?.id) === false)
+        await this.promoteAdmin(channelName, newOwner?.id as number)
 
       // set new owner
       try {
