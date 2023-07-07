@@ -249,7 +249,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const userChannels = await this.channel.findUserChannel(user.prismaId);
       const channelNames = userChannels.map(channel => channel.name);
       channelNames.forEach(roomName => {
-        this.server.to(roomName).emit('userjoin', { username: user.username, channelName: roomName});
+        // this.server.to(roomName).emit('userjoin', { username: user.username, channelName: roomName});
         this.chat.joinRoom(user, roomName);
         client.join(roomName);
       });
@@ -274,7 +274,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const roomNames = userRooms.map(userRoom => userRoom.id);
       roomNames.forEach(room => {
         client.leave(room);
-        this.server.to(room).emit('userleave', {username: user.username, channelName: room});
+        // this.server.to(room).emit('userleave', {username: user.username, channelName: room});
         this.chat.leaveRoom(user, room);
       });
     }
