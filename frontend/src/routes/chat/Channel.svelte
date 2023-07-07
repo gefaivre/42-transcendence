@@ -38,7 +38,7 @@
     console.log(channelName);
   };
 
-  
+
   $: listChannel = channels.filter(channel => channel.users.some(_user => _user.username == $user.username))
 
   onMount(() => {
@@ -46,7 +46,7 @@
     socket = ioClient(axios.defaults.baseURL, {
       path: '/chat',
       withCredentials: true,
-      extraHeaders: { "dm": "false" }
+      query: { dm: 'false', username: $user.username }
     })
 
     socket.on('connect', () => {

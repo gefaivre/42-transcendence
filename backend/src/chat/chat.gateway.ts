@@ -59,13 +59,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
 
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
     const user: WsUser = this.chat.chatUsers.find(user => user.socketId === client.id) as WsUser
 
-    if (this.chat.alreadyInRoom(user, room)) 
+    if (this.chat.alreadyInRoom(user, room))
       return ;
 
     this.server.to(room).emit('userjoin', { username: user.username, channelName: room });
@@ -88,7 +88,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
@@ -103,29 +103,33 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('ban')
   async handleBan(@ConnectedSocket() client: Socket, @MessageBody() ban: BanKickDto) {
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
     const banned: WsUser | undefined = this.chat.banUser(client.id, ban.username, ban.channelName);
     if (banned) {
       this.server.to(ban.channelName).emit('userban', { channelName: ban.channelName, username: banned.username });
-      banned.socket.leave(ban.channelName);
+      const roomSockets = await this.server.in(ban.channelName).fetchSockets();
+      const bannedSocket = roomSockets.find(socket => socket.handshake.query.username === ban.username)
+      bannedSocket?.leave(ban.channelName)
     }
   }
 
   @SubscribeMessage('kick')
   async handleKick(@ConnectedSocket() client: Socket, @MessageBody() kick: BanKickDto) {
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
     const kicked: WsUser | undefined = this.chat.kickUser(client.id, kick.username, kick.channelName);
     if (kicked) {
       this.server.to(kick.channelName).emit('userkick', { channelName: kick.channelName, username: kicked.username });
-      kicked.socket.leave(kick.channelName);
+      const roomSockets = await this.server.in(kick.channelName).fetchSockets();
+      const bannedSocket = roomSockets.find(socket => socket.handshake.query.username === kick.username)
+      bannedSocket?.leave(kick.channelName)
     }
   }
 
   @SubscribeMessage('sendPost')
   async handlePost(@ConnectedSocket() client: Socket, @MessageBody() post: PostDto) {
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
@@ -166,7 +170,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('sendDirectMessage')
   async handleSendDirectMessage(@ConnectedSocket() client: Socket, @MessageBody() message: SendDirectMessageDto) {
 
-    if (client.handshake.headers.dm === "false")
+    if (client.handshake.query.dm === "false")
       return;
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
@@ -203,7 +207,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // TODO: log must precise from which channel user has been muted
   @SubscribeMessage('mute')
   async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: MuteDto) {
-    if (client.handshake.headers.dm === "true")
+    if (client.handshake.query.dm === "true")
       return;
 
     // Since `ChatGuard` has been applied we assume `user` is not undefined
@@ -240,12 +244,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.AuthCookieNotFound)
 
     const tokenData: any = await this.chat.validateUser(authHeader)
-    const user: WsUser | undefined = await this.chat.addUser(client, tokenData)
+    const user: WsUser | undefined = await this.chat.addUser(client.id, tokenData)
 
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Connect, WsFailureCause.UserNotFound)
 
-    if (client.handshake.headers.dm === "false") {
+    if (client.handshake.query.dm === "false") {
       const userChannels = await this.channel.findUserChannel(user.prismaId);
       const channelNames = userChannels.map(channel => channel.name);
       channelNames.forEach(roomName => {
@@ -268,8 +272,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user === undefined)
       return this.lifecycleHookFailure(client.id, WsActionFailure.Disconnect, WsFailureCause.UserNotFound)
 
-
-    if (client.handshake.headers.dm === "false") {
+    if (client.handshake.query.dm === "false") {
       const userRooms = this.chat.getUserRooms(user);
       const roomNames = userRooms.map(userRoom => userRoom.id);
       roomNames.forEach(room => {
@@ -278,7 +281,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.chat.leaveRoom(user, room);
       });
     }
-    
+
     this.chat.removeUser(user.socketId)
 
     return this.lifecycleHookSuccess(user, WsActionSuccess.Disconnect)

@@ -33,7 +33,6 @@ export class UsersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(@ConnectedSocket() client: Socket) {
     if (this.status.some(status => status.username === client.handshake.query.username) === false) {
       this.status.push({
-        socket: client,
         username: client.handshake.query.username as string,
         prismaId: +(client.handshake.query.id as string),
         socketId: client.id,

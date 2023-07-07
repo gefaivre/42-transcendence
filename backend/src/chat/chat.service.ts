@@ -30,11 +30,11 @@ export class ChatService {
     return this.auth.validateToken(token)
   }
 
-  async addUser(socket: Socket, tokenData: any): Promise<WsUser | undefined> {
+  async addUser(socketId: string, tokenData: any): Promise<WsUser | undefined> {
     const user: Omit<User, 'password'> | null = await this.users.findById(tokenData.sub);
 
     if (user !== null) {
-      const chatUser: WsUser = { socket: socket, username: user.username, prismaId: user.id, socketId: socket.id, lastPing: Date.now()}
+      const chatUser: WsUser = { username: user.username, prismaId: user.id, socketId: socketId, lastPing: Date.now()}
       this.chatUsers.push(chatUser)
       return chatUser
     }
