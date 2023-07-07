@@ -49,7 +49,8 @@ export class ChatService {
         const banned = room.users.find(user => user.username === banUsername);
         if (banned) {
           const toDel: number = room.users.indexOf(banned);
-          room.users.splice(toDel, 1);
+          if (toDel !== -1)
+            room.users.splice(toDel, 1);
           return banned;
         }
      }
@@ -64,7 +65,8 @@ export class ChatService {
         const kicked = room.users.find(user => user.username === kickUsername);
         if (kicked) {
           const toDel: number = room.users.indexOf(kicked);
-          room.users.splice(toDel, 1);
+          if (toDel !== -1)
+            room.users.splice(toDel, 1);
           return kicked;
         }
       }
@@ -78,10 +80,12 @@ export class ChatService {
       const rooms: ChatRoom[] | undefined = this.getUserRooms(user);
       rooms.forEach(room => {
         const toDel = room.users.indexOf(user);
-        room.users.splice(toDel, 1);
+        if (toDel !== -1)
+          room.users.splice(toDel, 1);
         if (room.users.length === 0) {
           const toDel = this.rooms.indexOf(room);
-          this.rooms.splice(toDel, 1);
+          if (toDel !== -1)
+            this.rooms.splice(toDel, 1);
         }
       });
     }
@@ -134,10 +138,12 @@ export class ChatService {
     const room: ChatRoom | undefined = this.rooms.find(room => room.id == roomId);
     if (room) {
       const toDel: number = room.users.indexOf(user);
-      room.users.splice(toDel, 1);
+      if (toDel !== -1)
+        room.users.splice(toDel, 1);
       if (room.users.length === 0) {
         const toDel: number = this.rooms.indexOf(room);
-        this.rooms.splice(toDel, 1);
+        if (toDel !== -1)
+          this.rooms.splice(toDel, 1);
       }
     }
   }

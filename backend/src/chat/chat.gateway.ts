@@ -280,8 +280,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const userRooms = this.chat.getUserRooms(user);
       const roomNames = userRooms.map(userRoom => userRoom.id);
       roomNames.forEach(room => {
-        client.leave(room);
         // this.server.to(room).emit('userleave', {username: user.username, channelName: room});
+        client.leave(room);
         this.chat.leaveRoom(user, room);
       });
     }
