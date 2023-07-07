@@ -47,6 +47,10 @@
       toast.push(e.message, {classes: ['failure']})
     })
 
+    socket.on('changeName', () => {
+      toast.push('This user changed his name. You might want to reload the page before sending dm');
+    });
+
     socket.on('dm', async (_message: string, sender: string, date: Date) => {
       const dm: DirectMessage = {
         content: _message,
@@ -172,7 +176,7 @@
       <div class="chatbox" bind:this={chatbox}>
         <ul class="message-list">
           {#each messages as _message}
-            {#if _message.sender !== chatUser}
+            {#if _message.sender === $user.username}
             <li class="msg sender">
             <span class="date">{_message.date}</span><br>
             <span class="content">{_message.content}</span></li>
