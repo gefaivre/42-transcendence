@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ConflictException, UnprocessableEntityException, NotFoundException, ParseIntPipe, UseFilters, Res, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUsernameDto, UpdatePasswordDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,6 +31,10 @@ export class UsersController {
 
   @Patch('username')
   async updateUsername(@Body() body: UpdateUsernameDto, @Req() req: any) {
+
+    // would be cleaner to use `@MaxLength()`into `CreateUserDto`
+    if (body.username.length > 21)
+      throw new UnauthorizedException('Username too long (21 chars max)')
 
     try {
       await this.users.updateUsername(req.user.username, body.username);

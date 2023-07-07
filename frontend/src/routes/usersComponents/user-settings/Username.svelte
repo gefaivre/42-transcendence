@@ -7,10 +7,17 @@
   let username: string = null;
 
   async function updateUsername() {
+
     if (username === null) {
       toast.push('Empty username', { classes: ['failure'] })
       return
     }
+
+   if (username.length > 21) {
+      toast.push('Username too long (21 chars max)', { classes: ['failure'] })
+      return
+    }
+
     if (username === $user.username) {
       toast.push('Same username', { classes: ['failure'] })
       return

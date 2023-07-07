@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Patch, Query, Res, Req, UseGuards, Post, Body, ConflictException, UnprocessableEntityException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { UsersService } from '../users/users.service';
@@ -73,6 +73,10 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() body: CreateUserDto) {
+
+    // would be cleaner to use `@MaxLength()`into `CreateUserDto`
+    if (body.username.length > 21)
+      throw new UnauthorizedException('Username too long (21 chars max)')
 
     // hash password
     try {
